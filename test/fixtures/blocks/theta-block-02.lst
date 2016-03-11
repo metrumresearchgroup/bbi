@@ -1,0 +1,6 @@
+$THETA (0,2720) ; CL
+$THETA(0,2650) ; V2
+ $THETA (0,7730) ; V3
+ (0,3410) ; CL2
+ $THETA(0,0.232) FIX ; KA transit
+ 0.75 FIX ; allo-WT
