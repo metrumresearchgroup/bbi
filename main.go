@@ -1,37 +1,18 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"os"
+
+	"github.com/dpastoor/go-nm-utils/nonmemutils"
 )
 
-// readLines reads a whole file into memory
-// and returns a slice of its lines.
-func readLines(path string) ([]string, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	var lines []string
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
-	}
-	return lines, scanner.Err()
-}
-
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
 func main() {
-	lines, err := readLines("test/fixtures/blocks/theta-block1.lst")
-	check(err)
-	for i, line := range lines {
-		fmt.Println(i, line)
-	}
+	// file, _ := ioutil.ReadFile("./test/fixtures/blocks/theta-block-01.lst")
+	// // will need to check this also works as expected on windows and doesn't
+	// // keep the \r as well, couldt ry something like runtime.GOOS == "windows"
+	// newFile := strings.Split(string(file), "\n")
+	// for i, f := range newFile {
+	// 	fmt.Println(i, f)
+	// }
+	fmt.Println(nonmemutils.CleanThetaBlock([]string{"$THETA", "0 FIX"}))
 }
