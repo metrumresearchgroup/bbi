@@ -1,4 +1,4 @@
-package nonmemutils
+package parser
 
 import (
 	"regexp"

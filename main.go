@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/dpastoor/nonmemutils/nonmemutils"
+	"github.com/dpastoor/nonmemutils/parser"
 )
 
 func main() {
@@ -40,5 +40,5 @@ func main() {
 	// 	fmt.Println(formattedString[i])
 	// }
 
-	fmt.Println(nonmemutils.ParseOmegaResults(omegaResult01))
+	fmt.Println(parser.ParseOmegaResults(omegaResult01))
 }
