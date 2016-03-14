@@ -16,8 +16,8 @@
 3. NM-TRAN MESSAGES
 4. NM version
 5. TOT NO. OF OBS RECS
-6. TOT NO. OF INDIVIDUALS
-7. INITAL ESTIMATE THETA
+6. TOT NO. OF INDIVIDUAL
+7. INITIAL ESTIMATE THETA
 8. INITIAL ESTIMATE OMEGA
 9. INITIAL ESTIMATE SIGMA
 10. CPUTIME, Seconds
@@ -25,3 +25,30 @@
 
 additional things down the line?
 SIMULATION SEED
+
+
+## nonmem terms
+
+- `#TERM` 
+
+    - minimization status
+    - Function evaluations
+    - Sig digs of final estimate
+
+Etashrink (%)
+EPSshrink (%)(
+
+
+- `#TERE`
+    - Elapsed estimation time (seconds)
+    - Elapsed covariance time (seonds)
+
+`#OBJV`
+    - Objective function value
+   
+
+***... FINAL PARAMETER ESTIMATE ...***
+
+
+***... STANDARD ERROR OF ESTIMATE ...***
+    
