@@ -6,7 +6,7 @@ import (
 )
 
 // ParseOmegaResults parses omega results
-func ParseOmegaResults(lines []string) []string {
+func ParseBlockResults(lines []string) []string {
 	var omegaLine string
 	r := regexp.MustCompile("E[\\+|\\-]")
 	for _, line := range lines {
