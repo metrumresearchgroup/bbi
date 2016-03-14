@@ -35,7 +35,6 @@ func ParseFinalParameterEstimates(lines []string) FinalParameterEstimates {
 			continue
 		}
 	}
-	fmt.Println(thetaStart, omegaStart, sigmaStart, omegaCorrStart, sigmaCorrStart)
 	thetaParsed := ParseThetaResults(lines[thetaStart:omegaStart])
 	omegaParsed := ParseBlockResults(lines[omegaStart:sigmaStart])
 	sigmaParsed := ParseBlockResults(lines[sigmaStart:omegaCorrStart])

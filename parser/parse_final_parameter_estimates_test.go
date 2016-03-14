@@ -1,6 +1,9 @@
 package parser
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
 var finalParameterEstimates01 = []string{
 	"********************                             FINAL PARAMETER ESTIMATE                           ********************",
@@ -62,7 +65,34 @@ var finalParameterEstimates01 = []string{
 	"1",
 }
 
+var finalParameterEstimates01Results = FinalParameterEstimates{
+	[]string{"4.79E+00", "9.02E+01", "7.47E+00", "1.05E+02"},
+	[]string{"1.58E-01", "1.22E-01", "1.33E-01"},
+	[]string{"1.45E+03", "0.00E+00", "7.39E-03"},
+	[]string{"3.98E-01", "8.42E-01", "3.65E-01"},
+	[]string{"3.81E+01", "0.00E+00", "8.60E-02"},
+}
+
 func TestParseFinalParameterEstimates(t *testing.T) {
-	t.Log("no test")
-	t.Fail()
+	parsedData := ParseFinalParameterEstimates(finalParameterEstimates01)
+	if !reflect.DeepEqual(parsedData.Theta, finalParameterEstimates01Results.Theta) {
+		t.Log("Got: ", parsedData.Theta, "Expected: ", finalParameterEstimates01Results.Theta)
+		t.Fail()
+	}
+	if !reflect.DeepEqual(parsedData.Omega, finalParameterEstimates01Results.Omega) {
+		t.Log("Got: ", parsedData.Omega, "Expected: ", finalParameterEstimates01Results.Omega)
+		t.Fail()
+	}
+	if !reflect.DeepEqual(parsedData.Sigma, finalParameterEstimates01Results.Sigma) {
+		t.Log("Got: ", parsedData.Sigma, "Expected: ", finalParameterEstimates01Results.Sigma)
+		t.Fail()
+	}
+	if !reflect.DeepEqual(parsedData.OmegaCorr, finalParameterEstimates01Results.OmegaCorr) {
+		t.Log("Got: ", parsedData.OmegaCorr, "Expected: ", finalParameterEstimates01Results.OmegaCorr)
+		t.Fail()
+	}
+	if !reflect.DeepEqual(parsedData.SigmaCorr, finalParameterEstimates01Results.SigmaCorr) {
+		t.Log("Got: ", parsedData.SigmaCorr, "Expected: ", finalParameterEstimates01Results.SigmaCorr)
+		t.Fail()
+	}
 }
