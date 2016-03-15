@@ -1,0 +1,8 @@
+build:
+    box: google/golang
+    steps:
+
+    # Test the project
+    - script:
+        name: go test
+        code: go test ./...
