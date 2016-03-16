@@ -4,6 +4,7 @@ import (
 	"strings"
 )
 
+// FinalParameterEstimates contains the final parameter estimate values
 type FinalParameterEstimates struct {
 	Theta     []string
 	Omega     []string
@@ -12,6 +13,7 @@ type FinalParameterEstimates struct {
 	SigmaCorr []string
 }
 
+// ParseFinalParameterEstimates parses the final estimates of model parameters from lst file
 func ParseFinalParameterEstimates(lines []string) FinalParameterEstimates {
 	var thetaStart int
 	var omegaStart int

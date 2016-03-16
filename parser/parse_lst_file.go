@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 )
@@ -8,6 +9,7 @@ import (
 // LstData is the output struct from a lst file
 type LstData struct {
 	FinalParameterEstimates FinalParameterEstimates
+	ParameterNames          ParameterNames
 	OFV                     float64
 }
 
@@ -22,25 +24,33 @@ func parseOFV(line string) float64 {
 // ParseLstEstimationFile parses the lst file
 func ParseLstEstimationFile(lines []string) LstData {
 
-	var ofvLine int
-	var finalParameterEstimatesLine int
-	var standardErrorEstimateLine int
-
+	var ofvIndex int
+	var finalParameterEstimatesIndex int
+	var standardErrorEstimateIndex int
+	var startThetaIndex int
+	var endSigmaIndex int
 	for i, line := range lines {
 		switch {
+		case strings.Contains(line, "$THETA") && startThetaIndex == 0:
+			startThetaIndex = i
+		case strings.Contains(line, "$EST") && endSigmaIndex == 0:
+			endSigmaIndex = i
 		case strings.Contains(line, "#OBJV"):
-			ofvLine = i
+			ofvIndex = i
 		case strings.Contains(line, "FINAL PARAMETER ESTIMATE"):
 			// want to go 3 more lines to get into text not labelled block
-			finalParameterEstimatesLine = i + 3
+			finalParameterEstimatesIndex = i + 3
 		case strings.Contains(line, "STANDARD ERROR OF ESTIMATE"):
-			standardErrorEstimateLine = i + 3
+			standardErrorEstimateIndex = i + 3
 		}
-
 	}
+
+	fmt.Println(startThetaIndex, endSigmaIndex)
+
 	result := LstData{
-		ParseFinalParameterEstimates(lines[finalParameterEstimatesLine:standardErrorEstimateLine]),
-		parseOFV(lines[ofvLine]),
+		ParseFinalParameterEstimates(lines[finalParameterEstimatesIndex:standardErrorEstimateIndex]),
+		ParseParameterNames(lines[startThetaIndex:endSigmaIndex]),
+		parseOFV(lines[ofvIndex]),
 	}
 	return result
 }
