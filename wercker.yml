@@ -3,11 +3,12 @@ build:
     steps:
 
     # Build the project
-    - script:
-        name: go build
-        code: |
-          go build ./...
-      # Test the project
+      - script:
+          name: go build
+          code: |
+            go build ./...
+
+    # Test the project
       - script:
           name: go test
           code: go test ./...
