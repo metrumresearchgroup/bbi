@@ -1,17 +1,33 @@
 package parser
 
 import (
-	"io/ioutil"
-	"strings"
+	"bufio"
+	"os"
 	"testing"
 )
 
+var uglyString = []string{
+	"$THETA (0,2720) ; CL",
+	"$THETA(0,2650) ; V2",
+	" $THETA (0,7730) ; V3",
+	" (0,3410)",
+	" $THETA(0,0.232) FIX ; KA transit",
+	" 0.75 FIX ; allo-WT",
+}
+
 func readLines(path string) ([]string, error) {
-	file, err := ioutil.ReadFile(path)
-	// will need to check this also works as expected on windows and doesn't
-	// keep the \r as well, couldt ry something like runtime.GOOS == "windows"
-	newFile := strings.Split(string(file), "\n")
-	return newFile, err
+	inFile, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer inFile.Close()
+	scanner := bufio.NewScanner(inFile)
+	scanner.Split(bufio.ScanLines)
+	var lines []string
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+	return lines, nil
 }
 
 var thetaSliceCleanedResult = []string{
