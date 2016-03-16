@@ -1,8 +1,15 @@
+box: google/golang
 build:
-    box: google/golang
     steps:
 
-    # Test the project
-    - script:
-        name: go test
-        code: go test ./...
+      # get dependencies
+      - script:
+          name: go get
+          code: |
+            cd $WERCKER_SOURCE_DIR
+            go get -t ./...
+
+      # Test the project
+      - script:
+          name: go test
+          code: go test ./...
