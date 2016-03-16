@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/apcera/termtables"
 	"github.com/dpastoor/nonmemutils/parser"
@@ -29,6 +30,7 @@ func main() {
 	results := parser.ParseLstEstimationFile(data)
 	bs, _ := json.Marshal(results)
 	fmt.Println(string(bs))
+
 	termtables.DefaultStyle = &termtables.TableStyle{
 		SkipBorder: false,
 		BorderX:    "-", BorderY: "|", BorderI: "+",
@@ -36,12 +38,21 @@ func main() {
 		Width:     80,
 		Alignment: termtables.AlignRight,
 	}
-	table := termtables.CreateTable()
-	table.AddHeaders("Name", "Estimate")
-	for i := range results.FinalParameterEstimates.Theta {
-		table.AddRow(results.ParameterNames.Theta[i], results.FinalParameterEstimates.Theta[i])
-	}
-	table.SetAlign(termtables.AlignLeft, 1)
 
-	fmt.Println(table.Render())
+	thetaTable := termtables.CreateTable()
+	thetaTable.AddHeaders("Theta", "Name", "Estimate")
+	for i := range results.FinalParameterEstimates.Theta {
+		thetaTable.AddRow("TH "+strconv.Itoa(i+1), results.ParameterNames.Theta[i], results.FinalParameterEstimates.Theta[i])
+	}
+	thetaTable.SetAlign(termtables.AlignLeft, 1)
+
+	omegaTable := termtables.CreateTable()
+	omegaTable.AddHeaders("Omega", "Estimate")
+	// for i := range results.FinalParameterEstimates.Omega {
+	// 	omegaTable.AddRow(results.ParameterNames.Omega[i], results.FinalParameterEstimates.Omega[i])
+	// }
+	omegaTable.SetAlign(termtables.AlignLeft, 1)
+
+	fmt.Println(thetaTable.Render())
+	fmt.Println(omegaTable.Render())
 }
