@@ -2,12 +2,11 @@ box: google/golang
 build:
     steps:
 
-      # get dependencies
-      - script:
-          name: go get
-          code: |
-            go get -t ./...
-
+    # Build the project
+    - script:
+        name: go build
+        code: |
+          go build ./...
       # Test the project
       - script:
           name: go test
