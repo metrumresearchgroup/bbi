@@ -9,6 +9,7 @@ import (
 
 	"github.com/apcera/termtables"
 	"github.com/dpastoor/nonmemutils/parser"
+	"github.com/fatih/color"
 )
 
 func readLine(path string) ([]string, error) {
@@ -42,7 +43,21 @@ func main() {
 	thetaTable := termtables.CreateTable()
 	thetaTable.AddHeaders("Theta", "Name", "Estimate")
 	for i := range results.FinalParameterEstimates.Theta {
-		thetaTable.AddRow("TH "+strconv.Itoa(i+1), results.ParameterNames.Theta[i], results.FinalParameterEstimates.Theta[i])
+		if i == 2 {
+			thetaTable.AddRow(
+				color.RedString("TH "+strconv.Itoa(i+1)),
+				color.RedString(results.ParameterNames.Theta[i]),
+				color.RedString(results.FinalParameterEstimates.Theta[i]),
+			)
+		} else {
+			thetaTable.AddRow(
+				"TH "+strconv.Itoa(i+1),
+				results.ParameterNames.Theta[i],
+				results.FinalParameterEstimates.Theta[i],
+			)
+
+		}
+
 	}
 	thetaTable.SetAlign(termtables.AlignLeft, 1)
 
