@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/apcera/termtables"
 	"github.com/dpastoor/nonmemutils/parser"
 )
 
@@ -25,7 +26,22 @@ func readLine(path string) ([]string, error) {
 }
 func main() {
 	data, _ := readLine("parser/fixtures/lstfiles/simple-onecmpt-ex1.lst")
-	bs, _ := json.Marshal(parser.ParseLstEstimationFile(data))
+	results := parser.ParseLstEstimationFile(data)
+	bs, _ := json.Marshal(results)
 	fmt.Println(string(bs))
+	termtables.DefaultStyle = &termtables.TableStyle{
+		SkipBorder: false,
+		BorderX:    "-", BorderY: "|", BorderI: "+",
+		PaddingLeft: 3, PaddingRight: 3,
+		Width:     80,
+		Alignment: termtables.AlignRight,
+	}
+	table := termtables.CreateTable()
+	table.AddHeaders("Name", "Estimate")
+	for i := range results.FinalParameterEstimates.Theta {
+		table.AddRow(results.ParameterNames.Theta[i], results.FinalParameterEstimates.Theta[i])
+	}
+	table.SetAlign(termtables.AlignLeft, 1)
 
+	fmt.Println(table.Render())
 }
