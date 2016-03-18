@@ -29,7 +29,7 @@ SIMULATION SEED
 
 ## nonmem terms
 
-- `#TERM` 
+- `#TERM`
 
     - minimization status
     - Function evaluations
@@ -45,10 +45,11 @@ EPSshrink (%)(
 
 `#OBJV`
     - Objective function value
-   
+
 
 ***... FINAL PARAMETER ESTIMATE ...***
 
 
 ***... STANDARD ERROR OF ESTIMATE ...***
-    
+
+- `#METH`: estimation method
