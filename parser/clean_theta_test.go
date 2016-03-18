@@ -15,6 +15,30 @@ var uglyString = []string{
 	" 0.75 FIX ; allo-WT",
 }
 
+var rawThetaBlock02 = []string{
+	"$THETA  (0,5) ; CL",
+	"(0,97.2) ; V",
+	"(0,7.47,100) ; Q",
+	"(0,106,500) ; V2",
+	"$THETA  (-0.011,0.00977,0.030) ; CLWT1",
+	"$THETA  (-1,-0.16,5) ; V1SEX1",
+	"$THETA  (-0.011,0.0142,0.030) ; V1WT1",
+	"$THETA  (-1000000,0.0178,0.045) ; CLCRCL1",
+	"(-0.038,0.00231,1000000) ; CLCRCL2",
+}
+
+var rawThetaBlock02Cleaned = []string{
+	"(0,5) ; CL",
+	"(0,97.2) ; V",
+	"(0,7.47,100) ; Q",
+	"(0,106,500) ; V2",
+	"(-0.011,0.00977,0.030) ; CLWT1",
+	"(-1,-0.16,5) ; V1SEX1",
+	"(-0.011,0.0142,0.030) ; V1WT1",
+	"(-1000000,0.0178,0.045) ; CLCRCL1",
+	"(-0.038,0.00231,1000000) ; CLCRCL2",
+}
+
 func readLines(path string) ([]string, error) {
 	inFile, err := os.Open(path)
 	if err != nil {
