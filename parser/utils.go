@@ -1,7 +1,7 @@
 package parser
 
-// createDiagonalBlockSlice creates a slice of ints that would form a diagonal matrix with value 1 for diagonal and 0 for off diagonal elements
-func createDiagonalBlockSlice(num int) []int {
+// createDiagonalBlock creates a slice of ints that would form a diagonal matrix with value 1 for diagonal and 0 for off diagonal elements
+func createDiagonalBlock(num int) []int {
 	var iArr []int
 	for i := 1; i <= num; i++ {
 		for j := 1; j <= i; j++ {
