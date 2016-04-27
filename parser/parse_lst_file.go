@@ -56,7 +56,7 @@ func ParseLstEstimationFile(lines []string) LstData {
 
 	result := LstData{
 		ParseFinalParameterEstimates(lines[finalParameterEstimatesIndex:standardErrorEstimateIndex]),
-		ParseParameterStructures(lines[startParameterStructuresIndex:endParameterStucturesIndex]),
+		ParseParameterStructures(lines[startParameterStructuresIndex : endParameterStucturesIndex+1]),
 		ParseParameterNames(lines[startThetaIndex:endSigmaIndex]),
 		parseOFV(lines[ofvIndex]),
 	}
