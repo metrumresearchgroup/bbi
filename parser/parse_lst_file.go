@@ -9,6 +9,7 @@ import (
 // LstData is the output struct from a lst file
 type LstData struct {
 	FinalParameterEstimates FinalParameterEstimates
+	ParameterStructures     ParameterStructures
 	ParameterNames          ParameterNames
 	OFV                     float64
 }
@@ -25,6 +26,8 @@ func parseOFV(line string) float64 {
 func ParseLstEstimationFile(lines []string) LstData {
 
 	var ofvIndex int
+	var startParameterStructuresIndex int
+	var endParameterStucturesIndex int
 	var finalParameterEstimatesIndex int
 	var standardErrorEstimateIndex int
 	var startThetaIndex int
@@ -35,6 +38,10 @@ func ParseLstEstimationFile(lines []string) LstData {
 			startThetaIndex = i
 		case strings.Contains(line, "$EST") && endSigmaIndex == 0:
 			endSigmaIndex = i
+		case strings.Contains(line, "0LENGTH OF THETA"):
+			startParameterStructuresIndex = i
+		case strings.Contains(line, "0DEFAULT SIGMA BOUNDARY"):
+			endParameterStucturesIndex = i
 		case strings.Contains(line, "#OBJV"):
 			ofvIndex = i
 		case strings.Contains(line, "FINAL PARAMETER ESTIMATE"):
@@ -49,6 +56,7 @@ func ParseLstEstimationFile(lines []string) LstData {
 
 	result := LstData{
 		ParseFinalParameterEstimates(lines[finalParameterEstimatesIndex:standardErrorEstimateIndex]),
+		ParseParameterStructures(lines[startParameterStructuresIndex:endParameterStucturesIndex]),
 		ParseParameterNames(lines[startThetaIndex:endSigmaIndex]),
 		parseOFV(lines[ofvIndex]),
 	}
