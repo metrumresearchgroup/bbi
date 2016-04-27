@@ -84,8 +84,6 @@ func TestParseParameterStructures(t *testing.T) {
 		Sigma: []int{1},
 	}
 	parsedBlock01 := ParseParameterStructures(blocks01)
-	t.Log(parsedBlock01)
-	t.Fail()
 	if !reflect.DeepEqual(parsedBlock01.Theta, blocks01Results.Theta) {
 		t.Log("GOT: ", parsedBlock01.Theta, " EXPECTED: ", blocks01Results.Theta)
 		t.Fail()
