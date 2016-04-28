@@ -13,14 +13,11 @@ type ParameterStructures struct {
 }
 
 func parseParameterStructure(lines []string) []int {
-	var iArr []int
 	if strings.Contains(lines[0], "SIMPLE") {
 		omegaLength, _ := strconv.Atoi(strings.TrimSpace(strings.SplitAfter(lines[0], ":")[1]))
-		iArr = createDiagonalBlock(omegaLength)
-	} else {
-		iArr = ParseBlockStructure(lines[1:])
+		return createDiagonalBlock(omegaLength)
 	}
-	return iArr
+	return ParseBlockStructure(lines[1:])
 }
 
 // ParseParameterStructures parses the final estimates of model parameters from lst file
