@@ -8,6 +8,7 @@ import (
 
 // LstData is the output struct from a lst file
 type LstData struct {
+	RunDetails              RunDetails
 	FinalParameterEstimates FinalParameterEstimates
 	ParameterStructures     ParameterStructures
 	ParameterNames          ParameterNames
@@ -55,6 +56,7 @@ func ParseLstEstimationFile(lines []string) LstData {
 	fmt.Println(startThetaIndex, endSigmaIndex)
 
 	result := LstData{
+		ParseRunDetails(lines),
 		ParseFinalParameterEstimates(lines[finalParameterEstimatesIndex:standardErrorEstimateIndex]),
 		ParseParameterStructures(lines[startParameterStructuresIndex : endParameterStucturesIndex+1]),
 		ParseParameterNames(lines[startThetaIndex:endSigmaIndex]),
