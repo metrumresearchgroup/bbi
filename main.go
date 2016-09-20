@@ -12,7 +12,7 @@ import (
 func main() {
 	data, _ := readLine("parser/fixtures/lstfiles/simple-onecmpt-ex1.lst")
 	results := parser.ParseLstEstimationFile(data)
-	bs, _ := json.Marshal(results)
+	bs, _ := json.MarshalIndent(results, "", "\t")
 	fmt.Println(string(bs))
 	results.Summary()
 }
