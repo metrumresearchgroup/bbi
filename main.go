@@ -14,7 +14,7 @@ func main() {
 	results := parser.ParseLstEstimationFile(data)
 	bs, _ := json.Marshal(results)
 	fmt.Println(string(bs))
-	PrintAll(results)
+	results.Summary()
 }
 
 func readLine(path string) ([]string, error) {
