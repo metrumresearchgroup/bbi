@@ -10,6 +10,7 @@ import (
 type LstData struct {
 	RunDetails              RunDetails
 	FinalParameterEstimates FinalParameterEstimates
+	FinalParameterStdErr    FinalParameterEstimates
 	ParameterStructures     ParameterStructures
 	ParameterNames          ParameterNames
 	OFV                     float64
@@ -31,6 +32,7 @@ func ParseLstEstimationFile(lines []string) LstData {
 	var endParameterStucturesIndex int
 	var finalParameterEstimatesIndex int
 	var standardErrorEstimateIndex int
+	var covarianceMatrixEstimateIndex int
 	var startThetaIndex int
 	var endSigmaIndex int
 	for i, line := range lines {
@@ -50,7 +52,16 @@ func ParseLstEstimationFile(lines []string) LstData {
 			finalParameterEstimatesIndex = i + 3
 		case strings.Contains(line, "STANDARD ERROR OF ESTIMATE"):
 			standardErrorEstimateIndex = i + 3
+		case strings.Contains(line, "COVARIANCE MATRIX OF ESTIMATE"):
+			// only want to set this the first time it is detected
+			// another block called "INVERSE COVARIANCE ...." will match this
+			if covarianceMatrixEstimateIndex == 0 {
+				covarianceMatrixEstimateIndex = i + 3
+			}
+		default:
+			continue
 		}
+
 	}
 
 	fmt.Println(startThetaIndex, endSigmaIndex)
@@ -58,6 +69,7 @@ func ParseLstEstimationFile(lines []string) LstData {
 	result := LstData{
 		ParseRunDetails(lines),
 		ParseFinalParameterEstimates(lines[finalParameterEstimatesIndex:standardErrorEstimateIndex]),
+		ParseFinalParameterEstimates(lines[standardErrorEstimateIndex:covarianceMatrixEstimateIndex]),
 		ParseParameterStructures(lines[startParameterStructuresIndex : endParameterStucturesIndex+1]),
 		ParseParameterNames(lines[startThetaIndex:endSigmaIndex]),
 		parseOFV(lines[ofvIndex]),
