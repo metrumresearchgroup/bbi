@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// ParseOmegaResults parses omega results
+// ParseBlockResults parses results stored in a block-line structure
 func ParseBlockResults(lines []string) []string {
 	var omegaLine string
 	r := regexp.MustCompile("E[\\+|\\-]")
