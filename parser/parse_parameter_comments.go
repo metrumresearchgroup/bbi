@@ -14,7 +14,7 @@ func ParseThetaComments(lines []string) []string {
 	parsedLines := FormatThetaBlock(CleanThetaBlock(lines))
 	var result = make([]string, len(parsedLines))
 	for i, line := range parsedLines {
-		result[i] = strings.Split(line, ";")[1]
+		result[i] = strings.TrimSpace(strings.Split(line, ";")[1])
 	}
 	return result
 }

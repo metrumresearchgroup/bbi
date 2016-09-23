@@ -9,6 +9,7 @@ import (
 // LstData is the output struct from a lst file
 type LstData struct {
 	RunDetails              RunDetails
+	InitialEstimates        InitialEstimates
 	FinalParameterEstimates FinalParameterEstimates
 	FinalParameterStdErr    FinalParameterEstimates
 	ParameterStructures     ParameterStructures
@@ -68,6 +69,7 @@ func ParseLstEstimationFile(lines []string) LstData {
 
 	result := LstData{
 		ParseRunDetails(lines),
+		ParseInitialEstimates(lines),
 		ParseFinalParameterEstimates(lines[finalParameterEstimatesIndex:standardErrorEstimateIndex]),
 		ParseFinalParameterEstimates(lines[standardErrorEstimateIndex:covarianceMatrixEstimateIndex]),
 		ParseParameterStructures(lines[startParameterStructuresIndex : endParameterStucturesIndex+1]),
