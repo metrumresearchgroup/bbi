@@ -10,14 +10,14 @@ import (
 )
 
 func main() {
-	data, _ := readLine("parser/fixtures/lstfiles/simple-onecmpt-ex1.lst")
+	data, _ := readLines("parser/fixtures/lstfiles/simple-onecmpt-ex1.lst")
 	results := parser.ParseLstEstimationFile(data)
 	bs, _ := json.MarshalIndent(results, "", "\t")
 	fmt.Println(string(bs))
 	results.Summary()
 }
 
-func readLine(path string) ([]string, error) {
+func readLines(path string) ([]string, error) {
 	inFile, err := os.Open(path)
 	if err != nil {
 		return nil, err
