@@ -15,20 +15,20 @@ var thetaResults01 = []string{
 	"",
 }
 
-var thetaResults01Parsed = []string{
-	"2.69E+03",
-	"2.43E+03",
-	"7.80E+03",
-	"3.45E+03",
-	"1.80E-01",
-	"2.13E+00",
-	"4.14E-01",
-	"2.29E-02",
-	"2.50E+00",
-	"1.00E-03",
-	"8.33E-01",
-	"1.55E+00",
-	"1.13E+00",
+var thetaResults01Parsed = []float64{
+	2690,
+	2430,
+	7800,
+	3450,
+	0.180,
+	2.13,
+	0.414,
+	0.0229,
+	2.5,
+	0.001,
+	0.833,
+	1.55,
+	1.13,
 }
 
 func TestParseThetaResultsBlock(t *testing.T) {

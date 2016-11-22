@@ -12,10 +12,10 @@ var omegaResults01 = []string{
 	"+        0.00E+00  1.54E-01",
 }
 
-var omegaResults01Parsed = []string{
-	"1.23E-01",
-	"0.00E+00",
-	"1.54E-01",
+var omegaResults01Parsed = []float64{
+	0.123,
+	0,
+	0.154,
 }
 
 var omegaResults02 = []string{
@@ -28,10 +28,10 @@ var omegaResults02 = []string{
 	"+        .........  1.54E-01",
 }
 
-var omegaResults02Parsed = []string{
-	"1.23E-01",
-	".........",
-	"1.54E-01",
+var omegaResults02Parsed = []float64{
+	0.123,
+	0,
+	0.154,
 }
 
 func TestParseBlockResults(t *testing.T) {
