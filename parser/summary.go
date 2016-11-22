@@ -22,18 +22,19 @@ func (results LstData) Summary() bool {
 	for i := range results.FinalParameterEstimates.Theta {
 		numResult := results.FinalParameterEstimates.Theta[i]
 		if i == 2 {
+			//theta, _ := fmt.Printf("%.3E", results.FinalParameterEstimates.Theta[i])
 			thetaTable.AddRow(
 				color.RedString("TH "+strconv.Itoa(i+1)),
 				color.RedString(results.ParameterNames.Theta[i]),
-				//color.RedString(results.FinalParameterEstimates.Theta[i]),
-				//color.RedString(strconv.FormatFloat(numResult, 'f', -1, 64)),
+				color.RedString(strconv.FormatFloat(results.FinalParameterEstimates.Theta[i], 'E', 2, 64)),
+				color.RedString(strconv.FormatFloat(numResult, 'f', -1, 64)),
 				color.RedString("-"),
 			)
 		} else {
 			thetaTable.AddRow(
 				"TH "+strconv.Itoa(i+1),
 				results.ParameterNames.Theta[i],
-				results.FinalParameterEstimates.Theta[i],
+				strconv.FormatFloat(results.FinalParameterEstimates.Theta[i], 'E', 2, 64),
 				strconv.FormatFloat(numResult, 'f', -1, 64),
 				"-",
 			)
