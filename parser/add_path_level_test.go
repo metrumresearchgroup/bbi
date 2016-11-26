@@ -1,9 +1,6 @@
 package parser
 
-import (
-	"fmt"
-	"testing"
-)
+import "testing"
 
 func TestAddingPathLevel(t *testing.T) {
 	originalPaths := []string{
@@ -17,6 +14,10 @@ func TestAddingPathLevel(t *testing.T) {
 		"$DATA ../../modeling/data1.csv",
 	}
 	for i, val := range originalPaths {
-		fmt.Println(i, AddPathLevelToData(val), "   should be:   ", newPaths[i])
+		newPath := AddPathLevelToData(val)
+		if newPath != newPaths[i] {
+			t.Log("GOT: ", newPath, " EXPECTED: ", newPaths[i])
+			t.Fail()
+		}
 	}
 }
