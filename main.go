@@ -1,17 +1,16 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 
-	"github.com/dpastoor/nonmemutils/parser"
 	"github.com/dpastoor/nonmemutils/utils"
+	"github.com/spf13/afero"
 )
 
 func main() {
-	data, _ := utils.ReadLines("parser/fixtures/lstfiles/simple-onecmpt-ex1.lst")
-	results := parser.ParseLstEstimationFile(data)
-	bs, _ := json.MarshalIndent(results, "", "\t")
-	fmt.Println(string(bs))
-	results.Summary()
+	AppFs := afero.NewOsFs()
+	data, _ := utils.ReadLinesFS(AppFs, "parser/fixtures/lstfiles/simple-onecmpt-ex1.lst")
+	for i, line := range data {
+		fmt.Printf("%v:, %s\n", i, line)
+	}
 }
