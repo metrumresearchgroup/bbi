@@ -21,14 +21,14 @@ const FilePathSeparator = string(filepath.Separator)
 // ReplaceExtension takes a path and an extension, strips the old extension
 // and returns the path with the new extension.
 func ReplaceExtension(path string, newExt string) string {
-	f, _ := fileAndExt(path)
+	f, _ := FileAndExt(path)
 	return f + "." + newExt
 }
 
 // Filename takes a path, strips out the extension,
 // and returns the name of the file.
 func Filename(in string) (name string) {
-	name, _ = fileAndExt(in)
+	name, _ = FileAndExt(in)
 	return
 }
 
@@ -48,7 +48,7 @@ func Filename(in string) (name string) {
 // If the path, in, represents a filename with an extension,
 // then name will be the filename minus any extension - including the dot
 // and ext will contain the extension - minus the dot.
-func fileAndExt(in string) (name string, ext string) {
+func FileAndExt(in string) (name string, ext string) {
 	ext = filepath.Ext(in)
 	base := filepath.Base(in)
 
