@@ -1,6 +1,7 @@
 package parser
 
 import "strings"
+import "path/filepath"
 
 // AddPathLevelToData adds a level to the path declared in $DATA
 func AddPathLevelToData(s string) string {
@@ -11,10 +12,10 @@ func AddPathLevelToData(s string) string {
 		// don't change if set to absolute path already
 		return (s)
 	}
-	newPath := strings.Join([]string{
-		"../",
+	newPath := filepath.Join(
+		"..",
 		originalPath,
-	}, "")
+	)
 	return strings.Join([]string{
 		"$DATA",
 		newPath,
