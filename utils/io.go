@@ -40,9 +40,24 @@ func ReadLinesFS(fs afero.Fs, path string) ([]string, error) {
 	return lines, nil
 }
 
-//WriteLines writes lines to a file at a given path
+//WriteLines writes lines to a file at a given path given a filesystem
 func WriteLines(lines []string, path string) error {
 	file, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	w := bufio.NewWriter(file)
+	for _, line := range lines {
+		fmt.Fprintln(w, line)
+	}
+	return w.Flush()
+}
+
+//WriteLinesFS writes lines to a file at a given path given a filesystem
+func WriteLinesFS(fs afero.Fs, lines []string, path string) error {
+	file, err := fs.Create(path)
 	if err != nil {
 		return err
 	}
