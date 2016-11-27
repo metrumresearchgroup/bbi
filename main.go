@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"github.com/dpastoor/nonmemutils/utils"
 	"github.com/spf13/afero"
@@ -9,8 +10,14 @@ import (
 
 func main() {
 	AppFs := afero.NewOsFs()
-	data, _ := utils.ReadLinesFS(AppFs, "parser/fixtures/lstfiles/simple-onecmpt-ex1.lst")
-	for i, line := range data {
-		fmt.Printf("%v:, %s\n", i, line)
+	filePath := "parser/fixtures/lstfiles/simple-onecmpt-ex1.lst"
+	fileName, _ := utils.FileAndExt(filePath)
+	dir := filepath.Dir(filePath)
+	upOneLevel := filepath.Join(dir, "..")
+	dirInfo, _ := afero.ReadDir(AppFs, upOneLevel)
+	for i, line := range dirInfo {
+		if line.IsDir() {
+			fmt.Printf("%v: %s\n", i, line.Name())
+		}
 	}
 }
