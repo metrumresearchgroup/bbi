@@ -1,7 +1,10 @@
 package parser
 
-import "strings"
-import "path/filepath"
+import (
+	"fmt"
+	"path/filepath"
+	"strings"
+)
 
 // AddPathLevelToData adds a level to the path declared in $DATA
 func AddPathLevelToData(s string) string {
@@ -16,6 +19,14 @@ func AddPathLevelToData(s string) string {
 		"..",
 		originalPath,
 	)
+	// add things after the path back in if they exist
+	if len(dataComponents) > 2 {
+		newPath = fmt.Sprintf(
+			"%s %s",
+			newPath,
+			strings.Join(dataComponents[2:], " "),
+		)
+	}
 	return strings.Join([]string{
 		"$DATA",
 		newPath,
