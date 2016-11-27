@@ -14,7 +14,7 @@ go tool cover -html=nonmemutils.coverage
 ```
 
 
-```
+```go
  func main() {
  	data, _ := readLines("parser/fixtures/lstfiles/simple-onecmpt-ex1.lst")
  	results := parser.ParseLstEstimationFile(data)

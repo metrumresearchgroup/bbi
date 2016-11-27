@@ -7,11 +7,15 @@ func TestAddingPathLevel(t *testing.T) {
 		"$DATA modeling/data1.csv",
 		"$DATA /usr/modeling/data1.csv",
 		"$DATA ../modeling/data1.csv",
+		"$DATA modeling/data1.csv IGNORE=@",
+		"$DATA modeling/data1.csv IGNORE=@ IGNORE=ID.GT.5",
 	}
 	newPaths := []string{
 		"$DATA ../modeling/data1.csv",
 		"$DATA /usr/modeling/data1.csv",
 		"$DATA ../../modeling/data1.csv",
+		"$DATA ../modeling/data1.csv IGNORE=@",
+		"$DATA ../modeling/data1.csv IGNORE=@ IGNORE=ID.GT.5",
 	}
 	for i, val := range originalPaths {
 		newPath := AddPathLevelToData(val)
