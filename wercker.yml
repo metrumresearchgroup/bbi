@@ -2,6 +2,12 @@ box: google/golang
 build:
     steps:
 
+    # get the deps for the project
+      - script:
+          name: go get
+          code: |
+            go get ./...
+            
     # Build the project
       - script:
           name: go build
