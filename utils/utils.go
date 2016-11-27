@@ -1,4 +1,4 @@
-// helpers originally copied from
+// a few of the below helpers originally copied from
 // https://github.com/spf13/hugo/blob/master/helpers/path.go
 // as of commit https://github.com/spf13/hugo/commit/65e5959bad36a6faa7ff8b9c1b21a2b99c4dacad
 
@@ -207,4 +207,20 @@ func FileContainsAny(filename string, subslices [][]byte, fs afero.Fs) (bool, er
 // Exists checks if a file or directory exists.
 func Exists(path string, fs afero.Fs) (bool, error) {
 	return afero.Exists(fs, path)
+}
+
+// ListDirNames returns an array of directory names from an array of fileinfo
+// AppFs := afero.NewOsFs()
+// dir := filepath.Dir(".")
+// dirInfo, _ := afero.ReadDir(AppFs, dir)
+// ListDirNames(dirInfo)
+func ListDirNames(fd []os.FileInfo) []string {
+	dirs := []string{}
+	for _, pDir := range fd {
+		if pDir.IsDir() && !strings.HasPrefix(pDir.Name(), ".") {
+			//fmt.Printf("%v: %s\n", i, pDir.Name())
+			dirs = append(dirs, pDir.Name())
+		}
+	}
+	return dirs
 }
