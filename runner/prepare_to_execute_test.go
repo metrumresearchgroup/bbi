@@ -21,6 +21,18 @@ var pathtests = []struct {
 			"$PK",
 		},
 	},
+	{
+		[]string{
+			"$PROB",
+			"$DATA ../modeling.csv IGNORE=@",
+			"$PK",
+		},
+		[]string{
+			"$PROB",
+			"$DATA ../../modeling.csv IGNORE=@",
+			"$PK",
+		},
+	},
 }
 
 func TestPrepareForExecution(t *testing.T) {
