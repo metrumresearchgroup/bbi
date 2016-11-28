@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"io"
+	"os"
 	"path/filepath"
 
 	"github.com/dpastoor/nonmemutils/runner"
@@ -11,28 +13,59 @@ import (
 
 func main() {
 	AppFs := afero.NewOsFs()
-	filePath := "fixtures/run001.mod"
+	runNum := "run001"
+	dir := "fixtures"
+	dirToClean := "fixtures/run001_est_03/"
+	dirInfo, _ := afero.ReadDir(AppFs, dirToClean)
+	fileList := utils.ListFiles(dirInfo)
+	outputFiles := runner.EstOutputFileCleanLevels()
+	keyOutputFiles := runner.EstOutputFilesByRun(runNum)
+	for i, file := range fileList {
+		lvl, ok := outputFiles[file]
+		fmt.Println(fmt.Sprintf("%v: %s --> lvl:  %v ok: %v", i, file, lvl, ok))
+		if ok {
+			err := AppFs.Remove(filepath.Join(
+				dirToClean,
+				file,
+			))
+			if err != nil {
+				fmt.Println("ERROR: ", err)
+			}
+			fmt.Println("deleted file: ", file)
+			continue
+		}
+		lvl, ok = keyOutputFiles[file]
+		if ok {
+			// Copy files to directory above
+			fileToCopyLocation := filepath.Join(
+				dirToClean,
+				file,
+			)
+			fileToCopy, err := AppFs.Open(fileToCopyLocation)
+			if err != nil {
+				fmt.Println("TERRIBLE ERROR opening FILE TO COPY")
+				os.Exit(1)
+			}
+			defer fileToCopy.Close()
 
+			newFileLocation := filepath.Join(
+				dir,
+				file,
+			)
+			newFile, err := AppFs.Create(newFileLocation)
+			if err != nil {
+				fmt.Println("TERRIBLE ERROR CREATING FILE TO COPY")
+				os.Exit(1)
+				continue
+			}
+			defer newFile.Close()
+
+			_, err = io.Copy(newFile, fileToCopy)
+			if err != nil {
+				fmt.Println("TERRIBLE ERROR TRYING TO COPY: ", err)
+				os.Exit(1)
+			}
+		}
+	}
 	// create a new dir for model estimation
-	fileName, fileExt := utils.FileAndExt(filePath)
-	dir := filepath.Dir(filePath)
-	dirInfo, _ := afero.ReadDir(AppFs, dir)
-	dirs := utils.ListDirNames(dirInfo)
-	newDirSuggestion := runner.FindNextEstDirNum(fileName, dirs, 2)
-	AppFs.MkdirAll(filepath.Join(
-		dir,
-		newDirSuggestion.NextDirName,
-	), 0755)
-
-	// prepare and copy the model to be run001
-	fileLines, _ := utils.ReadLinesFS(AppFs, filePath)
-	utils.WriteLinesFS(
-		AppFs,
-		runner.PrepareForExecution(fileLines),
-		filepath.Join(
-			dir,
-			newDirSuggestion.NextDirName,
-			fmt.Sprintf("%s%s", fileName, fileExt),
-		),
-	)
 }
