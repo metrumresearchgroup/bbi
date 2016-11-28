@@ -15,7 +15,6 @@ func initResults() map[string]int {
 	results01["run001.ext"] = 1
 	results01["run001.grd"] = 1
 	results01["run001.lst"] = 1
-	results01["run001.mod"] = 1
 	results01["run001.phi"] = 1
 	results01["run001.shk"] = 1
 	results01["run001.shm"] = 1
@@ -33,7 +32,6 @@ func initFilenameKeys() []string {
 		"run001.ext",
 		"run001.grd",
 		"run001.lst",
-		"run001.mod",
 		"run001.phi",
 		"run001.shk",
 		"run001.shm",

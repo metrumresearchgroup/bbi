@@ -66,7 +66,6 @@ func EstOutputFilesByRun(r string) map[string]int {
 		".ext",
 		".grd",
 		".lst",
-		".mod",
 		".phi",
 		".shk",
 		".shm",
