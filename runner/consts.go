@@ -1,5 +1,9 @@
 package runner
 
+import (
+	"fmt"
+)
+
 // EstOutputFileCleanLevels gives a map of
 // information about the output of NONMEM estimations
 // to be used for cleaning and other manipulations
@@ -44,6 +48,33 @@ func EstOutputFileCleanLevels() map[string]int {
 	EstOutputFiles["trskip.set"] = 1
 	EstOutputFiles["worker.set"] = 1
 	EstOutputFiles["xmloff.set"] = 1
+	return EstOutputFiles
+}
+
+// EstOutputFilesByRun creates a map of run specific file names
+// in the output directory
+func EstOutputFilesByRun(r string) map[string]int {
+	var EstOutputFiles = make(map[string]int)
+	fileExts := []string{
+		".clt",
+		".coi",
+		".clt",
+		".coi",
+		".cor",
+		".cov",
+		".cpu",
+		".ext",
+		".grd",
+		".lst",
+		".mod",
+		".phi",
+		".shk",
+		".shm",
+		".xml",
+	}
+	for _, f := range fileExts {
+		EstOutputFiles[fmt.Sprintf("%s%s", r, f)] = 1
+	}
 	return EstOutputFiles
 }
 
