@@ -20,12 +20,13 @@ func (results LstData) Summary() bool {
 	thetaTable := termtables.CreateTable()
 	thetaTable.AddHeaders("Theta", "Name", "Estimate (SN)", "Estimate", "StdErr")
 	for i := range results.FinalParameterEstimates.Theta {
-		numResult, _ := strconv.ParseFloat(results.FinalParameterEstimates.Theta[i], 64)
+		numResult := results.FinalParameterEstimates.Theta[i]
 		if i == 2 {
+			//theta, _ := fmt.Printf("%.3E", results.FinalParameterEstimates.Theta[i])
 			thetaTable.AddRow(
 				color.RedString("TH "+strconv.Itoa(i+1)),
 				color.RedString(results.ParameterNames.Theta[i]),
-				color.RedString(results.FinalParameterEstimates.Theta[i]),
+				color.RedString(strconv.FormatFloat(results.FinalParameterEstimates.Theta[i], 'E', 2, 64)),
 				color.RedString(strconv.FormatFloat(numResult, 'f', -1, 64)),
 				color.RedString("-"),
 			)
@@ -33,7 +34,7 @@ func (results LstData) Summary() bool {
 			thetaTable.AddRow(
 				"TH "+strconv.Itoa(i+1),
 				results.ParameterNames.Theta[i],
-				results.FinalParameterEstimates.Theta[i],
+				strconv.FormatFloat(results.FinalParameterEstimates.Theta[i], 'E', 2, 64),
 				strconv.FormatFloat(numResult, 'f', -1, 64),
 				"-",
 			)
@@ -50,7 +51,7 @@ func (results LstData) Summary() bool {
 	for i := range results.FinalParameterEstimates.Omega {
 		if results.ParameterStructures.Omega[i] != 0 {
 			userEta++
-			val, _ := strconv.ParseFloat(results.FinalParameterEstimates.Omega[i], 64)
+			val := results.FinalParameterEstimates.Omega[i]
 			omegaTable.AddRow("ETA "+strconv.Itoa(userEta), val)
 		}
 

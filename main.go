@@ -1,33 +1,77 @@
 package main
 
 import (
-	"bufio"
-	"encoding/json"
 	"fmt"
+	"io"
 	"os"
+	"path/filepath"
 
-	"github.com/dpastoor/nonmemutils/parser"
+	"github.com/dpastoor/nonmemutils/runner"
+	"github.com/dpastoor/nonmemutils/utils"
+	"github.com/spf13/afero"
 )
 
 func main() {
-	data, _ := readLine("parser/fixtures/lstfiles/simple-onecmpt-ex1.lst")
-	results := parser.ParseLstEstimationFile(data)
-	bs, _ := json.MarshalIndent(results, "", "\t")
-	fmt.Println(string(bs))
-	results.Summary()
-}
+	AppFs := afero.NewOsFs()
+	runNum := "run001"
+	dir := "fixtures"
+	dirToClean := "fixtures/run001_est_03/"
+	cleanLvl := 2
+	copyLvl := 1
+	dirInfo, _ := afero.ReadDir(AppFs, dirToClean)
+	fileList := utils.ListFiles(dirInfo)
+	outputFiles := runner.EstOutputFileCleanLevels()
+	keyOutputFiles := runner.EstOutputFilesByRun(runNum)
+	for i, file := range fileList {
 
-func readLine(path string) ([]string, error) {
-	inFile, err := os.Open(path)
-	if err != nil {
-		return nil, err
+		// handle cleaning
+
+		lvl, ok := outputFiles[file]
+		fmt.Println(fmt.Sprintf("%v: %s --> lvl:  %v ok: %v", i, file, lvl, ok))
+		if ok && cleanLvl <= lvl {
+			err := AppFs.Remove(filepath.Join(
+				dirToClean,
+				file,
+			))
+			if err != nil {
+				fmt.Println("ERROR: ", err)
+			}
+			fmt.Println("deleted file: ", file)
+			continue
+		}
+
+		// Copy files to directory above
+		lvl, ok = keyOutputFiles[file]
+		if ok && copyLvl <= lvl {
+			fileToCopyLocation := filepath.Join(
+				dirToClean,
+				file,
+			)
+			fileToCopy, err := AppFs.Open(fileToCopyLocation)
+			if err != nil {
+				fmt.Println("TERRIBLE ERROR opening FILE TO COPY")
+				os.Exit(1)
+			}
+			defer fileToCopy.Close()
+
+			newFileLocation := filepath.Join(
+				dir,
+				file,
+			)
+			newFile, err := AppFs.Create(newFileLocation)
+			if err != nil {
+				fmt.Println("TERRIBLE ERROR CREATING FILE TO COPY")
+				os.Exit(1)
+				continue
+			}
+			defer newFile.Close()
+
+			_, err = io.Copy(newFile, fileToCopy)
+			if err != nil {
+				fmt.Println("TERRIBLE ERROR TRYING TO COPY: ", err)
+				os.Exit(1)
+			}
+		}
 	}
-	defer inFile.Close()
-	scanner := bufio.NewScanner(inFile)
-	scanner.Split(bufio.ScanLines)
-	var lines []string
-	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
-	}
-	return lines, nil
+	// create a new dir for model estimation
 }

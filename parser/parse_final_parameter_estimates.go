@@ -6,11 +6,11 @@ import (
 
 // FinalParameterEstimates contains the final parameter estimate values
 type FinalParameterEstimates struct {
-	Theta     []string
-	Omega     []string
-	Sigma     []string
-	OmegaCorr []string
-	SigmaCorr []string
+	Theta     []float64
+	Omega     []float64
+	Sigma     []float64
+	OmegaCorr []float64
+	SigmaCorr []float64
 }
 
 // ParseFinalParameterEstimates parses the final estimates of model parameters from lst file

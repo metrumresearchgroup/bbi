@@ -2,17 +2,24 @@ package parser
 
 import (
 	"regexp"
+	"strconv"
 	"strings"
 )
 
 // ParseThetaResults parses theta results
-func ParseThetaResults(lines []string) []string {
+func ParseThetaResults(lines []string) []float64 {
 	var thetaLine string
+	var thetaValues []float64
 	r := regexp.MustCompile("E[\\+|\\-]")
 	for _, line := range lines {
 		if r.MatchString(line) {
 			thetaLine += line
 		}
 	}
-	return strings.Fields(thetaLine)
+	stringValues := strings.Fields(thetaLine)
+	for _, strVal := range stringValues {
+		parsedVal, _ := strconv.ParseFloat(strVal, 64)
+		thetaValues = append(thetaValues, parsedVal)
+	}
+	return thetaValues
 }

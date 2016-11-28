@@ -66,11 +66,11 @@ var finalParameterEstimates01 = []string{
 }
 
 var finalParameterEstimates01Results = FinalParameterEstimates{
-	[]string{"4.79E+00", "9.02E+01", "7.47E+00", "1.05E+02"},
-	[]string{"1.58E-01", "1.22E-01", "1.33E-01"},
-	[]string{"1.45E+03", "0.00E+00", "7.39E-03"},
-	[]string{"3.98E-01", "8.42E-01", "3.65E-01"},
-	[]string{"3.81E+01", "0.00E+00", "8.60E-02"},
+	[]float64{4.79, 90.2, 7.47, 105},
+	[]float64{0.158, 0.122, 0.133},
+	[]float64{1450, 0, 0.00739},
+	[]float64{0.398, 0.842, 0.365},
+	[]float64{38.1, 0, 0.0860},
 }
 
 func TestParseFinalParameterEstimates(t *testing.T) {
