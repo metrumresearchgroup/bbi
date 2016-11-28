@@ -17,14 +17,18 @@ func main() {
 	dir := "fixtures"
 	dirToClean := "fixtures/run001_est_03/"
 	cleanLvl := 2
+	copyLvl := 1
 	dirInfo, _ := afero.ReadDir(AppFs, dirToClean)
 	fileList := utils.ListFiles(dirInfo)
 	outputFiles := runner.EstOutputFileCleanLevels()
 	keyOutputFiles := runner.EstOutputFilesByRun(runNum)
 	for i, file := range fileList {
+
+		// handle cleaning
+
 		lvl, ok := outputFiles[file]
 		fmt.Println(fmt.Sprintf("%v: %s --> lvl:  %v ok: %v", i, file, lvl, ok))
-		if ok && cleanLvl >= lvl {
+		if ok && cleanLvl <= lvl {
 			err := AppFs.Remove(filepath.Join(
 				dirToClean,
 				file,
@@ -35,9 +39,10 @@ func main() {
 			fmt.Println("deleted file: ", file)
 			continue
 		}
+
+		// Copy files to directory above
 		lvl, ok = keyOutputFiles[file]
-		if ok {
-			// Copy files to directory above
+		if ok && copyLvl <= lvl {
 			fileToCopyLocation := filepath.Join(
 				dirToClean,
 				file,
