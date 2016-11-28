@@ -1,5 +1,8 @@
+These are snippets used during testing to be converted to cli commands or other internal functions
 
-```
+## copy model to be executed in next run directory
+
+```go
 AppFs := afero.NewOsFs()
 filePath := "fixtures/run001.mod"
 
@@ -27,8 +30,9 @@ utils.WriteLinesFS(
 )
 ```
 
-seeing which files in dir
-```
+## seeing which files in dir
+
+```go
 AppFs := afero.NewOsFs()
 	dirToClean := "fixtures/run001_est_2/"
 	dirInfo, _ := afero.ReadDir(AppFs, dirToClean)
@@ -37,5 +41,71 @@ AppFs := afero.NewOsFs()
 		outputFiles := runner.EstOutputFileCleanLevels()
 		lvl, ok := outputFiles[file]
 		fmt.Println(fmt.Sprintf("%v: %s --> lvl:  %v ok: %v", i, file, lvl, ok))
+	}
+```
+
+## Clean folder and move relevant files to parent directory
+
+```go
+	AppFs := afero.NewOsFs()
+	runNum := "run001"
+	dir := "fixtures"
+	dirToClean := "fixtures/run001_est_03/"
+	cleanLvl := 2
+	copyLvl := 1
+	dirInfo, _ := afero.ReadDir(AppFs, dirToClean)
+	fileList := utils.ListFiles(dirInfo)
+	outputFiles := runner.EstOutputFileCleanLevels()
+	keyOutputFiles := runner.EstOutputFilesByRun(runNum)
+	for i, file := range fileList {
+
+		// handle cleaning
+
+		lvl, ok := outputFiles[file]
+		fmt.Println(fmt.Sprintf("%v: %s --> lvl:  %v ok: %v", i, file, lvl, ok))
+		if ok && cleanLvl <= lvl {
+			err := AppFs.Remove(filepath.Join(
+				dirToClean,
+				file,
+			))
+			if err != nil {
+				fmt.Println("ERROR: ", err)
+			}
+			fmt.Println("deleted file: ", file)
+			continue
+		}
+
+		// Copy files to directory above
+		lvl, ok = keyOutputFiles[file]
+		if ok && copyLvl <= lvl {
+			fileToCopyLocation := filepath.Join(
+				dirToClean,
+				file,
+			)
+			fileToCopy, err := AppFs.Open(fileToCopyLocation)
+			if err != nil {
+				fmt.Println("TERRIBLE ERROR opening FILE TO COPY")
+				os.Exit(1)
+			}
+			defer fileToCopy.Close()
+
+			newFileLocation := filepath.Join(
+				dir,
+				file,
+			)
+			newFile, err := AppFs.Create(newFileLocation)
+			if err != nil {
+				fmt.Println("TERRIBLE ERROR CREATING FILE TO COPY")
+				os.Exit(1)
+				continue
+			}
+			defer newFile.Close()
+
+			_, err = io.Copy(newFile, fileToCopy)
+			if err != nil {
+				fmt.Println("TERRIBLE ERROR TRYING TO COPY: ", err)
+				os.Exit(1)
+			}
+		}
 	}
 ```
