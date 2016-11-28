@@ -55,24 +55,29 @@ func EstOutputFileCleanLevels() map[string]int {
 // in the output directory
 func EstOutputFilesByRun(r string) map[string]int {
 	var EstOutputFiles = make(map[string]int)
-	fileExts := []string{
-		".clt",
-		".coi",
-		".clt",
-		".coi",
+	fileExtsLvl1 := []string{
 		".cor",
 		".cov",
-		".cpu",
 		".ext",
-		".grd",
 		".lst",
 		".phi",
+	}
+	fileExtsLvl2 := []string{
+		".clt",
+		".coi",
+		".clt",
+		".coi",
+		".cpu",
+		".grd",
 		".shk",
 		".shm",
 		".xml",
 	}
-	for _, f := range fileExts {
+	for _, f := range fileExtsLvl1 {
 		EstOutputFiles[fmt.Sprintf("%s%s", r, f)] = 1
+	}
+	for _, f := range fileExtsLvl2 {
+		EstOutputFiles[fmt.Sprintf("%s%s", r, f)] = 2
 	}
 	return EstOutputFiles
 }
