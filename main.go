@@ -1,77 +1,39 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
-	"io"
 	"os"
-	"path/filepath"
-
-	"github.com/dpastoor/nonmemutils/runner"
-	"github.com/dpastoor/nonmemutils/utils"
-	"github.com/spf13/afero"
+	"os/exec"
 )
 
 func main() {
-	AppFs := afero.NewOsFs()
-	runNum := "run001"
-	dir := "fixtures"
-	dirToClean := "fixtures/run001_est_03/"
-	cleanLvl := 2
-	copyLvl := 1
-	dirInfo, _ := afero.ReadDir(AppFs, dirToClean)
-	fileList := utils.ListFiles(dirInfo)
-	outputFiles := runner.EstOutputFileCleanLevels()
-	keyOutputFiles := runner.EstOutputFilesByRun(runNum)
-	for i, file := range fileList {
+	cmdName := "Rscript.exe"
+	cmdArgs := []string{"stdout_stream.R"}
 
-		// handle cleaning
-
-		lvl, ok := outputFiles[file]
-		fmt.Println(fmt.Sprintf("%v: %s --> lvl:  %v ok: %v", i, file, lvl, ok))
-		if ok && cleanLvl <= lvl {
-			err := AppFs.Remove(filepath.Join(
-				dirToClean,
-				file,
-			))
-			if err != nil {
-				fmt.Println("ERROR: ", err)
-			}
-			fmt.Println("deleted file: ", file)
-			continue
-		}
-
-		// Copy files to directory above
-		lvl, ok = keyOutputFiles[file]
-		if ok && copyLvl <= lvl {
-			fileToCopyLocation := filepath.Join(
-				dirToClean,
-				file,
-			)
-			fileToCopy, err := AppFs.Open(fileToCopyLocation)
-			if err != nil {
-				fmt.Println("TERRIBLE ERROR opening FILE TO COPY")
-				os.Exit(1)
-			}
-			defer fileToCopy.Close()
-
-			newFileLocation := filepath.Join(
-				dir,
-				file,
-			)
-			newFile, err := AppFs.Create(newFileLocation)
-			if err != nil {
-				fmt.Println("TERRIBLE ERROR CREATING FILE TO COPY")
-				os.Exit(1)
-				continue
-			}
-			defer newFile.Close()
-
-			_, err = io.Copy(newFile, fileToCopy)
-			if err != nil {
-				fmt.Println("TERRIBLE ERROR TRYING TO COPY: ", err)
-				os.Exit(1)
-			}
-		}
+	cmd := exec.Command(cmdName, cmdArgs...)
+	cmdReader, err := cmd.StdoutPipe()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Error creating StdoutPipe for Cmd", err)
+		os.Exit(1)
 	}
-	// create a new dir for model estimation
+
+	scanner := bufio.NewScanner(cmdReader)
+	go func() {
+		for scanner.Scan() {
+			fmt.Printf("Rscript out | %s\n", scanner.Text())
+		}
+	}()
+
+	err = cmd.Start()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Error starting Cmd", err)
+		os.Exit(1)
+	}
+
+	err = cmd.Wait()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Error waiting for Cmd", err)
+		os.Exit(1)
+	}
 }
