@@ -16,6 +16,7 @@ func main() {
 	runNum := "run001"
 	dir := "fixtures"
 	dirToClean := "fixtures/run001_est_03/"
+	cleanLvl := 2
 	dirInfo, _ := afero.ReadDir(AppFs, dirToClean)
 	fileList := utils.ListFiles(dirInfo)
 	outputFiles := runner.EstOutputFileCleanLevels()
@@ -23,7 +24,7 @@ func main() {
 	for i, file := range fileList {
 		lvl, ok := outputFiles[file]
 		fmt.Println(fmt.Sprintf("%v: %s --> lvl:  %v ok: %v", i, file, lvl, ok))
-		if ok {
+		if ok && cleanLvl >= lvl {
 			err := AppFs.Remove(filepath.Join(
 				dirToClean,
 				file,
