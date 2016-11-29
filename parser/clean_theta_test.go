@@ -64,7 +64,7 @@ var thetaSliceCleanedResult = []string{
 }
 
 func TestCleaningThetaBlock01(t *testing.T) {
-	testData, _ := readLines("fixtures/blocks/theta-block-01.lst")
+	testData, _ := readLines("testdata/blocks/theta-block-01.lst")
 	parsedData := CleanThetaBlock(testData)
 	if len(parsedData) != len(thetaSliceCleanedResult) {
 		t.Log("Mismatch between number of rows of cleaned and correct results")

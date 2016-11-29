@@ -1,39 +1,46 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"os"
-	"os/exec"
+	"path/filepath"
+
+	"github.com/dpastoor/nonmemutils/runner"
+	"github.com/dpastoor/nonmemutils/utils"
+	"github.com/spf13/afero"
 )
 
 func main() {
-	cmdName := "Rscript.exe"
-	cmdArgs := []string{"stdout_stream.R"}
+	AppFs := afero.NewOsFs()
 
-	cmd := exec.Command(cmdName, cmdArgs...)
-	cmdReader, err := cmd.StdoutPipe()
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "Error creating StdoutPipe for Cmd", err)
-		os.Exit(1)
-	}
+	filePath := "testdata/run001.mod"
 
-	scanner := bufio.NewScanner(cmdReader)
-	go func() {
-		for scanner.Scan() {
-			fmt.Printf("Rscript out | %s\n", scanner.Text())
-		}
-	}()
+	// create a new dir for model estimation
+	runNum, fileExt := utils.FileAndExt(filePath)
+	dir := filepath.Dir(filePath)
+	dirInfo, _ := afero.ReadDir(AppFs, dir)
+	dirs := utils.ListDirNames(dirInfo)
+	newDirSuggestion := runner.FindNextEstDirNum(runNum, dirs, 2)
+	AppFs.MkdirAll(filepath.Join(
+		dir,
+		newDirSuggestion.NextDirName,
+	), 0755)
 
-	err = cmd.Start()
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "Error starting Cmd", err)
-		os.Exit(1)
-	}
+	// prepare and copy the model to be run001
+	fileLines, _ := utils.ReadLinesFS(AppFs, filePath)
+	utils.WriteLinesFS(
+		AppFs,
+		runner.PrepareForExecution(fileLines),
+		filepath.Join(
+			dir,
+			newDirSuggestion.NextDirName,
+			fmt.Sprintf("%s%s", runNum, fileExt),
+		),
+	)
 
-	err = cmd.Wait()
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "Error waiting for Cmd", err)
-		os.Exit(1)
-	}
+	// dirToClean := newDirSuggestion.NextDirName
+	// cleanLvl := 2
+	// copyLvl := 2
+	// edirInfo, _ := afero.ReadDir(AppFs, filepath.Join(dir, dirToClean))
+	// fileList := utils.ListFiles(edirInfo)
+	// runner.CleanEstFolderAndCopyToParent(AppFs, dir, runNum, dirToClean, fileList, cleanLvl, copyLvl)
 }
