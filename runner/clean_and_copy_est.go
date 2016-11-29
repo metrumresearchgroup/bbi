@@ -23,6 +23,20 @@ import (
 func CleanEstFolderAndCopyToParent(fs afero.Fs, parentDir string, runNum string, dirToClean string, fileList []string, cleanLvl int, copyLvl int) {
 	outputFiles := EstOutputFileCleanLevels()
 	keyOutputFiles := EstOutputFilesByRun(runNum)
+
+	// handle temp_dir specially
+	lvl, _ := outputFiles["temp_dir"]
+	if cleanLvl >= lvl {
+		err := fs.RemoveAll(filepath.Join(
+			parentDir,
+			dirToClean,
+			"temp_dir",
+		))
+		if err != nil {
+			fmt.Println("could not remove temp_dir, ", err)
+		}
+	}
+
 	for i, file := range fileList {
 
 		// handle cleaning
