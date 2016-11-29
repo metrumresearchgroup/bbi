@@ -64,7 +64,11 @@ var thetaSliceCleanedResult = []string{
 }
 
 func TestCleaningThetaBlock01(t *testing.T) {
-	testData, _ := readLines("testdata/blocks/theta-block-01.lst")
+	testData, err := readLines("testdata/blocks/theta-block-01.lst")
+	if err != nil {
+		t.Log("could not read testData with err: ", err)
+		t.Fail()
+	}
 	parsedData := CleanThetaBlock(testData)
 	if len(parsedData) != len(thetaSliceCleanedResult) {
 		t.Log("Mismatch between number of rows of cleaned and correct results")
@@ -80,7 +84,11 @@ func TestCleaningThetaBlock01(t *testing.T) {
 }
 
 func TestCleaningThetaBlock02(t *testing.T) {
-	testData, _ := readLines("fixtures/blocks/theta-block-02.lst")
+	testData, err := readLines("testdata/blocks/theta-block-02.lst")
+	if err != nil {
+		t.Log("could not read testData with err: ", err)
+		t.Fail()
+	}
 	parsedData := CleanThetaBlock(testData)
 	if len(parsedData) != len(thetaSliceCleanedResult) {
 		t.Log("Mismatch between number of rows of cleaned and correct results")
@@ -96,7 +104,12 @@ func TestCleaningThetaBlock02(t *testing.T) {
 }
 
 func TestCleaningThetaBlock03(t *testing.T) {
-	testData, _ := readLines("fixtures/blocks/theta-block-03.lst")
+	testData, err := readLines("testdata/blocks/theta-block-03.lst")
+	if err != nil {
+		t.Log("could not read testData with err: ", err)
+		t.Fail()
+	}
+
 	parsedData := CleanThetaBlock(testData)
 	if len(parsedData) != len(thetaSliceCleanedResult) {
 		t.Log("Mismatch between number of rows of cleaned and correct results")
