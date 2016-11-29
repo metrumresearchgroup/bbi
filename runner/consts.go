@@ -25,10 +25,10 @@ func EstOutputFileCleanLevels() map[string]int {
 	EstOutputFiles["fsubs.f90"] = 1
 	EstOutputFiles["FSUBS2"] = 1
 	EstOutputFiles["gfortran.txt"] = 1
-	EstOutputFiles["GFCOMPILE"] = 1
+	EstOutputFiles["GFCOMPILE.BAT"] = 1
 	EstOutputFiles["INTER"] = 2
 	EstOutputFiles["licfile.set"] = 1
-	EstOutputFiles["linkc"] = 1
+	EstOutputFiles["linkc.lnk"] = 1
 	EstOutputFiles["LINK.LNK"] = 1
 	EstOutputFiles["LINKC.LNK"] = 1
 	EstOutputFiles["locfile.set"] = 1
