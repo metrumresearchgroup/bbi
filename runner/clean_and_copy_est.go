@@ -10,6 +10,16 @@ import (
 )
 
 // CleanEstFolderAndCopyToParent cleans the estimation folder and then copies relevant files back to parent dir
+// Ex:
+// AppFs := afero.NewOsFs()
+// runNum := "run001"
+// dir := "fixtures"
+// dirToClean := "run001_est_03"
+// cleanLvl := 2
+// copyLvl := 2
+// dirInfo, _ := afero.ReadDir(AppFs, filepath.Join(dir, dirToClean))
+// fileList := utils.ListFiles(dirInfo)
+// runner.CleanEstFolderAndCopyToParent(AppFs, dir, runNum, dirToClean, fileList, cleanLvl, copyLvl)
 func CleanEstFolderAndCopyToParent(fs afero.Fs, parentDir string, runNum string, dirToClean string, fileList []string, cleanLvl int, copyLvl int) {
 	outputFiles := EstOutputFileCleanLevels()
 	keyOutputFiles := EstOutputFilesByRun(runNum)
