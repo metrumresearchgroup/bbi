@@ -47,12 +47,13 @@ AppFs := afero.NewOsFs()
 ## Clean folder and move relevant files to parent directory
 
 ```go
+func main() {
 	AppFs := afero.NewOsFs()
 	runNum := "run001"
 	dir := "fixtures"
-	dirToClean := "fixtures/run001_est_03/"
+	dirToClean := "fixtures/run001_est_02/"
 	cleanLvl := 2
-	copyLvl := 1
+	copyLvl := 2
 	dirInfo, _ := afero.ReadDir(AppFs, dirToClean)
 	fileList := utils.ListFiles(dirInfo)
 	outputFiles := runner.EstOutputFileCleanLevels()
@@ -63,7 +64,7 @@ AppFs := afero.NewOsFs()
 
 		lvl, ok := outputFiles[file]
 		fmt.Println(fmt.Sprintf("%v: %s --> lvl:  %v ok: %v", i, file, lvl, ok))
-		if ok && cleanLvl <= lvl {
+		if ok && cleanLvl >= lvl {
 			err := AppFs.Remove(filepath.Join(
 				dirToClean,
 				file,
@@ -77,7 +78,7 @@ AppFs := afero.NewOsFs()
 
 		// Copy files to directory above
 		lvl, ok = keyOutputFiles[file]
-		if ok && copyLvl <= lvl {
+		if ok && lvl >= copyLvl {
 			fileToCopyLocation := filepath.Join(
 				dirToClean,
 				file,
@@ -108,4 +109,42 @@ AppFs := afero.NewOsFs()
 			}
 		}
 	}
+}
+
+
 ```
+
+
+## shell out
+
+
+func main() {
+	cmdName := "Rscript.exe"
+	cmdArgs := []string{"stdout_stream.R"}
+
+	cmd := exec.Command(cmdName, cmdArgs...)
+	cmdReader, err := cmd.StdoutPipe()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Error creating StdoutPipe for Cmd", err)
+		os.Exit(1)
+	}
+
+	scanner := bufio.NewScanner(cmdReader)
+	go func() {
+		for scanner.Scan() {
+			fmt.Printf("Rscript out | %s\n", scanner.Text())
+		}
+	}()
+
+	err = cmd.Start()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Error starting Cmd", err)
+		os.Exit(1)
+	}
+
+	err = cmd.Wait()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Error waiting for Cmd", err)
+		os.Exit(1)
+	}
+}
