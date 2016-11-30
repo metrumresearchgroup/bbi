@@ -117,7 +117,7 @@ func main() {
 
 ## shell out
 
-
+```
 func main() {
 	cmdName := "Rscript.exe"
 	cmdArgs := []string{"stdout_stream.R"}
@@ -148,3 +148,4 @@ func main() {
 		os.Exit(1)
 	}
 }
+```
