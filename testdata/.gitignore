@@ -1,1 +1,4 @@
 run*/
+*
+!acop.csv
+!run001.mod
