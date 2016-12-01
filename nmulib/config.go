@@ -30,5 +30,5 @@ func loadDefaultSettings() {
 	viper.SetDefault("cleanLvl", 2)
 	viper.SetDefault("copyLvl", 2)
 	viper.SetDefault("gitignoreLvl", 1)
-	viper.SetDefault("useGit", true)
+	viper.SetDefault("git", true)
 }
