@@ -19,35 +19,51 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	flag "github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
 
 var (
-	cleanLvl int
+	cleanLvl     int
+	copyLvl      int
+	gitignoreLvl int
+	git          bool
 )
 
 // runCmd represents the run command
 var runCmd = &cobra.Command{
 	Use:   "run",
-	Short: "run a model",
-	Long: `run a model 
-    here is more information`,
-	Run: func(cmd *cobra.Command, args []string) {
-		// TODO: Work your own magic here
-		if cleanLvl >= 0 {
-			viper.Set("cleanLvl", cleanLvl)
-		}
-		fmt.Println("run called with clean level of ", viper.GetInt("cleanLvl"))
-		fmt.Println("run called with args", strings.Join(args, " "))
-		if verbose {
-			fmt.Println("called with verbose flag!")
-		}
-	},
+	Short: "run a (set of) models",
+	Long: `run model(s), for example: 
+nmu run run001.mod
+nmu run run001.mod run002.mod --cleanLvl=1  
+ `,
+	Run: run,
 }
 
+func run(cmd *cobra.Command, args []string) {
+	if flagChanged(cmd.Flags(), "cleanLvl") {
+		viper.Set("cleanLvl", cleanLvl)
+	}
+	if flagChanged(cmd.Flags(), "copyLvl") {
+		viper.Set("copyLvl", copyLvl)
+	}
+	if flagChanged(cmd.Flags(), "git") {
+		viper.Set("git", git)
+	}
+	fmt.Println("usegit: ", viper.GetBool("git"))
+	fmt.Println("run called with clean level of ", viper.GetInt("cleanLvl"))
+	fmt.Println("run called with args", strings.Join(args, " "))
+	if verbose {
+		fmt.Println("called with verbose flag!")
+	}
+}
 func init() {
 	RootCmd.AddCommand(runCmd)
-	runCmd.Flags().IntVarP(&cleanLvl, "cleanLvl", "c", -1, "clean level used for files")
+	runCmd.Flags().IntVar(&cleanLvl, "cleanLvl", 0, "clean level used for file output from a given (set of) runs")
+	runCmd.Flags().IntVar(&copyLvl, "copyLvl", 0, "copy level used for file output from a given (set of) runs")
+	runCmd.Flags().IntVar(&gitignoreLvl, "gitignoreLvl", 0, "gitignore lvl for a given (set of) runs")
+	runCmd.Flags().BoolVar(&git, "git", false, "whether git is used")
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
@@ -58,4 +74,12 @@ func init() {
 	// is called directly, e.g.:
 	// runCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
+}
+
+func flagChanged(flags *flag.FlagSet, key string) bool {
+	flag := flags.Lookup(key)
+	if flag == nil {
+		return false
+	}
+	return flag.Changed
 }
