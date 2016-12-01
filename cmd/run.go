@@ -19,6 +19,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // runCmd represents the run command
@@ -30,9 +31,14 @@ var runCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		// TODO: Work your own magic here
 		fmt.Println("run called with args", strings.Join(args, " "))
-		if Verbose {
-			fmt.Println("called with Verbose flag!")
+		if verbose {
+			fmt.Println("called with verbose flag!")
 		}
+		fmt.Println("in run cmd....")
+		fmt.Println("clean level set to:", viper.Get("cleanLvl"))
+		fmt.Println("randomKey set to:", viper.GetInt("randomKey"))
+		fmt.Println("aKey set to:", viper.GetInt("aKey"))
+		fmt.Println("aConfigVar set to:", viper.GetInt("aConfigVar"))
 	},
 }
 

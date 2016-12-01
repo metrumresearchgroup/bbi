@@ -18,14 +18,15 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/dpastoor/nonmemutils/nmulib"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 var cfgFile string
 
-// Verbose is whether to give verbose output
-var Verbose bool
+// verbose is whether to give verbose output
+var verbose bool
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
@@ -43,6 +44,11 @@ func Execute() {
 		fmt.Println(err)
 		os.Exit(-1)
 	}
+	fmt.Println("outside any command")
+	fmt.Println("clean level set to:", viper.Get("cleanLvl"))
+	fmt.Println("randomKey set to:", viper.GetInt("randomKey"))
+	fmt.Println("aKey set to:", viper.GetInt("aKey"))
+	fmt.Println("aConfigVar set to:", viper.GetInt("aConfigVar"))
 }
 
 func init() {
@@ -52,8 +58,8 @@ func init() {
 	// Cobra supports Persistent Flags, which, if defined here,
 	// will be global for your application.
 
-	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.nmu.yaml)")
-	RootCmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "verbose output")
+	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/nmuconfig.yaml|json|toml)")
+	RootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
@@ -61,16 +67,13 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	if cfgFile != "" { // enable ability to specify config file via flag
-		viper.SetConfigFile(cfgFile)
-	}
+	// if cfgFile != "" { // enable ability to specify config file via flag
+	// 	viper.SetConfigFile(cfgFile)
+	// }
 
-	viper.SetConfigName(".nmu")  // name of config file (without extension)
-	viper.AddConfigPath("$HOME") // adding home directory as first search path
-	viper.AutomaticEnv()         // read in environment variables that match
-
-	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	err := nmulib.LoadGlobalConfig("nmuconfig.toml")
+	if err != nil {
+		fmt.Println(fmt.Errorf("err initializing config %s", err))
 	}
+	viper.SetDefault("randomKey", 10)
 }
