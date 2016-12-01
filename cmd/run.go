@@ -16,8 +16,13 @@ package cmd
 
 import (
 	"fmt"
+	"log"
+	"path/filepath"
 	"strings"
 
+	"github.com/dpastoor/nonmemutils/runner"
+	"github.com/dpastoor/nonmemutils/utils"
+	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	flag "github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -57,6 +62,23 @@ func run(cmd *cobra.Command, args []string) {
 	if verbose {
 		fmt.Println("called with verbose flag!")
 	}
+
+	AppFs := afero.NewOsFs()
+
+	filePath := args[0]
+
+	// create a new dir for model estimation
+	runNum, _ := utils.FileAndExt(filePath)
+	dir := filepath.Dir(filePath)
+	dirInfo, _ := afero.ReadDir(AppFs, dir)
+	dirs := utils.ListDirNames(dirInfo)
+	newDirSuggestion := runner.FindNextEstDirNum(runNum, dirs, 2)
+
+	err := runner.PrepareEstRun(AppFs, dir, filepath.Base(filePath), newDirSuggestion.NextDirName)
+	if err != nil {
+		log.Fatalf("error preparing estimation run: %s", err)
+	}
+
 }
 func init() {
 	RootCmd.AddCommand(runCmd)
