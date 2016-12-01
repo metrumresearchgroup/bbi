@@ -24,6 +24,9 @@ import (
 
 var cfgFile string
 
+// Verbose is whether to give verbose output
+var Verbose bool
+
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "nmu",
@@ -50,6 +53,8 @@ func init() {
 	// will be global for your application.
 
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.nmu.yaml)")
+	RootCmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "verbose output")
+
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 }

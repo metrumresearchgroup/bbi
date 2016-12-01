@@ -30,6 +30,9 @@ var runCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		// TODO: Work your own magic here
 		fmt.Println("run called with args", strings.Join(args, " "))
+		if Verbose {
+			fmt.Println("called with Verbose flag!")
+		}
 	},
 }
 
