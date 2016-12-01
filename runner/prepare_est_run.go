@@ -5,7 +5,6 @@ import (
 
 	"fmt"
 
-	"github.com/dpastoor/nonmemutils/runner"
 	"github.com/dpastoor/nonmemutils/utils"
 	"github.com/spf13/afero"
 )
@@ -31,11 +30,11 @@ func PrepareEstRun(fs afero.Fs, dir string, runName string, runDir string) error
 	}
 	err = utils.WriteLinesFS(
 		fs,
-		runner.PrepareForExecution(fileLines),
+		PrepareForExecution(fileLines),
 		filepath.Join(
 			dir,
 			runDir,
-			filepath.Base(runLocation),
+			runName,
 		),
 	)
 	if err != nil {
