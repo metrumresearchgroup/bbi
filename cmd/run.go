@@ -22,6 +22,10 @@ import (
 	"github.com/spf13/viper"
 )
 
+var (
+	cleanLvl int
+)
+
 // runCmd represents the run command
 var runCmd = &cobra.Command{
 	Use:   "run",
@@ -30,21 +34,20 @@ var runCmd = &cobra.Command{
     here is more information`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// TODO: Work your own magic here
+		if cleanLvl >= 0 {
+			viper.Set("cleanLvl", cleanLvl)
+		}
+		fmt.Println("run called with clean level of ", viper.GetInt("cleanLvl"))
 		fmt.Println("run called with args", strings.Join(args, " "))
 		if verbose {
 			fmt.Println("called with verbose flag!")
 		}
-		fmt.Println("in run cmd....")
-		fmt.Println("clean level set to:", viper.Get("cleanLvl"))
-		fmt.Println("randomKey set to:", viper.GetInt("randomKey"))
-		fmt.Println("aKey set to:", viper.GetInt("aKey"))
-		fmt.Println("aConfigVar set to:", viper.GetInt("aConfigVar"))
 	},
 }
 
 func init() {
 	RootCmd.AddCommand(runCmd)
-
+	runCmd.Flags().IntVarP(&cleanLvl, "cleanLvl", "c", -1, "clean level used for files")
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command

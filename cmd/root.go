@@ -20,7 +20,6 @@ import (
 
 	"github.com/dpastoor/nonmemutils/nmulib"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var cfgFile string
@@ -44,11 +43,6 @@ func Execute() {
 		fmt.Println(err)
 		os.Exit(-1)
 	}
-	fmt.Println("outside any command")
-	fmt.Println("clean level set to:", viper.Get("cleanLvl"))
-	fmt.Println("randomKey set to:", viper.GetInt("randomKey"))
-	fmt.Println("aKey set to:", viper.GetInt("aKey"))
-	fmt.Println("aConfigVar set to:", viper.GetInt("aConfigVar"))
 }
 
 func init() {
@@ -70,10 +64,9 @@ func initConfig() {
 	// if cfgFile != "" { // enable ability to specify config file via flag
 	// 	viper.SetConfigFile(cfgFile)
 	// }
-
+	// TODO: set config a little more flexibly
 	err := nmulib.LoadGlobalConfig("nmuconfig.toml")
 	if err != nil {
 		fmt.Println(fmt.Errorf("err initializing config %s", err))
 	}
-	viper.SetDefault("randomKey", 10)
 }
