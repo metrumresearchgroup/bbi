@@ -81,6 +81,21 @@ func run(cmd *cobra.Command, args []string) {
 	}
 
 	// run model
+	log.Print("about to start running model")
+	runner.RunEstModel(AppFs, dir, newDirSuggestion.NextDirName, filepath.Base(filePath))
+
+	// clean up after
+	log.Print("Done running, about to clean up")
+	estDirInfo, _ := afero.ReadDir(AppFs, filepath.Join(dir, newDirSuggestion.NextDirName))
+	fileList := utils.ListFiles(estDirInfo)
+	runner.CleanEstFolderAndCopyToParent(AppFs,
+		dir,
+		runNum,
+		newDirSuggestion.NextDirName,
+		fileList,
+		viper.GetInt("cleanLvl"),
+		viper.GetInt("copyLvl"),
+	)
 
 }
 func init() {
