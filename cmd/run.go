@@ -64,18 +64,23 @@ func run(cmd *cobra.Command, args []string) {
 
 	// create a new dir for model estimation
 	runNum, _ := utils.FileAndExt(filePath)
-	dir := filepath.Dir(filePath)
+	dir, _ := filepath.Abs(filepath.Dir(filePath))
 	dirInfo, _ := afero.ReadDir(AppFs, dir)
 	dirs := utils.ListDirNames(dirInfo)
 	newDirSuggestion := runner.FindNextEstDirNum(runNum, dirs, 2)
 	if verbose {
 		log.Printf("setting up run infrastructure for run %s", runNum)
+		log.Printf("base dir: %s", dir)
+		log.Printf("new run directory: %s", newDirSuggestion.NextDirName)
 	}
 
+	// copy files with any changes
 	err := runner.PrepareEstRun(AppFs, dir, filepath.Base(filePath), newDirSuggestion.NextDirName)
 	if err != nil {
 		log.Fatalf("error preparing estimation run: %s", err)
 	}
+
+	// run model
 
 }
 func init() {
