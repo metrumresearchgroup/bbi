@@ -31,4 +31,5 @@ func loadDefaultSettings() {
 	viper.SetDefault("copyLvl", 2)
 	viper.SetDefault("gitignoreLvl", 1)
 	viper.SetDefault("git", true)
+	viper.SetDefault("nmExecutable", "nmfe74")
 }
