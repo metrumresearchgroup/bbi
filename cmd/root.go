@@ -22,10 +22,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var cfgFile string
-
-// verbose is whether to give verbose output
-var verbose bool
+var (
+	// name of config file
+	cfgFile string
+	// verbose is whether to give verbose output
+	verbose bool
+	debug   bool
+)
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
@@ -54,6 +57,7 @@ func init() {
 
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/nmuconfig.yaml|json|toml)")
 	RootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
+	RootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "debug mode")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.

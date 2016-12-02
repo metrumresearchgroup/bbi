@@ -15,10 +15,8 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
 	"path/filepath"
-	"strings"
 
 	"github.com/dpastoor/nonmemutils/runner"
 	"github.com/dpastoor/nonmemutils/utils"
@@ -56,11 +54,8 @@ func run(cmd *cobra.Command, args []string) {
 	if flagChanged(cmd.Flags(), "git") {
 		viper.Set("git", git)
 	}
-	fmt.Println("usegit: ", viper.GetBool("git"))
-	fmt.Println("run called with clean level of ", viper.GetInt("cleanLvl"))
-	fmt.Println("run called with args", strings.Join(args, " "))
-	if verbose {
-		fmt.Println("called with verbose flag!")
+	if debug {
+		viper.Debug()
 	}
 
 	AppFs := afero.NewOsFs()
@@ -73,6 +68,9 @@ func run(cmd *cobra.Command, args []string) {
 	dirInfo, _ := afero.ReadDir(AppFs, dir)
 	dirs := utils.ListDirNames(dirInfo)
 	newDirSuggestion := runner.FindNextEstDirNum(runNum, dirs, 2)
+	if verbose {
+		log.Printf("setting up run infrastructure for run %s", runNum)
+	}
 
 	err := runner.PrepareEstRun(AppFs, dir, filepath.Base(filePath), newDirSuggestion.NextDirName)
 	if err != nil {
