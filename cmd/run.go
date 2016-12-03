@@ -15,7 +15,9 @@
 package cmd
 
 import (
-	"fmt"
+	"log"
+
+	"sync"
 
 	"github.com/dpastoor/nonmemutils/runner"
 	"github.com/spf13/afero"
@@ -56,12 +58,18 @@ func run(cmd *cobra.Command, args []string) error {
 	}
 
 	AppFs := afero.NewOsFs()
-
-	filePath := args[0]
-	err := runner.EstimateModel(AppFs, filePath, verbose, debug)
-	if err != nil {
-		return fmt.Errorf("error running model: (%s)", err)
+	var wg sync.WaitGroup
+	wg.Add(len(args))
+	for _, arg := range args {
+		log.Printf("starting goroutine for run %s \n", arg)
+		go func(filePath string) {
+			defer wg.Done()
+			runner.EstimateModel(AppFs, filePath, verbose, debug)
+			log.Printf("completed run %s \n", filePath)
+		}(arg)
 	}
+
+	wg.Wait()
 	return nil
 }
 func init() {
