@@ -1,4 +1,5 @@
 [![Circle CI](https://circleci.com/gh/dpastoor/nonmemutils.svg?style=svg)](https://circleci.com/gh/dpastoor/nonmemutils)
+[![Go Report Card](https://goreportcard.com/badge/github.com/dpastoor/nonmemutils)](https://goreportcard.com/report/github.com/dpastoor/nonmemutils)
 
 # nonmemutils
 nonmem utility functions written in Go with an emphasis on full test coverage
