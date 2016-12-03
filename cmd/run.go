@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"log"
+	"time"
 
 	"sync"
 
@@ -63,6 +64,7 @@ func run(cmd *cobra.Command, args []string) error {
 	AppFs := afero.NewOsFs()
 	var wg sync.WaitGroup
 	queue := make(chan struct{}, viper.GetInt("threads"))
+	start := time.Now()
 	if verbose {
 		log.Printf("setting up a work queue with %v workers", viper.GetInt("threads"))
 	}
@@ -81,6 +83,8 @@ func run(cmd *cobra.Command, args []string) error {
 	}
 
 	wg.Wait()
+	elapsed := time.Since(start)
+	log.Printf("running on %v threads took %s", viper.GetInt("threads"), elapsed)
 	return nil
 }
 func init() {
