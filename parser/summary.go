@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"github.com/apcera/termtables"
-	"github.com/fatih/color"
+	"github.com/logrusorgru/aurora"
 )
 
 // Summary prints all results from the parsed LstData
@@ -24,11 +24,11 @@ func (results LstData) Summary() bool {
 		if i == 2 {
 			//theta, _ := fmt.Printf("%.3E", results.FinalParameterEstimates.Theta[i])
 			thetaTable.AddRow(
-				color.RedString("TH "+strconv.Itoa(i+1)),
-				color.RedString(results.ParameterNames.Theta[i]),
-				color.RedString(strconv.FormatFloat(results.FinalParameterEstimates.Theta[i], 'E', 2, 64)),
-				color.RedString(strconv.FormatFloat(numResult, 'f', -1, 64)),
-				color.RedString("-"),
+				aurora.Red("TH "+strconv.Itoa(i+1)),
+				aurora.Red(results.ParameterNames.Theta[i]),
+				aurora.Red(strconv.FormatFloat(results.FinalParameterEstimates.Theta[i], 'E', 2, 64)),
+				aurora.Red(strconv.FormatFloat(numResult, 'f', -1, 64)),
+				aurora.Red("-"),
 			)
 		} else {
 			thetaTable.AddRow(
@@ -57,7 +57,6 @@ func (results LstData) Summary() bool {
 
 	}
 	omegaTable.SetAlign(termtables.AlignLeft, 1)
-
 	fmt.Println(thetaTable.Render())
 	fmt.Println(omegaTable.Render())
 	return true
