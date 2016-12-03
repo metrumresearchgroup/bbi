@@ -57,7 +57,7 @@ func summary(cmd *cobra.Command, args []string) {
 	fileLines, _ := utils.ReadLinesFS(AppFs, outputFilePath)
 	results := parser.ParseLstEstimationFile(fileLines)
 	jsonRes, _ := json.MarshalIndent(results, "", "\t")
-	fmt.Printf("%s", jsonRes)
+	fmt.Printf("%s\n", jsonRes)
 	results.Summary()
 
 }

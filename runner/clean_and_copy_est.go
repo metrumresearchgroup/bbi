@@ -66,7 +66,6 @@ func CleanEstFolderAndCopyToParent(
 			if verbose {
 				log.Println("deleted file: ", file)
 			}
-			continue
 		}
 
 		// Copy files to directory above
@@ -99,4 +98,5 @@ func CleanEstFolderAndCopyToParent(
 			}
 		}
 	}
+	return nil
 }
