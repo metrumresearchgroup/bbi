@@ -3,7 +3,7 @@ package runner
 import (
 	"fmt"
 	"io"
-	"os"
+	"log"
 	"path/filepath"
 
 	"github.com/spf13/afero"
@@ -19,8 +19,18 @@ import (
 // copyLvl := 2
 // dirInfo, _ := afero.ReadDir(AppFs, filepath.Join(dir, dirToClean))
 // fileList := utils.ListFiles(dirInfo)
-// runner.CleanEstFolderAndCopyToParent(AppFs, dir, runNum, dirToClean, fileList, cleanLvl, copyLvl)
-func CleanEstFolderAndCopyToParent(fs afero.Fs, parentDir string, runNum string, dirToClean string, fileList []string, cleanLvl int, copyLvl int) {
+// runner.CleanEstFolderAndCopyToParent(AppFs, dir, runNum, dirToClean, fileList, cleanLvl, copyLvl, true, true)
+func CleanEstFolderAndCopyToParent(
+	fs afero.Fs,
+	parentDir string,
+	runNum string,
+	dirToClean string,
+	fileList []string,
+	cleanLvl int,
+	copyLvl int,
+	verbose bool,
+	debug bool,
+) error {
 	outputFiles := EstOutputFileCleanLevels()
 	keyOutputFiles := EstOutputFilesByRun(runNum)
 
@@ -33,7 +43,7 @@ func CleanEstFolderAndCopyToParent(fs afero.Fs, parentDir string, runNum string,
 			"temp_dir",
 		))
 		if err != nil {
-			fmt.Println("could not remove temp_dir, ", err)
+			return fmt.Errorf("could not remove temp_dir, %s", err)
 		}
 	}
 
@@ -41,7 +51,9 @@ func CleanEstFolderAndCopyToParent(fs afero.Fs, parentDir string, runNum string,
 
 		// handle cleaning
 		lvl, ok := outputFiles[file]
-		fmt.Println(fmt.Sprintf("%v: %s --> lvl:  %v ok: %v", i, file, lvl, ok))
+		if debug {
+			fmt.Println(fmt.Sprintf("%v: %s --> lvl:  %v ok: %v", i, file, lvl, ok))
+		}
 		if ok && cleanLvl >= lvl {
 			err := fs.Remove(filepath.Join(
 				parentDir,
@@ -49,9 +61,11 @@ func CleanEstFolderAndCopyToParent(fs afero.Fs, parentDir string, runNum string,
 				file,
 			))
 			if err != nil {
-				fmt.Println("ERROR: ", err)
+				return err
 			}
-			fmt.Println("deleted file: ", file)
+			if verbose {
+				log.Println("deleted file: ", file)
+			}
 			continue
 		}
 
@@ -65,8 +79,7 @@ func CleanEstFolderAndCopyToParent(fs afero.Fs, parentDir string, runNum string,
 			)
 			fileToCopy, err := fs.Open(fileToCopyLocation)
 			if err != nil {
-				fmt.Println("TERRIBLE ERROR opening FILE TO COPY")
-				os.Exit(1)
+				return fmt.Errorf("error copying file: (%s)", err)
 			}
 			defer fileToCopy.Close()
 
@@ -76,16 +89,13 @@ func CleanEstFolderAndCopyToParent(fs afero.Fs, parentDir string, runNum string,
 			)
 			newFile, err := fs.Create(newFileLocation)
 			if err != nil {
-				fmt.Println("TERRIBLE ERROR CREATING FILE TO COPY")
-				os.Exit(1)
-				continue
+				return fmt.Errorf("error creating new file: (%s)", err)
 			}
 			defer newFile.Close()
 
 			_, err = io.Copy(newFile, fileToCopy)
 			if err != nil {
-				fmt.Println("TERRIBLE ERROR TRYING TO COPY: ", err)
-				os.Exit(1)
+				return fmt.Errorf("error copying to new file: (%s)", err)
 			}
 		}
 	}
