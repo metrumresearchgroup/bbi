@@ -2,6 +2,7 @@ package parser
 
 import (
 	"fmt"
+	"math"
 	"strconv"
 
 	"github.com/apcera/termtables"
@@ -18,32 +19,40 @@ func (results LstData) Summary() bool {
 		Alignment: termtables.AlignRight,
 	}
 	thetaTable := termtables.CreateTable()
-	thetaTable.AddHeaders("Theta", "Name", "Estimate (SN)", "Estimate", "StdErr")
+	thetaTable.AddHeaders("Theta", "Name", "Estimate (SN)", "Estimate", "StdErr", "SE (RSE)")
 	for i := range results.FinalParameterEstimates.Theta {
 		numResult := results.FinalParameterEstimates.Theta[i]
+		seResult := results.FinalParameterStdErr.Theta[i]
+		var rse float64
+		if seResult != 0 && numResult != 0 {
+			rse = math.Abs(seResult / numResult * 100)
+
+		}
+
 		if i == 2 {
 			//theta, _ := fmt.Printf("%.3E", results.FinalParameterEstimates.Theta[i])
 			thetaTable.AddRow(
 				aurora.Red("TH "+strconv.Itoa(i+1)),
 				aurora.Red(results.ParameterNames.Theta[i]),
-				aurora.Red(strconv.FormatFloat(results.FinalParameterEstimates.Theta[i], 'E', 2, 64)),
+				aurora.Red(strconv.FormatFloat(numResult, 'E', 2, 64)),
 				aurora.Red(strconv.FormatFloat(numResult, 'f', -1, 64)),
-				aurora.Red("-"),
+				aurora.Red(strconv.FormatFloat(seResult, 'f', -1, 64)),
+				aurora.Red(fmt.Sprintf("%s %%", strconv.FormatFloat(rse, 'f', 1, 64))),
 			)
 		} else {
 			thetaTable.AddRow(
 				"TH "+strconv.Itoa(i+1),
 				results.ParameterNames.Theta[i],
-				strconv.FormatFloat(results.FinalParameterEstimates.Theta[i], 'E', 2, 64),
+				strconv.FormatFloat(numResult, 'E', 2, 64),
 				strconv.FormatFloat(numResult, 'f', -1, 64),
-				"-",
+				strconv.FormatFloat(seResult, 'f', -1, 64),
+				fmt.Sprintf("%s %%", strconv.FormatFloat(rse, 'f', 1, 64)),
 			)
 
 		}
 
 	}
 	thetaTable.SetAlign(termtables.AlignLeft, 1)
-	thetaTable.SetAlign(termtables.AlignLeft, 5)
 
 	omegaTable := termtables.CreateTable()
 	omegaTable.AddHeaders("Omega", "Estimate")
