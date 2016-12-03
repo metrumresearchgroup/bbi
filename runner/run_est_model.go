@@ -54,7 +54,7 @@ func RunEstModel(fs afero.Fs, baseDir string, modelDir string, runName string) {
 
 	err = cmd.Wait()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Error waiting for Cmd", err)
+		fmt.Fprintln(os.Stderr, "Error attempting to run model, check the lst file in the run directory for more details", err)
 		os.Exit(1)
 	}
 }
