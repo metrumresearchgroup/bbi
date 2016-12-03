@@ -3,6 +3,8 @@ package nmulib
 import (
 	"fmt"
 
+	"runtime"
+
 	"github.com/spf13/viper"
 )
 
@@ -32,4 +34,5 @@ func loadDefaultSettings() {
 	viper.SetDefault("gitignoreLvl", 1)
 	viper.SetDefault("git", true)
 	viper.SetDefault("nmExecutable", "nmfe74")
+	viper.SetDefault("threads", runtime.NumCPU())
 }
