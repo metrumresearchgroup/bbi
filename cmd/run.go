@@ -15,6 +15,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/dpastoor/nonmemutils/runner"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
@@ -56,7 +58,11 @@ func run(cmd *cobra.Command, args []string) error {
 	AppFs := afero.NewOsFs()
 
 	filePath := args[0]
-	runner.EstimateModel(AppFs, filePath, verbose, debug)
+	err := runner.EstimateModel(AppFs, filePath, verbose, debug)
+	if err != nil {
+		return fmt.Errorf("error running model: (%s)", err)
+	}
+	return nil
 }
 func init() {
 	RootCmd.AddCommand(runCmd)

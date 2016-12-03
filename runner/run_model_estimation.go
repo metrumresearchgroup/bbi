@@ -31,11 +31,15 @@ func EstimateModel(fs afero.Fs, modelPath string, verbose bool, debug bool) erro
 	}
 
 	// run model
-	log.Println("about to start running model")
+	if verbose {
+		log.Println("about to start running model")
+	}
 	RunEstModel(fs, dir, newDirSuggestion.NextDirName, modelFile)
 
 	// clean up after
-	log.Println("cleaning up...")
+	if verbose {
+		log.Println("cleaning up...")
+	}
 	estDirInfo, _ := afero.ReadDir(fs, filepath.Join(dir, newDirSuggestion.NextDirName))
 	fileList := utils.ListFiles(estDirInfo)
 	err = CleanEstFolderAndCopyToParent(fs,
@@ -51,6 +55,9 @@ func EstimateModel(fs afero.Fs, modelPath string, verbose bool, debug bool) erro
 	if err != nil {
 		log.Printf("error cleaning estimation run: %s", err)
 		return err
+	}
+	if verbose {
+		log.Println("done cleaning up!")
 	}
 	return nil
 }
