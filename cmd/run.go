@@ -53,19 +53,27 @@ func run(cmd *cobra.Command, args []string) error {
 	if flagChanged(cmd.Flags(), "git") {
 		viper.Set("git", git)
 	}
+	if flagChanged(cmd.Flags(), "threads") {
+		viper.Set("threads", threads)
+	}
 	if debug {
 		viper.Debug()
 	}
 
 	AppFs := afero.NewOsFs()
 	var wg sync.WaitGroup
+	queue := make(chan struct{}, viper.GetInt("threads"))
+	defer close(queue)
 	wg.Add(len(args))
 	for _, arg := range args {
 		log.Printf("starting goroutine for run %s \n", arg)
 		go func(filePath string) {
+			queue <- struct{}{}
+			log.Printf("run %s running on worker!", filePath)
 			defer wg.Done()
 			runner.EstimateModel(AppFs, filePath, verbose, debug)
-			log.Printf("completed run %s \n", filePath)
+			log.Printf("completed run %s releasing worker back to queue \n", filePath)
+			<-queue
 		}(arg)
 	}
 

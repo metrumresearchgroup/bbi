@@ -29,6 +29,7 @@ var (
 	// verbose is whether to give verbose output
 	verbose bool
 	debug   bool
+	threads int
 )
 
 // RootCmd represents the base command when called without any subcommands
@@ -59,6 +60,7 @@ func init() {
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/nmuconfig.yaml|json|toml)")
 	RootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
 	RootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "debug mode")
+	RootCmd.PersistentFlags().IntVarP(&threads, "threads", "t", 0, "number of threads to execute with")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
