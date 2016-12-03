@@ -19,7 +19,7 @@ func (results LstData) Summary() bool {
 		Alignment: termtables.AlignRight,
 	}
 	thetaTable := termtables.CreateTable()
-	thetaTable.AddHeaders("Theta", "Name", "Estimate (SN)", "Estimate", "StdErr", "SE (RSE)")
+	thetaTable.AddHeaders("Theta", "Name", "Estimate (SN)", "Estimate", "StdErr (RSE)")
 	for i := range results.FinalParameterEstimates.Theta {
 		numResult := results.FinalParameterEstimates.Theta[i]
 		seResult := results.FinalParameterStdErr.Theta[i]
@@ -29,15 +29,18 @@ func (results LstData) Summary() bool {
 
 		}
 
-		if i == 2 {
+		if rse > 30 {
 			//theta, _ := fmt.Printf("%.3E", results.FinalParameterEstimates.Theta[i])
 			thetaTable.AddRow(
 				aurora.Red("TH "+strconv.Itoa(i+1)),
 				aurora.Red(results.ParameterNames.Theta[i]),
 				aurora.Red(strconv.FormatFloat(numResult, 'E', 2, 64)),
 				aurora.Red(strconv.FormatFloat(numResult, 'f', -1, 64)),
-				aurora.Red(strconv.FormatFloat(seResult, 'f', -1, 64)),
-				aurora.Red(fmt.Sprintf("%s %%", strconv.FormatFloat(rse, 'f', 1, 64))),
+				aurora.Red(
+					fmt.Sprintf("%s (%s %%)",
+						strconv.FormatFloat(seResult, 'f', -1, 64),
+						strconv.FormatFloat(rse, 'f', 1, 64)),
+				),
 			)
 		} else {
 			thetaTable.AddRow(
@@ -45,8 +48,10 @@ func (results LstData) Summary() bool {
 				results.ParameterNames.Theta[i],
 				strconv.FormatFloat(numResult, 'E', 2, 64),
 				strconv.FormatFloat(numResult, 'f', -1, 64),
-				strconv.FormatFloat(seResult, 'f', -1, 64),
-				fmt.Sprintf("%s %%", strconv.FormatFloat(rse, 'f', 1, 64)),
+				fmt.Sprintf("%s (%s %%)",
+					strconv.FormatFloat(seResult, 'f', -1, 64),
+					strconv.FormatFloat(rse, 'f', 1, 64),
+				),
 			)
 
 		}

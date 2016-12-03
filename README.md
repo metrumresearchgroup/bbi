@@ -21,7 +21,7 @@ By using go, this utility is nicely cross platform, and is distributed as a sing
 ** Currently the software is considered pre-alpha and documentation is non-existant **. However, go, being a statically typed language and simple in it's structures, makes it _reasonably_ easy to look at the raw source to get a feel for what is going on.
 
 
-Example output as of september 2016 (with new fields continually being added)
+Example output as of November 2016 (with new fields continually being added)
 ```
 {                                                                     
         "RunDetails": {                                               
@@ -112,13 +112,13 @@ Example output as of september 2016 (with new fields continually being added)
 With tabular outputs that look like:
 
 ```
-+-----------+----------+-------------------+--------------+------------+--------------+
-|   Theta   |   Name   |   Estimate (SN)   |   Estimate   |   StdErr   |   SE (RSE)   |
-+-----------+----------+-------------------+--------------+------------+--------------+
-|   TH 1    |     KA   |        2.31E+00   |       2.31   |   0.0862   |      3.7 %   |
-|   TH 2    |     CL   |        5.50E+01   |         55   |     3.33   |      6.1 %   |
-|   TH 3    |     V2   |        4.65E+02   |        465   |     29.7   |      6.4 %   |
-|   TH 4    |   RUVp   |       -8.06E-02   |    -0.0806   |   0.0555   |     68.9 %   |
-|   TH 5    |   RUVa   |        4.13E+00   |       4.13   |     1.36   |     32.9 %   |
-+-----------+----------+-------------------+--------------+------------+--------------+
++-----------+----------+-------------------+--------------+---------------------+
+|   Theta   |   Name   |   Estimate (SN)   |   Estimate   |      StdErr (RSE)   |
++-----------+----------+-------------------+--------------+---------------------+
+|   TH 1    |     KA   |        2.31E+00   |       2.31   |    0.0862 (3.7 %)   |
+|   TH 2    |     CL   |        5.50E+01   |         55   |      3.33 (6.1 %)   |
+|   TH 3    |     V2   |        4.65E+02   |        465   |      29.7 (6.4 %)   |
+|   TH 4    |   RUVp   |       -8.06E-02   |    -0.0806   |   0.0555 (68.9 %)   |
+|   TH 5    |   RUVa   |        4.13E+00   |       4.13   |     1.36 (32.9 %)   |
++-----------+----------+-------------------+--------------+---------------------+
 ```
