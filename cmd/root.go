@@ -20,6 +20,7 @@ import (
 
 	"github.com/dpastoor/nonmemutils/nmulib"
 	"github.com/spf13/cobra"
+	flag "github.com/spf13/pflag"
 )
 
 var (
@@ -73,4 +74,12 @@ func initConfig() {
 	if err != nil {
 		fmt.Println(fmt.Errorf("err initializing config %s", err))
 	}
+}
+
+func flagChanged(flags *flag.FlagSet, key string) bool {
+	flag := flags.Lookup(key)
+	if flag == nil {
+		return false
+	}
+	return flag.Changed
 }

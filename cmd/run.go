@@ -22,7 +22,6 @@ import (
 	"github.com/dpastoor/nonmemutils/utils"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
-	flag "github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
 
@@ -85,7 +84,7 @@ func run(cmd *cobra.Command, args []string) {
 	runner.RunEstModel(AppFs, dir, newDirSuggestion.NextDirName, filepath.Base(filePath))
 
 	// clean up after
-	log.Print("Done running, about to clean up")
+	log.Print("cleaning up...")
 	estDirInfo, _ := afero.ReadDir(AppFs, filepath.Join(dir, newDirSuggestion.NextDirName))
 	fileList := utils.ListFiles(estDirInfo)
 	runner.CleanEstFolderAndCopyToParent(AppFs,
@@ -114,12 +113,4 @@ func init() {
 	// is called directly, e.g.:
 	// runCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
-}
-
-func flagChanged(flags *flag.FlagSet, key string) bool {
-	flag := flags.Lookup(key)
-	if flag == nil {
-		return false
-	}
-	return flag.Changed
 }
