@@ -42,7 +42,7 @@ func RunEstModel(fs afero.Fs, baseDir string, modelDir string, runName string) {
 	scanner := bufio.NewScanner(cmdReader)
 	go func() {
 		for scanner.Scan() {
-			fmt.Printf("%s out | %s\n", nmExecutable, scanner.Text())
+			fmt.Printf("%s out | %s\n", runName, scanner.Text())
 		}
 	}()
 
