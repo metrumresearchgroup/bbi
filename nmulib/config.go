@@ -21,6 +21,7 @@ func LoadGlobalConfig(configFilename string) error {
 		if _, ok := err.(viper.ConfigParseError); ok {
 			return err
 		}
+		loadDefaultSettings() // still load default settings as don't need a config file
 		return fmt.Errorf("Unable to locate Config file. (%s)\n", err)
 	}
 
