@@ -15,11 +15,7 @@
 package cmd
 
 import (
-	"log"
-	"path/filepath"
-
 	"github.com/dpastoor/nonmemutils/runner"
-	"github.com/dpastoor/nonmemutils/utils"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -40,10 +36,10 @@ var runCmd = &cobra.Command{
 nmu run run001.mod
 nmu run run001.mod run002.mod --cleanLvl=1  
  `,
-	Run: run,
+	RunE: run,
 }
 
-func run(cmd *cobra.Command, args []string) {
+func run(cmd *cobra.Command, args []string) error {
 	if flagChanged(cmd.Flags(), "cleanLvl") {
 		viper.Set("cleanLvl", cleanLvl)
 	}
@@ -60,42 +56,7 @@ func run(cmd *cobra.Command, args []string) {
 	AppFs := afero.NewOsFs()
 
 	filePath := args[0]
-
-	// create a new dir for model estimation
-	runNum, _ := utils.FileAndExt(filePath)
-	dir, _ := filepath.Abs(filepath.Dir(filePath))
-	dirInfo, _ := afero.ReadDir(AppFs, dir)
-	dirs := utils.ListDirNames(dirInfo)
-	newDirSuggestion := runner.FindNextEstDirNum(runNum, dirs, 2)
-	if verbose {
-		log.Printf("setting up run infrastructure for run %s", runNum)
-		log.Printf("base dir: %s", dir)
-		log.Printf("new run directory: %s", newDirSuggestion.NextDirName)
-	}
-
-	// copy files with any changes
-	err := runner.PrepareEstRun(AppFs, dir, filepath.Base(filePath), newDirSuggestion.NextDirName)
-	if err != nil {
-		log.Fatalf("error preparing estimation run: %s", err)
-	}
-
-	// run model
-	log.Print("about to start running model")
-	runner.RunEstModel(AppFs, dir, newDirSuggestion.NextDirName, filepath.Base(filePath))
-
-	// clean up after
-	log.Print("cleaning up...")
-	estDirInfo, _ := afero.ReadDir(AppFs, filepath.Join(dir, newDirSuggestion.NextDirName))
-	fileList := utils.ListFiles(estDirInfo)
-	runner.CleanEstFolderAndCopyToParent(AppFs,
-		dir,
-		runNum,
-		newDirSuggestion.NextDirName,
-		fileList,
-		viper.GetInt("cleanLvl"),
-		viper.GetInt("copyLvl"),
-	)
-
+	runner.EstimateModel(AppFs, filePath, verbose, debug)
 }
 func init() {
 	RootCmd.AddCommand(runCmd)
