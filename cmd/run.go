@@ -63,6 +63,9 @@ func run(cmd *cobra.Command, args []string) error {
 	AppFs := afero.NewOsFs()
 	var wg sync.WaitGroup
 	queue := make(chan struct{}, viper.GetInt("threads"))
+	if verbose {
+		log.Printf("setting up a work queue with %v workers", viper.GetInt("threads"))
+	}
 	defer close(queue)
 	wg.Add(len(args))
 	for _, arg := range args {
