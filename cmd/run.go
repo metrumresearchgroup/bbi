@@ -15,6 +15,7 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -27,6 +28,8 @@ import (
 )
 
 var (
+	cacheDir     string
+	cacheExe     string
 	cleanLvl     int
 	copyLvl      int
 	gitignoreLvl int
@@ -45,6 +48,13 @@ nmu run run001.mod run002.mod --cleanLvl=1
 }
 
 func run(cmd *cobra.Command, args []string) error {
+	if flagChanged(cmd.Flags(), "cacheDir") {
+		viper.Set("cacheDir", cacheDir)
+	}
+	if flagChanged(cmd.Flags(), "cacheExe") {
+		fmt.Println("setting new cache exe of: ", cacheExe)
+		viper.Set("cacheExe", cacheExe)
+	}
 	if flagChanged(cmd.Flags(), "cleanLvl") {
 		viper.Set("cleanLvl", cleanLvl)
 	}
@@ -76,7 +86,15 @@ func run(cmd *cobra.Command, args []string) error {
 			queue <- struct{}{}
 			log.Printf("run %s running on worker!", filePath)
 			defer wg.Done()
-			runner.EstimateModel(AppFs, filePath, verbose, debug)
+			viper.Debug()
+			runner.EstimateModel(
+				AppFs,
+				filePath,
+				verbose,
+				debug,
+				viper.GetString("cacheDir"),
+				viper.GetString("cacheExe"),
+			)
 			log.Printf("completed run %s releasing worker back to queue \n", filePath)
 			<-queue
 		}(arg)
@@ -89,6 +107,8 @@ func run(cmd *cobra.Command, args []string) error {
 }
 func init() {
 	RootCmd.AddCommand(runCmd)
+	runCmd.Flags().StringVar(&cacheDir, "cacheDir", "", "directory path for cache of nonmem executables for NM7.4+")
+	runCmd.Flags().StringVar(&cacheExe, "cacheExe", "", "name of executable stored in cache")
 	runCmd.Flags().IntVar(&cleanLvl, "cleanLvl", 0, "clean level used for file output from a given (set of) runs")
 	runCmd.Flags().IntVar(&copyLvl, "copyLvl", 0, "copy level used for file output from a given (set of) runs")
 	runCmd.Flags().IntVar(&gitignoreLvl, "gitignoreLvl", 0, "gitignore lvl for a given (set of) runs")

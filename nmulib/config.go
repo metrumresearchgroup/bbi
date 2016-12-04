@@ -30,10 +30,13 @@ func LoadGlobalConfig(configFilename string) error {
 }
 
 func loadDefaultSettings() {
+	viper.SetDefault("cacheDir", "nmcache")
+	viper.SetDefault("cacheExe", "")
 	viper.SetDefault("cleanLvl", 2)
 	viper.SetDefault("copyLvl", 2)
 	viper.SetDefault("gitignoreLvl", 1)
 	viper.SetDefault("git", true)
 	viper.SetDefault("nmExecutable", "nmfe74")
+	viper.SetDefault("noBuild", false)
 	viper.SetDefault("threads", runtime.NumCPU())
 }

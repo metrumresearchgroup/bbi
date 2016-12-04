@@ -10,16 +10,17 @@ import (
 )
 
 // EstimateModel prepares, runs and cleans up a model estimation run
+// modelPath is the relative path of the model from where Estimate model is called from
 // cacheDir is the location of the cache dir, relative to the baseDir,
 //		for nonmem executable for version 7.4 for use in precompilation
-// nmNameInCache is the name of the nonmem executable in the cache dir
+// exeNameInCache is the name of the nonmem executable in the cache dir
 func EstimateModel(
 	fs afero.Fs,
 	modelPath string,
 	verbose bool,
 	debug bool,
 	cacheDir string,
-	nmNameInCache string,
+	exeNameInCache string,
 ) error {
 	modelFile := filepath.Base(modelPath)
 	runNum, _ := utils.FileAndExt(modelPath)
@@ -43,8 +44,8 @@ func EstimateModel(
 
 	// deal with cache maybe
 	noBuild := false
-	if nmNameInCache != "" {
-		utils.SetupCacheForRun(fs, dir, modelDir, cacheDir, nmNameInCache)
+	if exeNameInCache != "" {
+		utils.SetupCacheForRun(fs, dir, modelDir, cacheDir, exeNameInCache)
 		noBuild = true
 	}
 
