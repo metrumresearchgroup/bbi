@@ -16,11 +16,12 @@ import (
 
 // RunEstModel runs the estimation model in a given model dir
 // baseDir is the directory from which the original model file was copied
-func RunEstModel(fs afero.Fs, baseDir string, modelDir string, runName string) {
+func RunEstModel(fs afero.Fs, baseDir string, modelDir string, runName string) error {
 	ok, err := utils.DirExists(filepath.Join(baseDir, modelDir), fs)
 	if !ok || err != nil {
 		//TODO: change these exits to instead just return an error probably
-		log.Fatalf("could not change directory to: %s, ERR: %s, ok: %v", modelDir, err, ok)
+		log.Printf("could not change directory to: %s, ERR: %s, ok: %v", modelDir, err, ok)
+		return err
 	}
 
 	runNum, fileExt := utils.FileAndExt(runName)
@@ -36,7 +37,6 @@ func RunEstModel(fs afero.Fs, baseDir string, modelDir string, runName string) {
 	cmdReader, err := cmd.StdoutPipe()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Error creating StdoutPipe for Cmd", err)
-		os.Exit(1)
 	}
 
 	scanner := bufio.NewScanner(cmdReader)
@@ -49,12 +49,13 @@ func RunEstModel(fs afero.Fs, baseDir string, modelDir string, runName string) {
 	err = cmd.Start()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Error starting Cmd", err)
-		os.Exit(1)
+		return err
 	}
 
 	err = cmd.Wait()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Error attempting to run model, check the lst file in the run directory for more details", err)
-		os.Exit(1)
+		return err
 	}
+	return nil
 }
