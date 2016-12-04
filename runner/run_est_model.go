@@ -43,8 +43,7 @@ func RunEstModel(fs afero.Fs,
 		strings.Join([]string{runNum, ".lst"}, ""),
 	}
 
-	// this should probably all be abstracted to a function like SetupCache
-	if cacheDir != "" {
+	if nmNameInCache != "" {
 		utils.SetupCacheForRun(fs, baseDir, modelDir, cacheDir, nmNameInCache)
 		cmdArgs = append(cmdArgs, "--nobuild")
 	}
