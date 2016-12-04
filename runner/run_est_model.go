@@ -15,12 +15,24 @@ import (
 )
 
 // RunEstModel runs the estimation model in a given model dir
+//
 // baseDir is the directory from which the original model file was copied
-func RunEstModel(fs afero.Fs, baseDir string, modelDir string, runName string) error {
+// model dir is the name of the model directory to run the copied model
+// runName is the name of the run model file --> run001.mod
+// cacheDir is the location of the cache dir, relative to the baseDir,
+//		for nonmem executable for version 7.4 for use in precompilation
+// nmNameInCache is the name of the nonmem executable in the cache dir
+func RunEstModel(fs afero.Fs,
+	baseDir string,
+	modelDir string,
+	runName string,
+	cacheDir string,
+	nmNameInCache string,
+) error {
 	ok, err := utils.DirExists(filepath.Join(baseDir, modelDir), fs)
 	if !ok || err != nil {
 		//TODO: change these exits to instead just return an error probably
-		log.Printf("could not change directory to: %s, ERR: %s, ok: %v", modelDir, err, ok)
+		log.Printf("could not find directory to run model %s, ERR: %s, ok: %v", modelDir, err, ok)
 		return err
 	}
 
@@ -29,6 +41,12 @@ func RunEstModel(fs afero.Fs, baseDir string, modelDir string, runName string) e
 	cmdArgs := []string{
 		strings.Join([]string{runNum, fileExt}, ""),
 		strings.Join([]string{runNum, ".lst"}, ""),
+	}
+
+	// this should probably all be abstracted to a function like SetupCache
+	if cacheDir != "" {
+		utils.SetupCacheForRun(fs, baseDir, modelDir, cacheDir, nmNameInCache)
+		cmdArgs = append(cmdArgs, "--nobuild")
 	}
 
 	cmd := exec.Command(nmExecutable, cmdArgs...)

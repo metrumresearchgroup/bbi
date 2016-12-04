@@ -34,7 +34,13 @@ func EstimateModel(fs afero.Fs, modelPath string, verbose bool, debug bool) erro
 	if verbose {
 		log.Println("about to start running model")
 	}
-	RunEstModel(fs, dir, newDirSuggestion.NextDirName, modelFile)
+	cacheDir := ""
+	exeNameInCache := ""
+	err = RunEstModel(fs, dir, newDirSuggestion.NextDirName, modelFile, cacheDir, exeNameInCache)
+	if err != nil {
+		log.Printf("error during estimation run: %s", err)
+		return err
+	}
 
 	// clean up after
 	if verbose {
