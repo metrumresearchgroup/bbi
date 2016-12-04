@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 )
@@ -63,8 +62,6 @@ func ParseLstEstimationFile(lines []string) LstData {
 		}
 
 	}
-
-	fmt.Println(startThetaIndex, endSigmaIndex)
 
 	result := LstData{
 		ParseRunDetails(lines),
