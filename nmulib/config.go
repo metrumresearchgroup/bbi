@@ -10,12 +10,12 @@ import (
 
 // LoadGlobalConfig loads nonmemutils configuration into the global Viper
 func LoadGlobalConfig(configFilename string) error {
-	// viper.SetConfigName("nmuconfig")
-	// viper.SetConfigType("toml")
+	viper.SetConfigName(configFilename)
+	viper.SetConfigType("toml")
 	viper.AutomaticEnv()
 	viper.SetEnvPrefix("nmu")
-	viper.SetConfigFile(configFilename)
 	viper.AddConfigPath(".")
+	viper.AddConfigPath("$HOME")
 	err := viper.ReadInConfig()
 	if err != nil {
 		if _, ok := err.(viper.ConfigParseError); ok {
