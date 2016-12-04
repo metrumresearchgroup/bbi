@@ -26,8 +26,7 @@ func RunEstModel(fs afero.Fs,
 	baseDir string,
 	modelDir string,
 	runName string,
-	cacheDir string,
-	nmNameInCache string,
+	fromCache bool,
 ) error {
 	ok, err := utils.DirExists(filepath.Join(baseDir, modelDir), fs)
 	if !ok || err != nil {
@@ -43,8 +42,7 @@ func RunEstModel(fs afero.Fs,
 		strings.Join([]string{runNum, ".lst"}, ""),
 	}
 
-	if nmNameInCache != "" {
-		utils.SetupCacheForRun(fs, baseDir, modelDir, cacheDir, nmNameInCache)
+	if fromCache {
 		cmdArgs = append(cmdArgs, "--nobuild")
 	}
 

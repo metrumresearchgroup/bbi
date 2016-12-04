@@ -10,33 +10,47 @@ import (
 )
 
 // EstimateModel prepares, runs and cleans up a model estimation run
-func EstimateModel(fs afero.Fs, modelPath string, verbose bool, debug bool) error {
+func EstimateModel(
+	fs afero.Fs,
+	modelPath string,
+	verbose bool,
+	debug bool,
+	cacheDir string,
+	nmNameInCache string,
+) error {
 	modelFile := filepath.Base(modelPath)
 	runNum, _ := utils.FileAndExt(modelPath)
 	dir, _ := filepath.Abs(filepath.Dir(modelPath))
 	dirInfo, _ := afero.ReadDir(fs, dir)
 	dirs := utils.ListDirNames(dirInfo)
 	newDirSuggestion := FindNextEstDirNum(runNum, dirs, 2)
+	modelDir := newDirSuggestion.NextDirName
 	if verbose {
 		log.Printf("setting up run infrastructure for run %s", runNum)
 		log.Printf("base dir: %s", dir)
-		log.Printf("new run directory: %s", newDirSuggestion.NextDirName)
+		log.Printf("new run directory to be prepared: %s", modelDir)
 	}
 
 	// copy files with any changes
-	err := PrepareEstRun(fs, dir, modelFile, newDirSuggestion.NextDirName)
+	err := PrepareEstRun(fs, dir, modelFile, modelDir)
 	if err != nil {
 		log.Printf("error preparing estimation run: %s", err)
 		return err
+	}
+
+	// deal with cache maybe
+	fromCache := false
+	if nmNameInCache != "" {
+		utils.SetupCacheForRun(fs, dir, modelDir, cacheDir, nmNameInCache)
+		fromCache = true
 	}
 
 	// run model
 	if verbose {
 		log.Println("about to start running model")
 	}
-	cacheDir := ""
-	exeNameInCache := ""
-	err = RunEstModel(fs, dir, newDirSuggestion.NextDirName, modelFile, cacheDir, exeNameInCache)
+	err = RunEstModel(fs, dir, newDirSuggestion.NextDirName, modelFile, fromCache)
+
 	if err != nil {
 		log.Printf("error during estimation run: %s", err)
 		return err
