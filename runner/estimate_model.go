@@ -10,6 +10,9 @@ import (
 )
 
 // EstimateModel prepares, runs and cleans up a model estimation run
+// cacheDir is the location of the cache dir, relative to the baseDir,
+//		for nonmem executable for version 7.4 for use in precompilation
+// nmNameInCache is the name of the nonmem executable in the cache dir
 func EstimateModel(
 	fs afero.Fs,
 	modelPath string,
@@ -39,17 +42,17 @@ func EstimateModel(
 	}
 
 	// deal with cache maybe
-	fromCache := false
+	noBuild := false
 	if nmNameInCache != "" {
 		utils.SetupCacheForRun(fs, dir, modelDir, cacheDir, nmNameInCache)
-		fromCache = true
+		noBuild = true
 	}
 
 	// run model
 	if verbose {
 		log.Println("about to start running model")
 	}
-	err = RunEstModel(fs, dir, newDirSuggestion.NextDirName, modelFile, fromCache)
+	err = RunEstModel(fs, dir, newDirSuggestion.NextDirName, modelFile, noBuild)
 
 	if err != nil {
 		log.Printf("error during estimation run: %s", err)

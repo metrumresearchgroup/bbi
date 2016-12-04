@@ -17,16 +17,14 @@ import (
 // RunEstModel runs the estimation model in a given model dir
 //
 // baseDir is the directory from which the original model file was copied
-// model dir is the name of the model directory to run the copied model
+// modelDir is the name of the model directory to run the copied model
 // runName is the name of the run model file --> run001.mod
-// cacheDir is the location of the cache dir, relative to the baseDir,
-//		for nonmem executable for version 7.4 for use in precompilation
-// nmNameInCache is the name of the nonmem executable in the cache dir
+// noBuild is whether to append --nobuild given a nonmem executable is in the run dir
 func RunEstModel(fs afero.Fs,
 	baseDir string,
 	modelDir string,
 	runName string,
-	fromCache bool,
+	noBuild bool,
 ) error {
 	ok, err := utils.DirExists(filepath.Join(baseDir, modelDir), fs)
 	if !ok || err != nil {
@@ -42,7 +40,7 @@ func RunEstModel(fs afero.Fs,
 		strings.Join([]string{runNum, ".lst"}, ""),
 	}
 
-	if fromCache {
+	if noBuild {
 		cmdArgs = append(cmdArgs, "--nobuild")
 	}
 
