@@ -37,3 +37,11 @@
                    0.3000E-01   0.9000E-01
          3                                                                                   NO
                    0.1000E-01
+
+
+## SGE notes
+
+* submission script should look something like: 
+
+`qsub -V -r y -N wexample10.ctl -j y -cwd -b y -q main.q /opt/nm73/run/nmfe73 <runName>.mod <runName>.lst -background -prdefault`
+
