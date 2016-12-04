@@ -28,6 +28,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+var summaryTree bool
+
 // runCmd represents the run command
 var summaryCmd = &cobra.Command{
 	Use:   "summary",
@@ -56,21 +58,15 @@ func summary(cmd *cobra.Command, args []string) {
 	}
 	fileLines, _ := utils.ReadLinesFS(AppFs, outputFilePath)
 	results := parser.ParseLstEstimationFile(fileLines)
-	jsonRes, _ := json.MarshalIndent(results, "", "\t")
-	fmt.Printf("%s\n", jsonRes)
-	results.Summary()
+	if summaryTree {
+		jsonRes, _ := json.MarshalIndent(results, "", "\t")
+		fmt.Printf("%s\n", jsonRes)
+	} else {
+		results.Summary()
+	}
 
 }
 func init() {
 	RootCmd.AddCommand(summaryCmd)
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// runCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// runCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-
+	summaryCmd.Flags().BoolVar(&summaryTree, "tree", false, "show a json tree of parsed results from the lst file instead of summary tables")
 }
