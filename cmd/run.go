@@ -73,6 +73,14 @@ func run(cmd *cobra.Command, args []string) error {
 	}
 
 	AppFs := afero.NewOsFs()
+	// can use this to redirect log output
+	// f, err := os.OpenFile("testlogfile", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	// if err != nil {
+	// 	log.Fatalf("error opening file: %v", err)
+	// }
+	// defer f.Close()
+
+	// log.SetOutput(f)
 	var wg sync.WaitGroup
 	queue := make(chan struct{}, viper.GetInt("threads"))
 	start := time.Now()
