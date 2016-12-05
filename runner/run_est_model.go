@@ -26,7 +26,8 @@ func RunEstModel(fs afero.Fs,
 	runName string,
 	noBuild bool,
 ) error {
-	ok, err := utils.DirExists(filepath.Join(baseDir, modelDir), fs)
+	modelDirPath := filepath.Join(baseDir, modelDir)
+	ok, err := utils.DirExists(modelDirPath, fs)
 	if !ok || err != nil {
 		//TODO: change these exits to instead just return an error probably
 		log.Printf("could not find directory to run model %s, ERR: %s, ok: %v", modelDir, err, ok)
@@ -46,17 +47,22 @@ func RunEstModel(fs afero.Fs,
 
 	cmd := exec.Command(nmExecutable, cmdArgs...)
 	// set directory for the shell to relevant directory
-	cmd.Dir = filepath.Join(baseDir, modelDir)
+	cmd.Dir = modelDirPath
 	cmdReader, err := cmd.StdoutPipe()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Error creating StdoutPipe for Cmd", err)
 	}
 
 	scanner := bufio.NewScanner(cmdReader)
+	outputFile, _ := os.Create(filepath.Join(modelDirPath, "stdout.out"))
+	outputFileWriter := bufio.NewWriter(outputFile)
+	message := make(chan string)
 	go func() {
+		log.Println("starting goroutine to write to stdout")
 		for scanner.Scan() {
-			fmt.Printf("%s out | %s\n", runName, scanner.Text())
+			message <- fmt.Sprintf("%s out | %s\n", runName, scanner.Text())
 		}
+		close(message)
 	}()
 
 	err = cmd.Start()
@@ -64,7 +70,12 @@ func RunEstModel(fs afero.Fs,
 		fmt.Fprintln(os.Stderr, "Error starting Cmd", err)
 		return err
 	}
+	for msg := range message {
+		fmt.Fprint(outputFileWriter, msg)
+	}
+	outputFileWriter.Flush()
 
+	log.Println("waiting on stdout goroutine to finish...")
 	err = cmd.Wait()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Error attempting to run model, check the lst file in the run directory for more details", err)
