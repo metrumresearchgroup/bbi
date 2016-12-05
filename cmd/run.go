@@ -93,7 +93,7 @@ func run(cmd *cobra.Command, args []string) error {
 		// check if arg is a file or Dir
 		// dirty check for if doesn't have an extension is a folder
 		_, ext := utils.FileAndExt(arg)
-		if ext == "" {
+		if ext == "" || arg == "." {
 			// could be directory, will need to be careful about the waitgroup as don't want to
 			// keep waiting forever since it
 			isDir, err := utils.IsDir(arg, AppFs)
