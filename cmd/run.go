@@ -82,22 +82,7 @@ func run(cmd *cobra.Command, args []string) error {
 	wg.Add(len(args))
 	for _, arg := range args {
 		log.Printf("starting goroutine for run %s \n", arg)
-		go func(filePath string) {
-			queue <- struct{}{}
-			log.Printf("run %s running on worker!", filePath)
-			defer wg.Done()
-			viper.Debug()
-			runner.EstimateModel(
-				AppFs,
-				filePath,
-				verbose,
-				debug,
-				viper.GetString("cacheDir"),
-				viper.GetString("cacheExe"),
-			)
-			log.Printf("completed run %s releasing worker back to queue \n", filePath)
-			<-queue
-		}(arg)
+		go runModel(AppFs, arg, queue, &wg, verbose, debug)
 	}
 
 	wg.Wait()
@@ -105,6 +90,37 @@ func run(cmd *cobra.Command, args []string) error {
 	log.Printf("running on %v threads took %s", viper.GetInt("threads"), elapsed)
 	return nil
 }
+
+func runModel(
+	fs afero.Fs,
+	filePath string,
+	queue chan struct{},
+	wg *sync.WaitGroup,
+	verbose bool,
+	debug bool,
+) {
+	defer wg.Done()
+	queue <- struct{}{}
+	if verbose {
+		log.Printf("run %s running on worker!", filePath)
+	}
+	if debug {
+		viper.Debug()
+	}
+	runner.EstimateModel(
+		fs,
+		filePath,
+		verbose,
+		debug,
+		viper.GetString("cacheDir"),
+		viper.GetString("cacheExe"),
+	)
+	if verbose {
+		log.Printf("completed run %s releasing worker back to queue \n", filePath)
+	}
+	<-queue
+}
+
 func init() {
 	RootCmd.AddCommand(runCmd)
 	runCmd.Flags().StringVar(&cacheDir, "cacheDir", "", "directory path for cache of nonmem executables for NM7.4+")
