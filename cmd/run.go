@@ -22,6 +22,7 @@ import (
 	"sync"
 
 	"github.com/dpastoor/nonmemutils/runner"
+	"github.com/dpastoor/nonmemutils/utils"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -79,10 +80,39 @@ func run(cmd *cobra.Command, args []string) error {
 		log.Printf("setting up a work queue with %v workers", viper.GetInt("threads"))
 	}
 	defer close(queue)
-	wg.Add(len(args))
 	for _, arg := range args {
-		log.Printf("starting goroutine for run %s \n", arg)
-		go runModel(AppFs, arg, queue, &wg, verbose, debug)
+
+		// check if arg is a file or Dir
+		// dirty check for if doesn't have an extension is a folder
+		_, ext := utils.FileAndExt(arg)
+		if ext == "" {
+			// could be directory, will need to be careful about the waitgroup as don't want to
+			// keep waiting forever since it
+			isDir, err := utils.IsDir(arg, AppFs)
+			if err != nil || !isDir {
+				log.Printf("issue handling %s, if this is a run please add the extension. Err: (%s)", arg, err)
+				continue
+			}
+			modelsInDir, err := utils.ListModels(arg, ".mod", AppFs)
+			if err != nil {
+				log.Printf("issue getting models in dir %s, if this is a run please add the extension. Err: (%s)", arg, err)
+				continue
+			}
+			if verbose || debug {
+				log.Printf("adding %v model files in directory %s to queue", len(modelsInDir), arg)
+			}
+			wg.Add(len(modelsInDir))
+			for _, model := range modelsInDir {
+				log.Printf("adding model %s to queue\n", model)
+				go runModel(AppFs, model, queue, &wg, verbose, debug)
+			}
+
+			// go to dir and get all model files to run
+		} else {
+			log.Printf("adding model %s to queue \n", arg)
+			wg.Add(1)
+			go runModel(AppFs, arg, queue, &wg, verbose, debug)
+		}
 	}
 
 	wg.Wait()
