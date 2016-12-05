@@ -51,7 +51,7 @@ func EstimateModel(
 
 	// run model
 	if verbose {
-		log.Println("about to start running model")
+		log.Printf("about to start running model %s \n", runNum)
 	}
 	err = RunEstModel(fs, dir, newDirSuggestion.NextDirName, modelFile, noBuild)
 

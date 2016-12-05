@@ -54,15 +54,20 @@ func RunEstModel(fs afero.Fs,
 	}
 
 	scanner := bufio.NewScanner(cmdReader)
-	outputFile, _ := os.Create(filepath.Join(modelDirPath, "stdout.out"))
+	outputFile, err := os.Create(filepath.Join(modelDirPath, "stdout.out"))
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "could not make stdout file to pipe output to")
+	} else {
+		defer outputFile.Close()
+	}
+
 	outputFileWriter := bufio.NewWriter(outputFile)
-	message := make(chan string)
+
+	// handles where to write output to
 	go func() {
-		log.Println("starting goroutine to write to stdout")
 		for scanner.Scan() {
-			message <- fmt.Sprintf("%s out | %s\n", runName, scanner.Text())
+			fmt.Fprintf(outputFileWriter, "%s out | %s\n", runName, scanner.Text())
 		}
-		close(message)
 	}()
 
 	err = cmd.Start()
@@ -70,16 +75,12 @@ func RunEstModel(fs afero.Fs,
 		fmt.Fprintln(os.Stderr, "Error starting Cmd", err)
 		return err
 	}
-	for msg := range message {
-		fmt.Fprint(outputFileWriter, msg)
-	}
-	outputFileWriter.Flush()
 
-	log.Println("waiting on stdout goroutine to finish...")
 	err = cmd.Wait()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Error attempting to run model, check the lst file in the run directory for more details", err)
 		return err
 	}
+	outputFileWriter.Flush()
 	return nil
 }
