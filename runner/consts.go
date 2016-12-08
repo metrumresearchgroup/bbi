@@ -73,6 +73,12 @@ func EstOutputFilesByRun(r string) map[string]int {
 		".shk",
 		".shm",
 		".xml",
+		// these extensions don't fully jive with historical psn
+		// conventions, but will be a lot easier to consistently
+		// flag out by following the <runname><ext/suffix> convention
+		".msf",
+		"_ETAS.msf",
+		"_RMAT.msf",
 	}
 	fileExtsLvl2 := []string{
 		".cor",
