@@ -36,7 +36,7 @@ func EstimateModel(
 	}
 
 	// copy files with any changes
-	err := PrepareEstRun(fs, dir, modelFile, modelDir)
+	extraFiles, err := PrepareEstRun(fs, dir, modelFile, modelDir)
 	if err != nil {
 		log.Printf("error preparing estimation run: %s", err)
 		return err
@@ -71,6 +71,8 @@ func EstimateModel(
 		runNum,
 		newDirSuggestion.NextDirName,
 		fileList,
+		extraFiles.Files,
+		extraFiles.Files,
 		viper.GetInt("cleanLvl"),
 		viper.GetInt("copyLvl"),
 		verbose,

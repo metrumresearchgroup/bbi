@@ -5,29 +5,36 @@ import (
 
 	"fmt"
 
+	"github.com/dpastoor/nonmemutils/parser"
 	"github.com/dpastoor/nonmemutils/utils"
 	"github.com/spf13/afero"
 )
+
+// ModFileInfo stores information parsed from a model file such as declared files for use in other parts of the program
+type ModFileInfo struct {
+	Files []string
+}
 
 // PrepareEstRun prepares the directories and files needed to execute a run in the correct subdirectory
 // dir is the directory the model file is current in
 // runName is the file name of the model
 // runDir is the name of the new subdirectory to be created
-func PrepareEstRun(fs afero.Fs, dir string, runName string, runDir string) error {
+func PrepareEstRun(fs afero.Fs, dir string, runName string, runDir string) (ModFileInfo, error) {
 	err := fs.MkdirAll(filepath.Join(
 		dir,
 		runDir,
 	), 0755)
 	if err != nil {
-		return fmt.Errorf("Error creating new subdir to execute, with err: %s", err)
+		return ModFileInfo{}, fmt.Errorf("Error creating new subdir to execute, with err: %s", err)
 	}
 	fileLines, err := utils.ReadLinesFS(fs, filepath.Join(
 		dir,
 		runName,
 	))
 	if err != nil {
-		return fmt.Errorf("Error reading in model file, with err: %s", err)
+		return ModFileInfo{}, fmt.Errorf("Error reading in model file, with err: %s", err)
 	}
+	mfi := ModFileInfo{parser.FindOutputFiles(fileLines)}
 	err = utils.WriteLinesFS(
 		fs,
 		PrepareForExecution(fileLines),
@@ -38,7 +45,7 @@ func PrepareEstRun(fs afero.Fs, dir string, runName string, runDir string) error
 		),
 	)
 	if err != nil {
-		return fmt.Errorf("Error copying file to new run dir, with err: %s", err)
+		return mfi, fmt.Errorf("Error copying file to new run dir, with err: %s", err)
 	}
-	return nil
+	return mfi, nil
 }
