@@ -148,6 +148,7 @@ func runModel(
 	runner.EstimateModel(
 		fs,
 		filePath,
+		runner.RunSettings{viper.GetBool("git")},
 		verbose,
 		debug,
 		viper.GetString("cacheDir"),

@@ -9,6 +9,12 @@ import (
 	"github.com/spf13/viper"
 )
 
+// RunSettings is a struct that contains settings about run information
+// passed in from config variables or flags
+type RunSettings struct {
+	Git bool
+}
+
 // EstimateModel prepares, runs and cleans up a model estimation run
 // modelPath is the relative path of the model from where Estimate model is called from
 // cacheDir is the location of the cache dir, relative to the baseDir,
@@ -17,6 +23,7 @@ import (
 func EstimateModel(
 	fs afero.Fs,
 	modelPath string,
+	runSettings RunSettings,
 	verbose bool,
 	debug bool,
 	cacheDir string,
@@ -42,6 +49,10 @@ func EstimateModel(
 		return err
 	}
 
+	if runSettings.Git {
+		// for now just add a gitignore to add everything in run output by default
+		utils.WriteLinesFS(fs, []string{"*"}, filepath.Join(dir, modelDir, ".gitignore"))
+	}
 	// deal with cache maybe
 	noBuild := false
 	if exeNameInCache != "" {
