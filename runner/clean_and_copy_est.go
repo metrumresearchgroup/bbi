@@ -26,6 +26,8 @@ func CleanEstFolderAndCopyToParent(
 	runNum string,
 	dirToClean string,
 	fileList []string,
+	keepFiles []string,
+	copyFiles []string,
 	cleanLvl int,
 	copyLvl int,
 	verbose bool,
@@ -33,7 +35,14 @@ func CleanEstFolderAndCopyToParent(
 ) error {
 	outputFiles := EstOutputFileCleanLevels()
 	keyOutputFiles := EstOutputFilesByRun(runNum)
-
+	for _, f := range keepFiles {
+		// make sure will be kept
+		outputFiles[f] = cleanLvl + 1
+	}
+	for _, f := range copyFiles {
+		// make sure will be copied
+		keyOutputFiles[f] = copyLvl + 1
+	}
 	// handle temp_dir specially
 	lvl, _ := outputFiles["temp_dir"]
 	if cleanLvl >= lvl {
