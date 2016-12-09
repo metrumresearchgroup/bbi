@@ -33,7 +33,7 @@ func CleanEstFolderAndCopyToParent(
 	verbose bool,
 	debug bool,
 ) error {
-	outputFiles := EstOutputFileCleanLevels()
+	outputFiles := EstOutputFileCleanLevels(runNum)
 	keyOutputFiles := EstOutputFilesByRun(runNum)
 	for _, f := range keepFiles {
 		// make sure will be kept
@@ -58,8 +58,38 @@ func CleanEstFolderAndCopyToParent(
 
 	for i, file := range fileList {
 
+		// Copy files to directory above
+		lvl, ok := keyOutputFiles[file]
+		if ok && lvl >= copyLvl {
+			fileToCopyLocation := filepath.Join(
+				parentDir,
+				dirToClean,
+				file,
+			)
+			fileToCopy, err := fs.Open(fileToCopyLocation)
+			if err != nil {
+				return fmt.Errorf("error copying file: (%s)", err)
+			}
+
+			newFileLocation := filepath.Join(
+				parentDir,
+				file,
+			)
+			newFile, err := fs.Create(newFileLocation)
+			if err != nil {
+				return fmt.Errorf("error creating new file: (%s)", err)
+			}
+
+			_, err = io.Copy(newFile, fileToCopy)
+			if err != nil {
+				return fmt.Errorf("error copying to new file: (%s)", err)
+			}
+			fileToCopy.Close()
+			newFile.Close()
+		}
+
 		// handle cleaning
-		lvl, ok := outputFiles[file]
+		lvl, ok = outputFiles[file]
 		if debug {
 			fmt.Println(fmt.Sprintf("%v: %s --> lvl:  %v ok: %v", i, file, lvl, ok))
 		}
@@ -77,35 +107,6 @@ func CleanEstFolderAndCopyToParent(
 			}
 		}
 
-		// Copy files to directory above
-		lvl, ok = keyOutputFiles[file]
-		if ok && lvl >= copyLvl {
-			fileToCopyLocation := filepath.Join(
-				parentDir,
-				dirToClean,
-				file,
-			)
-			fileToCopy, err := fs.Open(fileToCopyLocation)
-			if err != nil {
-				return fmt.Errorf("error copying file: (%s)", err)
-			}
-			defer fileToCopy.Close()
-
-			newFileLocation := filepath.Join(
-				parentDir,
-				file,
-			)
-			newFile, err := fs.Create(newFileLocation)
-			if err != nil {
-				return fmt.Errorf("error creating new file: (%s)", err)
-			}
-			defer newFile.Close()
-
-			_, err = io.Copy(newFile, fileToCopy)
-			if err != nil {
-				return fmt.Errorf("error copying to new file: (%s)", err)
-			}
-		}
 	}
 	return nil
 }

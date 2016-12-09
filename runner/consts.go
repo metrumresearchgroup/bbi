@@ -2,12 +2,13 @@ package runner
 
 import (
 	"fmt"
+	"strings"
 )
 
 // EstOutputFileCleanLevels gives a map of
 // information about the output of NONMEM estimations
 // to be used for cleaning and other manipulations
-func EstOutputFileCleanLevels() map[string]int {
+func EstOutputFileCleanLevels(r string) map[string]int {
 	var EstOutputFiles = make(map[string]int)
 	EstOutputFiles["background.set"] = 1
 	EstOutputFiles["compile.lnk"] = 1
@@ -54,6 +55,30 @@ func EstOutputFileCleanLevels() map[string]int {
 	EstOutputFiles["trskip.set"] = 1
 	EstOutputFiles["worker.set"] = 1
 	EstOutputFiles["xmloff.set"] = 1
+
+	msfFileSuffixes := []string{
+		"",
+		"_ETAS",
+		"_RMAT",
+		"_SMAT",
+		".msf",
+		"_ETAS.msf",
+		"_RMAT.msf",
+		"_SMAT.msf",
+	}
+
+	for _, f := range msfFileSuffixes {
+		EstOutputFiles[strings.Replace(fmt.Sprintf("%s%s", r, f), "run", "msfb", 1)] = 1
+	}
+
+	return EstOutputFiles
+}
+
+//CleanFilesByRun sets clean levels for files by run
+func CleanFilesByRun(r string) map[string]int {
+	var EstOutputFiles = make(map[string]int)
+	// fileExtLvls are based on 1 = lowest priority -> n = highest priority
+
 	return EstOutputFiles
 }
 
@@ -89,11 +114,26 @@ func EstOutputFilesByRun(r string) map[string]int {
 		".ext",
 		".lst",
 	}
+
+	msfFileSuffixes := []string{
+		"",
+		"_ETAS",
+		"_RMAT",
+		"_SMAT",
+		".msf",
+		"_ETAS.msf",
+		"_RMAT.msf",
+		"_SMAT.msf",
+	}
+
 	for _, f := range fileExtsLvl1 {
 		EstOutputFiles[fmt.Sprintf("%s%s", r, f)] = 1
 	}
 	for _, f := range fileExtsLvl2 {
 		EstOutputFiles[fmt.Sprintf("%s%s", r, f)] = 2
+	}
+	for _, f := range msfFileSuffixes {
+		EstOutputFiles[strings.Replace(fmt.Sprintf("%s%s", r, f), "run", "msfb", 1)] = 2
 	}
 	for _, f := range fileExtsLvl3 {
 		EstOutputFiles[fmt.Sprintf("%s%s", r, f)] = 3
