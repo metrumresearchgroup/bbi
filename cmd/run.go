@@ -31,6 +31,7 @@ import (
 var (
 	cacheDir     string
 	cacheExe     string
+	saveExe      string
 	cleanLvl     int
 	copyLvl      int
 	gitignoreLvl int
@@ -148,7 +149,10 @@ func runModel(
 	runner.EstimateModel(
 		fs,
 		filePath,
-		runner.RunSettings{viper.GetBool("git")},
+		runner.RunSettings{
+			Git:     viper.GetBool("git"),
+			SaveExe: saveExe,
+		},
 		verbose,
 		debug,
 		viper.GetString("cacheDir"),
@@ -164,6 +168,7 @@ func init() {
 	RootCmd.AddCommand(runCmd)
 	runCmd.Flags().StringVar(&cacheDir, "cacheDir", "", "directory path for cache of nonmem executables for NM7.4+")
 	runCmd.Flags().StringVar(&cacheExe, "cacheExe", "", "name of executable stored in cache")
+	runCmd.Flags().StringVar(&saveExe, "saveExe", "", "what to name the executable when stored in cache")
 	runCmd.Flags().IntVar(&cleanLvl, "cleanLvl", 0, "clean level used for file output from a given (set of) runs")
 	runCmd.Flags().IntVar(&copyLvl, "copyLvl", 0, "copy level used for file output from a given (set of) runs")
 	runCmd.Flags().IntVar(&gitignoreLvl, "gitignoreLvl", 0, "gitignore lvl for a given (set of) runs")

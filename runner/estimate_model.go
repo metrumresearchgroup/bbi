@@ -12,7 +12,8 @@ import (
 // RunSettings is a struct that contains settings about run information
 // passed in from config variables or flags
 type RunSettings struct {
-	Git bool
+	Git     bool
+	SaveExe string
 }
 
 // EstimateModel prepares, runs and cleans up a model estimation run
@@ -62,13 +63,17 @@ func EstimateModel(
 
 	// run model
 	if verbose {
-		log.Printf("about to start running model %s \n", runNum)
+		log.Printf("running model %s ...\n", runNum)
 	}
 	err = RunEstModel(fs, dir, newDirSuggestion.NextDirName, modelFile, noBuild)
 
 	if err != nil {
 		log.Printf("error during estimation run: %s", err)
 		return err
+	}
+
+	if runSettings.SaveExe != "" {
+		utils.CopyExeToCache(fs, dir, modelDir, cacheDir, runSettings.SaveExe)
 	}
 
 	// clean up after
