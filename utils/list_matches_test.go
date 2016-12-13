@@ -45,6 +45,7 @@ func TestListMatchesByRegex(t *testing.T) {
 			},
 			[]string{
 				"run001.mod",
+				"run002.lst",
 				"run003.mod",
 			},
 		},
