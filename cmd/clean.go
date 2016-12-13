@@ -36,8 +36,10 @@ var cleanCmd = &cobra.Command{
 	Short: "clean files and folders",
 	Long: `
 nmu clean ^run // anything beggining with run
-nmu clean ^run --folders // folders only
-nmu clean .lst --files // files only matching .lst
+nmu clean ^run -v // print out files and folders that will be deleted 
+nmu clean ^run --noFolders // files only
+nmu clean _est_ --noFiles  // folders only 
+nmu clean _est_ --noFiles --simulateClean // show what output would be if clean occured but don't actually clean 
  `,
 	RunE: clean,
 }
