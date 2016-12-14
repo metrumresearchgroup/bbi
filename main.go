@@ -2,25 +2,19 @@ package main
 
 import (
 	"fmt"
-	"regexp"
-	"strings"
+
+	"github.com/dpastoor/nonmemutils/utils"
 )
 
 func main() {
 	testStrings := []string{
-		"hello here is a FILE",
-		"$TABLE CL V FILE=patab001",
-		"$TABLE O O2 FILE = sdtab001",
-		"$TABLE O O2 FILE = edtab001.ext",
-		"$TABLE O O2 FILE = mdtab001.ext MORE",
+		"run001.mod",
+		"run001.lst",
+		"run002.mod",
+		"run002.lst",
 	}
-	// pattern FILE, maybe whitespace, =, maybe whitespace, word (non-whitespace)
-	r, _ := regexp.Compile("FILE\\s?=\\s?(\\S+)")
-	for _, line := range testStrings {
-		fmt.Println(strings.Contains(line, "FILE="))
-		match := r.FindStringSubmatch(line)
-		if len(match) > 0 {
-			fmt.Println(match[1])
-		}
-	}
+
+	matches, err := utils.ListMatchesByRegex(testStrings, "run001\\.mod")
+	fmt.Println(matches)
+	fmt.Println(err)
 }
