@@ -40,6 +40,8 @@ nmu clean ^run -v // print out files and folders that will be deleted
 nmu clean ^run --noFolders // only remove matching files 
 nmu clean _est_ --noFiles  // only remove matching folders  
 nmu clean _est_ --noFiles --simulateClean // show what output would be if clean occured but don't actually clean 
+nmu clean "run009.[^mod]" // all matching run009.<ext> but not .mod files
+nmu clean "run009.(mod|lst)$" // match run009.lst and run009.mod
  `,
 	RunE: clean,
 }
