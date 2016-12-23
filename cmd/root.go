@@ -23,6 +23,8 @@ import (
 	flag "github.com/spf13/pflag"
 )
 
+const version string = "0.0.1"
+
 var (
 	// name of config file
 	cfgFile string
@@ -36,9 +38,7 @@ var (
 var RootCmd = &cobra.Command{
 	Use:   "nmu",
 	Short: "nonmem utility functions",
-	Long: `
-    more information in a longer form
-`,
+	Long:  fmt.Sprintf("nonmem utility functions version %s", version),
 }
 
 // Execute adds all child commands to the root command sets flags appropriately.
