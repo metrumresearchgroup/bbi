@@ -130,6 +130,7 @@ func run(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+// runModel wraps the EstimateModel to also handle the cli arguments
 func runModel(
 	fs afero.Fs,
 	filePath string,
