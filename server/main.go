@@ -1,17 +1,42 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"time"
 
-	"github.com/dpastoor/nonmemutils/runner"
+	"github.com/apex/log"
+	"github.com/boltdb/bolt"
 	"github.com/pressly/chi"
 	"github.com/pressly/chi/middleware"
 )
 
 func main() {
+
+	// Open the my.db data file in your current directory.
+	// It will be created if it doesn't exist.
+	db, err := bolt.Open("models.db", 0600, nil)
+	if err != nil {
+		log.Fatalf("could not open boltdb with err: %s", err)
+	}
+	ms := &ModelStore{"path", db}
+	fmt.Println("hello ms")
+	// create a model bucket to store models
+	db.Update(func(tx *bolt.Tx) error {
+		_, err := tx.CreateBucketIfNotExists([]byte("models"))
+		if err != nil {
+			return fmt.Errorf("create bucket: %s", err)
+		}
+		return nil
+	})
+	newModel := new(Model)
+	newModel2 := new(Model)
+	fmt.Println("newModel: ", newModel)
+	fmt.Println("newModel2: ", newModel2)
+	ms.CreateModel(newModel)
+	ms.CreateModel(newModel2)
+	fmt.Println("newModel Post Creation: ", newModel)
+	fmt.Println("newModel2 Post Creation: ", newModel2)
 	r := chi.NewRouter()
 
 	// A good base middleware stack
@@ -38,11 +63,9 @@ func main() {
 		// r.With(paginate).Get("/", listArticles) // GET /articles
 		// r.Post("/", createArticle)              // POST /articles
 		// r.Get("/search", searchArticles)        // GET /articles/search
-
 		r.Route("/:modelID", func(r chi.Router) {
-			r.Use(ModelCtx)
-			r.Get("/", getModelStatus) // GET /models/123
-			r.Post("/", submitModel)
+			r.Use(ms.ModelCtx)
+			r.Get("/", ms.handleGetModelID) // GET /models/123
 		})
 	})
 	fmt.Println("serving now on 3333")
@@ -50,45 +73,22 @@ func main() {
 
 }
 
-// ModelCtx is the context
-func ModelCtx(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		modelID := chi.URLParam(r, "modelID")
-		model, err := dbGetModel(modelID)
-		if err != nil {
-			http.Error(w, http.StatusText(404), 404)
-			return
-		}
-		ctx := context.WithValue(r.Context(), "model", model)
-		next.ServeHTTP(w, r.WithContext(ctx))
-	})
-}
+// func getModelStatus(w http.ResponseWriter, r *http.Request) {
+// 	ctx := r.Context()
+// 	model, ok := ctx.Value("model").(*Model)
+// 	if !ok {
+// 		http.Error(w, http.StatusText(422), 422)
+// 		return
+// 	}
+// 	w.Write([]byte(fmt.Sprintf("modelID:%v", model.ModelID)))
+// }
 
-func getModelStatus(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	model, ok := ctx.Value("model").(*Model)
-	if !ok {
-		http.Error(w, http.StatusText(422), 422)
-		return
-	}
-	w.Write([]byte(fmt.Sprintf("modelID:%v", model.ModelID)))
-}
+// func submitModel(w http.ResponseWriter, r *http.Request) {
+// 	model := new(Model)
+// 	fmt.Println("new model submitted to queue")
+// 	w.Write([]byte(fmt.Sprintf("modelID:%v", model.ModelID)))
+// }
 
-func submitModel(w http.ResponseWriter, r *http.Request) {
-	model := new(Model)
-	fmt.Println("new model submitted to queue")
-	w.Write([]byte(fmt.Sprintf("modelID:%v", model.ModelID)))
-}
-
-// Model information about a model to be executed
-type Model struct {
-	ModelID     int64
-	ModelPath   string
-	RunSettings runner.RunSettings
-	CacheDir    string
-	CacheExe    string
-}
-
-func dbGetModel(aid string) (*Model, error) {
-	return new(Model), nil
-}
+// func dbGetModel(aid string) (*Model, error) {
+// 	return new(Model), nil
+// }
