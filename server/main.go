@@ -58,14 +58,19 @@ func main() {
 		w.Write([]byte("hi"))
 	})
 
-	// RESTy routes for "articles" resource
+	// RESTy routes for "models" resource
+	// id route temporary to help experiment with different routes, NOT idiomatic or anything
+	r.Route("/id/:modelID", func(r chi.Router) {
+		r.Use(ms.ModelCtx)
+		r.Get("/", ms.handleGetModelID) // GET /models/123
+	})
 	r.Route("/models", func(r chi.Router) {
 		// r.With(paginate).Get("/", listArticles) // GET /articles
 		// r.Post("/", createArticle)              // POST /articles
 		// r.Get("/search", searchArticles)        // GET /articles/search
 		r.Route("/:modelID", func(r chi.Router) {
 			r.Use(ms.ModelCtx)
-			r.Get("/", ms.handleGetModelID) // GET /models/123
+			r.Get("/", ms.handleGetModel) // GET /models/123
 		})
 	})
 	fmt.Println("serving now on 3333")

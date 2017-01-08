@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/pressly/chi"
+	"github.com/pressly/chi/render"
 )
 
 func (ms *ModelStore) handleGetModelID(w http.ResponseWriter, r *http.Request) {
@@ -18,6 +19,17 @@ func (ms *ModelStore) handleGetModelID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Write([]byte(fmt.Sprintf("modelID:%v", model.ID)))
+}
+
+func (ms *ModelStore) handleGetModel(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	model, ok := ctx.Value("model").(*Model)
+
+	if !ok {
+		http.Error(w, http.StatusText(422), 422)
+		return
+	}
+	render.JSON(w, r, model)
 }
 
 // ModelCtx is the context
