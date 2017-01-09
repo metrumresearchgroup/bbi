@@ -8,7 +8,7 @@ var parameterDiagonal01Results = []int{1}
 var parameterDiagonal02Results = []int{1, 0, 1}
 var parameterDiagonal03Results = []int{1, 0, 1, 0, 0, 1}
 
-func TestcreateDiagonalBlock(t *testing.T) {
+func TestCreateDiagonalBlock(t *testing.T) {
 	result1 := createDiagonalBlock(1)
 	result2 := createDiagonalBlock(2)
 	result3 := createDiagonalBlock(3)
