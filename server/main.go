@@ -7,6 +7,7 @@ import (
 
 	"github.com/apex/log"
 	"github.com/boltdb/bolt"
+	"github.com/dpastoor/nonmemutils/runner"
 	"github.com/pressly/chi"
 	"github.com/pressly/chi/middleware"
 )
@@ -29,12 +30,27 @@ func main() {
 		}
 		return nil
 	})
-	newModel := new(Model)
-	newModel2 := new(Model)
+
+	newModel := &Model{ID: 0, Status: "Queued",
+		Details: ModelDetails{
+			ModelPath:   "C://temphello",
+			RunSettings: runner.RunSettings{true, "cache.exe"},
+			CacheDir:    "cache_dir",
+			CacheExe:    "cache.exe",
+		}}
+	newModel2 := &Model{ID: 0, Status: "Queued",
+		Details: ModelDetails{
+			ModelPath:   "C://temp",
+			RunSettings: runner.RunSettings{true, "cache.exe"},
+			CacheDir:    "cache_dir",
+			CacheExe:    "cache.exe",
+		}}
+	newModel3 := new(Model)
 	fmt.Println("newModel: ", newModel)
 	fmt.Println("newModel2: ", newModel2)
 	ms.CreateModel(newModel)
 	ms.CreateModel(newModel2)
+	ms.CreateModel(newModel3)
 	fmt.Println("newModel Post Creation: ", newModel)
 	fmt.Println("newModel2 Post Creation: ", newModel2)
 	r := chi.NewRouter()
