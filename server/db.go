@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/binary"
 	"encoding/json"
-	"fmt"
 
 	"github.com/boltdb/bolt"
 	"github.com/dpastoor/nonmemutils/runner"
@@ -77,8 +76,6 @@ func (m *ModelStore) CreateModel(model *Model) error {
 		model.ID = int(id)
 
 		buf, err := json.Marshal(model)
-		fmt.Println("after json marshalling in CreateModel")
-		fmt.Println(buf)
 		if err != nil {
 			return err
 		}
