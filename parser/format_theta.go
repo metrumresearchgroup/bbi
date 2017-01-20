@@ -9,6 +9,10 @@ func FormatThetaBlock(lines []string) []string {
 
 	for _, line := range lines {
 		lineIndex := strings.Index(line, ";")
+		// some thetas may have no comments and would want to inject comments after
+		if lineIndex == -1 {
+			lineIndex = len(line) + 1
+		}
 		if lineIndex > longestCommentIndex {
 			longestCommentIndex = lineIndex
 		}
