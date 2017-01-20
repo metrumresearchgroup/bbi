@@ -39,8 +39,20 @@ type ModelStore struct {
 // }
 
 // GetModels returns all models in the boltdb
-func (m *ModelStore) GetModels() ([]*Model, error) {
-	return nil, nil
+func (m *ModelStore) GetModels() ([]Model, error) {
+	var models []Model
+	m.db.View(func(tx *bolt.Tx) error {
+		// models bucket created when db initialized
+		b := tx.Bucket([]byte("models"))
+		b.ForEach(func(key []byte, value []byte) error {
+			var model Model
+			json.Unmarshal(value, &model)
+			models = append(models, model)
+			return nil
+		})
+		return nil
+	})
+	return models, nil
 }
 
 // GetModel returns details about a specific Model

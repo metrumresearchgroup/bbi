@@ -2,12 +2,19 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/pressly/chi"
 	"github.com/pressly/chi/render"
 )
+
+func (ms *ModelStore) handleGetModels(w http.ResponseWriter, r *http.Request) {
+	models, _ := ms.GetModels()
+	fmt.Println(models)
+	render.JSON(w, r, models)
+}
 
 func (ms *ModelStore) handleGetModel(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()

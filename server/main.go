@@ -45,12 +45,10 @@ func main() {
 			CacheDir:    "cache_dir",
 			CacheExe:    "cache.exe",
 		}}
-	newModel3 := new(Model)
 	fmt.Println("newModel: ", newModel)
 	fmt.Println("newModel2: ", newModel2)
 	ms.CreateModel(newModel)
 	ms.CreateModel(newModel2)
-	ms.CreateModel(newModel3)
 	fmt.Println("newModel Post Creation: ", newModel)
 	fmt.Println("newModel2 Post Creation: ", newModel2)
 	r := chi.NewRouter()
@@ -74,13 +72,8 @@ func main() {
 		w.Write([]byte("hi"))
 	})
 
-	// RESTy routes for "models" resource
-	// id route temporary to help experiment with different routes, NOT idiomatic or anything
-	r.Route("/id/:modelID", func(r chi.Router) {
-		r.Use(ms.ModelCtx)
-		r.Get("/", ms.handleGetModelID) // GET /models/123
-	})
 	r.Route("/models", func(r chi.Router) {
+		r.Get("/", ms.handleGetModels)
 		// r.With(paginate).Get("/", listArticles) // GET /articles
 		// r.Post("/", createArticle)              // POST /articles
 		// r.Get("/search", searchArticles)        // GET /articles/search
