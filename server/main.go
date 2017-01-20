@@ -30,27 +30,40 @@ func main() {
 		}
 		return nil
 	})
+	startInsert := time.Now()
+	for i := 0; i < 8; i++ {
+		newModel := &Model{ID: 0, Status: "Completed",
+			Details: ModelDetails{
+				ModelPath:   "C://temphello",
+				RunSettings: runner.RunSettings{true, "cache.exe"},
+				CacheDir:    "cache_dir",
+				CacheExe:    "cache.exe",
+			}}
+		ms.CreateModel(newModel)
+	}
+	for i := 0; i < 4; i++ {
+		newModel := &Model{ID: 0, Status: "Running",
+			Details: ModelDetails{
+				ModelPath:   "C://temphello",
+				RunSettings: runner.RunSettings{true, "cache.exe"},
+				CacheDir:    "cache_dir",
+				CacheExe:    "cache.exe",
+			}}
+		ms.CreateModel(newModel)
+	}
+	for i := 0; i < 10; i++ {
+		newModel := &Model{ID: 0, Status: "Queued",
+			Details: ModelDetails{
+				ModelPath:   "C://temphello",
+				RunSettings: runner.RunSettings{true, "cache.exe"},
+				CacheDir:    "cache_dir",
+				CacheExe:    "cache.exe",
+			}}
+		ms.CreateModel(newModel)
+	}
 
-	newModel := &Model{ID: 0, Status: "Queued",
-		Details: ModelDetails{
-			ModelPath:   "C://temphello",
-			RunSettings: runner.RunSettings{true, "cache.exe"},
-			CacheDir:    "cache_dir",
-			CacheExe:    "cache.exe",
-		}}
-	newModel2 := &Model{ID: 0, Status: "Queued",
-		Details: ModelDetails{
-			ModelPath:   "C://temp",
-			RunSettings: runner.RunSettings{true, "cache.exe"},
-			CacheDir:    "cache_dir",
-			CacheExe:    "cache.exe",
-		}}
-	fmt.Println("newModel: ", newModel)
-	fmt.Println("newModel2: ", newModel2)
-	ms.CreateModel(newModel)
-	ms.CreateModel(newModel2)
-	fmt.Println("newModel Post Creation: ", newModel)
-	fmt.Println("newModel2 Post Creation: ", newModel2)
+	fmt.Println("inserted sample model output in: ", time.Since(startInsert))
+
 	r := chi.NewRouter()
 
 	// A good base middleware stack
