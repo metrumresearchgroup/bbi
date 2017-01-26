@@ -35,7 +35,7 @@ func main() {
 		newModel := &Model{ID: 0, Status: "Completed",
 			Details: ModelDetails{
 				ModelPath:   "C://temphello",
-				RunSettings: runner.RunSettings{true, "cache.exe"},
+				RunSettings: runner.RunSettings{Git: true, SaveExe: "cache.exe"},
 				CacheDir:    "cache_dir",
 				CacheExe:    "cache.exe",
 			}}
@@ -45,7 +45,7 @@ func main() {
 		newModel := &Model{ID: 0, Status: "Running",
 			Details: ModelDetails{
 				ModelPath:   "C://temphello",
-				RunSettings: runner.RunSettings{true, "cache.exe"},
+				RunSettings: runner.RunSettings{Git: true, SaveExe: "cache.exe"},
 				CacheDir:    "cache_dir",
 				CacheExe:    "cache.exe",
 			}}
@@ -55,7 +55,7 @@ func main() {
 		newModel := &Model{ID: 0, Status: "Queued",
 			Details: ModelDetails{
 				ModelPath:   "C://temphello",
-				RunSettings: runner.RunSettings{true, "cache.exe"},
+				RunSettings: runner.RunSettings{Git: true, SaveExe: "cache.exe"},
 				CacheDir:    "cache_dir",
 				CacheExe:    "cache.exe",
 			}}
