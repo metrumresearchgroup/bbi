@@ -32,7 +32,7 @@ func (ms *ModelStore) ModelCtx(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		modelID := chi.URLParam(r, "modelID")
 		mid, _ := strconv.ParseInt(modelID, 10, 64)
-		model, err := ms.GetModel(int(mid))
+		model, err := ms.GetModelByID(int(mid))
 		if err != nil {
 			http.Error(w, http.StatusText(404), 404)
 			return
