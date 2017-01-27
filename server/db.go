@@ -10,13 +10,25 @@ import (
 
 // Model information about a model to be executed
 type Model struct {
-	ID      int
-	Status  string
-	Details ModelDetails
+	ID        int
+	Status    string
+	ModelInfo ModelInfo
+	RunInfo   RunInfo
 }
 
-// ModelDetails contains the information passed in to execute the model
-type ModelDetails struct {
+// RunInfo stores details about a model runner
+// Queue time represents the time a model was added to the Queue
+// StartTime is the time the worker starts execution of the model code for processing steps
+// Duration is the time, in milliseconds from StartTime to The model run completing
+// as a unix timestamp
+type RunInfo struct {
+	QueueTime int64
+	StartTime int64
+	Duration  int64
+}
+
+// ModelInfo contains the information passed in to execute the model
+type ModelInfo struct {
 	ModelPath   string
 	RunSettings runner.RunSettings
 	CacheDir    string
@@ -54,8 +66,8 @@ func (m *ModelStore) GetModels() ([]Model, error) {
 	return models, nil
 }
 
-// GetModel returns details about a specific Model
-func (m *ModelStore) GetModel(modelID int) (*Model, error) {
+// GetModelByID returns details about a specific Model
+func (m *ModelStore) GetModelByID(modelID int) (*Model, error) {
 	var model *Model
 	m.db.View(func(tx *bolt.Tx) error {
 		// models bucket created when db initialized

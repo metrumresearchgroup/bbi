@@ -31,34 +31,59 @@ func main() {
 		return nil
 	})
 	startInsert := time.Now()
+	sampleDuration := time.Now().AddDate(0, 0, -1).Add(10*time.Minute).Unix() - time.Now().AddDate(0, 0, -1).Unix()
 	for i := 0; i < 8; i++ {
-		newModel := &Model{ID: 0, Status: "Completed",
-			Details: ModelDetails{
+		newModel := &Model{
+			ID:     0,
+			Status: "Completed",
+			ModelInfo: ModelInfo{
 				ModelPath:   "C://temphello",
 				RunSettings: runner.RunSettings{Git: true, SaveExe: "cache.exe"},
 				CacheDir:    "cache_dir",
 				CacheExe:    "cache.exe",
-			}}
+			},
+			RunInfo: RunInfo{
+				QueueTime: time.Now().AddDate(0, 0, -1).Unix(),
+				StartTime: time.Now().AddDate(0, 0, -1).Unix(),
+				Duration:  sampleDuration,
+			},
+		}
 		ms.CreateModel(newModel)
 	}
 	for i := 0; i < 4; i++ {
-		newModel := &Model{ID: 0, Status: "Running",
-			Details: ModelDetails{
+		newModel := &Model{
+			ID:     0,
+			Status: "Running",
+			ModelInfo: ModelInfo{
 				ModelPath:   "C://temphello",
 				RunSettings: runner.RunSettings{Git: true, SaveExe: "cache.exe"},
 				CacheDir:    "cache_dir",
 				CacheExe:    "cache.exe",
-			}}
+			},
+			RunInfo: RunInfo{
+				QueueTime: time.Now().AddDate(0, 0, -1).Unix(),
+				StartTime: time.Now().Unix(),
+				Duration:  int64(0),
+			},
+		}
 		ms.CreateModel(newModel)
 	}
 	for i := 0; i < 10; i++ {
-		newModel := &Model{ID: 0, Status: "Queued",
-			Details: ModelDetails{
+		newModel := &Model{
+			ID:     0,
+			Status: "Queued",
+			ModelInfo: ModelInfo{
 				ModelPath:   "C://temphello",
 				RunSettings: runner.RunSettings{Git: true, SaveExe: "cache.exe"},
 				CacheDir:    "cache_dir",
 				CacheExe:    "cache.exe",
-			}}
+			},
+			RunInfo: RunInfo{
+				QueueTime: time.Now().AddDate(0, 0, -1).Unix(),
+				StartTime: int64(0),
+				Duration:  int64(0),
+			},
+		}
 		ms.CreateModel(newModel)
 	}
 
