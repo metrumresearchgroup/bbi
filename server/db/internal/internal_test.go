@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -35,7 +34,6 @@ func TestMarshalModel(t *testing.T) {
 			Duration:  sampleDuration,
 		},
 	}
-	fmt.Println(testModel)
 
 	var result server.Model
 	if buf, err := MarshalModel(&testModel); err != nil {
