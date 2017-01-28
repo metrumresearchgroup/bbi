@@ -125,6 +125,10 @@ func (m *ModelService) AcquireNextQueuedModel() (server.Model, error) {
 				break
 			}
 		}
+		if nextModel.ID == 0 {
+			// no queued models found
+			return nil
+		}
 		buf, err := internal.MarshalModel(&nextModel)
 		if err != nil {
 			return err
@@ -132,6 +136,20 @@ func (m *ModelService) AcquireNextQueuedModel() (server.Model, error) {
 		return b.Put(itob(nextModel.ID), buf)
 	})
 	return nextModel, err
+}
+
+// UpdateModel updates the model status
+func (m *ModelService) UpdateModel(model *server.Model) error {
+	err := m.client.db.Update(func(tx *bolt.Tx) error {
+		// models bucket created when db initialized
+		b := tx.Bucket([]byte("models"))
+		buf, err := internal.MarshalModel(model)
+		if err != nil {
+			return err
+		}
+		return b.Put(itob(model.ID), buf)
+	})
+	return err
 }
 
 // itob returns an 8-byte big endian representation of v.
