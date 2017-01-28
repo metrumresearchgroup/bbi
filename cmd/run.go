@@ -151,15 +151,15 @@ func runModel(
 		fs,
 		filePath,
 		runner.RunSettings{
-			Git:     viper.GetBool("git"),
-			SaveExe: saveExe,
+			Git:            viper.GetBool("git"),
+			SaveExe:        saveExe,
+			Verbose:        verbose,
+			Debug:          debug,
+			CleanLvl:       cleanLvl,
+			CopyLvl:        copyLvl,
+			CacheDir:       viper.GetString("cacheDir"),
+			ExeNameInCache: viper.GetString("cacheExe"),
 		},
-		verbose,
-		debug,
-		cleanLvl,
-		copyLvl,
-		viper.GetString("cacheDir"),
-		viper.GetString("cacheExe"),
 	)
 	if verbose {
 		log.Printf("completed run %s releasing worker back to queue \n", filePath)
