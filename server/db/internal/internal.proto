@@ -14,6 +14,7 @@ message ModelInfo {
         int32 copy_lvl = 6;
         string cache_dir = 7;
         string exe_name_in_cache = 8;
+        string nm_executable_or_path = 9;
     }
     
     RunSettings run_settings = 2;
