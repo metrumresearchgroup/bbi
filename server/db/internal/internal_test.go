@@ -17,10 +17,17 @@ func TestMarshalModel(t *testing.T) {
 		ID:     0,
 		Status: "COMPLETED",
 		ModelInfo: server.ModelInfo{
-			ModelPath:   "C://temphello",
-			RunSettings: runner.RunSettings{Git: true, SaveExe: "cache.exe"},
-			CacheDir:    "cache_dir",
-			CacheExe:    "cache.exe",
+			ModelPath: "C://temphello",
+			RunSettings: runner.RunSettings{
+				Git:            true,
+				SaveExe:        "cache.exe",
+				Verbose:        true,
+				Debug:          true,
+				CleanLvl:       1,
+				CopyLvl:        2,
+				CacheDir:       "cache_dir",
+				ExeNameInCache: "cache.exe",
+			},
 		},
 		RunInfo: server.RunInfo{
 			QueueTime: time.Now().AddDate(0, 0, -1).Unix(),

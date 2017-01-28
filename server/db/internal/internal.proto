@@ -4,13 +4,19 @@ package internal;
 
 message ModelInfo {
     string model_path = 1;
+
     message RunSettings {
         bool git = 1;
         string save_exe = 2;
+        bool verbose = 3;
+        bool debug = 4;
+        int32 clean_lvl = 5;
+        int32 copy_lvl = 6;
+        string cache_dir = 7;
+        string exe_name_in_cache = 8;
     }
+    
     RunSettings run_settings = 2;
-    string cache_dir = 3;
-    string cache_exe = 4;
 }
 
 message RunInfo {

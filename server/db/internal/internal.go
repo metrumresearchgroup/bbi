@@ -31,11 +31,15 @@ func MarshalModel(m *server.Model) ([]byte, error) {
 		ModelInfo: &ModelInfo{
 			ModelPath: modelInfo.ModelPath,
 			RunSettings: &ModelInfo_RunSettings{
-				Git:     modelInfo.RunSettings.Git,
-				SaveExe: modelInfo.RunSettings.SaveExe,
+				Git:            modelInfo.RunSettings.Git,
+				SaveExe:        modelInfo.RunSettings.SaveExe,
+				Verbose:        modelInfo.RunSettings.Verbose,
+				Debug:          modelInfo.RunSettings.Debug,
+				CleanLvl:       int32(modelInfo.RunSettings.CleanLvl),
+				CopyLvl:        int32(modelInfo.RunSettings.CopyLvl),
+				CacheDir:       modelInfo.RunSettings.CacheDir,
+				ExeNameInCache: modelInfo.RunSettings.ExeNameInCache,
 			},
-			CacheDir: modelInfo.CacheDir,
-			CacheExe: modelInfo.CacheExe,
 		},
 		RunInfo: &RunInfo{
 			QueueTime: runInfo.QueueTime,
@@ -71,11 +75,15 @@ func UnmarshalModel(data []byte, m *server.Model) error {
 	m.ModelInfo = server.ModelInfo{
 		ModelPath: modelInfo.ModelPath,
 		RunSettings: runner.RunSettings{
-			Git:     modelInfo.RunSettings.Git,
-			SaveExe: modelInfo.RunSettings.SaveExe,
+			Git:            modelInfo.RunSettings.Git,
+			SaveExe:        modelInfo.RunSettings.SaveExe,
+			Verbose:        modelInfo.RunSettings.Verbose,
+			Debug:          modelInfo.RunSettings.Debug,
+			CleanLvl:       int(modelInfo.RunSettings.CleanLvl),
+			CopyLvl:        int(modelInfo.RunSettings.CopyLvl),
+			CacheDir:       modelInfo.RunSettings.CacheDir,
+			ExeNameInCache: modelInfo.RunSettings.ExeNameInCache,
 		},
-		CacheDir: modelInfo.CacheDir,
-		CacheExe: modelInfo.CacheExe,
 	}
 	m.RunInfo = server.RunInfo{
 		QueueTime: runInfo.QueueTime,

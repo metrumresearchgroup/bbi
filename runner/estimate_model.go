@@ -11,8 +11,14 @@ import (
 // RunSettings is a struct that contains settings about run information
 // passed in from config variables or flags
 type RunSettings struct {
-	Git     bool
-	SaveExe string
+	Git            bool
+	SaveExe        string
+	Verbose        bool
+	Debug          bool
+	CleanLvl       int
+	CopyLvl        int
+	CacheDir       string
+	ExeNameInCache string
 }
 
 // EstimateModel prepares, runs and cleans up a model estimation run
@@ -24,13 +30,8 @@ func EstimateModel(
 	fs afero.Fs,
 	modelPath string,
 	runSettings RunSettings,
-	verbose bool,
-	debug bool,
-	cleanLvl int,
-	copyLvl int,
-	cacheDir string,
-	exeNameInCache string,
 ) error {
+
 	modelFile := filepath.Base(modelPath)
 	runNum, _ := utils.FileAndExt(modelPath)
 	dir, _ := filepath.Abs(filepath.Dir(modelPath))
@@ -38,6 +39,15 @@ func EstimateModel(
 	dirs := utils.ListDirNames(dirInfo)
 	newDirSuggestion := FindNextEstDirNum(runNum, dirs, 2)
 	modelDir := newDirSuggestion.NextDirName
+
+	// unpack settings
+	verbose := runSettings.Verbose
+	debug := runSettings.Debug
+	cleanLvl := runSettings.CleanLvl
+	copyLvl := runSettings.CopyLvl
+	cacheDir := runSettings.CacheDir
+	exeNameInCache := runSettings.ExeNameInCache
+
 	if verbose {
 		log.Printf("setting up run infrastructure for run %s", runNum)
 		log.Printf("base dir: %s", dir)
