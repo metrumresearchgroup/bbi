@@ -156,6 +156,8 @@ func runModel(
 		},
 		verbose,
 		debug,
+		cleanLvl,
+		copyLvl,
 		viper.GetString("cacheDir"),
 		viper.GetString("cacheExe"),
 	)
