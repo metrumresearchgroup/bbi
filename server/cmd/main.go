@@ -34,7 +34,9 @@ func main() {
 	// create a model bucket to store models
 	sampleDuration := time.Now().AddDate(0, 0, -1).Add(10*time.Minute).Unix() - time.Now().AddDate(0, 0, -1).Unix()
 	startInsert := time.Now()
-	for i := 0; i < 100; i++ {
+
+	var newModels []server.Model
+	for i := 0; i < 40000; i++ {
 		newModel := server.Model{
 			ID:     0,
 			Status: "COMPLETED",
@@ -50,7 +52,7 @@ func main() {
 				Duration:  sampleDuration,
 			},
 		}
-		ms.CreateModel(&newModel)
+		newModels = append(newModels, newModel)
 	}
 	for i := 0; i < 4; i++ {
 		newModel := server.Model{
@@ -68,7 +70,7 @@ func main() {
 				Duration:  int64(0),
 			},
 		}
-		ms.CreateModel(&newModel)
+		newModels = append(newModels, newModel)
 	}
 	for i := 0; i < 10; i++ {
 		newModel := server.Model{
@@ -86,8 +88,10 @@ func main() {
 				Duration:  int64(0),
 			},
 		}
-		ms.CreateModel(&newModel)
+		newModels = append(newModels, newModel)
 	}
+
+	ms.CreateModels(newModels)
 
 	fmt.Println("inserted sample model output in: ", time.Since(startInsert))
 
