@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"time"
 
+	"os"
+
 	"github.com/dpastoor/nonmemutils/runner"
 	"github.com/dpastoor/nonmemutils/server"
 	"github.com/dpastoor/nonmemutils/server/db"
@@ -89,6 +91,12 @@ func main() {
 
 	fmt.Println("inserted sample model output in: ", time.Since(startInsert))
 
+	startScan := time.Now()
+	nextModel, err := ms.AcquireNextQueuedModel()
+	fmt.Println("found next queued model in: ", time.Since(startScan))
+	fmt.Println(nextModel)
+	fmt.Println(err)
+	os.Exit(1)
 	r := chi.NewRouter()
 
 	// A good base middleware stack
