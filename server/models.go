@@ -39,5 +39,6 @@ type ModelService interface {
 	GetModels() ([]Model, error)
 	GetModelByID(modelID int) (Model, error)
 	CreateModel(m *Model) error
+	CreateModels(model []Model) error
 	AcquireNextQueuedModel() (Model, error)
 }

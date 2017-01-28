@@ -2,6 +2,7 @@ package db
 
 import (
 	"encoding/binary"
+	"fmt"
 
 	"github.com/boltdb/bolt"
 	"github.com/dpastoor/nonmemutils/server"
@@ -59,6 +60,32 @@ func (m *ModelService) CreateModel(model *server.Model) error {
 			return err
 		}
 		return b.Put(itob(model.ID), buf)
+	})
+	return err
+}
+
+// CreateModels adds an array of models to the boltdb in a single batch transaction
+func (m *ModelService) CreateModels(models []server.Model) error {
+	err := m.client.db.Batch(func(tx *bolt.Tx) error {
+		// models bucket created when db initialized
+		b := tx.Bucket([]byte("models"))
+		id, err := b.NextSequence()
+		i := 0
+		for _, model := range models {
+			model.ID = int(id)
+			buf, err := internal.MarshalModel(&model)
+			if err != nil {
+				return err
+			}
+			err = b.Put(itob(model.ID), buf)
+			if err != nil {
+				return err
+			}
+			id++ //increment to next sequence value
+			i++
+		}
+		fmt.Printf("inserted %v models in batch \n", i)
+		return err
 	})
 	return err
 }
