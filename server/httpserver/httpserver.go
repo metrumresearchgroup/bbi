@@ -33,6 +33,7 @@ func (c *ModelHandler) HandleGetAllModels(w http.ResponseWriter, r *http.Request
 	} else {
 		models, _ = c.ModelService.GetModels()
 	}
+
 	render.JSON(w, r, models)
 }
 

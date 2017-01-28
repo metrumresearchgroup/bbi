@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
+	"runtime"
 	"time"
 
 	"github.com/dpastoor/nonmemutils/runner"
@@ -13,6 +15,7 @@ import (
 	"github.com/dpastoor/nonmemutils/server/httpserver"
 	"github.com/pressly/chi"
 	"github.com/pressly/chi/middleware"
+	"github.com/spf13/afero"
 )
 
 func main() {
@@ -21,7 +24,8 @@ func main() {
 	// It will be created if it doesn't exist.
 	client := db.NewClient()
 	client.Path = "models.db"
-
+	// os.Remove("models.db")
+	// os.Remove("models.db.lock")
 	_, existsErr := os.Stat(client.Path)
 
 	err := client.Open() // connect to the boltDB instance
@@ -37,6 +41,20 @@ func main() {
 	if os.IsNotExist(existsErr) {
 		fmt.Println("no database was detected on initializiation, populating a sample one now...")
 		populateDB(ms)
+	}
+
+	// launch the worker(s)
+	aferofs := afero.NewOsFs()
+
+	numWorkers := runtime.NumCPU()
+	if numWorkers == 1 {
+		// don't want to block the http manager with the worker routine
+		runtime.GOMAXPROCS(2)
+	}
+
+	for i := 0; i < numWorkers; i++ {
+		fmt.Printf("launching worker number %v", i)
+		go launchWorker(aferofs, ms, true)
 	}
 
 	r := chi.NewRouter()
@@ -75,11 +93,60 @@ func main() {
 
 }
 
+//runWorker polls the DB and acquires queue'd models to run via EstimateModel
+func launchWorker(
+	fs afero.Fs,
+	ms server.ModelService,
+	verbose bool,
+) {
+
+	for {
+		model, err := ms.AcquireNextQueuedModel()
+		if model.ID == 0 {
+			// no queued models
+			fmt.Println("no queued models, going to sleep...")
+			time.Sleep(5 * time.Second)
+			continue
+		}
+		if err != nil {
+			fmt.Println("error acquiring new model")
+		}
+		filePath := model.ModelInfo.ModelPath
+		startTime := time.Now()
+		if verbose {
+			log.Printf("run %s running on worker!", filePath)
+		}
+		// runner.EstimateModel(
+		// 	fs,
+		// 	filePath,
+		// 	model.ModelInfo.RunSettings,
+		// 	false,
+		// 	false,
+		// 	1, // cleanLvl
+		// 	1, // copyLvl
+		// 	model.ModelInfo.CacheDir,
+		// 	model.ModelInfo.CacheExe,
+		// )
+		fmt.Println("Running fake model...")
+		time.Sleep(time.Duration(rand.Int31n(5000)) * time.Millisecond)
+		if verbose {
+			log.Printf("completed run %s releasing worker back to queue \n", filePath)
+		}
+		duration := time.Since(startTime)
+		model.Status = "COMPLETED"
+		model.RunInfo.StartTime = startTime.Unix()
+		model.RunInfo.Duration = int64(duration.Seconds())
+		ms.UpdateModel(&model)
+
+		fmt.Println("duration: ", duration)
+	}
+}
+
 func populateDB(ms server.ModelService) error {
 	var newModels []server.Model
 	sampleDuration := time.Now().AddDate(0, 0, -1).Add(10*time.Minute).Unix() - time.Now().AddDate(0, 0, -1).Unix()
 	startInsert := time.Now()
-	for i := 0; i < 4000; i++ {
+	for i := 0; i < 10; i++ {
 		newModel := server.Model{
 			ID:     0,
 			Status: "COMPLETED",
@@ -115,7 +182,7 @@ func populateDB(ms server.ModelService) error {
 		}
 		newModels = append(newModels, newModel)
 	}
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 100; i++ {
 		newModel := server.Model{
 			ID:     0,
 			Status: "QUEUED",
