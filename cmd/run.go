@@ -151,14 +151,15 @@ func runModel(
 		fs,
 		filePath,
 		runner.RunSettings{
-			Git:            viper.GetBool("git"),
-			SaveExe:        saveExe,
-			Verbose:        verbose,
-			Debug:          debug,
-			CleanLvl:       cleanLvl,
-			CopyLvl:        copyLvl,
-			CacheDir:       viper.GetString("cacheDir"),
-			ExeNameInCache: viper.GetString("cacheExe"),
+			Git:                viper.GetBool("git"),
+			SaveExe:            saveExe,
+			Verbose:            verbose,
+			Debug:              debug,
+			CleanLvl:           cleanLvl,
+			CopyLvl:            copyLvl,
+			CacheDir:           viper.GetString("cacheDir"),
+			ExeNameInCache:     viper.GetString("cacheExe"),
+			NmExecutableOrPath: viper.GetString("nmExecutable"),
 		},
 	)
 	if verbose {
