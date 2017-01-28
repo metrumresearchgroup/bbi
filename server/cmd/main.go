@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
-
 	"os"
+	"time"
 
 	"github.com/dpastoor/nonmemutils/runner"
 	"github.com/dpastoor/nonmemutils/server"
@@ -23,6 +22,8 @@ func main() {
 	client := db.NewClient()
 	client.Path = "models.db"
 
+	_, existsErr := os.Stat(client.Path)
+
 	err := client.Open() // connect to the boltDB instance
 	if err != nil {
 		log.Fatalf("could not open boltdb instance")
@@ -31,12 +32,54 @@ func main() {
 	ms := client.ModelService()
 	httpClient := httpserver.NewModelHandler()
 	httpClient.ModelService = ms
+
 	// create a model bucket to store models
+	if os.IsNotExist(existsErr) {
+		fmt.Println("no database was detected on initializiation, populating a sample one now...")
+		populateDB(ms)
+	}
+
+	r := chi.NewRouter()
+
+	// A good base middleware stack
+	r.Use(middleware.RequestID)
+	r.Use(middleware.RealIP)
+	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
+
+	// When a client closes their connection midway through a request, the
+	// http.CloseNotifier will cancel the request context (ctx).
+	r.Use(middleware.CloseNotify)
+
+	// Set a timeout value on the request context (ctx), that will signal
+	// through ctx.Done() that the request has timed out and further
+	// processing should be stopped.
+	r.Use(middleware.Timeout(60 * time.Second))
+
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("hi"))
+	})
+
+	r.Route("/models", func(r chi.Router) {
+		r.Get("/", httpClient.HandleGetAllModels)
+		// r.With(paginate).Get("/", listArticles) // GET /articles
+		// r.Post("/", createArticle)              // POST /articles
+		// r.Get("/search", searchArticles)        // GET /articles/search
+		r.Route("/:modelID", func(r chi.Router) {
+			r.Use(httpClient.ModelCtx)
+			r.Get("/", httpClient.HandleGetModelByID) // GET /models/123
+		})
+	})
+	fmt.Println("serving now on 3333")
+	http.ListenAndServe(":3333", r)
+
+}
+
+func populateDB(ms server.ModelService) error {
+	var newModels []server.Model
 	sampleDuration := time.Now().AddDate(0, 0, -1).Add(10*time.Minute).Unix() - time.Now().AddDate(0, 0, -1).Unix()
 	startInsert := time.Now()
-
-	var newModels []server.Model
-	for i := 0; i < 40000; i++ {
+	for i := 0; i < 4000; i++ {
 		newModel := server.Model{
 			ID:     0,
 			Status: "COMPLETED",
@@ -91,50 +134,9 @@ func main() {
 		newModels = append(newModels, newModel)
 	}
 
-	ms.CreateModels(newModels)
-
+	err := ms.CreateModels(newModels)
 	fmt.Println("inserted sample model output in: ", time.Since(startInsert))
-
-	startScan := time.Now()
-	nextModel, err := ms.AcquireNextQueuedModel()
-	fmt.Println("found next queued model in: ", time.Since(startScan))
-	fmt.Println(nextModel)
-	fmt.Println(err)
-	os.Exit(1)
-	r := chi.NewRouter()
-
-	// A good base middleware stack
-	r.Use(middleware.RequestID)
-	r.Use(middleware.RealIP)
-	r.Use(middleware.Logger)
-	r.Use(middleware.Recoverer)
-
-	// When a client closes their connection midway through a request, the
-	// http.CloseNotifier will cancel the request context (ctx).
-	r.Use(middleware.CloseNotify)
-
-	// Set a timeout value on the request context (ctx), that will signal
-	// through ctx.Done() that the request has timed out and further
-	// processing should be stopped.
-	r.Use(middleware.Timeout(60 * time.Second))
-
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("hi"))
-	})
-
-	r.Route("/models", func(r chi.Router) {
-		r.Get("/", httpClient.HandleGetModels)
-		// r.With(paginate).Get("/", listArticles) // GET /articles
-		// r.Post("/", createArticle)              // POST /articles
-		// r.Get("/search", searchArticles)        // GET /articles/search
-		r.Route("/:modelID", func(r chi.Router) {
-			r.Use(httpClient.ModelCtx)
-			r.Get("/", httpClient.HandleGetModelByID) // GET /models/123
-		})
-	})
-	fmt.Println("serving now on 3333")
-	http.ListenAndServe(":3333", r)
-
+	return err
 }
 
 // func getModelStatus(w http.ResponseWriter, r *http.Request) {
