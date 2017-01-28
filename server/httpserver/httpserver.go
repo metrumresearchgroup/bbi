@@ -2,7 +2,6 @@ package httpserver
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -22,10 +21,9 @@ func NewModelHandler() *ModelHandler {
 	return c
 }
 
-// HandleGetModels provides all models
-func (c *ModelHandler) HandleGetModels(w http.ResponseWriter, r *http.Request) {
+// HandleGetAllModels provides all models
+func (c *ModelHandler) HandleGetAllModels(w http.ResponseWriter, r *http.Request) {
 	models, _ := c.ModelService.GetModels()
-	fmt.Println(models)
 	render.JSON(w, r, models)
 }
 
