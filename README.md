@@ -1,4 +1,6 @@
 [![Circle CI](https://circleci.com/gh/dpastoor/nonmemutils.svg?style=svg)](https://circleci.com/gh/dpastoor/nonmemutils)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/dpastoor/nonmemutils?branch=master&svg=true)](https://ci.appveyor.com/project/dpastoor/nonmemutils)
+
 [![Go Report Card](https://goreportcard.com/badge/github.com/dpastoor/nonmemutils)](https://goreportcard.com/report/github.com/dpastoor/nonmemutils)
 
 # nonmemutils
