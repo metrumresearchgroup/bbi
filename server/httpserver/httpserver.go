@@ -2,6 +2,7 @@ package httpserver
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -22,8 +23,16 @@ func NewModelHandler() *ModelHandler {
 }
 
 // HandleGetAllModels provides all models
+// accepts query param status with values COMPLETED, QUEUED, RUNNING
 func (c *ModelHandler) HandleGetAllModels(w http.ResponseWriter, r *http.Request) {
-	models, _ := c.ModelService.GetModels()
+	var models []server.Model
+	status := r.URL.Query().Get("status")
+	fmt.Println("status: ", status)
+	if status != "" {
+		models, _ = c.ModelService.GetModelsByStatus(status)
+	} else {
+		models, _ = c.ModelService.GetModels()
+	}
 	render.JSON(w, r, models)
 }
 

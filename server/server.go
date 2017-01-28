@@ -37,6 +37,7 @@ type Client interface {
 // ModelService describes the interface to interact with models
 type ModelService interface {
 	GetModels() ([]Model, error)
+	GetModelsByStatus(status string) ([]Model, error)
 	GetModelByID(modelID int) (Model, error)
 	CreateModel(m *Model) error
 	CreateModels(model []Model) error

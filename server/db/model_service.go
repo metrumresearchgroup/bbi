@@ -34,6 +34,25 @@ func (m *ModelService) GetModels() ([]server.Model, error) {
 	return models, nil
 }
 
+// GetModelsByStatus returns all models in the boltdb
+func (m *ModelService) GetModelsByStatus(status string) ([]server.Model, error) {
+	var models []server.Model
+	m.client.db.View(func(tx *bolt.Tx) error {
+		// models bucket created when db initialized
+		b := tx.Bucket([]byte("models"))
+		b.ForEach(func(key []byte, value []byte) error {
+			var model server.Model
+			internal.UnmarshalModel(value, &model)
+			if model.Status == status {
+				models = append(models, model)
+			}
+			return nil
+		})
+		return nil
+	})
+	return models, nil
+}
+
 // GetModelByID returns details about a specific Model
 func (m *ModelService) GetModelByID(modelID int) (server.Model, error) {
 	var model server.Model
