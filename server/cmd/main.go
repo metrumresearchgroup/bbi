@@ -24,9 +24,9 @@ func main() {
 	// It will be created if it doesn't exist.
 	client := db.NewClient()
 	client.Path = "models.db"
-	// os.Remove("models.db")
-	// os.Remove("models.db.lock")
-	_, existsErr := os.Stat(client.Path)
+	os.Remove("models.db")
+	os.Remove("models.db.lock")
+	//_, existsErr := os.Stat(client.Path)
 
 	err := client.Open() // connect to the boltDB instance
 	if err != nil {
@@ -38,10 +38,10 @@ func main() {
 	httpClient.ModelService = ms
 
 	// create a model bucket to store models
-	if os.IsNotExist(existsErr) {
-		fmt.Println("no database was detected on initializiation, populating a sample one now...")
-		populateDB(ms)
-	}
+	// if os.IsNotExist(existsErr) {
+	// 	fmt.Println("no database was detected on initializiation, populating a sample one now...")
+	// 	populateDB(ms)
+	// }
 
 	// launch the worker(s)
 	aferofs := afero.NewOsFs()
@@ -52,7 +52,7 @@ func main() {
 		runtime.GOMAXPROCS(2)
 	}
 
-	for i := 0; i < numWorkers; i++ {
+	for i := 0; i < numWorkers-4; i++ {
 		fmt.Printf("launching worker number %v", i)
 		go launchWorker(aferofs, ms, true)
 	}
@@ -67,12 +67,12 @@ func main() {
 
 	// When a client closes their connection midway through a request, the
 	// http.CloseNotifier will cancel the request context (ctx).
-	r.Use(middleware.CloseNotify)
+	// r.Use(middleware.CloseNotify)
 
 	// Set a timeout value on the request context (ctx), that will signal
 	// through ctx.Done() that the request has timed out and further
 	// processing should be stopped.
-	r.Use(middleware.Timeout(60 * time.Second))
+	// r.Use(middleware.Timeout(60 * time.Second))
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("hi"))
@@ -80,6 +80,7 @@ func main() {
 
 	r.Route("/models", func(r chi.Router) {
 		r.Get("/", httpClient.HandleGetAllModels)
+		r.Post("/", httpClient.HandleSubmitModels)
 		// r.With(paginate).Get("/", listArticles) // GET /articles
 		// r.Post("/", createArticle)              // POST /articles
 		// r.Get("/search", searchArticles)        // GET /articles/search
