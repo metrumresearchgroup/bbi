@@ -6,7 +6,6 @@ import (
 
 	"github.com/dpastoor/nonmemutils/utils"
 	"github.com/spf13/afero"
-	"github.com/spf13/viper"
 )
 
 // RunSettings is a struct that contains settings about run information
@@ -27,6 +26,8 @@ func EstimateModel(
 	runSettings RunSettings,
 	verbose bool,
 	debug bool,
+	cleanLvl int,
+	copyLvl int,
 	cacheDir string,
 	exeNameInCache string,
 ) error {
@@ -89,8 +90,8 @@ func EstimateModel(
 		fileList,
 		extraFiles.Files,
 		extraFiles.Files,
-		viper.GetInt("cleanLvl"),
-		viper.GetInt("copyLvl"),
+		cleanLvl,
+		copyLvl,
 		verbose,
 		debug,
 	)
