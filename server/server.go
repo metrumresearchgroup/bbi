@@ -42,4 +42,5 @@ type ModelService interface {
 	CreateModel(m *Model) error
 	CreateModels(model []Model) error
 	AcquireNextQueuedModel() (Model, error)
+	UpdateModel(m *Model) error
 }
