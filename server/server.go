@@ -25,8 +25,6 @@ type RunInfo struct {
 type ModelInfo struct {
 	ModelPath   string
 	RunSettings runner.RunSettings
-	CacheDir    string
-	CacheExe    string
 }
 
 // Client creates a connection to services
