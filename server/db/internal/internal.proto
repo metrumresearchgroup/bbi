@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package internal;
+
+message ModelInfo {
+    string model_path = 1;
+    message RunSettings {
+        bool git = 1;
+        string save_exe = 2;
+    }
+    RunSettings run_settings = 2;
+    string cache_dir = 3;
+    string cache_exe = 4;
+}
+
+message RunInfo {
+    int64 queue_time = 1;
+    int64 start_time = 2;
+    int64 duration = 3;
+}
+
+message Model {
+    int64 id = 1;
+
+    enum StatusType {
+        QUEUED = 0;
+        RUNNING = 1;
+        COMPLETED = 2;
+    }
+
+    StatusType status = 2;
+    ModelInfo model_info = 3;
+    RunInfo run_info = 4; 
+}
