@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"runtime"
 	"time"
 
@@ -25,8 +24,8 @@ func main() {
 	// It will be created if it doesn't exist.
 	client := db.NewClient()
 	client.Path = "models.db"
-	os.Remove("models.db")
-	os.Remove("models.db.lock")
+	// os.Remove("models.db")
+	// os.Remove("models.db.lock")
 	// _, existsErr := os.Stat(client.Path)
 
 	err := client.Open() // connect to the boltDB instance

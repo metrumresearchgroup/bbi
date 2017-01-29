@@ -59,7 +59,7 @@ func (c *ModelHandler) ModelCtx(next http.Handler) http.Handler {
 			http.Error(w, http.StatusText(404), 404)
 			return
 		}
-		ctx := context.WithValue(r.Context(), "model", model)
+		ctx := context.WithValue(r.Context(), "model", &model)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
