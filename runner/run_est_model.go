@@ -11,7 +11,6 @@ import (
 
 	"github.com/dpastoor/nonmemutils/utils"
 	"github.com/spf13/afero"
-	"github.com/spf13/viper"
 )
 
 // RunEstModel runs the estimation model in a given model dir
@@ -25,6 +24,7 @@ func RunEstModel(fs afero.Fs,
 	modelDir string,
 	runName string,
 	noBuild bool,
+	nmExecutableOrPath string,
 ) error {
 	modelDirPath := filepath.Join(baseDir, modelDir)
 	ok, err := utils.DirExists(modelDirPath, fs)
@@ -33,9 +33,8 @@ func RunEstModel(fs afero.Fs,
 		log.Printf("could not find directory to run model %s, ERR: %s, ok: %v", modelDir, err, ok)
 		return err
 	}
-
 	runNum, fileExt := utils.FileAndExt(runName)
-	nmExecutable := viper.GetString("nmExecutable")
+	nmExecutable := nmExecutableOrPath
 	cmdArgs := []string{
 		strings.Join([]string{runNum, fileExt}, ""),
 		strings.Join([]string{runNum, ".lst"}, ""),
