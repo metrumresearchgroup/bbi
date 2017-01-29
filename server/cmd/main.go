@@ -26,15 +26,18 @@ func main() {
 	client.Path = "models.db"
 	os.Remove("models.db")
 	os.Remove("models.db.lock")
-	//_, existsErr := os.Stat(client.Path)
+	// _, existsErr := os.Stat(client.Path)
 
 	err := client.Open() // connect to the boltDB instance
 	if err != nil {
 		log.Fatalf("could not open boltdb instance")
 	}
 
+	// extract the model service and initalize http handlers
 	ms := client.ModelService()
 	httpClient := httpserver.NewModelHandler()
+
+	// provide the model service to the httpClient so has access to the boltdb
 	httpClient.ModelService = ms
 
 	// create a model bucket to store models
@@ -89,6 +92,7 @@ func main() {
 			r.Get("/", httpClient.HandleGetModelByID) // GET /models/123
 		})
 	})
+
 	fmt.Println("serving now on 3333")
 	http.ListenAndServe(":3333", r)
 
@@ -199,7 +203,7 @@ func populateDB(ms server.ModelService) error {
 		}
 		newModels = append(newModels, newModel)
 	}
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 40000; i++ {
 		newModel := server.Model{
 			ID:     0,
 			Status: "QUEUED",
@@ -226,7 +230,7 @@ func populateDB(ms server.ModelService) error {
 		newModels = append(newModels, newModel)
 	}
 
-	err := ms.CreateModels(newModels)
+	_, err := ms.CreateModels(newModels)
 	fmt.Println("inserted sample model output in: ", time.Since(startInsert))
 	return err
 }
