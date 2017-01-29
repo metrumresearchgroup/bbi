@@ -6,14 +6,20 @@ import (
 
 	"github.com/dpastoor/nonmemutils/utils"
 	"github.com/spf13/afero"
-	"github.com/spf13/viper"
 )
 
 // RunSettings is a struct that contains settings about run information
 // passed in from config variables or flags
 type RunSettings struct {
-	Git     bool
-	SaveExe string
+	Git                bool
+	SaveExe            string
+	Verbose            bool
+	Debug              bool
+	CleanLvl           int
+	CopyLvl            int
+	CacheDir           string
+	ExeNameInCache     string
+	NmExecutableOrPath string
 }
 
 // EstimateModel prepares, runs and cleans up a model estimation run
@@ -25,11 +31,8 @@ func EstimateModel(
 	fs afero.Fs,
 	modelPath string,
 	runSettings RunSettings,
-	verbose bool,
-	debug bool,
-	cacheDir string,
-	exeNameInCache string,
 ) error {
+
 	modelFile := filepath.Base(modelPath)
 	runNum, _ := utils.FileAndExt(modelPath)
 	dir, _ := filepath.Abs(filepath.Dir(modelPath))
@@ -37,6 +40,16 @@ func EstimateModel(
 	dirs := utils.ListDirNames(dirInfo)
 	newDirSuggestion := FindNextEstDirNum(runNum, dirs, 2)
 	modelDir := newDirSuggestion.NextDirName
+
+	// unpack settings
+	verbose := runSettings.Verbose
+	debug := runSettings.Debug
+	cleanLvl := runSettings.CleanLvl
+	copyLvl := runSettings.CopyLvl
+	cacheDir := runSettings.CacheDir
+	exeNameInCache := runSettings.ExeNameInCache
+
+	nmExecutableOrPath := runSettings.NmExecutableOrPath
 	if verbose {
 		log.Printf("setting up run infrastructure for run %s", runNum)
 		log.Printf("base dir: %s", dir)
@@ -65,7 +78,7 @@ func EstimateModel(
 	if verbose {
 		log.Printf("running model %s ...\n", runNum)
 	}
-	err = RunEstModel(fs, dir, newDirSuggestion.NextDirName, modelFile, noBuild)
+	err = RunEstModel(fs, dir, newDirSuggestion.NextDirName, modelFile, noBuild, nmExecutableOrPath)
 
 	if err != nil {
 		log.Printf("error during estimation run: %s", err)
@@ -89,8 +102,8 @@ func EstimateModel(
 		fileList,
 		extraFiles.Files,
 		extraFiles.Files,
-		viper.GetInt("cleanLvl"),
-		viper.GetInt("copyLvl"),
+		cleanLvl,
+		copyLvl,
 		verbose,
 		debug,
 	)
