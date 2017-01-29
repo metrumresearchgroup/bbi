@@ -90,6 +90,9 @@ func (m *ModelService) CreateModels(models []server.Model) ([]server.Model, erro
 		n := 0
 		for i, model := range models {
 			id, err := b.NextSequence()
+			if err != nil {
+				return err
+			}
 			model.ID = int(id)
 			buf, err := internal.MarshalModel(&model)
 			if err != nil {
