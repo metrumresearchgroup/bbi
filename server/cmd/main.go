@@ -3,11 +3,12 @@ package main
 import (
 	"fmt"
 	"log"
-	"math/rand"
 	"net/http"
 	"os"
 	"runtime"
 	"time"
+
+	"path/filepath"
 
 	"github.com/dpastoor/nonmemutils/runner"
 	"github.com/dpastoor/nonmemutils/server"
@@ -55,9 +56,12 @@ func main() {
 		runtime.GOMAXPROCS(2)
 	}
 
-	for i := 0; i < numWorkers-4; i++ {
-		fmt.Printf("launching worker number %v", i)
-		go launchWorker(aferofs, ms, true)
+	// for hyperthreaded machines -2 should still basically saturate the CPU completely, while still leaving
+	// two threads goroutines to deal with requests and db management
+	// eg 4 core machine will show up as having 8 cpus, therefore 6 workers
+	// running 6 models on a 4 core machine will definitely saturate the CPU well.
+	for i := 0; i < numWorkers-2; i++ {
+		go launchWorker(aferofs, ms, true, i)
 	}
 
 	r := chi.NewRouter()
@@ -99,12 +103,17 @@ func main() {
 }
 
 //runWorker polls the DB and acquires queue'd models to run via EstimateModel
+// fs is the file system abstraction that the runner code will use, should use an afero.OsFS
+// ms is the model service that interacts with the db/queue
+// verbose is whether to log information
+// workerNumber is the worker number for use in logs
 func launchWorker(
 	fs afero.Fs,
 	ms server.ModelService,
 	verbose bool,
+	workerNum int,
 ) {
-
+	fmt.Printf("launching worker number %v\n", workerNum)
 	for {
 		model, err := ms.AcquireNextQueuedModel()
 		if model.ID == 0 {
@@ -114,26 +123,19 @@ func launchWorker(
 			continue
 		}
 		if err != nil {
-			fmt.Println("error acquiring new model")
+			fmt.Println("error acquiring new model, skipping...")
+			continue
 		}
 		filePath := model.ModelInfo.ModelPath
 		startTime := time.Now()
 		if verbose {
-			log.Printf("run %s running on worker!", filePath)
+			log.Printf("run %s running on worker %v!", filepath.Base(filePath), workerNum)
 		}
-		// runner.EstimateModel(
-		// 	fs,
-		// 	filePath,
-		// 	model.ModelInfo.RunSettings,
-		// 	false,
-		// 	false,
-		// 	1, // cleanLvl
-		// 	1, // copyLvl
-		// 	model.ModelInfo.CacheDir,
-		// 	model.ModelInfo.CacheExe,
-		// )
-		fmt.Println("Running fake model...")
-		time.Sleep(time.Duration(rand.Int31n(5000)) * time.Millisecond)
+		runner.EstimateModel(
+			fs,
+			filePath,
+			model.ModelInfo.RunSettings,
+		)
 		if verbose {
 			log.Printf("completed run %s releasing worker back to queue \n", filePath)
 		}
