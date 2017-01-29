@@ -2,7 +2,6 @@ package db
 
 import (
 	"encoding/binary"
-	"fmt"
 
 	"github.com/boltdb/bolt"
 	"github.com/dpastoor/nonmemutils/server"
@@ -84,13 +83,13 @@ func (m *ModelService) CreateModel(model *server.Model) error {
 }
 
 // CreateModels adds an array of models to the boltdb in a single batch transaction
-func (m *ModelService) CreateModels(models []server.Model) error {
+func (m *ModelService) CreateModels(models []server.Model) ([]server.Model, error) {
 	err := m.client.db.Batch(func(tx *bolt.Tx) error {
 		// models bucket created when db initialized
 		b := tx.Bucket([]byte("models"))
-		id, err := b.NextSequence()
-		i := 0
-		for _, model := range models {
+		n := 0
+		for i, model := range models {
+			id, err := b.NextSequence()
 			model.ID = int(id)
 			buf, err := internal.MarshalModel(&model)
 			if err != nil {
@@ -100,13 +99,13 @@ func (m *ModelService) CreateModels(models []server.Model) error {
 			if err != nil {
 				return err
 			}
-			id++ //increment to next sequence value
-			i++
+			// update the model stored in the slice so contains the new ID when returned
+			models[i] = model
+			n++
 		}
-		fmt.Printf("inserted %v models in batch \n", i)
-		return err
+		return nil
 	})
-	return err
+	return models, err
 }
 
 // AcquireNextQueuedModel returns the next model with status QUEUED while also changing the value to RUNNING

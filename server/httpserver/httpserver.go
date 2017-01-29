@@ -71,9 +71,9 @@ func (c *ModelHandler) HandleSubmitModels(w http.ResponseWriter, r *http.Request
 		render.JSON(w, r, err.Error())
 		return
 	}
-	err := c.ModelService.CreateModels(models)
+	models, err := c.ModelService.CreateModels(models)
 	if err != nil {
 		fmt.Printf("Insertion of models failed with err: %v", err)
 	}
-	render.JSON(w, r, "sucessfully submitted all models <to replace this message>")
+	render.JSON(w, r, models)
 }
