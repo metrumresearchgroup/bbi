@@ -1,6 +1,9 @@
 package parser
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 // Est represents information about an estimation step
 type Est struct {
@@ -36,8 +39,13 @@ type ModelInfo struct {
 }
 
 // ParseModInfo parses the model file
-func ParseModInfo(lines []string) ModelInfo {
-
+func ParseModInfo(lines []string) (result ModelInfo, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("Recovered in f", r)
+			err, _ = r.(error)
+		}
+	}()
 	var probLine string
 	var routineLine string
 	var estLines []int
@@ -75,7 +83,7 @@ func ParseModInfo(lines []string) ModelInfo {
 		}
 	}
 
-	result := ModelInfo{
+	result = ModelInfo{
 		Prob:    probLine,
 		Routine: routineLine,
 		Est:     estRecords,
@@ -83,5 +91,5 @@ func ParseModInfo(lines []string) ModelInfo {
 		Sim:     sim,
 		Tables:  tables,
 	}
-	return result
+	return result, nil
 }
