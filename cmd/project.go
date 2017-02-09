@@ -16,8 +16,11 @@ package cmd
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"path/filepath"
+
+	"os"
 
 	"github.com/apcera/termtables"
 	"github.com/dpastoor/nonmemutils/parser"
@@ -43,9 +46,16 @@ func project(cmd *cobra.Command, args []string) error {
 	}
 
 	AppFs := afero.NewOsFs()
-
-	dirPath := args[0]
-	fmt.Println("dirpath: ", dirPath)
+	var dirPath string
+	switch len(args) {
+	case 0:
+		dirPath, _ = os.Getwd()
+	case 1:
+		dirPath = args[0]
+	default:
+		fmt.Println("currently only supports scanning one directory")
+		return errors.New("project only supports specifying one directory")
+	}
 	// create a new dir for model estimation
 	dir, _ := filepath.Abs(dirPath)
 
