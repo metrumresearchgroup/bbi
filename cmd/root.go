@@ -23,7 +23,8 @@ import (
 	flag "github.com/spf13/pflag"
 )
 
-const version string = "0.0.1"
+// VERSION is the current nmu version
+const VERSION string = "0.0.2"
 
 var (
 	// name of config file
