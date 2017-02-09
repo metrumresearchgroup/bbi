@@ -66,8 +66,8 @@ func project(cmd *cobra.Command, args []string) error {
 					Prob:      ms.Summary.Prob,
 				})
 			}
-			probSummary(probSummaries)
 		}
+		probSummary(probSummaries)
 	}
 	return nil
 }
