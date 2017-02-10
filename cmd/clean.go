@@ -25,9 +25,8 @@ import (
 )
 
 var (
-	noFolders     bool
-	noFiles       bool
-	simulateClean bool
+	noFolders bool
+	noFiles   bool
 )
 
 // cleanCmd represents the clean command
@@ -82,7 +81,7 @@ func clean(cmd *cobra.Command, args []string) error {
 		fmt.Println("cleaning files: ", matchedFiles)
 		fmt.Println("cleaning folders: ", matchedFolders)
 	}
-	if simulateClean {
+	if preview {
 		fmt.Println("would clean files: ", matchedFiles)
 		fmt.Println("would clean folders: ", matchedFolders)
 		return nil
@@ -103,5 +102,4 @@ func init() {
 	RootCmd.AddCommand(cleanCmd)
 	cleanCmd.Flags().BoolVar(&noFolders, "noFolders", false, "exclude folders during cleaning")
 	cleanCmd.Flags().BoolVar(&noFiles, "noFiles", false, "exclude files during cleaning")
-	cleanCmd.Flags().BoolVar(&simulateClean, "simulateClean", false, "simulate removal to show what would be removed")
 }

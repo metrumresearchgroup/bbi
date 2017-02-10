@@ -34,6 +34,7 @@ var (
 	debug   bool
 	threads int
 	tree    bool
+	preview bool
 )
 
 // RootCmd represents the base command when called without any subcommands
@@ -64,6 +65,7 @@ func init() {
 	RootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "debug mode")
 	RootCmd.PersistentFlags().IntVar(&threads, "threads", 0, "number of threads to execute with")
 	RootCmd.PersistentFlags().BoolVarP(&tree, "tree", "t", false, "json tree of output, if possible")
+	RootCmd.PersistentFlags().BoolVarP(&preview, "preview", "p", false, "preview action, but don't actually run command")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
