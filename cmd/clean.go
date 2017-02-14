@@ -27,6 +27,7 @@ import (
 var (
 	noFolders bool
 	noFiles   bool
+	inverse   bool
 )
 
 // cleanCmd represents the clean command
@@ -63,14 +64,25 @@ func clean(cmd *cobra.Command, args []string) error {
 	matchedFolders := []string{}
 	for _, expr := range args {
 		if !noFolders {
-			matches, err := utils.ListMatchesByRegex(folders, expr)
+			var matches []string
+			if !inverse {
+				matches, err = utils.ListMatchesByRegex(folders, expr)
+			} else {
+				matches, err = utils.ListNonMatchesByRegex(folders, expr)
+			}
 			if err != nil {
 				return fmt.Errorf("error with regex (%s), err: (%s)", expr, err)
 			}
 			matchedFolders = append(matchedFolders, matches...)
 		}
 		if !noFiles {
-			matches, err := utils.ListMatchesByRegex(files, expr)
+			var matches []string
+			if !inverse {
+				matches, err = utils.ListMatchesByRegex(files, expr)
+			} else {
+
+				matches, err = utils.ListNonMatchesByRegex(files, expr)
+			}
 			if err != nil {
 				return fmt.Errorf("error with regex (%s), err: (%s)", expr, err)
 			}
@@ -102,4 +114,5 @@ func init() {
 	RootCmd.AddCommand(cleanCmd)
 	cleanCmd.Flags().BoolVar(&noFolders, "noFolders", false, "exclude folders during cleaning")
 	cleanCmd.Flags().BoolVar(&noFiles, "noFiles", false, "exclude files during cleaning")
+	cleanCmd.Flags().BoolVar(&inverse, "inverse", false, "inverse selection from the given regex match criteria")
 }
