@@ -56,7 +56,7 @@ func project(cmd *cobra.Command, args []string) error {
 		fmt.Println("currently only supports scanning one directory")
 		return errors.New("project only supports specifying one directory")
 	}
-	// create a new dir for model estimation
+
 	dir, _ := filepath.Abs(dirPath)
 
 	modelFiles, err := utils.ListModels(dir, ".mod", AppFs)

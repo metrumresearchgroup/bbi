@@ -42,6 +42,10 @@ nmu clean _est_ --noFiles  // only remove matching folders
 nmu clean _est_ --noFiles --simulateClean // show what output would be if clean occured but don't actually clean 
 nmu clean "run009.[^mod]" // all matching run009.<ext> but not .mod files
 nmu clean "run009.(mod|lst)$" // match run009.lst and run009.mod
+
+can also clean via the opposite of a match with inverse
+
+nmu clean ".modt{0,1}$" --noFolders --inverse // clean all files not matching .mod or .modt
  `,
 	RunE: clean,
 }
