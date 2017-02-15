@@ -77,7 +77,7 @@ func initConfig() {
 	// 	viper.SetConfigFile(cfgFile)
 	// }
 	// TODO: set config a little more flexibly
-	err := nmulib.LoadGlobalConfig("nmuconfig.toml")
+	err := nmulib.LoadGlobalConfig("nmuconfig")
 	if err != nil {
 		fmt.Println(fmt.Errorf("err initializing config %s", err))
 	}
