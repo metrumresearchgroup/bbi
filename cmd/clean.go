@@ -120,3 +120,4 @@ func init() {
 	cleanCmd.Flags().BoolVar(&noFiles, "noFiles", false, "exclude files during cleaning")
 	cleanCmd.Flags().BoolVar(&inverse, "inverse", false, "inverse selection from the given regex match criteria")
 }
+
