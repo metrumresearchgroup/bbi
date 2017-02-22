@@ -6,13 +6,23 @@ import (
 
 	"bytes"
 
+	"os"
+	"path/filepath"
+
 	"github.com/clbanning/mxj"
 )
 
 func main() {
-	xmlDataRaw, err := ioutil.ReadFile("run001.xml")
+	file, err := filepath.Abs("C:/Users/devin/Desktop/vanco-neonates-bayesian/modeling/run200.xml")
+	fmt.Println(file)
+
+	if os.IsNotExist(err) {
+		fmt.Println("could not find specified file or resolve path")
+	}
+	xmlDataRaw, err := ioutil.ReadFile(file)
 	if err != nil {
 		fmt.Println("error reading")
+		fmt.Println(err)
 	}
 	// we need to strip the ascii alert at the top of the xml file, as xml's parsers choke on it
 	// and we don't have funky characters to need to worry about being specific about what
@@ -21,6 +31,7 @@ func main() {
 	if err != nil {
 		fmt.Println("error reading")
 	}
+
 	// all data after first line
 	xmlData := s[1]
 	m, merr := mxj.NewMapXml(xmlData)
@@ -28,14 +39,24 @@ func main() {
 		fmt.Println("error mapping")
 	}
 
-	getThetas(&m)
-	getBlockValues(&m, "omega")
-	getBlockValues(&m, "sigma")
+	thetas := getThetas(&m)
+	omegas := getBlockValues(&m, "omega")
+	sigmas := getBlockValues(&m, "sigma")
 	//getBlockValues(&m, "covariance")
 	//	fmt.Println(values)
+	fmt.Println("thetas: ", thetas)
+	fmt.Println("omegas: ", omegas)
+	fmt.Println("sigmas: ", sigmas)
 }
 
-func getBlockValues(m *mxj.Map, key string) {
+type blockValue struct {
+	Value string
+	Row   string
+	Col   string
+}
+
+func getBlockValues(m *mxj.Map, key string) []blockValue {
+	var results []blockValue
 	omegaKey := m.PathsForKey(key)
 	value, err := m.ValuesForPath(omegaKey[0]) // should only have 1 place for thetas (for now?)
 	// this could be different if multiple estimation steps run
@@ -53,12 +74,21 @@ func getBlockValues(m *mxj.Map, key string) {
 					colVals := colMap.(map[string]interface{})
 					fmt.Println(rowVals["-rname"], colVals["-cname"])
 					fmt.Println("value: ", colVals["#text"])
+					results = append(results, blockValue{
+						Value: colVals["#text"].(string),
+						Row:   rowVals["-rname"].(string),
+						Col:   colVals["-cname"].(string),
+					})
 				} else {
 					for _, m := range colMap.([]interface{}) {
 						colVals := m.(map[string]interface{})
 						fmt.Println(rowVals["-rname"], colVals["-cname"])
 						fmt.Println("value: ", colVals["#text"])
-
+						results = append(results, blockValue{
+							Value: colVals["#text"].(string),
+							Row:   rowVals["-rname"].(string),
+							Col:   colVals["-cname"].(string),
+						})
 						//fmt.Println(i, m["-cname"], m["#text"])
 					}
 
@@ -66,8 +96,10 @@ func getBlockValues(m *mxj.Map, key string) {
 			}
 		}
 	}
+	return results
 }
-func getThetas(m *mxj.Map) {
+func getThetas(m *mxj.Map) []string {
+	var output []string
 	thetaKey := m.PathsForKey("theta")
 	values, err := m.ValuesForPath(thetaKey[0]) // should only have 1 place for thetas (for now?)
 	// this could be different if multiple estimation steps run
@@ -83,8 +115,10 @@ func getThetas(m *mxj.Map) {
 				vals := val.(map[string]interface{})
 				fmt.Println(vals["-name"])
 				fmt.Println(vals["#text"])
+				output = append(output, vals["#text"].(string))
 			}
 		}
 	}
+	return output
 
 }
