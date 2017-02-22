@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	file, err := filepath.Abs("C:/Users/devin/Desktop/vanco-neonates-bayesian/modeling/run111c4.xml")
+	file, err := filepath.Abs(os.Args[1])
 	fmt.Println(file)
 
 	if os.IsNotExist(err) {
@@ -53,6 +53,8 @@ func main() {
 	fmt.Println("omegaSE: ", omegasSE)
 	fmt.Println("sigmas: ", sigmas)
 	fmt.Println("sigmasSE: ", sigmasSE)
+	terminationStatus := getValue(&m, "termination_information")
+	fmt.Println(terminationStatus)
 }
 
 type blockValue struct {
@@ -61,6 +63,18 @@ type blockValue struct {
 	Col   string
 }
 
+func getValue(m *mxj.Map, key string) string {
+	var results string
+	keyPath := m.PathsForKey(key)
+	value, err := m.ValuesForPath(keyPath[0])
+	if err != nil {
+		fmt.Println("err parsing: ", err)
+	}
+	for _, val := range value {
+		results = val.(string)
+	}
+	return results
+}
 func getBlockValues(m *mxj.Map, key string) []blockValue {
 	var results []blockValue
 	omegaKey := m.PathsForKey(key)
@@ -79,8 +93,6 @@ func getBlockValues(m *mxj.Map, key string) []blockValue {
 				colMap := rowVals["col"]
 				if rowVals["-rname"] == "1" || rowVals["-rname"] == "THETA1" {
 					colVals := colMap.(map[string]interface{})
-					fmt.Println(rowVals["-rname"], colVals["-cname"])
-					fmt.Println("value: ", colVals["#text"])
 					results = append(results, blockValue{
 						Value: colVals["#text"].(string),
 						Row:   rowVals["-rname"].(string),
@@ -89,8 +101,6 @@ func getBlockValues(m *mxj.Map, key string) []blockValue {
 				} else {
 					for _, m := range colMap.([]interface{}) {
 						colVals := m.(map[string]interface{})
-						fmt.Println(rowVals["-rname"], colVals["-cname"])
-						fmt.Println("value: ", colVals["#text"])
 						results = append(results, blockValue{
 							Value: colVals["#text"].(string),
 							Row:   rowVals["-rname"].(string),
@@ -112,6 +122,7 @@ func getThetas(m *mxj.Map, key string) []string {
 	// this could be different if multiple estimation steps run
 	if err != nil {
 		fmt.Println("error extracting values: ", err)
+		return output
 	}
 	for _, val := range values {
 		for _, val := range val.(map[string]interface{}) {
@@ -120,8 +131,6 @@ func getThetas(m *mxj.Map, key string) []string {
 			thetaVals := val.([]interface{})
 			for _, val := range thetaVals {
 				vals := val.(map[string]interface{})
-				fmt.Println(vals["-name"])
-				fmt.Println(vals["#text"])
 				output = append(output, vals["#text"].(string))
 			}
 		}
