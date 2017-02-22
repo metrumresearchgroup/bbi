@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	file, err := filepath.Abs("C:/Users/devin/Desktop/vanco-neonates-bayesian/modeling/run200.xml")
+	file, err := filepath.Abs("C:/Users/devin/Desktop/vanco-neonates-bayesian/modeling/run111c4.xml")
 	fmt.Println(file)
 
 	if os.IsNotExist(err) {
@@ -39,14 +39,20 @@ func main() {
 		fmt.Println("error mapping")
 	}
 
-	thetas := getThetas(&m)
+	thetas := getThetas(&m, "theta")
+	thetasSE := getThetas(&m, "thetase")
 	omegas := getBlockValues(&m, "omega")
 	sigmas := getBlockValues(&m, "sigma")
+	omegasSE := getBlockValues(&m, "omegase")
+	sigmasSE := getBlockValues(&m, "sigmase")
 	//getBlockValues(&m, "covariance")
 	//	fmt.Println(values)
 	fmt.Println("thetas: ", thetas)
+	fmt.Println("thetasSE: ", thetasSE)
 	fmt.Println("omegas: ", omegas)
+	fmt.Println("omegaSE: ", omegasSE)
 	fmt.Println("sigmas: ", sigmas)
+	fmt.Println("sigmasSE: ", sigmasSE)
 }
 
 type blockValue struct {
@@ -62,6 +68,7 @@ func getBlockValues(m *mxj.Map, key string) []blockValue {
 	// this could be different if multiple estimation steps run
 	if err != nil {
 		fmt.Println("error extracting values: ", err)
+		return results
 	}
 	for _, val := range value {
 		omegaRows := val.(map[string]interface{})
@@ -98,9 +105,9 @@ func getBlockValues(m *mxj.Map, key string) []blockValue {
 	}
 	return results
 }
-func getThetas(m *mxj.Map) []string {
+func getThetas(m *mxj.Map, key string) []string {
 	var output []string
-	thetaKey := m.PathsForKey("theta")
+	thetaKey := m.PathsForKey(key)
 	values, err := m.ValuesForPath(thetaKey[0]) // should only have 1 place for thetas (for now?)
 	// this could be different if multiple estimation steps run
 	if err != nil {
