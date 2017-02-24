@@ -83,14 +83,12 @@ func EstimateModel(
 		return err
 	}
 
+	log.Printf("completed execution of %s, cleaning up...", runNum)
+
 	if runSettings.SaveExe != "" {
 		utils.CopyExeToCache(fs, dir, modelDir, cacheDir, runSettings.SaveExe)
 	}
 
-	// clean up after
-	if verbose {
-		log.Println("cleaning up...")
-	}
 	estDirInfo, _ := afero.ReadDir(fs, filepath.Join(dir, newDirSuggestion.NextDirName))
 	fileList := utils.ListFiles(estDirInfo)
 	err = CleanEstFolderAndCopyToParent(fs,
