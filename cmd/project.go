@@ -31,16 +31,16 @@ import (
 )
 
 // projectCmd represents the command to get information about a given modeling project
-var projectCmd = &cobra.Command{
-	Use:   "project",
+var probsCmd = &cobra.Command{
+	Use:   "probs",
 	Short: "summarize information about project",
 	Long: `get information about models in the project: 
 nmu project
  `,
-	RunE: project,
+	RunE: probs,
 }
 
-func project(cmd *cobra.Command, args []string) error {
+func probs(cmd *cobra.Command, args []string) error {
 	if debug {
 		viper.Debug()
 	}
