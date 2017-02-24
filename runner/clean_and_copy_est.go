@@ -102,7 +102,7 @@ func CleanEstFolderAndCopyToParent(
 			if err != nil {
 				return err
 			}
-			if verbose {
+			if debug {
 				log.Println("deleted file: ", file)
 			}
 		}

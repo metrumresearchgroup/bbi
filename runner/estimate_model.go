@@ -75,9 +75,7 @@ func EstimateModel(
 	}
 
 	// run model
-	if verbose {
-		log.Printf("running model %s ...\n", runNum)
-	}
+	log.Printf("running model %s ...\n", runNum)
 	err = RunEstModel(fs, dir, newDirSuggestion.NextDirName, modelFile, noBuild, nmExecutableOrPath)
 
 	if err != nil {
