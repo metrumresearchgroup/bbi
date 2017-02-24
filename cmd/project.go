@@ -22,6 +22,8 @@ import (
 
 	"os"
 
+	"strings"
+
 	"github.com/apcera/termtables"
 	"github.com/dpastoor/nonmemutils/parser"
 	"github.com/dpastoor/nonmemutils/utils"
@@ -121,14 +123,13 @@ func probSummary(mp []modelSummary) {
 		BorderX:    "-", BorderY: "|", BorderI: "+",
 		PaddingLeft: 3, PaddingRight: 3,
 		Width:     100,
-		Alignment: termtables.AlignRight,
+		Alignment: termtables.AlignLeft,
 	}
 	probTable := termtables.CreateTable()
 	probTable.AddHeaders("Run", "Prob")
 	for _, m := range mp {
-		probTable.AddRow(m.ModelName, m.Prob)
+		probTable.AddRow(m.ModelName, strings.TrimPrefix(m.Prob, "$PROB"))
 	}
-	probTable.SetAlign(termtables.AlignLeft, 1)
 
 	fmt.Println(probTable.Render())
 }
