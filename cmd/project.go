@@ -30,7 +30,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-// projectCmd represents the command to get information about a given modeling project
+// probsCmd represents the command to get information about a given modeling project
 var probsCmd = &cobra.Command{
 	Use:   "probs",
 	Short: "summarize information about project",
