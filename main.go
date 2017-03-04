@@ -8,13 +8,19 @@ import (
 
 func main() {
 	testStrings := []string{
-		"run001.mod",
-		"run001.lst",
-		"run002.mod",
-		"run002.lst",
+		"run[001:003].mod",
+		"[0:2]hello",
+		"tab[0:2]",
+		"run[01:01].mod",
+		"run[005:002].mod",
+		"run000.mod",
 	}
-
-	matches, err := utils.ListMatchesByRegex(testStrings, "run001\\.mod")
-	fmt.Println(matches)
-	fmt.Println(err)
+	for _, t := range testStrings {
+		fmt.Println("------------")
+		fmt.Println("string: ", t)
+		expandedNames, err := utils.ExpandNameSequence(t)
+		fmt.Println("err:", err)
+		fmt.Println(expandedNames)
+		fmt.Println("------------")
+	}
 }
