@@ -41,7 +41,7 @@ var (
 var RootCmd = &cobra.Command{
 	Use:   "nmu",
 	Short: "nonmem utility functions",
-	Long:  fmt.Sprintf("nonmem utility functions version %s", version),
+	Long:  fmt.Sprintf("nonmem utility functions version %s", VERSION),
 }
 
 // Execute adds all child commands to the root command sets flags appropriately.
