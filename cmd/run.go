@@ -17,6 +17,7 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"regexp"
 	"time"
 
 	"sync"
@@ -45,6 +46,8 @@ var runCmd = &cobra.Command{
 	Long: `run model(s), for example: 
 nmu run run001.mod
 nmu run run001.mod run002.mod --cleanLvl=1  
+nmu run run[001:006].mod // expand to run001.mod run002.mod ... run006.mod
+nmu run . // run all models in directory
  `,
 	RunE: run,
 }
@@ -89,6 +92,10 @@ func run(cmd *cobra.Command, args []string) error {
 		log.Printf("setting up a work queue with %v workers", viper.GetInt("threads"))
 	}
 	defer close(queue)
+
+	// regex for filename expansion check
+	r := regexp.MustCompile("(.*)?\\[(.*)\\](.*)?")
+
 	for _, arg := range args {
 
 		// check if arg is a file or Dir
@@ -116,11 +123,29 @@ func run(cmd *cobra.Command, args []string) error {
 				go runModel(AppFs, model, queue, &wg, verbose, debug)
 			}
 
-			// go to dir and get all model files to run
 		} else {
-			log.Printf("adding model %s to queue \n", arg)
-			wg.Add(1)
-			go runModel(AppFs, arg, queue, &wg, verbose, debug)
+			// figure out if need to do expansion, or run as-is
+			if len(r.FindAllStringSubmatch(arg, 1)) > 0 {
+				log.Printf("expanding model pattern: %s \n", arg)
+				pat, err := utils.ExpandNameSequence(arg)
+				if err != nil {
+					log.Printf("err expanding name: %v", err)
+					// don't try to run this model
+					continue
+				}
+				if verbose || debug {
+					log.Printf("expanded models: %s \n", pat)
+				}
+				for _, p := range pat {
+					log.Printf("adding model %s to queue \n", arg)
+					wg.Add(1)
+					go runModel(AppFs, p, queue, &wg, verbose, debug)
+				}
+			} else {
+				log.Printf("adding model %s to queue \n", arg)
+				wg.Add(1)
+				go runModel(AppFs, arg, queue, &wg, verbose, debug)
+			}
 		}
 	}
 
