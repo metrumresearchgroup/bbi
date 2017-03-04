@@ -137,7 +137,7 @@ func run(cmd *cobra.Command, args []string) error {
 					log.Printf("expanded models: %s \n", pat)
 				}
 				for _, p := range pat {
-					log.Printf("adding model %s to queue \n", arg)
+					log.Printf("adding model %s to queue \n", p)
 					wg.Add(1)
 					go runModel(AppFs, p, queue, &wg, verbose, debug)
 				}
