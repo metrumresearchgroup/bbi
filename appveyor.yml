@@ -25,7 +25,4 @@ test_script:
   - go test -race ./...
   - ineffassign .
 
-after_test:
-  - golint ./...
-
 deploy: off
