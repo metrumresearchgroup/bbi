@@ -67,7 +67,7 @@ func (c *ModelHandler) ModelCtx(next http.Handler) http.Handler {
 // HandleSubmitModels adds models to the database for workers to execute
 func (c *ModelHandler) HandleSubmitModels(w http.ResponseWriter, r *http.Request) {
 	var models []server.Model
-	if err := render.Bind(r.Body, &models); err != nil {
+	if err := render.DecodeJSON(r.Body, &models); err != nil {
 		render.JSON(w, r, err.Error())
 		return
 	}
