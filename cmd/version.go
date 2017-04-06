@@ -14,7 +14,11 @@
 
 package cmd
 
-import "github.com/spf13/cobra"
+import (
+	"fmt"
+
+	"github.com/spf13/cobra"
+)
 
 // runCmd represents the run command
 var versionCmd = &cobra.Command{
@@ -27,8 +31,8 @@ nmu version
 }
 
 func version(cmd *cobra.Command, args []string) {
-
+	fmt.Println(VERSION)
 }
 func init() {
-	RootCmd.AddCommand(summaryCmd)
+	RootCmd.AddCommand(versionCmd)
 }
