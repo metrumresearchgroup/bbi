@@ -45,6 +45,13 @@ func SetupCacheForRun(
 		fullCacheDirPath,
 		nmNameInCache,
 	)
+
+	ok, err = Exists(fileToCopyLocation, fs)
+	if !ok || err != nil {
+		log.Printf("no cached model detected at: %s, skipping attempt to precompile", fileToCopyLocation)
+		return err
+	}
+
 	fileToCopy, err := fs.Open(fileToCopyLocation)
 	if err != nil {
 		return fmt.Errorf("error copying file: (%s)", err)
