@@ -70,6 +70,7 @@ func scaffold(cmd *cobra.Command, args []string) error {
 			"*",
 			"*/",
 			"!.gitignore",
+			"",
 		},
 			filepath.Join(cache, ".gitignore"))
 	}
