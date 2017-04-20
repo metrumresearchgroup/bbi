@@ -19,6 +19,7 @@ import (
 	"log"
 	"path/filepath"
 
+	"github.com/dpastoor/nonmemutils/utils"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -51,10 +52,27 @@ func scaffold(cmd *cobra.Command, args []string) error {
 			fmt.Println(fmt.Sprintf("would create cache dir at: %s", cache))
 			return nil
 		}
-		err := AppFs.MkdirAll(cache, 0766)
+
+		exists, err := afero.Exists(AppFs, cache)
+		if err != nil {
+			log.Fatalf("error checking for cache directory: %s", err)
+		}
+		if exists {
+			fmt.Printf("directory already exists at:  %s, nothing to do...\n", cache)
+		}
+
+		err = AppFs.MkdirAll(cache, 0766)
 		if err != nil {
 			log.Fatalf("error creating cache directory: %s", err)
 		}
+		fmt.Println("adding .gitignore to cache directory...")
+		utils.WriteLinesFS(AppFs, []string{
+			"*",
+			"*/",
+			"!.gitignore",
+			"",
+		},
+			filepath.Join(cache, ".gitignore"))
 	}
 
 	return nil
