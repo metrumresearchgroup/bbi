@@ -2,7 +2,7 @@ version: "{build}"
 
 os: Windows Server 2012 R2
 
-clone_folder: c:\gopath\src\github.com\dpastoor\nonmemutils
+clone_folder: c:\gopath\src\github.com\dpastoor\babylon
 
 environment:
   GOPATH: c:\gopath
