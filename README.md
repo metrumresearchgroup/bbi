@@ -4,13 +4,18 @@
 
 # babylon
 
-Babylon is (will be) a complete solution for managing projects involving modeling and simulation with a number of software solutions used in pharmaceutical sciences. 
+Babylon is (will be) a complete solution for managing projects involving modeling and simulation with a number 
+of software solutions used in pharmaceutical sciences. 
+This is a fork of the [nonmemutils project](https://github.com/dpastoor/nonmemutils) that is broader in scope.
 
 Initial support encompasses NONMEM and STAN, however the api is designed in a way to be flexible to handle other software.
 
-By using go, virtually all components are nicely cross platform, and can be distributed as a single binary.
+Most components are written in Go, a language championed by google. By using go, virtually all components are nicely cross platform,
+ and can be distributed as a single binary with no (required) dependencies for the user.
 
-** Currently the software is considered pre-alpha and documentation is non-existant **. However, go, being a statically typed language and simple in it's structures, makes it _reasonably_ easy to look at the raw source to get a feel for what is going on.
+** Currently the software is considered pre-alpha and documentation is non-existant **. However, go, 
+being a statically typed language and simple in it's structures, 
+makes it _reasonably_ easy to look at the raw source to get a feel for what is going on.
 
 Babylon is broken up into a couple core components:
 
@@ -29,7 +34,7 @@ to run under specific resource constraints or in a cluster environment.
 Internal components, such as the parsers, runners, and other utility data expose their
 api in such a way that at minimum can be used by both the cli and server
 
-### Exampale output
+### Example output
 
 Example output of NONMEM run summary as of November 2016 (with new fields continually being added)
 
