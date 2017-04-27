@@ -1,28 +1,40 @@
-[![Circle CI](https://circleci.com/gh/dpastoor/nonmemutils.svg?style=svg)](https://circleci.com/gh/dpastoor/nonmemutils)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/dpastoor/nonmemutils?branch=master&svg=true)](https://ci.appveyor.com/project/dpastoor/nonmemutils)
-[![Go Report Card](https://goreportcard.com/badge/github.com/dpastoor/nonmemutils)](https://goreportcard.com/report/github.com/dpastoor/nonmemutils)
+[![Circle CI](https://circleci.com/gh/dpastoor/babylon.svg?style=svg)](https://circleci.com/gh/dpastoor/babylon)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/dpastoor/babylon?branch=master&svg=true)](https://ci.appveyor.com/project/dpastoor/babylon)
+[![Go Report Card](https://goreportcard.com/badge/github.com/dpastoor/babylon)](https://goreportcard.com/report/github.com/dpastoor/babylon)
 
-# nonmemutils
-nonmem utility functions written in Go with an emphasis on full test coverage
+# babylon
 
-This project has two main goals
+Babylon is (will be) a complete solution for managing projects involving modeling and simulation with a number of software solutions used in pharmaceutical sciences. 
 
-1) to support my use cases in nonmem, as well as those requested by collegues
-* handle parsing of lst files for command line summaries and as JSON output to be pulled into other programs like R
-* execute jobs and support nonmem 7.4's pre-compiled binary features
-* manage run submissions 'globally' in that a single run submission should not lock out the shell if you don't want, and all runs should be aware of one-another as to not oversaturate resources, namely CPU.
-* clean up and provide some helpers for managing output from PsN submitted jobs, namely more first class integration with git.
-* provide simulation and re-estimation templating 
-* first class hooks to R for pre- and post- processing
+Initial support encompasses NONMEM and STAN, however the api is designed in a way to be flexible to handle other software.
 
-2) to learn and experiment with go.
-
-By using go, this utility is nicely cross platform, and is distributed as a single binary.
+By using go, virtually all components are nicely cross platform, and can be distributed as a single binary.
 
 ** Currently the software is considered pre-alpha and documentation is non-existant **. However, go, being a statically typed language and simple in it's structures, makes it _reasonably_ easy to look at the raw source to get a feel for what is going on.
 
+Babylon is broken up into a couple core components:
 
-Example output as of November 2016 (with new fields continually being added)
+### babylon-cli
+
+command line interface for executing and managing models and projects
+
+### babylon-server
+
+a server component that can help provide an entry-point for non-cli applications, or hook into the 
+cli to allow for more managed and/or asyncronous execution patterns. For example, queueing models
+to run under specific resource constraints or in a cluster environment.
+
+### internal components
+
+Internal components, such as the parsers, runners, and other utility data expose their
+api in such a way that at minimum can be used by both the cli and server
+
+### Exampale output
+
+Example output of NONMEM run summary as of November 2016 (with new fields continually being added)
+
+By controlling the CLI flags, it can either be an object that can be consumed by other programs such as R:
+
 ```
 {                                                                     
         "RunDetails": {                                               
@@ -110,7 +122,7 @@ Example output as of November 2016 (with new fields continually being added)
 }    
 ```
 
-With tabular outputs that look like:
+or human readable tabular formats such as:
 
 ```
 +-----------+----------+-------------------+--------------+---------------------+
