@@ -1,6 +1,6 @@
 package server
 
-import "github.com/dpastoor/nonmemutils/runner"
+import "github.com/dpastoor/babylon/runner"
 
 // Model information about a model to be executed
 type Model struct {

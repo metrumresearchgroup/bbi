@@ -11,10 +11,10 @@ import (
 
 	flag "github.com/spf13/pflag"
 
-	"github.com/dpastoor/nonmemutils/runner"
-	"github.com/dpastoor/nonmemutils/server"
-	"github.com/dpastoor/nonmemutils/server/db"
-	"github.com/dpastoor/nonmemutils/server/httpserver"
+	"github.com/dpastoor/babylon/runner"
+	"github.com/dpastoor/babylon/server"
+	"github.com/dpastoor/babylon/server/db"
+	"github.com/dpastoor/babylon/server/httpserver"
 	"github.com/pressly/chi"
 	"github.com/pressly/chi/middleware"
 	"github.com/spf13/afero"

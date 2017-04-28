@@ -4,8 +4,8 @@ import (
 	"encoding/binary"
 
 	"github.com/boltdb/bolt"
-	"github.com/dpastoor/nonmemutils/server"
-	"github.com/dpastoor/nonmemutils/server/db/internal"
+	"github.com/dpastoor/babylon/server"
+	"github.com/dpastoor/babylon/server/db/internal"
 )
 
 // make sure ModelService implements server.ModelService

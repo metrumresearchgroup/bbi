@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/boltdb/bolt"
-	"github.com/dpastoor/nonmemutils/server"
+	"github.com/dpastoor/babylon/server"
 )
 
 // Client represents a client to the underlying BoltDB instance
