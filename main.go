@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/dpastoor/nonmemutils/utils"
+	"github.com/dpastoor/babylon/utils"
 )
 
 func main() {
