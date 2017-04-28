@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/dpastoor/nonmemutils/server"
+	"github.com/dpastoor/babylon/server"
 	"github.com/pressly/chi"
 	"github.com/pressly/chi/render"
 )
