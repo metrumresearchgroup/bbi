@@ -5,7 +5,7 @@ import (
 
 	"fmt"
 
-	"github.com/dpastoor/nonmemutils/parser"
+	parser "github.com/dpastoor/babylon/parsers/nmparser"
 	"github.com/dpastoor/nonmemutils/utils"
 	"github.com/spf13/afero"
 )

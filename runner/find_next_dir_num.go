@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/dpastoor/nonmemutils/utils"
+	"github.com/dpastoor/babylon/utils"
 )
 
 //NextDirSuggestion provides a struct for the recommended next

@@ -4,7 +4,7 @@ import (
 	"log"
 	"path/filepath"
 
-	"github.com/dpastoor/nonmemutils/utils"
+	"github.com/dpastoor/babylon/utils"
 	"github.com/spf13/afero"
 )
 

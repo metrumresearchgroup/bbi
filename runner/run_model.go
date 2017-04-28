@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/dpastoor/nonmemutils/utils"
+	"github.com/dpastoor/babylon/utils"
 	"github.com/spf13/afero"
 )
 
