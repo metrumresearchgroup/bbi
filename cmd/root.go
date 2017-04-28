@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/dpastoor/nonmemutils/nmulib"
+	"github.com/dpastoor/babylon/configlib"
 	"github.com/spf13/cobra"
 	flag "github.com/spf13/pflag"
 )
@@ -77,7 +77,7 @@ func initConfig() {
 	// 	viper.SetConfigFile(cfgFile)
 	// }
 	// TODO: set config a little more flexibly
-	err := nmulib.LoadGlobalConfig("nmuconfig")
+	err := configlib.LoadGlobalConfig("babconfig")
 	if err != nil {
 		fmt.Println(fmt.Errorf("err initializing config %s", err))
 	}
