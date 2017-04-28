@@ -30,7 +30,7 @@ func LoadGlobalConfig(configFilename string) error {
 }
 
 func loadDefaultSettings() {
-	viper.SetDefault("cacheDir", "nmcache")
+	viper.SetDefault("cacheDir", "mdlcache")
 	viper.SetDefault("cacheExe", "")
 	viper.SetDefault("cleanLvl", 2)
 	viper.SetDefault("copyLvl", 2)
