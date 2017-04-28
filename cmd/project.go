@@ -25,8 +25,8 @@ import (
 	"strings"
 
 	"github.com/apcera/termtables"
-	"github.com/dpastoor/nonmemutils/parser"
-	"github.com/dpastoor/nonmemutils/utils"
+	parser "github.com/dpastoor/babylon/parsers/nmparser"
+	"github.com/dpastoor/babylon/utils"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

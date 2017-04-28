@@ -22,8 +22,8 @@ import (
 
 	"sync"
 
-	"github.com/dpastoor/nonmemutils/runner"
-	"github.com/dpastoor/nonmemutils/utils"
+	"github.com/dpastoor/babylon/runner"
+	"github.com/dpastoor/babylon/utils"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
