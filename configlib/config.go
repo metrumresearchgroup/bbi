@@ -1,4 +1,4 @@
-package nmulib
+package configlib
 
 import (
 	"fmt"
@@ -13,7 +13,7 @@ func LoadGlobalConfig(configFilename string) error {
 	viper.SetConfigName(configFilename)
 	viper.SetConfigType("toml")
 	viper.AutomaticEnv()
-	viper.SetEnvPrefix("nmu")
+	viper.SetEnvPrefix("bab")
 	viper.AddConfigPath(".")
 	viper.AddConfigPath("$HOME")
 	err := viper.ReadInConfig()
@@ -22,7 +22,7 @@ func LoadGlobalConfig(configFilename string) error {
 			return err
 		}
 		loadDefaultSettings() // still load default settings as don't need a config file
-		return fmt.Errorf("Unable to locate Config file. (%s)\n", err)
+		return fmt.Errorf("unable to locate Config file. (%s)", err)
 	}
 
 	loadDefaultSettings()
