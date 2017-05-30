@@ -20,6 +20,8 @@ install:
   #- if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then bash dist/gitcookie.sh; fi
   - go get -t -v ./...
   - go get github.com/golang/lint/golint
+  # install goveralls for multi-package code coverage report
+  - go get github.com/mattn/goveralls
   # Install gometalinter and certain linters
   - go get github.com/alecthomas/gometalinter
   - go get github.com/client9/misspell/cmd/misspell
@@ -29,8 +31,7 @@ install:
 
 script:
   - gometalinter --disable-all -E vet -E gofmt -E misspell -E ineffassign -E goimports -E deadcode --tests --vendor ./...
-  # TODO: When Go 1.9 is released, replace $(go list) subcommand with ./... because vendor folder should be ignored
-  - go test -race $(go list ./... | grep -v vendor) -coverprofile=coverage.txt -covermode=atomic
+  - $HOME/gopath/bin/goveralls -service=travis-ci
 
 after_script:
   # TODO: When Go 1.9 is released, replace $(go list) subcommand with ./... because vendor folder should be ignored
