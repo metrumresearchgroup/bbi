@@ -4,6 +4,12 @@ go:
   - 1.8.3
   - tip
 
+notifications:
+    email:
+        recipients: devin.pastoor@gmail.com
+        on_success: change
+        on_failure: always
+        
 matrix:
   allow_failures:
     - go: tip
