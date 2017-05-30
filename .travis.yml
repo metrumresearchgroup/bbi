@@ -29,7 +29,6 @@ install:
 
 script:
   - gometalinter --disable-all -E vet -E gofmt -E misspell -E ineffassign -E goimports -E deadcode --tests --vendor ./...
-  - vendorcheck ./...
   # TODO: When Go 1.9 is released, replace $(go list) subcommand with ./... because vendor folder should be ignored
   - go test -race $(go list ./... | grep -v vendor) -coverprofile=coverage.txt -covermode=atomic
 
