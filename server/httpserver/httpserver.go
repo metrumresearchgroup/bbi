@@ -18,8 +18,7 @@ type ModelHandler struct {
 
 // NewModelHandler provides a pointer to a new httpClient
 func NewModelHandler() *ModelHandler {
-	c := &ModelHandler{}
-	return c
+	return &ModelHandler{}
 }
 
 // HandleGetAllModels provides all models

@@ -21,11 +21,10 @@ import (
 )
 
 var (
-	port          int
-	database      string
-	reset         bool
-	workers       int
-	adjustWorkers int
+	port     int
+	database string
+	reset    bool
+	workers  int
 )
 
 func init() {
