@@ -144,6 +144,9 @@ or human readable tabular formats such as:
 
 ### Development
 
+Test-driven development encouraged, facilitated by goconvey to monitor coverage
+and re-run tests on change(s)
+
 ```
 $ go get github.com/smartystreets/goconvey
 goconvey 
