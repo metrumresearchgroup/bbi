@@ -40,8 +40,8 @@ var (
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "nmu",
-	Short: "nonmem utility functions",
-	Long:  fmt.Sprintf("nonmem utility functions version %s", VERSION),
+	Short: "manage and execute models",
+	Long:  fmt.Sprintf("babylon version %s", VERSION),
 }
 
 // Execute adds all child commands to the root command sets flags appropriately.
