@@ -41,7 +41,7 @@ var (
 var RootCmd = &cobra.Command{
 	Use:   "bbi",
 	Short: "manage and execute models",
-	Long:  fmt.Sprintf("babylon version %s", VERSION),
+	Long:  fmt.Sprintf("babylon cli version %s", VERSION),
 }
 
 // Execute adds all child commands to the root command sets flags appropriately.
