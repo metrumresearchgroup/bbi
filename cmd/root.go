@@ -39,7 +39,7 @@ var (
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
-	Use:   "nmu",
+	Use:   "bbi",
 	Short: "manage and execute models",
 	Long:  fmt.Sprintf("babylon version %s", VERSION),
 }
