@@ -23,8 +23,8 @@ import (
 	flag "github.com/spf13/pflag"
 )
 
-// VERSION is the current nmu version
-const VERSION string = "0.0.3"
+// VERSION is the current bbi version
+const VERSION string = "0.1.0"
 
 var (
 	// name of config file
