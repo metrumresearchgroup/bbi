@@ -1,0 +1,10 @@
+# goreleaser.yml
+# Build customization
+build:
+  binary: bbi
+  goos:
+    - windows
+    - darwin
+    - linux
+  goarch:
+    - amd64
