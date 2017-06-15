@@ -60,7 +60,7 @@ func init() {
 	// Cobra supports Persistent Flags, which, if defined here,
 	// will be global for your application.
 
-	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/nmuconfig.yaml|json|toml)")
+	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/babylonconfig.toml)")
 	RootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
 	RootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "debug mode")
 	RootCmd.PersistentFlags().IntVar(&threads, "threads", 0, "number of threads to execute with")
@@ -77,7 +77,7 @@ func initConfig() {
 	// 	viper.SetConfigFile(cfgFile)
 	// }
 	// TODO: set config a little more flexibly
-	err := configlib.LoadGlobalConfig("babconfig")
+	err := configlib.LoadGlobalConfig("babylonconfig")
 	if err != nil {
 		fmt.Println(fmt.Errorf("err initializing config %s", err))
 	}
