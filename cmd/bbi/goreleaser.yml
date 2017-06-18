@@ -8,3 +8,10 @@ build:
     - linux
   goarch:
     - amd64
+
+# goreleaser.yml
+brew:
+  # Repository to push the tap to.
+  github:
+    owner: dpastoor 
+    name: homebrew-tap 
