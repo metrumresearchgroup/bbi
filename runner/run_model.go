@@ -98,5 +98,6 @@ func RunEstModel(fs afero.Fs,
 		return err
 	}
 	outputFileWriter.Flush()
+	errOutputFileWriter.Flush()
 	return nil
 }
