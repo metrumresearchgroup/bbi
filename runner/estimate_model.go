@@ -72,9 +72,9 @@ func EstimateModel(
 	if exeNameInCache != "" {
 		err := utils.SetupCacheForRun(fs, dir, modelDir, cacheDir, exeNameInCache)
 		if err != nil {
-			noBuild = true
+			log.Printf("error setting up cache: %v \n unable to precompile model", err)
 		} else {
-			log.Printf("error setting up cache: %s \n unable to precompile model", err)
+			noBuild = true
 		}
 	}
 
