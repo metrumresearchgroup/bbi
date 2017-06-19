@@ -24,7 +24,6 @@ func SetupCacheForRun(
 	// this function is called is after the modelDir is successfully created, but given
 	// there may be other uses, to be safe will also check again.
 	fullModelDirPath := filepath.Join(baseDir, modelDir)
-
 	ok, err := DirExists(fullCacheDirPath, fs)
 	if !ok || err != nil {
 		//TODO: change these exits to instead just return an error probably
@@ -78,5 +77,6 @@ func SetupCacheForRun(
 	if err != nil {
 		return fmt.Errorf("error copying to new file: (%s)", err)
 	}
+
 	return nil
 }
