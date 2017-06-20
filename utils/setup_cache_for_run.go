@@ -18,12 +18,22 @@ func SetupCacheForRun(
 	cacheDir string,
 	nmNameInCache string,
 ) error {
+	var fullCacheDirPath string
+	var fullModelDirPath string
+	if filepath.IsAbs(cacheDir) {
+		fullCacheDirPath = cacheDir
+	} else {
+		fullCacheDirPath = filepath.Join(baseDir, cacheDir)
+	}
 
-	fullCacheDirPath := filepath.Join(baseDir, cacheDir)
+	if filepath.IsAbs(modelDir) {
+		fullModelDirPath = modelDir
+	} else {
+		fullModelDirPath = filepath.Join(baseDir, modelDir)
+	}
 	// this should always be there how the package is being used currently as the time
 	// this function is called is after the modelDir is successfully created, but given
 	// there may be other uses, to be safe will also check again.
-	fullModelDirPath := filepath.Join(baseDir, modelDir)
 	ok, err := DirExists(fullCacheDirPath, fs)
 	if !ok || err != nil {
 		//TODO: change these exits to instead just return an error probably
