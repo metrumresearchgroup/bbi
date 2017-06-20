@@ -136,9 +136,6 @@ func main() {
 	r.Route("/models", func(r chi.Router) {
 		r.Get("/", httpClient.HandleGetAllModels)
 		r.Post("/", httpClient.HandleSubmitModels)
-		// r.With(paginate).Get("/", listArticles) // GET /articles
-		// r.Post("/", createArticle)              // POST /articles
-		// r.Get("/search", searchArticles)        // GET /articles/search
 		r.Route("/:modelID", func(r chi.Router) {
 			r.Use(httpClient.ModelCtx)
 			r.Get("/", httpClient.HandleGetModelByID) // GET /models/123
@@ -192,21 +189,26 @@ func launchWorker(
 		if verbose {
 			log.Printf("run %s running on worker %v!", filepath.Base(filePath), workerNum)
 		}
-		runner.EstimateModel(
+		err = runner.EstimateModel(
 			fs,
 			filePath,
 			model.ModelInfo.RunSettings,
 		)
-		if verbose {
-			log.Printf("completed run %s releasing worker back to queue \n", filePath)
-		}
 		duration := time.Since(startTime)
-		model.Status = "COMPLETED"
+		if err != nil {
+			model.Status = "ERROR"
+			log.Printf("error on run %s releasing worker back to queue \n", filePath)
+		} else {
+			model.Status = "COMPLETED"
+		}
 		model.RunInfo.StartTime = startTime.Unix()
 		model.RunInfo.Duration = int64(duration.Seconds())
 		ms.UpdateModel(&model)
 
-		fmt.Println("duration: ", duration)
+		if verbose {
+			log.Printf("completed run %s releasing worker back to queue \n", filePath)
+			log.Println("duration: ", duration)
+		}
 	}
 }
 
