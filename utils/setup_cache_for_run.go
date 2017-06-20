@@ -17,6 +17,7 @@ func SetupCacheForRun(
 	modelDir string,
 	cacheDir string,
 	nmNameInCache string,
+	debug bool,
 ) error {
 	var fullCacheDirPath string
 	var fullModelDirPath string
@@ -30,6 +31,10 @@ func SetupCacheForRun(
 		fullModelDirPath = modelDir
 	} else {
 		fullModelDirPath = filepath.Join(baseDir, modelDir)
+	}
+	if debug {
+		log.Printf("cache directory: %s", fullCacheDirPath)
+		log.Printf("model directory: %s", fullModelDirPath)
 	}
 	// this should always be there how the package is being used currently as the time
 	// this function is called is after the modelDir is successfully created, but given
