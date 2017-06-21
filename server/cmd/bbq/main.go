@@ -233,6 +233,7 @@ func populateDB(ms server.ModelService) error {
 					CacheDir:           "cache_dir",
 					ExeNameInCache:     "cache.exe",
 					NmExecutableOrPath: "nmfe74",
+					OneEst:             true,
 				},
 			},
 			RunInfo: server.RunInfo{
@@ -259,6 +260,7 @@ func populateDB(ms server.ModelService) error {
 					CacheDir:           "cache_dir",
 					ExeNameInCache:     "cache.exe",
 					NmExecutableOrPath: "nmfe74",
+					OneEst:             true,
 				},
 			},
 			RunInfo: server.RunInfo{
@@ -285,6 +287,7 @@ func populateDB(ms server.ModelService) error {
 					CacheDir:           "cache_dir",
 					ExeNameInCache:     "cache.exe",
 					NmExecutableOrPath: "nmfe74",
+					OneEst:             true,
 				},
 			},
 			RunInfo: server.RunInfo{
