@@ -46,8 +46,8 @@ func FindNextEstDirNum(modelFile string, dirNames []string, padding int) NextDir
 	firstRun = false
 	sortedRunNums := sort.IntSlice(existingRunNums)
 	sort.Sort(sortedRunNums)
-	// TODO: this actually needs logic, as right now will not properly identify
 	nextRunNum := sortedRunNums[len(sortedRunNums)-1] + 1
+
 	if nextRunNum != len(sortedRunNums)+1 {
 		reOrg = true
 	}
