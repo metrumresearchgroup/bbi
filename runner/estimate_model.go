@@ -20,6 +20,7 @@ type RunSettings struct {
 	CacheDir           string
 	ExeNameInCache     string
 	NmExecutableOrPath string
+	OneEst             bool
 }
 
 // EstimateModel prepares, runs and cleans up a model estimation run
@@ -39,6 +40,12 @@ func EstimateModel(
 	dirInfo, _ := afero.ReadDir(fs, dir)
 	dirs := utils.ListDirNames(dirInfo)
 	newDirSuggestion := FindNextEstDirNum(runNum, dirs, 2)
+	if newDirSuggestion.FirstRun && runSettings.OneEst {
+		if runSettings.Verbose {
+			log.Printf("run directory for model %s exists, not re-running", runNum)
+		}
+		return nil
+	}
 	modelDir := newDirSuggestion.NextDirName
 
 	// unpack settings
@@ -48,8 +55,8 @@ func EstimateModel(
 	copyLvl := runSettings.CopyLvl
 	cacheDir := runSettings.CacheDir
 	exeNameInCache := runSettings.ExeNameInCache
-
 	nmExecutableOrPath := runSettings.NmExecutableOrPath
+
 	if verbose {
 		log.Printf("setting up run infrastructure for run %s", runNum)
 		log.Printf("base dir: %s", dir)
@@ -79,7 +86,9 @@ func EstimateModel(
 	}
 
 	// run model
-	log.Printf("running model %s ...\n", runNum)
+	if verbose {
+		log.Printf("running model %s ...\n", runNum)
+	}
 	err = RunEstModel(fs, dir, newDirSuggestion.NextDirName, modelFile, noBuild, nmExecutableOrPath)
 
 	if err != nil {
@@ -87,7 +96,9 @@ func EstimateModel(
 		return err
 	}
 
-	log.Printf("completed execution of %s, cleaning up...", runNum)
+	if verbose {
+		log.Printf("completed execution of %s, cleaning up...", runNum)
+	}
 
 	if runSettings.SaveExe != "" {
 		utils.CopyExeToCache(fs, dir, modelDir, cacheDir, runSettings.SaveExe)
