@@ -40,7 +40,7 @@ func EstimateModel(
 	dirInfo, _ := afero.ReadDir(fs, dir)
 	dirs := utils.ListDirNames(dirInfo)
 	newDirSuggestion := FindNextEstDirNum(runNum, dirs, 2)
-	if newDirSuggestion.FirstRun && runSettings.OneEst {
+	if !newDirSuggestion.FirstRun && runSettings.OneEst {
 		if runSettings.Verbose {
 			log.Printf("run directory for model %s exists, not re-running", runNum)
 		}
