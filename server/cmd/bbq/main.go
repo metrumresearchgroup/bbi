@@ -20,12 +20,16 @@ import (
 	"github.com/spf13/afero"
 )
 
+// Version of bbq
+const Version = "0.1.0"
+
 var (
 	port          int
 	database      string
 	reset         bool
 	workers       int
 	adjustWorkers int
+	versionOnly   bool
 )
 
 func init() {
@@ -33,10 +37,16 @@ func init() {
 	flag.BoolVarP(&reset, "reset", "r", false, "wipe and reset the database")
 	flag.StringVarP(&database, "database", "d", "models.db", "path and name of database to store model results")
 	flag.IntVarP(&workers, "workers", "w", 0, "number of workers, set to negative number for no workers to be activated on initialization")
+	flag.BoolVarP(&versionOnly, "version", "v", false, "print the version")
+	flag.Parse()
 }
 
 func main() {
-
+	if versionOnly {
+		fmt.Print(Version)
+		os.Exit(0)
+	}
+	log.Printf("babylon queue version: %s", Version)
 	if reset {
 		_, existsErr := os.Stat(database)
 
