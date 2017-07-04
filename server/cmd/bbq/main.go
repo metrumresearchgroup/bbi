@@ -21,7 +21,7 @@ import (
 )
 
 // Version of bbq
-const Version = "0.1.0"
+const Version = "0.1.2"
 
 var (
 	port          int
@@ -71,7 +71,7 @@ func main() {
 
 	err := client.Open() // connect to the boltDB instance
 	if err != nil {
-		log.Fatalf("could not open boltdb instance")
+		log.Fatalf("could not open boltdb instance with error: %v", err)
 	}
 
 	// extract the model service and initalize http handlers
