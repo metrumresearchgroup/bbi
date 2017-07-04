@@ -55,6 +55,9 @@ func EstOutputFileCleanLevels(r string) map[string]int {
 	EstOutputFiles["trskip.set"] = 1
 	EstOutputFiles["worker.set"] = 1
 	EstOutputFiles["xmloff.set"] = 1
+	EstOutputFiles["fort.2001"] = 1
+	EstOutputFiles["fort.2002"] = 1
+	EstOutputFiles["flushtime.set"] = 1
 
 	msfFileSuffixes := []string{
 		"",
@@ -97,7 +100,7 @@ func EstOutputFilesByRun(r string) map[string]int {
 		".grd",
 		".shk",
 		".shm",
-		".xml",
+		".phi",
 		// these extensions don't fully jive with historical psn
 		// conventions, but will be a lot easier to consistently
 		// flag out by following the <runname><ext/suffix> convention
@@ -106,9 +109,9 @@ func EstOutputFilesByRun(r string) map[string]int {
 		"_RMAT.msf",
 	}
 	fileExtsLvl2 := []string{
+		".xml",
 		".cor",
 		".cov",
-		".phi",
 	}
 	fileExtsLvl3 := []string{
 		".ext",
