@@ -24,12 +24,11 @@ import (
 const Version = "0.1.2"
 
 var (
-	port          int
-	database      string
-	reset         bool
-	workers       int
-	adjustWorkers int
-	versionOnly   bool
+	port        int
+	database    string
+	reset       bool
+	workers     int
+	versionOnly bool
 )
 
 func init() {
