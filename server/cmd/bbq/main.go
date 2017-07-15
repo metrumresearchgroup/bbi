@@ -15,8 +15,8 @@ import (
 	"github.com/dpastoor/babylon/server"
 	"github.com/dpastoor/babylon/server/db"
 	"github.com/dpastoor/babylon/server/httpserver"
-	"github.com/pressly/chi"
-	"github.com/pressly/chi/middleware"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	"github.com/spf13/afero"
 )
 
@@ -145,7 +145,7 @@ func main() {
 	r.Route("/models", func(r chi.Router) {
 		r.Get("/", httpClient.HandleGetAllModels)
 		r.Post("/", httpClient.HandleSubmitModels)
-		r.Route("/:modelID", func(r chi.Router) {
+		r.Route("/{modelID}", func(r chi.Router) {
 			r.Use(httpClient.ModelCtx)
 			r.Get("/", httpClient.HandleGetModelByID) // GET /models/123
 		})

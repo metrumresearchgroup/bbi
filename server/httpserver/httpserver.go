@@ -7,8 +7,8 @@ import (
 	"strconv"
 
 	"github.com/dpastoor/babylon/server"
-	"github.com/pressly/chi"
-	"github.com/pressly/chi/render"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/render"
 )
 
 // ModelHandler represents the HTTP API handler for ModelService
