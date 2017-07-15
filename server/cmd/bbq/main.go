@@ -21,7 +21,7 @@ import (
 )
 
 // Version of bbq
-const Version = "0.1.2"
+const Version = "0.2.0"
 
 var (
 	port        int
@@ -140,6 +140,11 @@ func main() {
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("hi"))
+	})
+
+	r.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(200)
+		w.Write([]byte("pong"))
 	})
 
 	r.Route("/models", func(r chi.Router) {
