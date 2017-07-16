@@ -21,9 +21,9 @@ func NewModelHandler() *ModelHandler {
 	return &ModelHandler{}
 }
 
-// HandleGetAllModels provides all models
+// HandleGetModelsByStatus provides all models
 // accepts query param status with values COMPLETED, QUEUED, RUNNING
-func (c *ModelHandler) HandleGetAllModels(w http.ResponseWriter, r *http.Request) {
+func (c *ModelHandler) HandleGetModelsByStatus(w http.ResponseWriter, r *http.Request) {
 	var models []server.Model
 	status := r.URL.Query().Get("status")
 	fmt.Println("status: ", status)

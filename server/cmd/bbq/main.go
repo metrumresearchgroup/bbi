@@ -148,7 +148,7 @@ func main() {
 	})
 
 	r.Route("/models", func(r chi.Router) {
-		r.Get("/", httpClient.HandleGetAllModels)
+		r.Get("/", httpClient.HandleGetModelsByStatus)
 		r.Post("/", httpClient.HandleSubmitModels)
 		r.Route("/{modelID}", func(r chi.Router) {
 			r.Use(httpClient.ModelCtx)
@@ -190,7 +190,6 @@ func launchWorker(
 		model, err := ms.AcquireNextQueuedModel()
 		if model.ID == 0 {
 			// no queued models
-			fmt.Println("no queued models, going to sleep...")
 			time.Sleep(5 * time.Second)
 			continue
 		}
