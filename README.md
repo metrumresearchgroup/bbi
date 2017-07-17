@@ -140,3 +140,17 @@ or human readable tabular formats such as:
 |   TH 5    |   RUVa   |        4.13E+00   |       4.13   |     1.36 (32.9 %)   |
 +-----------+----------+-------------------+--------------+---------------------+
 ```
+
+
+### Development
+
+Test-driven development encouraged, facilitated by goconvey to monitor coverage
+and re-run tests on change(s)
+
+```
+$ go get github.com/smartystreets/goconvey
+goconvey 
+```
+
+a web UI will be started at localhost:8080 with file watchers to rerun tests on 
+file change(s)

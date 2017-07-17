@@ -42,6 +42,7 @@ func MarshalModel(m *server.Model) ([]byte, error) {
 				CacheDir:           modelInfo.RunSettings.CacheDir,
 				ExeNameInCache:     modelInfo.RunSettings.ExeNameInCache,
 				NmExecutableOrPath: modelInfo.RunSettings.NmExecutableOrPath,
+				OneEst:             modelInfo.RunSettings.OneEst,
 			},
 		},
 		RunInfo: &RunInfo{
@@ -88,6 +89,7 @@ func UnmarshalModel(data []byte, m *server.Model) error {
 			CacheDir:           modelInfo.RunSettings.CacheDir,
 			ExeNameInCache:     modelInfo.RunSettings.ExeNameInCache,
 			NmExecutableOrPath: modelInfo.RunSettings.NmExecutableOrPath,
+			OneEst:             modelInfo.RunSettings.OneEst,
 		},
 	}
 	m.RunInfo = server.RunInfo{

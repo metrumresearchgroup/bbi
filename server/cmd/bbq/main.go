@@ -20,12 +20,15 @@ import (
 	"github.com/spf13/afero"
 )
 
+// Version of bbq
+const Version = "0.1.2"
+
 var (
-	port          int
-	database      string
-	reset         bool
-	workers       int
-	adjustWorkers int
+	port        int
+	database    string
+	reset       bool
+	workers     int
+	versionOnly bool
 )
 
 func init() {
@@ -33,10 +36,16 @@ func init() {
 	flag.BoolVarP(&reset, "reset", "r", false, "wipe and reset the database")
 	flag.StringVarP(&database, "database", "d", "models.db", "path and name of database to store model results")
 	flag.IntVarP(&workers, "workers", "w", 0, "number of workers, set to negative number for no workers to be activated on initialization")
+	flag.BoolVarP(&versionOnly, "version", "v", false, "print the version")
+	flag.Parse()
 }
 
 func main() {
-
+	if versionOnly {
+		fmt.Print(Version)
+		os.Exit(0)
+	}
+	log.Printf("babylon queue version: %s", Version)
 	if reset {
 		_, existsErr := os.Stat(database)
 
@@ -61,7 +70,7 @@ func main() {
 
 	err := client.Open() // connect to the boltDB instance
 	if err != nil {
-		log.Fatalf("could not open boltdb instance")
+		log.Fatalf("could not open boltdb instance with error: %v", err)
 	}
 
 	// extract the model service and initalize http handlers
@@ -136,9 +145,6 @@ func main() {
 	r.Route("/models", func(r chi.Router) {
 		r.Get("/", httpClient.HandleGetAllModels)
 		r.Post("/", httpClient.HandleSubmitModels)
-		// r.With(paginate).Get("/", listArticles) // GET /articles
-		// r.Post("/", createArticle)              // POST /articles
-		// r.Get("/search", searchArticles)        // GET /articles/search
 		r.Route("/:modelID", func(r chi.Router) {
 			r.Use(httpClient.ModelCtx)
 			r.Get("/", httpClient.HandleGetModelByID) // GET /models/123
@@ -192,21 +198,26 @@ func launchWorker(
 		if verbose {
 			log.Printf("run %s running on worker %v!", filepath.Base(filePath), workerNum)
 		}
-		runner.EstimateModel(
+		err = runner.EstimateModel(
 			fs,
 			filePath,
 			model.ModelInfo.RunSettings,
 		)
-		if verbose {
-			log.Printf("completed run %s releasing worker back to queue \n", filePath)
-		}
 		duration := time.Since(startTime)
-		model.Status = "COMPLETED"
+		if err != nil {
+			model.Status = "ERROR"
+			log.Printf("error on run %s releasing worker back to queue \n", filePath)
+		} else {
+			model.Status = "COMPLETED"
+		}
 		model.RunInfo.StartTime = startTime.Unix()
 		model.RunInfo.Duration = int64(duration.Seconds())
 		ms.UpdateModel(&model)
 
-		fmt.Println("duration: ", duration)
+		if verbose {
+			log.Printf("completed run %s releasing worker back to queue \n", filePath)
+			log.Println("duration: ", duration)
+		}
 	}
 }
 
@@ -231,6 +242,7 @@ func populateDB(ms server.ModelService) error {
 					CacheDir:           "cache_dir",
 					ExeNameInCache:     "cache.exe",
 					NmExecutableOrPath: "nmfe74",
+					OneEst:             true,
 				},
 			},
 			RunInfo: server.RunInfo{
@@ -257,6 +269,7 @@ func populateDB(ms server.ModelService) error {
 					CacheDir:           "cache_dir",
 					ExeNameInCache:     "cache.exe",
 					NmExecutableOrPath: "nmfe74",
+					OneEst:             true,
 				},
 			},
 			RunInfo: server.RunInfo{
@@ -283,6 +296,7 @@ func populateDB(ms server.ModelService) error {
 					CacheDir:           "cache_dir",
 					ExeNameInCache:     "cache.exe",
 					NmExecutableOrPath: "nmfe74",
+					OneEst:             true,
 				},
 			},
 			RunInfo: server.RunInfo{

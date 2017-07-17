@@ -225,7 +225,7 @@ func ListDirNames(fd []os.FileInfo) []string {
 	return dirs
 }
 
-// ListFileNames returns an array of directory names from an array of fileinfo
+// ListFiles returns an array of directory names from an array of fileinfo
 // AppFs := afero.NewOsFs()
 // dir := filepath.Dir(".")
 // dirInfo, _ := afero.ReadDir(AppFs, dir)

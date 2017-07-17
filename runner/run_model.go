@@ -51,21 +51,38 @@ func RunEstModel(fs afero.Fs,
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Error creating StdoutPipe for Cmd", err)
 	}
+	errReader, err := cmd.StderrPipe()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Error creating StdErrPipe for Cmd", err)
+	}
 
 	scanner := bufio.NewScanner(cmdReader)
+	errScanner := bufio.NewScanner(errReader)
 	outputFile, err := os.Create(filepath.Join(modelDirPath, "stdout.out"))
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "could not make stdout file to pipe output to")
 	} else {
 		defer outputFile.Close()
 	}
+	errOutputFile, err := os.Create(filepath.Join(modelDirPath, "stderr.out"))
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "could not make stderr file to pipe output to")
+	} else {
+		defer errOutputFile.Close()
+	}
 
 	outputFileWriter := bufio.NewWriter(outputFile)
+	errOutputFileWriter := bufio.NewWriter(outputFile)
 
 	// handles where to write output to
 	go func() {
 		for scanner.Scan() {
 			fmt.Fprintf(outputFileWriter, "%s out | %s\n", runName, scanner.Text())
+		}
+	}()
+	go func() {
+		for errScanner.Scan() {
+			fmt.Fprintf(errOutputFileWriter, "%s out | %s\n", runName, errScanner.Text())
 		}
 	}()
 
@@ -81,5 +98,6 @@ func RunEstModel(fs afero.Fs,
 		return err
 	}
 	outputFileWriter.Flush()
+	errOutputFileWriter.Flush()
 	return nil
 }
