@@ -18,12 +18,13 @@ message ModelInfo {
     }
     
     RunSettings run_settings = 2;
-}
+   }
 
 message RunInfo {
     int64 queue_time = 1;
     int64 start_time = 2;
     int64 duration = 3;
+    string run_dir = 4;
 }
 
 message Model {

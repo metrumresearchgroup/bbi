@@ -8,6 +8,8 @@ import (
 	"github.com/gogo/protobuf/proto"
 )
 
+// need go get github.com/gogo/protobuf/protoc-gen-gofast
+
 //go:generate protoc --gofast_out=. internal.proto
 
 // MarshalModel encodes a model to binary format.
@@ -46,6 +48,7 @@ func MarshalModel(m *server.Model) ([]byte, error) {
 			QueueTime: runInfo.QueueTime,
 			StartTime: runInfo.StartTime,
 			Duration:  runInfo.Duration,
+			RunDir:    runInfo.RunDir,
 		},
 	})
 }
@@ -91,6 +94,7 @@ func UnmarshalModel(data []byte, m *server.Model) error {
 		QueueTime: runInfo.QueueTime,
 		StartTime: runInfo.StartTime,
 		Duration:  runInfo.Duration,
+		RunDir:    runInfo.RunDir,
 	}
 
 	return nil

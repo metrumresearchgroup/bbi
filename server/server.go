@@ -14,14 +14,16 @@ type Model struct {
 // Queue time represents the time a model was added to the Queue
 // StartTime is the time the worker starts execution of the model code for processing steps
 // Duration is the time, in milliseconds from StartTime to The model run completing
+// RunDir is the (sub)-directory where the model is executed
 // as a unix timestamp
 type RunInfo struct {
 	QueueTime int64
 	StartTime int64
 	Duration  int64
+	RunDir    string
 }
 
-// ModelInfo contains the information passed in to execute the model
+// ModelInfo contains the information about the model execution
 type ModelInfo struct {
 	ModelPath   string
 	RunSettings runner.RunSettings
