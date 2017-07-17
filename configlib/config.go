@@ -38,5 +38,6 @@ func loadDefaultSettings() {
 	viper.SetDefault("git", true)
 	viper.SetDefault("nmExecutable", "nmfe74")
 	viper.SetDefault("noBuild", false)
+	viper.SetDefault("oneEst", false)
 	viper.SetDefault("threads", runtime.NumCPU())
 }

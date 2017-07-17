@@ -9,6 +9,8 @@ func PrepareForExecution(s []string) []string {
 	for i, line := range s {
 		if strings.Contains(line, "$DATA") {
 			s[i] = parser.AddPathLevelToData(line)
+			// assuming only one $DATA record can just fix this and exit
+			break
 		}
 	}
 	return s

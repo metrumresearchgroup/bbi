@@ -36,7 +36,9 @@ install:
   - go get github.com/tsenart/deadcode
 
 script:
-  - gometalinter --disable-all -E vet -E gofmt -E misspell -E ineffassign -E goimports -E deadcode --tests --vendor ./...
+  # for now relax metalinter and just check that tests pass
+  #- gometalinter --disable-all -E vet -E gofmt -E misspell -E ineffassign -E goimports -E deadcode --tests --vendor ./...
+  - go test ./...
   - $HOME/gopath/bin/goveralls -service=travis-ci
 
 after_script:

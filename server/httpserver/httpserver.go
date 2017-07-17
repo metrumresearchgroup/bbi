@@ -7,8 +7,8 @@ import (
 	"strconv"
 
 	"github.com/dpastoor/babylon/server"
-	"github.com/pressly/chi"
-	"github.com/pressly/chi/render"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/render"
 )
 
 // ModelHandler represents the HTTP API handler for ModelService
@@ -17,14 +17,15 @@ type ModelHandler struct {
 }
 
 // NewModelHandler provides a pointer to a new httpClient
-func NewModelHandler() *ModelHandler {
-	c := &ModelHandler{}
-	return c
+func NewModelHandler(ms server.ModelService) *ModelHandler {
+	return &ModelHandler{
+		ModelService: ms,
+	}
 }
 
-// HandleGetAllModels provides all models
+// HandleGetModelsByStatus provides all models
 // accepts query param status with values COMPLETED, QUEUED, RUNNING
-func (c *ModelHandler) HandleGetAllModels(w http.ResponseWriter, r *http.Request) {
+func (c *ModelHandler) HandleGetModelsByStatus(w http.ResponseWriter, r *http.Request) {
 	var models []server.Model
 	status := r.URL.Query().Get("status")
 	fmt.Println("status: ", status)

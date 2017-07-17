@@ -26,6 +26,7 @@ func TestMarshalModel(t *testing.T) {
 				CopyLvl:        2,
 				CacheDir:       "cache_dir",
 				ExeNameInCache: "cache.exe",
+				OneEst:         true,
 			},
 		},
 		RunInfo: server.RunInfo{

@@ -11,14 +11,17 @@ import (
 
 //NextDirSuggestion provides a struct for the recommended next
 // directory name, and whether there should be a project reorganization
-// based on directory modifications
+// based on directory modifications, and whether this will be the first dir in the sequence
 type NextDirSuggestion struct {
 	NextDirName string
 	Reorg       bool
+	FirstRun    bool
 }
 
 //FindNextEstDirNum provides the next dir num
 func FindNextEstDirNum(modelFile string, dirNames []string, padding int) NextDirSuggestion {
+	firstRun := true
+	reOrg := false
 	existingRunNums := []int{}
 	modelNameEst := strings.Join([]string{
 		filepath.Base(modelFile),
@@ -36,14 +39,20 @@ func FindNextEstDirNum(modelFile string, dirNames []string, padding int) NextDir
 		return NextDirSuggestion{strings.Join([]string{
 			modelNameEst,
 			utils.PadNum(1, padding),
-		}, ""), false}
+		}, ""), false, firstRun}
 
 	}
+	// if got here means at least one run currently present
+	firstRun = false
 	sortedRunNums := sort.IntSlice(existingRunNums)
 	sort.Sort(sortedRunNums)
+	nextRunNum := sortedRunNums[len(sortedRunNums)-1] + 1
 
+	if nextRunNum != len(sortedRunNums)+1 {
+		reOrg = true
+	}
 	return NextDirSuggestion{strings.Join([]string{
 		modelNameEst,
-		utils.PadNum(sortedRunNums[len(sortedRunNums)-1]+1, padding),
-	}, ""), false}
+		utils.PadNum(nextRunNum, padding),
+	}, ""), reOrg, firstRun}
 }

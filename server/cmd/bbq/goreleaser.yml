@@ -1,0 +1,17 @@
+# goreleaser.yml
+# Build customization
+build:
+  binary: bbq
+  goos:
+    - windows
+    - darwin
+    - linux
+  goarch:
+    - amd64
+
+# goreleaser.yml
+brew:
+  # Repository to push the tap to.
+  github:
+    owner: dpastoor 
+    name: homebrew-tap 

@@ -23,8 +23,8 @@ import (
 	flag "github.com/spf13/pflag"
 )
 
-// VERSION is the current nmu version
-const VERSION string = "0.0.3"
+// VERSION is the current bbi version
+const VERSION string = "0.2.0"
 
 var (
 	// name of config file
@@ -39,9 +39,9 @@ var (
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
-	Use:   "nmu",
-	Short: "nonmem utility functions",
-	Long:  fmt.Sprintf("nonmem utility functions version %s", VERSION),
+	Use:   "bbi",
+	Short: "manage and execute models",
+	Long:  fmt.Sprintf("babylon cli version %s", VERSION),
 }
 
 // Execute adds all child commands to the root command sets flags appropriately.
@@ -60,7 +60,7 @@ func init() {
 	// Cobra supports Persistent Flags, which, if defined here,
 	// will be global for your application.
 
-	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/nmuconfig.yaml|json|toml)")
+	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/babylonconfig.toml)")
 	RootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
 	RootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "debug mode")
 	RootCmd.PersistentFlags().IntVar(&threads, "threads", 0, "number of threads to execute with")
@@ -77,7 +77,7 @@ func initConfig() {
 	// 	viper.SetConfigFile(cfgFile)
 	// }
 	// TODO: set config a little more flexibly
-	err := configlib.LoadGlobalConfig("babconfig")
+	err := configlib.LoadGlobalConfig("babylonconfig")
 	if err != nil {
 		fmt.Println(fmt.Errorf("err initializing config %s", err))
 	}

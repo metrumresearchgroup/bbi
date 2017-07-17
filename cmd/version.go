@@ -24,8 +24,8 @@ import (
 var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "check version",
-	Long: `check the current nmu version
-nmu version 
+	Long: `check the current bbi version
+bbi version 
  `,
 	Run: version,
 }
