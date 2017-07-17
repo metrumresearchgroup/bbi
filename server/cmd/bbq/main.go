@@ -15,13 +15,13 @@ import (
 	"github.com/dpastoor/babylon/server"
 	"github.com/dpastoor/babylon/server/db"
 	"github.com/dpastoor/babylon/server/httpserver"
-	"github.com/pressly/chi"
-	"github.com/pressly/chi/middleware"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	"github.com/spf13/afero"
 )
 
 // Version of bbq
-const Version = "0.1.2"
+const Version = "0.2.0"
 
 var (
 	port        int
@@ -75,10 +75,7 @@ func main() {
 
 	// extract the model service and initalize http handlers
 	ms := client.ModelService()
-	httpClient := httpserver.NewModelHandler()
-
-	// provide the model service to the httpClient so has access to the boltdb
-	httpClient.ModelService = ms
+	httpClient := httpserver.NewModelHandler(ms)
 
 	// launch the worker(s)
 	aferofs := afero.NewOsFs()
@@ -142,10 +139,15 @@ func main() {
 		w.Write([]byte("hi"))
 	})
 
+	r.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(200)
+		w.Write([]byte("pong"))
+	})
+
 	r.Route("/models", func(r chi.Router) {
-		r.Get("/", httpClient.HandleGetAllModels)
+		r.Get("/", httpClient.HandleGetModelsByStatus)
 		r.Post("/", httpClient.HandleSubmitModels)
-		r.Route("/:modelID", func(r chi.Router) {
+		r.Route("/{modelID}", func(r chi.Router) {
 			r.Use(httpClient.ModelCtx)
 			r.Get("/", httpClient.HandleGetModelByID) // GET /models/123
 		})
@@ -185,7 +187,6 @@ func launchWorker(
 		model, err := ms.AcquireNextQueuedModel()
 		if model.ID == 0 {
 			// no queued models
-			fmt.Println("no queued models, going to sleep...")
 			time.Sleep(5 * time.Second)
 			continue
 		}
