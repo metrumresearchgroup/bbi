@@ -75,10 +75,7 @@ func main() {
 
 	// extract the model service and initalize http handlers
 	ms := client.ModelService()
-	httpClient := httpserver.NewModelHandler()
-
-	// provide the model service to the httpClient so has access to the boltdb
-	httpClient.ModelService = ms
+	httpClient := httpserver.NewModelHandler(ms)
 
 	// launch the worker(s)
 	aferofs := afero.NewOsFs()

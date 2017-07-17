@@ -17,8 +17,10 @@ type ModelHandler struct {
 }
 
 // NewModelHandler provides a pointer to a new httpClient
-func NewModelHandler() *ModelHandler {
-	return &ModelHandler{}
+func NewModelHandler(ms server.ModelService) *ModelHandler {
+	return &ModelHandler{
+		ModelService: ms,
+	}
 }
 
 // HandleGetModelsByStatus provides all models
