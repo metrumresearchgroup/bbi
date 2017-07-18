@@ -33,6 +33,7 @@ func TestMarshalModel(t *testing.T) {
 			QueueTime: time.Now().AddDate(0, 0, -1).Unix(),
 			StartTime: time.Now().AddDate(0, 0, -1).Unix(),
 			Duration:  sampleDuration,
+			RunDir:    "run_est_001",
 		},
 	}
 
