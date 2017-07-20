@@ -4,6 +4,8 @@ import (
 	"log"
 	"path/filepath"
 
+	"fmt"
+
 	"github.com/dpastoor/babylon/utils"
 	"github.com/spf13/afero"
 )
@@ -21,6 +23,14 @@ type RunSettings struct {
 	ExeNameInCache     string
 	NmExecutableOrPath string
 	OneEst             bool
+	ProposedRunDir     string
+}
+
+// ReturnStatus gives information about the result of a model run
+type ReturnStatus struct {
+	RunDir string
+	DidRun bool
+	Error  error
 }
 
 // EstimateModel prepares, runs and cleans up a model estimation run
@@ -32,21 +42,51 @@ func EstimateModel(
 	fs afero.Fs,
 	modelPath string,
 	runSettings RunSettings,
-) error {
+) ReturnStatus {
 
 	modelFile := filepath.Base(modelPath)
 	runNum, _ := utils.FileAndExt(modelPath)
 	dir, _ := filepath.Abs(filepath.Dir(modelPath))
 	dirInfo, _ := afero.ReadDir(fs, dir)
 	dirs := utils.ListDirNames(dirInfo)
-	newDirSuggestion := FindNextEstDirNum(runNum, dirs, 2)
+	newDirSuggestion := NextDirSuggestion{}
+	var modelDir string
+	if runSettings.ProposedRunDir == "" {
+		newDirSuggestion = FindNextEstDirNum(runNum, dirs, 2)
+		// to normalize with a potentially passed proposedRunDir, will
+		// use absolute paths to run models
+		modelDir = filepath.Join(modelPath, newDirSuggestion.NextDirName)
+	} else {
+		// if user proposes a new directory, will consider it a 'first' run, as they are customizing the output
+		// directory. As we have less control over this directory, will need to more aggressively check it
+		// the default behavior can be considered that it will _not_ overwrite an existing directory,
+		// perhaps could add a force/overwrite setting, but for now, will just make the user cleanup if they
+		// want a specific directory
+		proposedRunDir := runSettings.ProposedRunDir
+		if !filepath.IsAbs(proposedRunDir) {
+			proposedRunDir := filepath.Join(modelPath, proposedRunDir)
+		}
+		modelDir = proposedRunDir
+		exists, err := utils.DirExists(modelDir, fs)
+		if exists {
+			return ReturnStatus{
+				RunDir: modelDir,
+				DidRun: false,
+				Error:  fmt.Errorf("run directory %s already exists! will not overwrite", proposedRunDir),
+			}
+		}
+	}
+
 	if !newDirSuggestion.FirstRun && runSettings.OneEst {
 		if runSettings.Verbose {
 			log.Printf("run directory for model %s exists, not re-running", runNum)
 		}
-		return nil
+		return ReturnStatus{
+			RunDir: modelDir,
+			DidRun: false,
+			Error:  fmt.Errorf("run directory %s already exists! will not overwrite", newDirSuggestion.NextDirName),
+		}
 	}
-	modelDir := newDirSuggestion.NextDirName
 
 	// unpack settings
 	verbose := runSettings.Verbose
@@ -67,7 +107,11 @@ func EstimateModel(
 	extraFiles, err := PrepareEstRun(fs, dir, modelFile, modelDir)
 	if err != nil {
 		log.Printf("error preparing estimation run: %s", err)
-		return err
+		return ReturnStatus{
+			RunDir: modelDir,
+			DidRun: false,
+			Error:  err,
+		}
 	}
 
 	if runSettings.Git {
@@ -89,11 +133,15 @@ func EstimateModel(
 	if verbose {
 		log.Printf("running model %s ...\n", runNum)
 	}
-	err = RunEstModel(fs, dir, newDirSuggestion.NextDirName, modelFile, noBuild, nmExecutableOrPath)
+	err = RunEstModel(fs, dir, modelDir, modelFile, noBuild, nmExecutableOrPath)
 
 	if err != nil {
 		log.Printf("error during estimation run: %s", err)
-		return err
+		return ReturnStatus{
+			RunDir: modelDir,
+			DidRun: true,
+			Error:  err,
+		}
 	}
 
 	if verbose {
@@ -101,15 +149,18 @@ func EstimateModel(
 	}
 
 	if runSettings.SaveExe != "" {
-		utils.CopyExeToCache(fs, dir, modelDir, cacheDir, runSettings.SaveExe)
+		err := utils.CopyExeToCache(fs, dir, modelDir, cacheDir, runSettings.SaveExe)
+		if err != nil {
+			log.Printf("error during estimation run: %s", err)
+		}
 	}
 
-	estDirInfo, _ := afero.ReadDir(fs, filepath.Join(dir, newDirSuggestion.NextDirName))
+	estDirInfo, _ := afero.ReadDir(fs, modelDir)
 	fileList := utils.ListFiles(estDirInfo)
 	err = CleanEstFolderAndCopyToParent(fs,
 		dir,
 		runNum,
-		newDirSuggestion.NextDirName,
+		modelDir,
 		fileList,
 		extraFiles.Files,
 		extraFiles.Files,
@@ -120,10 +171,18 @@ func EstimateModel(
 	)
 	if err != nil {
 		log.Printf("error cleaning estimation run: %s", err)
-		return err
+		return ReturnStatus{
+			RunDir: modelDir,
+			DidRun: true,
+			Error:  err,
+		}
 	}
 	if verbose {
 		log.Println("done cleaning up!")
 	}
-	return nil
+	return ReturnStatus{
+		RunDir: modelDir,
+		DidRun: true,
+		Error:  nil,
+	}
 }
