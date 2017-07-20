@@ -176,7 +176,7 @@ func runModel(
 	if debug {
 		viper.Debug()
 	}
-	runner.EstimateModel(
+	runOutput := runner.EstimateModel(
 		fs,
 		filePath,
 		runner.RunSettings{
@@ -190,8 +190,12 @@ func runModel(
 			ExeNameInCache:     viper.GetString("cacheExe"),
 			NmExecutableOrPath: viper.GetString("nmExecutable"),
 			OneEst:             viper.GetBool("oneEst"),
+			ProposedRunDir:     "",
 		},
 	)
+	if runOutput.Error != nil {
+		log.Printf("error running model at dir: %s", runOutput.)
+	}
 	if verbose {
 		log.Printf("completed run %s releasing worker back to queue \n", filePath)
 	}
