@@ -199,13 +199,13 @@ func launchWorker(
 		if verbose {
 			log.Printf("run %s running on worker %v!", filepath.Base(filePath), workerNum)
 		}
-		err = runner.EstimateModel(
+		runResult := runner.EstimateModel(
 			fs,
 			filePath,
 			model.ModelInfo.RunSettings,
 		)
 		duration := time.Since(startTime)
-		if err != nil {
+		if runResult.Error != nil || !runResult.DidRun {
 			model.Status = "ERROR"
 			log.Printf("error on run %s releasing worker back to queue \n", filePath)
 		} else {
@@ -213,6 +213,7 @@ func launchWorker(
 		}
 		model.RunInfo.StartTime = startTime.Unix()
 		model.RunInfo.Duration = int64(duration.Seconds())
+		model.RunInfo.RunDir = runResult.RunDir // TODO(devin) decide if this should actually stor ethe entire runResult
 		ms.UpdateModel(&model)
 
 		if verbose {
