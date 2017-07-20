@@ -194,10 +194,11 @@ func runModel(
 		},
 	)
 	if runOutput.Error != nil {
-		log.Printf("error running model at dir: %s", runOutput.)
-	}
-	if verbose {
-		log.Printf("completed run %s releasing worker back to queue \n", filePath)
+		log.Printf("error running model at dir: %s", runOutput.Error)
+	} else {
+		if verbose {
+			log.Printf("completed run %s releasing worker back to queue \n", filePath)
+		}
 	}
 	<-queue
 }
