@@ -64,7 +64,7 @@ func EstimateModel(
 		// want a specific directory
 		proposedRunDir := runSettings.ProposedRunDir
 		if !filepath.IsAbs(proposedRunDir) {
-			proposedRunDir = filepath.Join(modelPath, proposedRunDir)
+			proposedRunDir = filepath.Join(dir, proposedRunDir)
 		}
 		modelDir = proposedRunDir
 		exists, err := utils.DirExists(modelDir, fs)
