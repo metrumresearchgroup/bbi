@@ -34,6 +34,7 @@ func TestMarshalModel(t *testing.T) {
 			StartTime: time.Now().AddDate(0, 0, -1).Unix(),
 			Duration:  sampleDuration,
 			RunDir:    "run_est_001",
+			Error:     "an error",
 		},
 	}
 

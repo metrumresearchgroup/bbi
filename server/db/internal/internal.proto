@@ -16,6 +16,7 @@ message ModelInfo {
         string exe_name_in_cache = 8;
         string nm_executable_or_path = 9;
         bool one_est = 10;
+        string proposed_run_dir = 11;
     }
     
     RunSettings run_settings = 2;
@@ -26,6 +27,7 @@ message RunInfo {
     int64 start_time = 2;
     int64 duration = 3;
     string run_dir = 4;
+    string error = 5;
 }
 
 message Model {

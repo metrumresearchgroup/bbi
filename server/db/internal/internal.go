@@ -24,6 +24,8 @@ func MarshalModel(m *server.Model) ([]byte, error) {
 		status = Model_RUNNING
 	case "COMPLETED":
 		status = Model_COMPLETED
+	case "ERROR":
+		status = Model_ERROR
 	default:
 		return nil, fmt.Errorf("unrecognized model status: %v", m.Status)
 	}
@@ -43,6 +45,7 @@ func MarshalModel(m *server.Model) ([]byte, error) {
 				ExeNameInCache:     modelInfo.RunSettings.ExeNameInCache,
 				NmExecutableOrPath: modelInfo.RunSettings.NmExecutableOrPath,
 				OneEst:             modelInfo.RunSettings.OneEst,
+				ProposedRunDir:     modelInfo.RunSettings.ProposedRunDir,
 			},
 		},
 		RunInfo: &RunInfo{
@@ -50,6 +53,7 @@ func MarshalModel(m *server.Model) ([]byte, error) {
 			StartTime: runInfo.StartTime,
 			Duration:  runInfo.Duration,
 			RunDir:    runInfo.RunDir,
+			Error:     runInfo.Error,
 		},
 	})
 }
@@ -70,6 +74,8 @@ func UnmarshalModel(data []byte, m *server.Model) error {
 	switch status {
 	case Model_COMPLETED:
 		m.Status = "COMPLETED"
+	case Model_ERROR:
+		m.Status = "ERROR"
 	case Model_RUNNING:
 		m.Status = "RUNNING"
 	case Model_QUEUED:
@@ -90,6 +96,7 @@ func UnmarshalModel(data []byte, m *server.Model) error {
 			ExeNameInCache:     modelInfo.RunSettings.ExeNameInCache,
 			NmExecutableOrPath: modelInfo.RunSettings.NmExecutableOrPath,
 			OneEst:             modelInfo.RunSettings.OneEst,
+			ProposedRunDir:     modelInfo.RunSettings.ProposedRunDir,
 		},
 	}
 	m.RunInfo = server.RunInfo{
@@ -97,6 +104,7 @@ func UnmarshalModel(data []byte, m *server.Model) error {
 		StartTime: runInfo.StartTime,
 		Duration:  runInfo.Duration,
 		RunDir:    runInfo.RunDir,
+		Error:     runInfo.Error,
 	}
 
 	return nil
