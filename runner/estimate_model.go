@@ -55,7 +55,7 @@ func EstimateModel(
 		newDirSuggestion = FindNextEstDirNum(runNum, dirs, 2)
 		// to normalize with a potentially passed proposedRunDir, will
 		// use absolute paths to run models
-		modelDir = filepath.Join(modelPath, newDirSuggestion.NextDirName)
+		modelDir = filepath.Join(dir, newDirSuggestion.NextDirName)
 	} else {
 		// if user proposes a new directory, will consider it a 'first' run, as they are customizing the output
 		// directory. As we have less control over this directory, will need to more aggressively check it
@@ -133,7 +133,7 @@ func EstimateModel(
 	if verbose {
 		log.Printf("running model %s ...\n", runNum)
 	}
-	err = RunEstModel(fs, dir, modelDir, modelFile, noBuild, nmExecutableOrPath)
+	err = RunEstModel(fs, modelDir, modelFile, noBuild, nmExecutableOrPath)
 
 	if err != nil {
 		log.Printf("error during estimation run: %s", err)
@@ -149,7 +149,7 @@ func EstimateModel(
 	}
 
 	if runSettings.SaveExe != "" {
-		err := utils.CopyExeToCache(fs, dir, modelDir, cacheDir, runSettings.SaveExe)
+		err := utils.CopyExeToCache(fs, modelDir, cacheDir, runSettings.SaveExe)
 		if err != nil {
 			log.Printf("error during estimation run: %s", err)
 		}
