@@ -15,12 +15,14 @@ type Model struct {
 // StartTime is the time the worker starts execution of the model code for processing steps
 // Duration is the time, in milliseconds from StartTime to The model run completing
 // RunDir is the (sub)-directory where the model is executed
+// Error is the string representation of the error that stopped the run if an error was present
 // as a unix timestamp
 type RunInfo struct {
 	QueueTime int64
 	StartTime int64
 	Duration  int64
 	RunDir    string
+	Error     string
 }
 
 // ModelInfo contains the information about the model execution
