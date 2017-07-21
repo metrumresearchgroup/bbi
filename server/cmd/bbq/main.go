@@ -245,6 +245,7 @@ func populateDB(ms server.ModelService) error {
 					ExeNameInCache:     "cache.exe",
 					NmExecutableOrPath: "nmfe74",
 					OneEst:             true,
+					ProposedRunDir:     "",
 				},
 			},
 			RunInfo: server.RunInfo{
@@ -272,6 +273,7 @@ func populateDB(ms server.ModelService) error {
 					ExeNameInCache:     "cache.exe",
 					NmExecutableOrPath: "nmfe74",
 					OneEst:             true,
+					ProposedRunDir:     "",
 				},
 			},
 			RunInfo: server.RunInfo{
@@ -282,7 +284,7 @@ func populateDB(ms server.ModelService) error {
 		}
 		newModels = append(newModels, newModel)
 	}
-	for i := 0; i < 40000; i++ {
+	for i := 0; i < 400; i++ {
 		newModel := server.Model{
 			ID:     0,
 			Status: "QUEUED",
@@ -299,6 +301,7 @@ func populateDB(ms server.ModelService) error {
 					ExeNameInCache:     "cache.exe",
 					NmExecutableOrPath: "nmfe74",
 					OneEst:             true,
+					ProposedRunDir:     "",
 				},
 			},
 			RunInfo: server.RunInfo{
