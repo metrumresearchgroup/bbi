@@ -144,6 +144,11 @@ func main() {
 		w.Write([]byte("pong"))
 	})
 
+	r.Get("/version", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(200)
+		w.Write([]byte(Version))
+	})
+
 	r.Route("/models", func(r chi.Router) {
 		r.Get("/", httpClient.HandleGetModelsByStatus)
 		r.Post("/", httpClient.HandleSubmitModels)
