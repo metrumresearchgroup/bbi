@@ -21,7 +21,7 @@ import (
 )
 
 // Version of bbq
-const Version = "0.2.0"
+const Version = "0.3.0"
 
 var (
 	port        int
@@ -144,6 +144,11 @@ func main() {
 		w.Write([]byte("pong"))
 	})
 
+	r.Get("/version", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(200)
+		w.Write([]byte(Version))
+	})
+
 	r.Route("/models", func(r chi.Router) {
 		r.Get("/", httpClient.HandleGetModelsByStatus)
 		r.Post("/", httpClient.HandleSubmitModels)
@@ -199,20 +204,22 @@ func launchWorker(
 		if verbose {
 			log.Printf("run %s running on worker %v!", filepath.Base(filePath), workerNum)
 		}
-		err = runner.EstimateModel(
+		runResult := runner.EstimateModel(
 			fs,
 			filePath,
 			model.ModelInfo.RunSettings,
 		)
 		duration := time.Since(startTime)
-		if err != nil {
+		if runResult.Error != nil || !runResult.DidRun {
 			model.Status = "ERROR"
 			log.Printf("error on run %s releasing worker back to queue \n", filePath)
+			model.RunInfo.Error = runResult.Error.Error() // since Error needs to be string to make easy to store in DB
 		} else {
 			model.Status = "COMPLETED"
 		}
 		model.RunInfo.StartTime = startTime.Unix()
 		model.RunInfo.Duration = int64(duration.Seconds())
+		model.RunInfo.RunDir = runResult.RunDir // TODO(devin) decide if this should actually stor ethe entire runResult
 		ms.UpdateModel(&model)
 
 		if verbose {
@@ -244,6 +251,7 @@ func populateDB(ms server.ModelService) error {
 					ExeNameInCache:     "cache.exe",
 					NmExecutableOrPath: "nmfe74",
 					OneEst:             true,
+					ProposedRunDir:     "",
 				},
 			},
 			RunInfo: server.RunInfo{
@@ -271,6 +279,7 @@ func populateDB(ms server.ModelService) error {
 					ExeNameInCache:     "cache.exe",
 					NmExecutableOrPath: "nmfe74",
 					OneEst:             true,
+					ProposedRunDir:     "",
 				},
 			},
 			RunInfo: server.RunInfo{
@@ -281,7 +290,7 @@ func populateDB(ms server.ModelService) error {
 		}
 		newModels = append(newModels, newModel)
 	}
-	for i := 0; i < 40000; i++ {
+	for i := 0; i < 400; i++ {
 		newModel := server.Model{
 			ID:     0,
 			Status: "QUEUED",
@@ -298,6 +307,7 @@ func populateDB(ms server.ModelService) error {
 					ExeNameInCache:     "cache.exe",
 					NmExecutableOrPath: "nmfe74",
 					OneEst:             true,
+					ProposedRunDir:     "",
 				},
 			},
 			RunInfo: server.RunInfo{

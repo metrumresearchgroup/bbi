@@ -38,6 +38,7 @@ var (
 	gitignoreLvl int
 	git          bool
 	oneEst       bool
+	runDir       string
 )
 
 // runCmd represents the run command
@@ -75,6 +76,9 @@ func run(cmd *cobra.Command, args []string) error {
 	}
 	if flagChanged(cmd.Flags(), "oneEst") {
 		viper.Set("oneEst", oneEst)
+	}
+	if flagChanged(cmd.Flags(), "runDir") {
+		viper.Set("runDir", runDir)
 	}
 	if debug {
 		viper.Debug()
@@ -176,7 +180,7 @@ func runModel(
 	if debug {
 		viper.Debug()
 	}
-	runner.EstimateModel(
+	runOutput := runner.EstimateModel(
 		fs,
 		filePath,
 		runner.RunSettings{
@@ -190,10 +194,15 @@ func runModel(
 			ExeNameInCache:     viper.GetString("cacheExe"),
 			NmExecutableOrPath: viper.GetString("nmExecutable"),
 			OneEst:             viper.GetBool("oneEst"),
+			ProposedRunDir:     viper.GetString("runDir"),
 		},
 	)
-	if verbose {
-		log.Printf("completed run %s releasing worker back to queue \n", filePath)
+	if runOutput.Error != nil {
+		log.Printf("error running model at dir: %s", runOutput.Error)
+	} else {
+		if verbose {
+			log.Printf("completed run %s releasing worker back to queue \n", filePath)
+		}
 	}
 	<-queue
 }
@@ -208,6 +217,7 @@ func init() {
 	runCmd.Flags().IntVar(&gitignoreLvl, "gitignoreLvl", 0, "gitignore lvl for a given (set of) runs")
 	runCmd.Flags().BoolVar(&git, "git", false, "whether git is used")
 	runCmd.Flags().BoolVar(&oneEst, "oneEst", false, "whether to only run a model once, and skip if output directory present")
+	runCmd.Flags().StringVar(&runDir, "runDir", "", "run directory name")
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command

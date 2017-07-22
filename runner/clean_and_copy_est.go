@@ -37,6 +37,9 @@ func CleanEstFolderAndCopyToParent(
 ) error {
 	outputFiles := EstOutputFileCleanLevels(runNum)
 	keyOutputFiles := EstOutputFilesByRun(runNum)
+	if !filepath.IsAbs(dirToClean) {
+		dirToClean = filepath.Join(parentDir, dirToClean)
+	}
 	for _, f := range keepFiles {
 		// make sure will be kept
 		outputFiles[f] = cleanLvl + 1
@@ -49,7 +52,6 @@ func CleanEstFolderAndCopyToParent(
 	lvl, _ := outputFiles["temp_dir"]
 	if cleanLvl >= lvl {
 		err := fs.RemoveAll(filepath.Join(
-			parentDir,
 			dirToClean,
 			"temp_dir",
 		))
@@ -64,7 +66,6 @@ func CleanEstFolderAndCopyToParent(
 		lvl, ok := keyOutputFiles[file]
 		if ok && lvl >= copyLvl {
 			fileToCopyLocation := filepath.Join(
-				parentDir,
 				dirToClean,
 				file,
 			)
@@ -97,7 +98,6 @@ func CleanEstFolderAndCopyToParent(
 		}
 		if ok && cleanLvl >= lvl {
 			err := fs.Remove(filepath.Join(
-				parentDir,
 				dirToClean,
 				file,
 			))

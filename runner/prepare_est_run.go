@@ -20,10 +20,13 @@ type ModFileInfo struct {
 // runName is the file name of the model
 // runDir is the name of the new subdirectory to be created
 func PrepareEstRun(fs afero.Fs, dir string, runName string, runDir string) (ModFileInfo, error) {
-	err := fs.MkdirAll(filepath.Join(
-		dir,
-		runDir,
-	), 0755)
+	if !filepath.IsAbs(runDir) {
+		runDir = filepath.Join(
+			dir,
+			runDir,
+		)
+	}
+	err := fs.MkdirAll(runDir, 0755)
 	if err != nil {
 		return ModFileInfo{}, fmt.Errorf("Error creating new subdir to execute, with err: %s", err)
 	}
@@ -39,7 +42,6 @@ func PrepareEstRun(fs afero.Fs, dir string, runName string, runDir string) (ModF
 		fs,
 		PrepareForExecution(fileLines),
 		filepath.Join(
-			dir,
 			runDir,
 			runName,
 		),
