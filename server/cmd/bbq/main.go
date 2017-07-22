@@ -208,6 +208,7 @@ func launchWorker(
 		if runResult.Error != nil || !runResult.DidRun {
 			model.Status = "ERROR"
 			log.Printf("error on run %s releasing worker back to queue \n", filePath)
+			model.RunInfo.Error = runResult.Error.Error() // since Error needs to be string to make easy to store in DB
 		} else {
 			model.Status = "COMPLETED"
 		}
