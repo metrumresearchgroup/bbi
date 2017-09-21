@@ -13,9 +13,9 @@ import (
 // directory name, and whether there should be a project reorganization
 // based on directory modifications, and whether this will be the first dir in the sequence
 type NextDirSuggestion struct {
-	NextDirName string
-	Reorg       bool
-	FirstRun    bool
+	NextDirName string `json:"next_dir_name,omitempty"`
+	Reorg       bool   `json:"reorg,omitempty"`
+	FirstRun    bool   `json:"first_run,omitempty"`
 }
 
 //FindNextEstDirNum provides the next dir num

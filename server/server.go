@@ -4,10 +4,10 @@ import "github.com/dpastoor/babylon/runner"
 
 // Model information about a model to be executed
 type Model struct {
-	ID        int
-	Status    string
-	ModelInfo ModelInfo
-	RunInfo   RunInfo
+	ID        int       `json:"id,omitempty"`
+	Status    string    `json:"status,omitempty"`
+	ModelInfo ModelInfo `json:"model_info,omitempty"`
+	RunInfo   RunInfo   `json:"run_info,omitempty"`
 }
 
 // RunInfo stores details about a model runner
@@ -18,17 +18,17 @@ type Model struct {
 // Error is the string representation of the error that stopped the run if an error was present
 // as a unix timestamp
 type RunInfo struct {
-	QueueTime int64
-	StartTime int64
-	Duration  int64
-	RunDir    string
-	Error     string
+	QueueTime int64  `json:"queue_time,omitempty"`
+	StartTime int64  `json:"start_time,omitempty"`
+	Duration  int64  `json:"duration,omitempty"`
+	RunDir    string `json:"run_dir,omitempty"`
+	Error     string `json:"error,omitempty"`
 }
 
 // ModelInfo contains the information about the model execution
 type ModelInfo struct {
-	ModelPath   string
-	RunSettings runner.RunSettings
+	ModelPath   string             `json:"model_path,omitempty"`
+	RunSettings runner.RunSettings `json:"run_settings,omitempty"`
 }
 
 // Client creates a connection to services

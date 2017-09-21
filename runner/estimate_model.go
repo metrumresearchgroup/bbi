@@ -13,24 +13,24 @@ import (
 // RunSettings is a struct that contains settings about run information
 // passed in from config variables or flags
 type RunSettings struct {
-	Git                bool
-	SaveExe            string
-	Verbose            bool
-	Debug              bool
-	CleanLvl           int
-	CopyLvl            int
-	CacheDir           string
-	ExeNameInCache     string
-	NmExecutableOrPath string
-	OneEst             bool
-	ProposedRunDir     string
+	Git                bool   `json:"git,omitempty"`
+	SaveExe            string `json:"save_exe,omitempty"`
+	Verbose            bool   `json:"verbose,omitempty"`
+	Debug              bool   `json:"debug,omitempty"`
+	CleanLvl           int    `json:"clean_lvl,omitempty"`
+	CopyLvl            int    `json:"copy_lvl,omitempty"`
+	CacheDir           string `json:"cache_dir,omitempty"`
+	ExeNameInCache     string `json:"exe_name_in_cache,omitempty"`
+	NmExecutableOrPath string `json:"nm_executable_or_path,omitempty"`
+	OneEst             bool   `json:"one_est,omitempty"`
+	ProposedRunDir     string `json:"proposed_run_dir,omitempty"`
 }
 
 // ReturnStatus gives information about the result of a model run
 type ReturnStatus struct {
-	RunDir string
-	DidRun bool
-	Error  error
+	RunDir string `json:"run_dir,omitempty"`
+	DidRun bool   `json:"did_run,omitempty"`
+	Error  error  `json:"error,omitempty"`
 }
 
 // EstimateModel prepares, runs and cleans up a model estimation run
