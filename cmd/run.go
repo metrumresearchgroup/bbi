@@ -46,10 +46,10 @@ var runCmd = &cobra.Command{
 	Use:   "run",
 	Short: "run a (set of) models",
 	Long: `run model(s), for example: 
-nmu run run001.mod
-nmu run run001.mod run002.mod --cleanLvl=1  
-nmu run run[001:006].mod // expand to run001.mod run002.mod ... run006.mod
-nmu run . // run all models in directory
+bbi run run001.mod
+bbi run run001.mod run002.mod --cleanLvl=1  
+bbi run run[001:006].mod // expand to run001.mod run002.mod ... run006.mod
+bbi run . // run all models in directory
  `,
 	RunE: run,
 }
