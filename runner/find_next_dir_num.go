@@ -9,15 +9,6 @@ import (
 	"github.com/dpastoor/babylon/utils"
 )
 
-//NextDirSuggestion provides a struct for the recommended next
-// directory name, and whether there should be a project reorganization
-// based on directory modifications, and whether this will be the first dir in the sequence
-type NextDirSuggestion struct {
-	NextDirName string `json:"next_dir_name,omitempty"`
-	Reorg       bool   `json:"reorg,omitempty"`
-	FirstRun    bool   `json:"first_run,omitempty"`
-}
-
 //FindNextEstDirNum provides the next dir num
 func FindNextEstDirNum(modelFile string, dirNames []string, padding int) NextDirSuggestion {
 	firstRun := true
