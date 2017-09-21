@@ -1,0 +1,27 @@
+{
+"window.zoomLevel": 0,
+"go.lintOnSave": "package",
+"editor.fontFamily": "'Fira Code', Menlo, Monaco, 'Courier New', monospace",
+"editor.fontLigatures": true,
+"go.addTags": {
+    "tags": "json",
+    "options": "json=omitempty",
+    "promptForTags": true,
+    "transform": "snakecase"
+},
+"go.editorContextMenuCommands": {
+    "toggleTestFile": true,
+    "addTags": true,
+    "removeTags": false,
+    "testAtCursor": false,
+    "testFile": false,
+    "testPackage": false,
+    "generateTestForFunction": false,
+    "generateTestForFile": false,
+    "generateTestForPackage": false,
+    "addImport": false,
+    "testCoverage": false
+},
+"workbench.colorTheme": "Monokai",
+"debug.inlineValues": true
+}
