@@ -21,14 +21,15 @@ import (
 )
 
 // Version of bbq
-const Version = "0.3.0"
+const Version = "1.0.0"
 
 var (
-	port        int
-	database    string
-	reset       bool
-	workers     int
-	versionOnly bool
+	port         int
+	database     string
+	reset        bool
+	workers      int
+	versionOnly  bool
+	pollInterval int // polling interval for workers in seconds
 )
 
 func init() {
@@ -37,6 +38,7 @@ func init() {
 	flag.StringVarP(&database, "database", "d", "models.db", "path and name of database to store model results")
 	flag.IntVarP(&workers, "workers", "w", 0, "number of workers, set to negative number for no workers to be activated on initialization")
 	flag.BoolVarP(&versionOnly, "version", "v", false, "print the version")
+	flag.IntVarP(&pollInterval, "pollInterval", "i", 2, "polling interval for the workers to check for new queued models, default 2 seconds")
 	flag.Parse()
 }
 
@@ -115,7 +117,7 @@ func main() {
 	// eg 4 core machine will show up as having 8 cpus, therefore 6 workers
 	// running 6 models on a 4 core machine will definitely saturate the CPU well.
 	for i := 0; i < numWorkers; i++ {
-		go launchWorker(aferofs, ms, true, i)
+		go launchWorker(aferofs, ms, true, i, pollInterval)
 	}
 
 	r := chi.NewRouter()
@@ -186,13 +188,18 @@ func launchWorker(
 	ms server.ModelService,
 	verbose bool,
 	workerNum int,
+	pollInterval int,
 ) {
 	fmt.Printf("launching worker number %v\n", workerNum)
 	for {
 		model, err := ms.AcquireNextQueuedModel()
 		if model.ID == 0 {
 			// no queued models
-			time.Sleep(5 * time.Second)
+			if pollInterval > 10 {
+				fmt.Println("poll duration of greater than 10 seconds unlikely to pick up models, setting to 10seconds")
+				pollInterval = 10
+			}
+			time.Sleep(time.Duration(pollInterval) * time.Second)
 			continue
 		}
 		if err != nil {
