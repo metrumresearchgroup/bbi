@@ -1,5 +1,7 @@
 # goreleaser.yml
 # Build customization
+project_name: bbi
+
 build:
   binary: bbi
   goos:
