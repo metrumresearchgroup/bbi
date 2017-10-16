@@ -99,15 +99,18 @@ func CleanEstFolderAndCopyToParent(
 			newFile.Close()
 			copiedFiles = append(copiedFiles, CopiedFile{File: file, Level: lvl})
 		}
-		b, err := json.MarshalIndent(copiedFiles, "", "\t")
-		if err != nil {
-			log.Println("error marshaling copied files to json")
-		}
-		copyInfoFile, err := fs.Create(fmt.Sprintf("%s_copied.json", runNum))
-		if err != nil {
-			log.Printf("error copying to new file: (%s)", err)
-		} else {
-			copyInfoFile.Write(b)
+
+		if len(copiedFiles) > 0 {
+			b, err := json.MarshalIndent(copiedFiles, "", "\t")
+			if err != nil {
+				log.Println("error marshaling copied files to json")
+			}
+			copyInfoFile, err := fs.Create(fmt.Sprintf("%s_copied.json", runNum))
+			if err != nil {
+				log.Printf("error copying to new file: (%s)", err)
+			} else {
+				copyInfoFile.Write(b)
+			}
 		}
 		// handle cleaning
 		lvl, ok = outputFiles[file]
