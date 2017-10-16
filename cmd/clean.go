@@ -16,18 +16,23 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"path/filepath"
+	"strings"
 
-	"github.com/dpastoor/nonmemutils/utils"
+	"github.com/dpastoor/babylon/runner"
+	"github.com/dpastoor/babylon/utils"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 var (
-	noFolders bool
-	noFiles   bool
-	inverse   bool
+	filesOnly  bool
+	dirsOnly   bool
+	inverse    bool
+	copiedRuns string
+	regex      bool
 )
 
 // cleanCmd represents the clean command
@@ -35,17 +40,32 @@ var cleanCmd = &cobra.Command{
 	Use:   "clean",
 	Short: "clean files and folders",
 	Long: `
-nmu clean ^run // anything beginning with the letters run
-nmu clean ^run -v // print out files and folders that will be deleted 
-nmu clean ^run --noFolders // only remove matching files 
-nmu clean _est_ --noFiles  // only remove matching folders  
-nmu clean _est_ --noFiles --simulateClean // show what output would be if clean occured but don't actually clean 
-nmu clean "run009.[^mod]" // all matching run009.<ext> but not .mod files
-nmu clean "run009.(mod|lst)$" // match run009.lst and run009.mod
+glob examples:
+bbi clean *.mod // anything with extension .mod
+bbi clean *.mod --noFolders // anything with extension .mod
+bbi clean run* // anything starting with run
+regular expression examples:
+
+bbi clean ^run --regex // anything beginning with the letters run
+bbi clean ^run -v --regex // print out files and folders that will be deleted 
+bbi clean ^run --filesOnly --regex // only remove matching files 
+bbi clean _est_ --dirsOnly --regex // only remove matching folders  
+bbi clean _est_ --dirsOnly --preview --regex // show what output would be if clean occured but don't actually clean 
+bbi clean "run009.[^mod]" --regex // all matching run009.<ext> but not .mod files
+bbi clean "run009.(mod|lst)$" --regex // match run009.lst and run009.mod
 
 can also clean via the opposite of a match with inverse
 
-nmu clean ".modt{0,1}$" --noFolders --inverse // clean all files not matching .mod or .modt
+bbi clean ".modt{0,1}$" --filesOnly --inverse --regex // clean all files not matching .mod or .modt
+
+clean copied files via
+
+bbi clean --copiedRuns="run001"
+bbi clean --copiedRuns="run[001:010]"
+
+can be a comma separated list as well
+
+bbi clean --copiedRuns="run[001:010],run100"
  `,
 	RunE: clean,
 }
@@ -67,30 +87,43 @@ func clean(cmd *cobra.Command, args []string) error {
 	matchedFiles := []string{}
 	matchedFolders := []string{}
 	for _, expr := range args {
-		if !noFolders {
-			var matches []string
-			if !inverse {
-				matches, err = utils.ListMatchesByRegex(folders, expr)
-			} else {
-				matches, err = utils.ListNonMatchesByRegex(folders, expr)
-			}
+		if !filesOnly {
+			matches, err := getMatches(folders, expr, regex)
 			if err != nil {
-				return fmt.Errorf("error with regex (%s), err: (%s)", expr, err)
+				return err
 			}
 			matchedFolders = append(matchedFolders, matches...)
 		}
-		if !noFiles {
-			var matches []string
-			if !inverse {
-				matches, err = utils.ListMatchesByRegex(files, expr)
-			} else {
-
-				matches, err = utils.ListNonMatchesByRegex(files, expr)
-			}
+		if !dirsOnly {
+			matches, err := getMatches(files, expr, regex)
 			if err != nil {
-				return fmt.Errorf("error with regex (%s), err: (%s)", expr, err)
+				return err
 			}
 			matchedFiles = append(matchedFiles, matches...)
+		}
+	}
+
+	if copiedRuns != "" {
+		copies := strings.Split(copiedRuns, ",")
+		for _, arg := range copies {
+			pat, err := utils.ExpandNameSequence(arg)
+			if err != nil {
+				log.Printf("err expanding name: %v", err)
+				// don't try to run this model
+				continue
+			}
+			if verbose || debug {
+				log.Printf("expanded models: %s \n", pat)
+			}
+			for _, p := range pat {
+				cleanedFiles, err := runner.GetCopiedFilenames(AppFs, p)
+				if err != nil {
+					log.Printf("err getting copied filenames: %v", err)
+					// don't try to run this model
+					continue
+				}
+				matchedFiles = append(matchedFiles, cleanedFiles...)
+			}
 		}
 	}
 	if verbose {
@@ -102,22 +135,49 @@ func clean(cmd *cobra.Command, args []string) error {
 		fmt.Println("would clean folders: ", matchedFolders)
 		return nil
 	}
-	if !noFolders {
+	if !filesOnly {
 		for _, f := range matchedFolders {
 			AppFs.RemoveAll(filepath.Join(dir, f))
 		}
 	}
-	if !noFiles {
+	if !dirsOnly {
 		for _, f := range matchedFiles {
 			AppFs.Remove(filepath.Join(dir, f))
 		}
 	}
 	return nil
 }
-func init() {
-	RootCmd.AddCommand(cleanCmd)
-	cleanCmd.Flags().BoolVar(&noFolders, "noFolders", false, "exclude folders during cleaning")
-	cleanCmd.Flags().BoolVar(&noFiles, "noFiles", false, "exclude files during cleaning")
-	cleanCmd.Flags().BoolVar(&inverse, "inverse", false, "inverse selection from the given regex match criteria")
+
+func getMatches(s []string, expr string, regex bool) ([]string, error) {
+	var matches []string
+	var err error
+	if regex {
+		if !inverse {
+			matches, err = utils.ListMatchesByRegex(s, expr)
+		} else {
+			matches, err = utils.ListNonMatchesByRegex(s, expr)
+		}
+		if err != nil {
+			return nil, fmt.Errorf("error with regex (%s), err: (%s)", expr, err)
+		}
+	} else {
+		if !inverse {
+			matches, err = utils.ListMatchesByGlob(s, expr)
+		} else {
+			matches, err = utils.ListNonMatchesByGlob(s, expr)
+		}
+		if err != nil {
+			return nil, fmt.Errorf("error with glob (%s), err: (%s)", expr, err)
+		}
+	}
+	return matches, nil
 }
 
+func init() {
+	RootCmd.AddCommand(cleanCmd)
+	cleanCmd.Flags().BoolVar(&dirsOnly, "dirsOnly", false, "only match and clean directories")
+	cleanCmd.Flags().BoolVar(&filesOnly, "filesOnly", false, "only match and clean files")
+	cleanCmd.Flags().BoolVar(&inverse, "inverse", false, "inverse selection from the given regex match criteria")
+	cleanCmd.Flags().BoolVar(&regex, "regex", false, "use regular expression to match instead of glob")
+	cleanCmd.Flags().StringVar(&copiedRuns, "copiedRuns", "", "run names")
+}

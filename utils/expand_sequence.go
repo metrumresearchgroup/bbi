@@ -12,7 +12,6 @@ import (
 func ExpandNameSequence(fnp string) ([]string, error) {
 	var output []string
 	r := regexp.MustCompile("(.*)?\\[(.*)\\](.*)?")
-
 	grps := r.FindAllStringSubmatch(fnp, 1)
 	if len(grps) > 0 {
 		match := grps[0]
@@ -31,7 +30,11 @@ func ExpandNameSequence(fnp string) ([]string, error) {
 		for _, s := range runSeq {
 			output = append(output, fmt.Sprintf("%s%s%s", startName, s, endName))
 		}
+	} else {
+		// nothing to expand, so just return the original string
+		output = append(output, fnp)
 	}
+
 	return output, nil
 }
 

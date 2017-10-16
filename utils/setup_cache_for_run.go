@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"os"
 	"path/filepath"
 	"runtime"
 
@@ -92,6 +93,12 @@ func SetupCacheForRun(
 	if err != nil {
 		return fmt.Errorf("error copying to new file: (%s)", err)
 	}
-
+	if debug {
+		log.Println("changing executable privileges for nonmem executable")
+	}
+	if err := os.Chmod(newFileLocation, 0755); err != nil {
+		log.Println("error changing permissions of executable after copying from cache")
+		return (err)
+	}
 	return nil
 }

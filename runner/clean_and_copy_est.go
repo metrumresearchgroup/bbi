@@ -1,6 +1,7 @@
 package runner
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -10,6 +11,12 @@ import (
 	"github.com/dpastoor/babylon/utils"
 	"github.com/spf13/afero"
 )
+
+// CopiedFile represents metadata about files copied after run to parent directory
+type CopiedFile struct {
+	File  string `json:"file,omitempty"`
+	Level int    `json:"level,omitempty"`
+}
 
 // CleanEstFolderAndCopyToParent cleans the estimation folder and then copies relevant files back to parent dir
 // Ex:
@@ -37,6 +44,7 @@ func CleanEstFolderAndCopyToParent(
 ) error {
 	outputFiles := EstOutputFileCleanLevels(runNum)
 	keyOutputFiles := EstOutputFilesByRun(runNum)
+	var copiedFiles []CopiedFile
 	if !filepath.IsAbs(dirToClean) {
 		dirToClean = filepath.Join(parentDir, dirToClean)
 	}
@@ -89,8 +97,21 @@ func CleanEstFolderAndCopyToParent(
 			}
 			fileToCopy.Close()
 			newFile.Close()
+			copiedFiles = append(copiedFiles, CopiedFile{File: file, Level: lvl})
 		}
 
+		if len(copiedFiles) > 0 {
+			b, err := json.MarshalIndent(copiedFiles, "", "\t")
+			if err != nil {
+				log.Println("error marshaling copied files to json")
+			}
+			copyInfoFile, err := fs.Create(fmt.Sprintf("%s_copied.json", runNum))
+			if err != nil {
+				log.Printf("error copying to new file: (%s)", err)
+			} else {
+				copyInfoFile.Write(b)
+			}
+		}
 		// handle cleaning
 		lvl, ok = outputFiles[file]
 		if debug {

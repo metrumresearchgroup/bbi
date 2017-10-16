@@ -60,3 +60,62 @@ func TestListMatchesByRegex(t *testing.T) {
 		}
 	}
 }
+
+func TestListMatchesByGlob(t *testing.T) {
+	type input struct {
+		Names []string
+		Glob  string
+	}
+	type test struct {
+		input    input
+		expected []string
+	}
+	exData := []string{
+		"run001.mod",
+		"run002.lst",
+		"run003.mod",
+		"nota.run",
+	}
+
+	data := []test{
+		{
+			input{
+				Names: exData,
+				Glob:  "run*.mod",
+			},
+			[]string{
+				"run001.mod",
+				"run003.mod",
+			},
+		},
+		{
+			input{
+				Names: exData,
+				Glob:  "*run",
+			},
+			[]string{
+				"nota.run",
+			},
+		},
+		{
+			input{
+				Names: exData,
+				Glob:  "run*",
+			},
+			[]string{
+				"run001.mod",
+				"run002.lst",
+				"run003.mod",
+			},
+		},
+	}
+
+	for i, d := range data {
+		res, _ := ListMatchesByGlob(d.input.Names, d.input.Glob)
+		for j, expected := range res {
+			if d.expected[j] != expected {
+				t.Errorf("Test %d failed. Expected %s got %s", i, d.expected[j], expected)
+			}
+		}
+	}
+}

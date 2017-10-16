@@ -24,7 +24,7 @@ import (
 )
 
 // VERSION is the current bbi version
-const VERSION string = "0.3.0"
+const VERSION string = "1.0.0"
 
 var (
 	// name of config file
