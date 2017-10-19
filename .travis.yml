@@ -30,7 +30,6 @@ install:
   # install goveralls for multi-package code coverage report
   - go get github.com/mattn/goveralls
   # Install gometalinter and certain linters
-  - go get github.com/dnephin/govet
   - go get github.com/alecthomas/gometalinter
   - go get github.com/client9/misspell/cmd/misspell
   - go get github.com/gordonklaus/ineffassign
