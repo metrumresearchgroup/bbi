@@ -27,10 +27,10 @@ install:
   - go get -t -v ./...
   - go get github.com/golang/lint/golint
   - go get github.com/FiloSottile/vendorcheck
-
   # install goveralls for multi-package code coverage report
   - go get github.com/mattn/goveralls
   # Install gometalinter and certain linters
+  - go get github.com/dnephin/govet
   - go get github.com/alecthomas/gometalinter
   - go get github.com/client9/misspell/cmd/misspell
   - go get github.com/gordonklaus/ineffassign
@@ -39,11 +39,11 @@ install:
 
 script:
   # for now relax metalinter and just check that tests pass
+  - gometalinter --install
   - gometalinter --disable-all -E vet -E gofmt -E misspell -E ineffassign -E goimports -E deadcode --tests --vendor ./...
   - vendorcheck ./...
   - go test -race ./...
 after_script:
-  # TODO: When Go 1.9 is released, replace $(go list) subcommand with ./... because vendor folder should be ignored
   - golint ./... 
   
 after_success:
