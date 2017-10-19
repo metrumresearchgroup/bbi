@@ -26,6 +26,8 @@ install:
   #- if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then bash dist/gitcookie.sh; fi
   - go get -t -v ./...
   - go get github.com/golang/lint/golint
+  - go get github.com/FiloSottile/vendorcheck
+
   # install goveralls for multi-package code coverage report
   - go get github.com/mattn/goveralls
   # Install gometalinter and certain linters
