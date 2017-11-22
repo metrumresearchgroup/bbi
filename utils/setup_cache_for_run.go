@@ -96,7 +96,7 @@ func SetupCacheForRun(
 	if debug {
 		log.Println("changing executable privileges for nonmem executable")
 	}
-	if err := os.Chmod(newFileLocation, 0755); err != nil {
+	if err := os.Chmod(newFileLocation, 0777); err != nil {
 		log.Println("error changing permissions of executable after copying from cache")
 		return (err)
 	}
