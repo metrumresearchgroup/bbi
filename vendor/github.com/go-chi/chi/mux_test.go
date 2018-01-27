@@ -492,11 +492,14 @@ func TestMuxComplicatedNotFound(t *testing.T) {
 	ts := httptest.NewServer(r)
 	defer ts.Close()
 
-	// check that we didn't broke correct routes
+	// check that we didn't break correct routes
 	if _, body := testRequest(t, ts, "GET", "/auth", nil); body != "auth get" {
 		t.Fatalf(body)
 	}
 	if _, body := testRequest(t, ts, "GET", "/public", nil); body != "public get" {
+		t.Fatalf(body)
+	}
+	if _, body := testRequest(t, ts, "GET", "/public/", nil); body != "public get" {
 		t.Fatalf(body)
 	}
 	if _, body := testRequest(t, ts, "GET", "/private/resource", nil); body != "private get" {
@@ -517,15 +520,6 @@ func TestMuxComplicatedNotFound(t *testing.T) {
 	}
 	// check custom not-found on trailing slash routes
 	if _, body := testRequest(t, ts, "GET", "/auth/", nil); body != "custom not-found" {
-		t.Fatalf(body)
-	}
-	if _, body := testRequest(t, ts, "GET", "/public/", nil); body != "custom not-found" {
-		t.Fatalf(body)
-	}
-	if _, body := testRequest(t, ts, "GET", "/private/", nil); body != "custom not-found" {
-		t.Fatalf(body)
-	}
-	if _, body := testRequest(t, ts, "GET", "/private/resource/", nil); body != "custom not-found" {
 		t.Fatalf(body)
 	}
 }
@@ -581,6 +575,26 @@ func TestMuxWith(t *testing.T) {
 	if cmwHandler2 != 1 {
 		t.Fatalf("expecting cmwHandler2 to be 1, got %d", cmwHandler2)
 	}
+}
+
+func TestRouterFromMuxWith(t *testing.T) {
+	t.Parallel()
+
+	r := NewRouter()
+
+	with := r.With(func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			next.ServeHTTP(w, r)
+		})
+	})
+
+	with.Get("/with_middleware", func(w http.ResponseWriter, r *http.Request) {})
+
+	ts := httptest.NewServer(with)
+	defer ts.Close()
+
+	// Without the fix this test was committed with, this causes a panic.
+	testRequest(t, ts, http.MethodGet, "/with_middleware", nil)
 }
 
 func TestMuxMiddlewareStack(t *testing.T) {
@@ -1028,6 +1042,9 @@ func TestMuxSubroutes(t *testing.T) {
 	sr := NewRouter()
 	sr.Get("/", hHubView3)
 	r.Mount("/hubs/{hubID}/users", sr)
+	r.Get("/hubs/{hubID}/users/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("hub3 override"))
+	})
 
 	sr3 := NewRouter()
 	sr3.Get("/", hAccountView1)
@@ -1049,7 +1066,6 @@ func TestMuxSubroutes(t *testing.T) {
 	defer ts.Close()
 
 	var body, expected string
-	var resp *http.Response
 
 	_, body = testRequest(t, ts, "GET", "/hubs/123/view", nil)
 	expected = "hub1"
@@ -1066,9 +1082,9 @@ func TestMuxSubroutes(t *testing.T) {
 	if body != expected {
 		t.Fatalf("expected:%s got:%s", expected, body)
 	}
-	resp, body = testRequest(t, ts, "GET", "/hubs/123/users/", nil)
-	expected = "404 page not found\n"
-	if resp.StatusCode != 404 || body != expected {
+	_, body = testRequest(t, ts, "GET", "/hubs/123/users/", nil)
+	expected = "hub3 override"
+	if body != expected {
 		t.Fatalf("expected:%s got:%s", expected, body)
 	}
 	_, body = testRequest(t, ts, "GET", "/accounts/44", nil)
@@ -1333,6 +1349,26 @@ func TestMountingSimilarPattern(t *testing.T) {
 	defer ts.Close()
 
 	if _, body := testRequest(t, ts, "GET", "/hi", nil); body != "bye" {
+		t.Fatalf(body)
+	}
+}
+
+func TestMuxEmptyParams(t *testing.T) {
+	r := NewRouter()
+	r.Get(`/users/{x}/{y}/{z}`, func(w http.ResponseWriter, r *http.Request) {
+		x := URLParam(r, "x")
+		y := URLParam(r, "y")
+		z := URLParam(r, "z")
+		w.Write([]byte(fmt.Sprintf("%s-%s-%s", x, y, z)))
+	})
+
+	ts := httptest.NewServer(r)
+	defer ts.Close()
+
+	if _, body := testRequest(t, ts, "GET", "/users/a/b/c", nil); body != "a-b-c" {
+		t.Fatalf(body)
+	}
+	if _, body := testRequest(t, ts, "GET", "/users///c", nil); body != "--c" {
 		t.Fatalf(body)
 	}
 }
