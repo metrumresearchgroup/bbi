@@ -11,7 +11,7 @@ import (
 )
 
 func TestMarshalModel(t *testing.T) {
-	sampleDuration := time.Now().AddDate(0, 0, -1).Add(10*time.Minute).Unix() - time.Now().AddDate(0, 0, -1).Unix()
+	sampleDuration := float64(time.Now().AddDate(0, 0, -1).Add(10*time.Minute).Unix() - time.Now().AddDate(0, 0, -1).Unix())
 	testModel := server.Model{
 		ID:     0,
 		Status: "COMPLETED",
