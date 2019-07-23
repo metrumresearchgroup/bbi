@@ -1,5 +1,5 @@
 {
-"window.zoomLevel": 0,
+"window.zoomLevel": 2,
 "go.lintOnSave": "package",
 "editor.fontFamily": "'Fira Code', Menlo, Monaco, 'Courier New', monospace",
 "editor.fontLigatures": true,
@@ -22,6 +22,17 @@
     "addImport": false,
     "testCoverage": false
 },
-"workbench.colorTheme": "Monokai",
-"debug.inlineValues": true
+"debug.inlineValues": true,
+"go.useLanguageServer": true,
+"[go]": {
+    "editor.snippetSuggestions": "none",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": true
+    }
+},
+"gopls": {
+    "usePlaceholders": true // add parameter placeholders when completing a function
+},
+"files.eol": "\n", // formatting only supports LF line endings
 }
