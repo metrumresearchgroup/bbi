@@ -28,8 +28,8 @@
 [[projects]]
   name = "github.com/go-chi/chi"
   packages = [".","middleware"]
-  revision = "f7c66f685bcab06bcce78ac212c5f3553c063d19"
-  version = "v3.3.0"
+  revision = "e83ac2304db3c50cf03d96a2fcd39009d458bc35"
+  version = "v3.3.2"
 
 [[projects]]
   name = "github.com/go-chi/render"
@@ -154,6 +154,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "3006ab53963f6b5f3e7ee385c0ab7c6bb35d0c3ca2910be459ad6c3f89578a05"
+  inputs-digest = "7a98e77d60bd5595f6b579f414f0c4dd689907316ef856104562255ebf292a05"
   solver-name = "gps-cdcl"
   solver-version = 1

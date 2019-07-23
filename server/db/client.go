@@ -28,8 +28,8 @@ type Client struct {
 // }
 
 // NewClient creates a new client bound to the modelService
-func NewClient() *Client {
-	c := &Client{}
+func NewClient(path string) *Client {
+	c := &Client{Path: path}
 	c.modelService.client = c
 	return c
 }

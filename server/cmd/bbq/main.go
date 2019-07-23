@@ -67,8 +67,7 @@ func main() {
 	}
 	// Open the my.db data file in your current directory.
 	// It will be created if it doesn't exist.
-	client := db.NewClient()
-	client.Path = database
+	client := db.NewClient(database)
 
 	err := client.Open() // connect to the boltDB instance
 	if err != nil {
@@ -225,7 +224,7 @@ func launchWorker(
 			model.Status = "COMPLETED"
 		}
 		model.RunInfo.StartTime = startTime.Unix()
-		model.RunInfo.Duration = int64(duration.Seconds())
+		model.RunInfo.Duration = duration.Seconds()
 		model.RunInfo.RunDir = runResult.RunDir // TODO(devin) decide if this should actually stor ethe entire runResult
 		ms.UpdateModel(&model)
 
@@ -239,7 +238,7 @@ func launchWorker(
 // populateDB populates the database with some fake objects with various statuses
 func populateDB(ms server.ModelService) error {
 	var newModels []server.Model
-	sampleDuration := time.Now().AddDate(0, 0, -1).Add(10*time.Minute).Unix() - time.Now().AddDate(0, 0, -1).Unix()
+	sampleDuration := float64(time.Now().AddDate(0, 0, -1).Add(10*time.Minute).Unix() - time.Now().AddDate(0, 0, -1).Unix())
 	startInsert := time.Now()
 	for i := 0; i < 10; i++ {
 		newModel := server.Model{
@@ -292,7 +291,7 @@ func populateDB(ms server.ModelService) error {
 			RunInfo: server.RunInfo{
 				QueueTime: time.Now().AddDate(0, 0, -1).Unix(),
 				StartTime: time.Now().Unix(),
-				Duration:  int64(0),
+				Duration:  float64(0),
 			},
 		}
 		newModels = append(newModels, newModel)
@@ -320,7 +319,7 @@ func populateDB(ms server.ModelService) error {
 			RunInfo: server.RunInfo{
 				QueueTime: time.Now().AddDate(0, 0, -1).Unix(),
 				StartTime: int64(0),
-				Duration:  int64(0),
+				Duration:  float64(0),
 			},
 		}
 		newModels = append(newModels, newModel)

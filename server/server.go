@@ -18,11 +18,11 @@ type Model struct {
 // Error is the string representation of the error that stopped the run if an error was present
 // as a unix timestamp
 type RunInfo struct {
-	QueueTime int64  `json:"queue_time,omitempty"`
-	StartTime int64  `json:"start_time,omitempty"`
-	Duration  int64  `json:"duration,omitempty"`
-	RunDir    string `json:"run_dir,omitempty"`
-	Error     string `json:"error,omitempty"`
+	QueueTime int64   `json:"queue_time,omitempty"`
+	StartTime int64   `json:"start_time,omitempty"`
+	Duration  float64 `json:"duration,omitempty"`
+	RunDir    string  `json:"run_dir,omitempty"`
+	Error     string  `json:"error,omitempty"`
 }
 
 // ModelInfo contains the information about the model execution
