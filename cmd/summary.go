@@ -21,8 +21,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	parser "github.com/dpastoor/babylon/parsers/nmparser"
-	"github.com/dpastoor/babylon/utils"
+	parser "github.com/metrumresearchgroup/babylon/parsers/nmparser"
+	"github.com/metrumresearchgroup/babylon/utils"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

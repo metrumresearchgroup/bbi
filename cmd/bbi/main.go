@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/dpastoor/babylon/cmd"
+	"github.com/metrumresearchgroup/babylon/cmd"
 )
 
 // if want to generate docs

@@ -1,6 +1,6 @@
-[![Circle CI](https://circleci.com/gh/dpastoor/babylon.svg?style=svg)](https://circleci.com/gh/dpastoor/babylon)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/dpastoor/babylon?branch=master&svg=true)](https://ci.appveyor.com/project/dpastoor/babylon)
-[![Go Report Card](https://goreportcard.com/badge/github.com/dpastoor/babylon)](https://goreportcard.com/report/github.com/dpastoor/babylon)
+[![Circle CI](https://circleci.com/gh/metrumresearchgroup/babylon.svg?style=svg)](https://circleci.com/gh/metrumresearchgroup/babylon)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/metrumresearchgroup/babylon?branch=master&svg=true)](https://ci.appveyor.com/project/metrumresearchgroup/babylon)
+[![Go Report Card](https://goreportcard.com/badge/github.com/metrumresearchgroup/babylon)](https://goreportcard.com/report/github.com/metrumresearchgroup/babylon)
 
 # babylon
 

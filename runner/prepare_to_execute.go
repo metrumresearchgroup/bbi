@@ -1,7 +1,7 @@
 package runner
 
 import "strings"
-import parser "github.com/dpastoor/babylon/parsers/nmparser"
+import parser "github.com/metrumresearchgroup/babylon/parsers/nmparser"
 
 //PrepareForExecution parses and prepares strings from a file for execution in a different context
 // for example, replacing the $DATA path

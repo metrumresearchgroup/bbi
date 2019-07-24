@@ -3,9 +3,9 @@ package db
 import (
 	"encoding/binary"
 
-	"github.com/boltdb/bolt"
-	"github.com/dpastoor/babylon/server"
-	"github.com/dpastoor/babylon/server/db/internal"
+	"github.com/coreos/bbolt"
+	"github.com/metrumresearchgroup/babylon/server"
+	"github.com/metrumresearchgroup/babylon/server/db/internal"
 )
 
 // make sure ModelService implements server.ModelService

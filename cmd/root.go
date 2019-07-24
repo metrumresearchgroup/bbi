@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/dpastoor/babylon/configlib"
+	"github.com/metrumresearchgroup/babylon/configlib"
 	"github.com/spf13/cobra"
 	flag "github.com/spf13/pflag"
 )
