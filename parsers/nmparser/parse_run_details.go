@@ -53,21 +53,20 @@ func ParseRunDetails(lines []string) RunDetails {
 	}
 
 	return RunDetails{
-		nmversion,
-		runStart,
-		runEnd,
-		estimationTime,
-		covarianceTime,
-		functionEvaluations,
-		significantDigits,
-		// TODO: populate with values
-		"",         // ProblemText 		string
-		"",         // ModFile             string
-		[]string{}, // EstimationMethod    []string
-		"",         // DataSet             string
-		0,          // NumberOfPatients    int32
-		0,          // NumberOfObs         int32
-		0,          // NumberOfDataRecords int32
-		"",         // OutputTable         string
+		NMversion:           nmversion,
+		RunStart:            runStart,
+		RunEnd:              runEnd,
+		EstimationTime:      estimationTime,
+		CovarianceTime:      covarianceTime,
+		FunctionEvaluations: functionEvaluations,
+		SignificantDigits:   significantDigits,
+		ProblemText:         "",
+		ModFile:             "",
+		EstimationMethod:    []string{},
+		DataSet:             "",
+		NumberOfPatients:    0,
+		NumberOfObs:         0,
+		NumberOfDataRecords: 0,
+		OutputTable:         "",
 	}
 }
