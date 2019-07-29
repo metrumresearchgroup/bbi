@@ -147,6 +147,8 @@ or human readable tabular formats such as:
 Test-driven development encouraged, facilitated by goconvey to monitor coverage
 and re-run tests on change(s)
 
+During development, while installing new versions for testing, running "make install" will auto-append a timestamp to the build version.
+
 ```
 $ go get github.com/smartystreets/goconvey
 goconvey 
