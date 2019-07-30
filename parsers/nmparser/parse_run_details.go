@@ -6,17 +6,6 @@ import (
 	"strings"
 )
 
-// RunDetails contains key information about logistics of the model run
-type RunDetails struct {
-	NMversion           string
-	RunStart            string
-	RunEnd              string
-	EstimationTime      float64
-	CovarianceTime      float64
-	FunctionEvaluations int64
-	SignificantDigits   float64
-}
-
 func parseFinalTime(line string) float64 {
 	re := regexp.MustCompile("[-+]?([0-9]*\\.[0-9]+|[0-9]+)$")
 	res, _ := strconv.ParseFloat(re.FindString(line), 64)
@@ -64,12 +53,20 @@ func ParseRunDetails(lines []string) RunDetails {
 	}
 
 	return RunDetails{
-		nmversion,
-		runStart,
-		runEnd,
-		estimationTime,
-		covarianceTime,
-		functionEvaluations,
-		significantDigits,
+		NMversion:           nmversion,
+		RunStart:            runStart,
+		RunEnd:              runEnd,
+		EstimationTime:      estimationTime,
+		CovarianceTime:      covarianceTime,
+		FunctionEvaluations: functionEvaluations,
+		SignificantDigits:   significantDigits,
+		ProblemText:         "",
+		ModFile:             "",
+		EstimationMethod:    []string{},
+		DataSet:             "",
+		NumberOfPatients:    0,
+		NumberOfObs:         0,
+		NumberOfDataRecords: 0,
+		OutputTable:         "",
 	}
 }
