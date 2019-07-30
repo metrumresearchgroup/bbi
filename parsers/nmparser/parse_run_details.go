@@ -22,6 +22,24 @@ func replaceTrim(line string, replacement string) string {
 	return strings.TrimSpace(strings.Replace(line, replacement, "", -1))
 }
 
+func parseValue(line string, value string) string {
+	tokens := strings.Split(line, " ")
+	for _, s := range tokens {
+		if strings.Contains(s, value) {
+			return replaceTrim(s, value)
+		}
+	}
+	return ""
+}
+
+func parseLine(line string, n int) string {
+	tokens := strings.Split(line, " ")
+	if len(tokens) >= n {
+		return tokens[n]
+	}
+	return ""
+}
+
 // ParseRunDetails parses run details such as start date/time and estimation time etc.
 func ParseRunDetails(lines []string) RunDetails {
 	nmversion := ""
@@ -31,6 +49,15 @@ func ParseRunDetails(lines []string) RunDetails {
 	covarianceTime := 0.0
 	functionEvaluations := int64(0)
 	significantDigits := 0.0
+	problemText := ""
+	modFile := ""
+	estimationMethod := []string{}
+	dataSet := ""
+	numberOfPatients := int64(0)
+	numberOfObs := int64(0)
+	numberOfDataRecords := int64(0)
+	outputTable := ""
+
 	for _, line := range lines {
 		switch {
 		case strings.Contains(line, "1NONLINEAR MIXED EFFECTS MODEL PROGRAM (NONMEM) VERSION"):
@@ -39,16 +66,41 @@ func ParseRunDetails(lines []string) RunDetails {
 			functionEvaluations, _ = strconv.ParseInt(replaceTrim(line, "NO. OF FUNCTION EVALUATIONS USED:"), 10, 64)
 		case strings.Contains(line, "NO. OF SIG. DIGITS IN FINAL EST.:"):
 			significantDigits, _ = strconv.ParseFloat(replaceTrim(line, "NO. OF SIG. DIGITS IN FINAL EST.:"), 64)
-		case strings.Contains(line, "Elapsed estimation time in seconds:"):
+		case strings.Contains(line, "Elapsed estimation"):
 			estimationTime = parseFinalTime(line)
 		case strings.Contains(line, "Elapsed covariance time in seconds:"):
+			covarianceTime = parseFinalTime(line)
+		case strings.Contains(line, "Elapsed postprocess time in seconds:"):
 			covarianceTime = parseFinalTime(line)
 		case strings.Contains(line, "Started"):
 			runStart = replaceTrim(line, "Started")
 		case strings.Contains(line, "Finished"):
 			runEnd = replaceTrim(line, "Finished")
+		case strings.Contains(line, "$PROB"):
+			problemText = replaceTrim(line, "$PROB")
+		case strings.Contains(line, "$ESTIMATION MAXEVAL"):
+			estimationMethod = append(estimationMethod, parseValue(line, "METH="))
+		case strings.Contains(line, "$DATA"):
+			dataSet = parseLine(line, 1)
+		case strings.Contains(line, "TOT. NO. OF INDIVIDUALS:"):
+			numberOfPatients, _ = strconv.ParseInt(replaceTrim(line, "TOT. NO. OF INDIVIDUALS:"), 10, 64)
+		case strings.Contains(line, "TOT. NO. OF OBS RECS:"):
+			numberOfObs, _ = strconv.ParseInt(replaceTrim(line, "TOT. NO. OF OBS RECS:"), 10, 64)
+		case strings.Contains(line, "NO. OF DATA RECS IN DATA SET:"):
+			numberOfDataRecords, _ = strconv.ParseInt(replaceTrim(line, "NO. OF DATA RECS IN DATA SET:"), 10, 64)
+		case strings.Contains(line, "$TABLE NOPRINT ONEHEADER FILE="):
+			outputTable = parseValue(line, "FILE=")
 		default:
 			continue
+		}
+	}
+
+	if nmversion == "7.4.3" {
+		if runStart == "" {
+			runStart = lines[0]
+		}
+		if runEnd == "" {
+			runEnd = lines[len(lines)-2]
 		}
 	}
 
@@ -60,13 +112,13 @@ func ParseRunDetails(lines []string) RunDetails {
 		CovarianceTime:      covarianceTime,
 		FunctionEvaluations: functionEvaluations,
 		SignificantDigits:   significantDigits,
-		ProblemText:         "",
-		ModFile:             "",
-		EstimationMethod:    []string{},
-		DataSet:             "",
-		NumberOfPatients:    0,
-		NumberOfObs:         0,
-		NumberOfDataRecords: 0,
-		OutputTable:         "",
+		ProblemText:         problemText,
+		ModFile:             modFile,
+		EstimationMethod:    estimationMethod,
+		DataSet:             dataSet,
+		NumberOfPatients:    numberOfPatients,
+		NumberOfObs:         numberOfObs,
+		NumberOfDataRecords: numberOfDataRecords,
+		OutputTable:         outputTable,
 	}
 }
