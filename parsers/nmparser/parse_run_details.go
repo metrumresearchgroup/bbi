@@ -50,7 +50,7 @@ func ParseRunDetails(lines []string) RunDetails {
 	functionEvaluations := int64(0)
 	significantDigits := 0.0
 	problemText := ""
-	modFile := ""
+	modFile := "" // TODO, pass in from caller
 	estimationMethod := []string{}
 	dataSet := ""
 	numberOfPatients := int64(0)
@@ -58,7 +58,7 @@ func ParseRunDetails(lines []string) RunDetails {
 	numberOfDataRecords := int64(0)
 	outputTable := ""
 
-	for _, line := range lines {
+	for i, line := range lines {
 		switch {
 		case strings.Contains(line, "1NONLINEAR MIXED EFFECTS MODEL PROGRAM (NONMEM) VERSION"):
 			nmversion = parseNMVersion(line)
@@ -76,6 +76,10 @@ func ParseRunDetails(lines []string) RunDetails {
 			runStart = replaceTrim(line, "Started")
 		case strings.Contains(line, "Finished"):
 			runEnd = replaceTrim(line, "Finished")
+		case strings.Contains(line, "Stop Time:"):
+			if i+1 < len(lines) {
+				runEnd = lines[i+1]
+			}
 		case strings.Contains(line, "$PROB"):
 			problemText = replaceTrim(line, "$PROB")
 		case strings.Contains(line, "$ESTIMATION MAXEVAL"):
@@ -98,9 +102,6 @@ func ParseRunDetails(lines []string) RunDetails {
 	if nmversion == "7.4.3" {
 		if runStart == "" {
 			runStart = lines[0]
-		}
-		if runEnd == "" {
-			runEnd = lines[len(lines)-2]
 		}
 	}
 

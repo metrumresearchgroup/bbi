@@ -25,15 +25,15 @@ func parseOFV(line string) float64 {
 
 // ParseLstEstimationFile parses the lst file
 func ParseLstEstimationFile(lines []string) LstData {
+	ofvIndex := 0
+	startParameterStructuresIndex := 0
+	endParameterStucturesIndex := 0
+	finalParameterEstimatesIndex := 0
+	standardErrorEstimateIndex := 0
+	covarianceMatrixEstimateIndex := 0
+	startThetaIndex := 0
+	endSigmaIndex := 0
 
-	var ofvIndex int
-	var startParameterStructuresIndex int
-	var endParameterStucturesIndex int
-	var finalParameterEstimatesIndex int
-	var standardErrorEstimateIndex int
-	var covarianceMatrixEstimateIndex int
-	var startThetaIndex int
-	var endSigmaIndex int
 	for i, line := range lines {
 		switch {
 		case strings.Contains(line, "$THETA") && startThetaIndex == 0:
@@ -60,15 +60,35 @@ func ParseLstEstimationFile(lines []string) LstData {
 		default:
 			continue
 		}
+	}
 
+	var finalParameterEst FinalParameterEstimates
+	var finalParameterStdErr FinalParameterEstimates
+	var parameterStructures ParameterStructures
+	var parameterNames ParameterNames
+
+	if standardErrorEstimateIndex > finalParameterEstimatesIndex {
+		finalParameterEst = ParseFinalParameterEstimates(lines[finalParameterEstimatesIndex:standardErrorEstimateIndex])
+	}
+
+	if covarianceMatrixEstimateIndex > standardErrorEstimateIndex {
+		finalParameterStdErr = ParseFinalParameterEstimates(lines[standardErrorEstimateIndex:covarianceMatrixEstimateIndex])
+	}
+
+	if (endParameterStucturesIndex + 1) > startParameterStructuresIndex {
+		parameterStructures = ParseParameterStructures(lines[startParameterStructuresIndex : endParameterStucturesIndex+1])
+	}
+
+	if endSigmaIndex > startThetaIndex {
+		parameterNames = ParseParameterNames(lines[startThetaIndex:endSigmaIndex])
 	}
 
 	result := LstData{
 		ParseRunDetails(lines),
-		ParseFinalParameterEstimates(lines[finalParameterEstimatesIndex:standardErrorEstimateIndex]),
-		ParseFinalParameterEstimates(lines[standardErrorEstimateIndex:covarianceMatrixEstimateIndex]),
-		ParseParameterStructures(lines[startParameterStructuresIndex : endParameterStucturesIndex+1]),
-		ParseParameterNames(lines[startThetaIndex:endSigmaIndex]),
+		finalParameterEst,
+		finalParameterStdErr,
+		parameterStructures,
+		parameterNames,
 		parseOFV(lines[ofvIndex]),
 	}
 	return result
