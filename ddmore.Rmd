@@ -19,10 +19,11 @@ library(tidyverse)
 data_dir <- "./testdata/nmoutputs"
 file_paths <- list.files(data_dir, "\\.lst$", full.names = TRUE)
 bdf <- function(.filename){
-  df <- data.frame( filename = basename(.filename),  lines = readLines(.filename, skipNul = TRUE))
+  df <- data.frame( stringsAsFactors = FALSE,
+                    filename = as.character(basename(.filename)),  
+                    lines = readr::read_lines(.filename)) 
 }
-df_list <- lapply(file_paths, bdf)
-df <- do.call(rbind, df_list)
+df <- map_df(file_paths[1:2], bdf)
 
 ```
 
