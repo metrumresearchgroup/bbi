@@ -1,0 +1,104 @@
+---
+title: "ddmore"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(stringr)
+library(tidyverse)
+```
+
+
+```{r}
+## one big df
+
+data_dir <- "./testdata/nmoutputs"
+file_paths <- list.files(data_dir, "\\.lst$", full.names = TRUE)
+bdf <- function(.filename){
+  df <- data.frame( filename = basename(.filename),  lines = readLines(.filename, skipNul = TRUE))
+}
+df_list <- lapply(file_paths, bdf)
+df <- do.call(rbind, df_list)
+
+```
+
+
+
+```{r}
+## one long list of lines
+lines <- unlist(lapply(file_paths, readLines, skipNul = TRUE)) %>% 
+          grep(pattern = "^[^;]", value = TRUE, useBytes = TRUE) 
+```
+
+
+```{r}
+## distinct list of lines
+dlines <- unlist(lapply(file_paths, readLines, skipNul = TRUE)) %>% 
+          grep(pattern = "^[^;]", value = TRUE, useBytes = TRUE) %>% 
+            as_data_frame() %>% 
+              distinct(value) %>% 
+                as.list()
+```
+
+```{r}
+## show lines around grep hit
+
+show_lines <- function(.pattern, .line_count = 4){
+  ln <- grep(.pattern, lines, fixed = TRUE, useBytes = TRUE)
+  lapply(ln, function(.x){
+    start <- as.numeric(.x)
+    end <- as.numeric(.x+.line_count)
+  lines[start:end]
+  })
+}
+
+show_lines("$TABLE", .line_count = 4)
+
+```
+
+
+```{r}
+grep("METH", lines, value=TRUE, fixed = TRUE, useBytes = TRUE) %>% as_data_frame()  %>%  distinct(value)
+grep("METHOD", lines, value=TRUE, fixed = TRUE, useBytes = TRUE) %>% as_data_frame()  %>%  distinct(value)
+grep("METHOD=", lines, value=TRUE, fixed = TRUE, useBytes = TRUE) %>% as_data_frame()  %>%  distinct(value)
+grep("#METH", lines, value=TRUE, fixed = TRUE, useBytes = TRUE) %>% as_data_frame()  %>%  distinct(value)
+grep("#METH", lines, value=TRUE, fixed = TRUE, useBytes = TRUE) %>%  as_data_frame() %>% count()
+grep("#METH", lines, value=TRUE, fixed = TRUE, useBytes = TRUE) %>% as_data_frame()  %>%  distinct(value)
+```
+
+
+```{r}
+grep("^\\$EST", lines, value=TRUE, useBytes = TRUE ) %>% 
+      as_data_frame()  %>%  
+        distinct(value)
+```
+
+
+```{r}
+show_lines("$EST")
+```
+
+```{r}
+show_lines("$INPUT", 8)
+```
+
+
+```{r}
+show_lines("$MODEL")
+```
+
+
+```{r}
+show_lines("$DATA",0)
+
+grep("$DATA", lines, value=TRUE, fixed = TRUE, useBytes = TRUE) %>% 
+      as_data_frame()  %>%  
+        distinct(value)
+```
+
+
+
