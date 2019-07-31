@@ -20,10 +20,23 @@ data_dir <- "./testdata/nmoutputs"
 file_paths <- list.files(data_dir, "\\.lst$", full.names = TRUE)
 bdf <- function(.filename){
   df <- data.frame( stringsAsFactors = FALSE,
-                    filename = as.character(basename(.filename)),  
-                    lines = readr::read_lines(.filename)) 
+                    file_name = as.character(basename(.filename)),  
+                    line_text = readr::read_lines(.filename))  %>%    
+                        mutate (line_number = row_number()) %>% 
+                          select(file_name, line_number, line_text)
 }
-df <- map_df(file_paths[1:2], bdf)
+df1 <- map_df(file_paths, bdf)
+df <- df1 %>% 
+        mutate(has_dollar_est = grepl(x = df$line_text, pattern = "$EST", fixed = TRUE, useBytes = TRUE)) %>% 
+        mutate(has_dollar_table = grepl(x = df$line_text, pattern = "$TABLE", fixed = TRUE, useBytes = TRUE)) %>% 
+        mutate(has_dollar_input = grepl(x = df$line_text, pattern = "$INPUT", fixed = TRUE, useBytes = TRUE)) %>% 
+        mutate(has_any_method = grepl(x = df$line_text, pattern = "METH", fixed = TRUE, useBytes = TRUE))
+
+#df %>% dplyr::filter(has_dollar_est == TRUE)
+#df %>% dplyr::filter(has_dollar_table == TRUE)
+#df %>% dplyr::filter(has_dollar_input == TRUE)
+#df %>% dplyr::filter(has_any_meth == TRUE)
+
 
 ```
 
