@@ -90,7 +90,7 @@ func ParseRunDetails(lines []string) RunDetails {
 	numberOfPatients := int64(0)
 	numberOfObs := int64(0)
 	numberOfDataRecords := int64(0)
-	outputTable := ""
+	outputTable := []string{}
 
 	for i, line := range lines {
 		switch {
@@ -127,7 +127,7 @@ func ParseRunDetails(lines []string) RunDetails {
 		case strings.Contains(line, "NO. OF DATA RECS IN DATA SET:"):
 			numberOfDataRecords, _ = strconv.ParseInt(replaceTrim(line, "NO. OF DATA RECS IN DATA SET:"), 10, 64)
 		case strings.Contains(line, "$TABLE"):
-			outputTable = parseTableFile(getLines(lines, i, 10))
+			outputTable = append(outputTable, parseTableFile(getLines(lines, i, 10)))
 		default:
 			continue
 		}

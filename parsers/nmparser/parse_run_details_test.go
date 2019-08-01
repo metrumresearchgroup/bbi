@@ -49,7 +49,7 @@ var RunDetails01Results = RunDetails{
 	50,
 	442,
 	492,
-	"./1.tab",
+	[]string{"./1.tab"},
 }
 
 var RunDetails02 = "../../testdata/2.lst"
@@ -69,7 +69,7 @@ var RunDetails02Results = RunDetails{
 	50,
 	442,
 	492,
-	"./1.tab",
+	[]string{"./1.tab"},
 }
 
 func TestParseRunDetails(t *testing.T) {
