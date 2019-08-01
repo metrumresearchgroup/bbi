@@ -82,8 +82,8 @@ func ParseRunDetails(lines []string) RunDetails {
 			}
 		case strings.Contains(line, "$PROB"):
 			problemText = replaceTrim(line, "$PROB")
-		case strings.Contains(line, "$ESTIMATION MAXEVAL"):
-			estimationMethod = append(estimationMethod, parseValue(line, "METH="))
+		case strings.Contains(line, "#METH:"):
+			estimationMethod = append(estimationMethod, replaceTrim(line, "#METH:"))
 		case strings.Contains(line, "$DATA"):
 			dataSet = parseLine(line, 1)
 		case strings.Contains(line, "TOT. NO. OF INDIVIDUALS:"):
@@ -92,8 +92,10 @@ func ParseRunDetails(lines []string) RunDetails {
 			numberOfObs, _ = strconv.ParseInt(replaceTrim(line, "TOT. NO. OF OBS RECS:"), 10, 64)
 		case strings.Contains(line, "NO. OF DATA RECS IN DATA SET:"):
 			numberOfDataRecords, _ = strconv.ParseInt(replaceTrim(line, "NO. OF DATA RECS IN DATA SET:"), 10, 64)
-		case strings.Contains(line, "$TABLE NOPRINT ONEHEADER FILE="):
-			outputTable = parseValue(line, "FILE=")
+		// This is not reliable because TABLE statements can span multiple lines
+		// TODO: support using multi-line feature, when available
+		// case strings.Contains(line, "$TABLE NOPRINT ONEHEADER FILE="):
+		// 	outputTable = parseValue(line, "FILE=")
 		default:
 			continue
 		}

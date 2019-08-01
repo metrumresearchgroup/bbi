@@ -26,7 +26,7 @@ var RunDetails01 = []string{
 	"$PROB 3.mod, double inital estimates",
 	"", // TODO, pass full path control stream file name into ParseRunDetails
 	// 3.mod; initial estimate of inter-subject variability (matrix). also ETA
-	"$ESTIMATION MAXEVAL=9999 PRINT=1 METH=1 INT MSF=./1.msf",
+	"#METH: First Order Conditional Estimation with Interaction",
 	"$DATA ../../derived/mock1.csv IGNORE=C",
 	"TOT. NO. OF INDIVIDUALS:       50",
 	"TOT. NO. OF OBS RECS:      442",
@@ -44,12 +44,12 @@ var RunDetails01Results = RunDetails{
 	3.4,
 	"3.mod, double inital estimates",
 	"",
-	[]string{"1"},
+	[]string{"First Order Conditional Estimation with Interaction"},
 	"../../derived/mock1.csv",
 	50,
 	442,
 	492,
-	"./1.tab",
+	"",
 }
 
 var RunDetails02 = "../../testdata/2.lst"
@@ -64,12 +64,12 @@ var RunDetails02Results = RunDetails{
 	3.1,
 	"1 model, 1 comp",
 	"",
-	[]string{"1"},
+	[]string{"First Order Conditional Estimation with Interaction"},
 	"../../derived/mock1.csv",
 	50,
 	442,
 	492,
-	"./1.tab",
+	"",
 }
 
 func TestParseRunDetails(t *testing.T) {
