@@ -49,7 +49,7 @@ var RunDetails01Results = RunDetails{
 	50,
 	442,
 	492,
-	"",
+	"./1.tab",
 }
 
 var RunDetails02 = "../../testdata/2.lst"
@@ -69,7 +69,7 @@ var RunDetails02Results = RunDetails{
 	50,
 	442,
 	492,
-	"",
+	"./1.tab",
 }
 
 func TestParseRunDetails(t *testing.T) {
@@ -87,6 +87,73 @@ func TestParseRunDetailsFromFile(t *testing.T) {
 	parsedData := ParseRunDetails(lines)
 	if !reflect.DeepEqual(parsedData, RunDetails02Results) {
 		t.Log("\nGOT: ", parsedData, "\n Expected: ", RunDetails02Results)
+		t.Fail()
+	}
+}
+
+func TestGetLines(t *testing.T) {
+	name := "Positive count 1, index 0"
+	index := 0
+	count := 1
+	lines := getLines(RunDetails01, index, count)
+	for i := 0; i < count; i++ {
+		if lines[i] != RunDetails01[i] {
+			t.Log("\nFAILED: ", name)
+			t.Log("\nGOT: ", lines[i], "\n Expected: ", RunDetails01[i])
+			t.Fail()
+		}
+	}
+	name = "Positive count 5, index 5"
+	index = 5
+	count = 5
+	lines = getLines(RunDetails01, index, count)
+	for i := 0; i < count; i++ {
+		if lines[i] != RunDetails01[index+i] {
+			t.Log("\nFAILED: ", name)
+			t.Log("\nGOT: ", lines[i], "\n Expected: ", RunDetails01[index+i])
+			t.Fail()
+		}
+	}
+
+	name = "Positive count 10, index 99"
+	index = 99
+	count = 10
+	lines = getLines(RunDetails01, index, count)
+	if len(lines) > 0 {
+		t.Log("\nFAILED: ", name)
+		t.Log("\nGOT: ", len(lines), "\n Expected: 0")
+		t.Fail()
+	}
+
+	name = "Positive count 17, index 10"
+	index = 17
+	count = 10
+	lines = getLines(RunDetails01, index, count)
+	if len(lines) != 5 {
+		t.Log("\nFAILED: ", name)
+		t.Log("\nGOT: ", len(lines), "\n Expected: 5")
+		t.Fail()
+	}
+
+	name = "Negative count -3, index 21"
+	index = 21
+	count = -3
+	lines = getLines(RunDetails01, index, count)
+	for i := 0; i < (count * -1); i++ {
+		if lines[i] != RunDetails01[index+count+i+1] {
+			t.Log("\nFAILED: ", name)
+			t.Log("\nGOT: ", lines[i], "\n Expected: ", RunDetails01[index+i])
+			t.Fail()
+		}
+	}
+
+	name = "Negative count -10, index 5"
+	index = 5
+	count = -10
+	lines = getLines(RunDetails01, index, count)
+	if len(lines) != 6 {
+		t.Log("\nFAILED: ", name)
+		t.Log("\nGOT: ", len(lines), "\n Expected: 5")
 		t.Fail()
 	}
 }

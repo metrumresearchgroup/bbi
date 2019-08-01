@@ -18,6 +18,15 @@ func parseNMVersion(line string) string {
 	return res
 }
 
+func parseTableFile(lines []string) string {
+	for _, line := range lines {
+		if strings.Contains(line, "FILE=") {
+			return parseValue(line, "FILE=")
+		}
+	}
+	return ""
+}
+
 func replaceTrim(line string, replacement string) string {
 	return strings.TrimSpace(strings.Replace(line, replacement, "", -1))
 }
@@ -38,6 +47,31 @@ func parseLine(line string, n int) string {
 		return tokens[n]
 	}
 	return ""
+}
+
+func getLines(lines []string, index int, count int) []string {
+	size := len(lines)
+	if index < 0 {
+		return []string{}
+	}
+	if index >= size {
+		return []string{}
+	}
+	if count >= 0 {
+		end := index + count
+		if end > size {
+			end = size
+		}
+		return lines[index:end]
+	}
+	if count < 0 {
+		start := index + count + 1
+		if start < 0 {
+			start = 0
+		}
+		return lines[start : index+1]
+	}
+	return []string{}
 }
 
 // ParseRunDetails parses run details such as start date/time and estimation time etc.
@@ -92,10 +126,8 @@ func ParseRunDetails(lines []string) RunDetails {
 			numberOfObs, _ = strconv.ParseInt(replaceTrim(line, "TOT. NO. OF OBS RECS:"), 10, 64)
 		case strings.Contains(line, "NO. OF DATA RECS IN DATA SET:"):
 			numberOfDataRecords, _ = strconv.ParseInt(replaceTrim(line, "NO. OF DATA RECS IN DATA SET:"), 10, 64)
-		// This is not reliable because TABLE statements can span multiple lines
-		// TODO: support using multi-line feature, when available
-		// case strings.Contains(line, "$TABLE NOPRINT ONEHEADER FILE="):
-		// 	outputTable = parseValue(line, "FILE=")
+		case strings.Contains(line, "$TABLE"):
+			outputTable = parseTableFile(getLines(lines, i, 10))
 		default:
 			continue
 		}
