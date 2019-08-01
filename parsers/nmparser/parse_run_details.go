@@ -23,7 +23,7 @@ func replaceTrim(line string, replacement string) string {
 }
 
 func parseValue(line string, value string) string {
-	tokens := strings.Split(line, " ")
+	tokens := strings.Fields(line)
 	for _, s := range tokens {
 		if strings.Contains(s, value) {
 			return replaceTrim(s, value)
@@ -33,7 +33,7 @@ func parseValue(line string, value string) string {
 }
 
 func parseLine(line string, n int) string {
-	tokens := strings.Split(line, " ")
+	tokens := strings.Fields(line)
 	if len(tokens) >= n {
 		return tokens[n]
 	}

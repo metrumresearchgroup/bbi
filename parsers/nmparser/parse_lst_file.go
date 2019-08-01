@@ -25,14 +25,15 @@ func parseOFV(line string) float64 {
 
 // ParseLstEstimationFile parses the lst file
 func ParseLstEstimationFile(lines []string) LstData {
-	ofvIndex := 0
-	startParameterStructuresIndex := 0
-	endParameterStucturesIndex := 0
-	finalParameterEstimatesIndex := 0
-	standardErrorEstimateIndex := 0
-	covarianceMatrixEstimateIndex := 0
-	startThetaIndex := 0
-	endSigmaIndex := 0
+
+	var ofvIndex int
+	var startParameterStructuresIndex int
+	var endParameterStucturesIndex int
+	var finalParameterEstimatesIndex int
+	var standardErrorEstimateIndex int
+	var covarianceMatrixEstimateIndex int
+	var startThetaIndex int
+	var endSigmaIndex int
 
 	for i, line := range lines {
 		switch {
