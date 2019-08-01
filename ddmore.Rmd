@@ -19,11 +19,10 @@ library(tidyverse)
 data_dir <- "./testdata/nmoutputs"
 file_paths <- list.files(data_dir, "\\.lst$", full.names = TRUE)
 bdf <- function(.filename){
-  df <- data.frame( stringsAsFactors = FALSE,
-                    file_name = as.character(basename(.filename)),  
-                    line_text = readr::read_lines(.filename))  %>%    
-                        mutate (line_number = row_number()) %>% 
-                          select(file_name, line_number, line_text)
+  df <- tibble::tibble( file_name = as.character(basename(.filename)),  
+                        line_text = readr::read_lines(.filename))  %>%    
+                             mutate (line_number = row_number()) %>% 
+                                select(file_name, line_number, everything())
 }
 df1 <- map_df(file_paths, bdf)
 df <- df1 %>% 
