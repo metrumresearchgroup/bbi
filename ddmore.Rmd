@@ -1,0 +1,117 @@
+---
+title: "ddmore"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(stringr)
+library(tidyverse)
+```
+
+
+```{r}
+## one big df
+
+data_dir <- "./testdata/nmoutputs"
+file_paths <- list.files(data_dir, "\\.lst$", full.names = TRUE)
+bdf <- function(.filename){
+  df <- tibble::tibble( file_name = as.character(basename(.filename)),  
+                        line_text = readr::read_lines(.filename))  %>%    
+                             mutate (line_number = row_number()) %>% 
+                                select(file_name, line_number, everything())
+}
+df1 <- map_df(file_paths, bdf)
+df <- df1 %>% 
+        mutate(has_dollar_est = grepl(x = df$line_text, pattern = "$EST", fixed = TRUE, useBytes = TRUE)) %>% 
+        mutate(has_dollar_table = grepl(x = df$line_text, pattern = "$TABLE", fixed = TRUE, useBytes = TRUE)) %>% 
+        mutate(has_dollar_input = grepl(x = df$line_text, pattern = "$INPUT", fixed = TRUE, useBytes = TRUE)) %>% 
+        mutate(has_any_method = grepl(x = df$line_text, pattern = "METH", fixed = TRUE, useBytes = TRUE))
+
+#df %>% dplyr::filter(has_dollar_est == TRUE)
+#df %>% dplyr::filter(has_dollar_table == TRUE)
+#df %>% dplyr::filter(has_dollar_input == TRUE)
+#df %>% dplyr::filter(has_any_meth == TRUE)
+
+
+```
+
+
+
+```{r}
+## one long list of lines
+lines <- unlist(lapply(file_paths, readLines, skipNul = TRUE)) %>% 
+          grep(pattern = "^[^;]", value = TRUE, useBytes = TRUE) 
+```
+
+
+```{r}
+## distinct list of lines
+dlines <- unlist(lapply(file_paths, readLines, skipNul = TRUE)) %>% 
+          grep(pattern = "^[^;]", value = TRUE, useBytes = TRUE) %>% 
+            as_data_frame() %>% 
+              distinct(value) %>% 
+                as.list()
+```
+
+```{r}
+## show lines around grep hit
+
+show_lines <- function(.pattern, .line_count = 4){
+  ln <- grep(.pattern, lines, fixed = TRUE, useBytes = TRUE)
+  lapply(ln, function(.x){
+    start <- as.numeric(.x)
+    end <- as.numeric(.x+.line_count)
+  lines[start:end]
+  })
+}
+
+show_lines("$TABLE", .line_count = 4)
+
+```
+
+
+```{r}
+grep("METH", lines, value=TRUE, fixed = TRUE, useBytes = TRUE) %>% as_data_frame()  %>%  distinct(value)
+grep("METHOD", lines, value=TRUE, fixed = TRUE, useBytes = TRUE) %>% as_data_frame()  %>%  distinct(value)
+grep("METHOD=", lines, value=TRUE, fixed = TRUE, useBytes = TRUE) %>% as_data_frame()  %>%  distinct(value)
+grep("#METH", lines, value=TRUE, fixed = TRUE, useBytes = TRUE) %>% as_data_frame()  %>%  distinct(value)
+grep("#METH", lines, value=TRUE, fixed = TRUE, useBytes = TRUE) %>%  as_data_frame() %>% count()
+grep("#METH", lines, value=TRUE, fixed = TRUE, useBytes = TRUE) %>% as_data_frame()  %>%  distinct(value)
+```
+
+
+```{r}
+grep("^\\$EST", lines, value=TRUE, useBytes = TRUE ) %>% 
+      as_data_frame()  %>%  
+        distinct(value)
+```
+
+
+```{r}
+show_lines("$EST")
+```
+
+```{r}
+show_lines("$INPUT", 8)
+```
+
+
+```{r}
+show_lines("$MODEL")
+```
+
+
+```{r}
+show_lines("$DATA",0)
+
+grep("$DATA", lines, value=TRUE, fixed = TRUE, useBytes = TRUE) %>% 
+      as_data_frame()  %>%  
+        distinct(value)
+```
+
+
+

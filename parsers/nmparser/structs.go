@@ -13,9 +13,9 @@ type RunDetails struct {
 	ModFile             string
 	EstimationMethod    []string
 	DataSet             string
-	NumberOfPatients    int32
-	NumberOfObs         int32
-	NumberOfDataRecords int32
+	NumberOfPatients    int64
+	NumberOfObs         int64
+	NumberOfDataRecords int64
 	OutputTable         string
 }
 
