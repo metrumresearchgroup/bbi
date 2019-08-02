@@ -56,10 +56,3 @@ type Shrinkage struct {
 	SD []float64
 	VR []float64
 }
-
-// OfvDetails ...
-type OfvDetails struct {
-	OFV             float64
-	OFVNoConstant   float64
-	OFVWithConstant float64
-}
