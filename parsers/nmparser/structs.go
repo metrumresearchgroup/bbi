@@ -56,3 +56,20 @@ type Shrinkage struct {
 	SD []float64
 	VR []float64
 }
+
+// OfvDetails ...
+type OfvDetails struct {
+	OFV             float64
+	OFVNoConstant   float64
+	OFVWithConstant float64
+}
+
+// LstData is the output struct from a lst file
+type LstData struct {
+	RunDetails              RunDetails
+	FinalParameterEstimates FinalParameterEstimates
+	FinalParameterStdErr    FinalParameterEstimates
+	ParameterStructures     ParameterStructures
+	ParameterNames          ParameterNames
+	OFV                     OfvDetails
+}

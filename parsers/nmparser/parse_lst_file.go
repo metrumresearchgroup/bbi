@@ -5,23 +5,6 @@ import (
 	"strings"
 )
 
-// LstData is the output struct from a lst file
-type LstData struct {
-	RunDetails              RunDetails
-	FinalParameterEstimates FinalParameterEstimates
-	FinalParameterStdErr    FinalParameterEstimates
-	ParameterStructures     ParameterStructures
-	ParameterNames          ParameterNames
-	OFV                     OfvDetails
-}
-
-// OfvDetails ...
-type OfvDetails struct {
-	OFV             float64
-	OFVNoConstant   float64
-	OFVWithConstant float64
-}
-
 func parseOFV(line string, ofvDetails *OfvDetails) {
 	if strings.Contains(line, "#OBJV") {
 		// get rid of everything but stars and ofv
@@ -46,7 +29,6 @@ func parseOFV(line string, ofvDetails *OfvDetails) {
 
 // ParseLstEstimationFile parses the lst file
 func ParseLstEstimationFile(lines []string) LstData {
-
 	ofvDetails := new(OfvDetails)
 	var startParameterStructuresIndex int
 	var endParameterStucturesIndex int
