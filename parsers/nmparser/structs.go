@@ -16,7 +16,7 @@ type RunDetails struct {
 	NumberOfPatients    int64
 	NumberOfObs         int64
 	NumberOfDataRecords int64
-	OutputTable         []string
+	OutputTables        []string
 }
 
 // CompletionDetails ...
