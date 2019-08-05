@@ -6,12 +6,11 @@ import (
 )
 
 func parseOFV(line string, ofvDetails *OfvDetails) {
-	if strings.Contains(line, "#OBJV") {
-		// get rid of everything but stars and ofv
-		result := line[10:]
-		result = strings.Replace(result, "*", "", -1)
-		output, _ := strconv.ParseFloat(strings.Fields(result)[0], 64)
-		ofvDetails.OFVNoConstant = output
+	if strings.Contains(line, "#OBJV:") {
+		result := strings.Replace(line, "*", "", -1)
+		ofvDetails.OFVNoConstant, _ = strconv.ParseFloat(
+			strings.TrimSpace(strings.Replace(result, "#OBJV:", "", -1)),
+			64)
 	} else if strings.Contains(line, "CONSTANT TO OBJECTIVE FUNCTION") {
 		ofvDetails.OFV, _ = strconv.ParseFloat(
 			strings.TrimSpace(strings.Replace(line, "N*LOG(2PI) CONSTANT TO OBJECTIVE FUNCTION:", "", -1)),
