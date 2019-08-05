@@ -72,4 +72,5 @@ type LstData struct {
 	ParameterStructures     ParameterStructures
 	ParameterNames          ParameterNames
 	OFV                     OfvDetails
+	ShrinkageDetails        ShrinkageDetails
 }

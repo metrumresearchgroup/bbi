@@ -5,6 +5,33 @@ import (
 	"strings"
 )
 
+func parseShrinkage(line string, shrinkageDetails ShrinkageDetails) ShrinkageDetails {
+	if strings.Contains(line, "ETASHRINKSD(%)") {
+		shrinkageDetails.Eta.SD = parseFloats(line, "ETASHRINKSD(%)")
+	} else if strings.Contains(line, "ETASHRINKVR(%)") {
+		shrinkageDetails.Eta.VR = parseFloats(line, "ETASHRINKVR(%)")
+	} else if strings.Contains(line, "EBVSHRINKSD(%)") {
+		shrinkageDetails.Ebv.SD = parseFloats(line, "EBVSHRINKSD(%)")
+	} else if strings.Contains(line, "EBVSHRINKVR(%)") {
+		shrinkageDetails.Ebv.VR = parseFloats(line, "EBVSHRINKVR(%)")
+	} else if strings.Contains(line, "EPSSHRINKSD(%)") {
+		shrinkageDetails.Eps.SD = parseFloats(line, "EPSSHRINKSD(%)")
+	} else if strings.Contains(line, "EPSSHRINKVR(%)") {
+		shrinkageDetails.Eps.VR = parseFloats(line, "EPSSHRINKVR(%)")
+	}
+	return shrinkageDetails
+}
+
+func parseFloats(line, name string) []float64 {
+	var floats []float64
+	values := strings.Fields(strings.TrimSpace(strings.Replace(line, name, "", -1)))
+	for _, value := range values {
+		fvalue, _ := strconv.ParseFloat(value, 64)
+		floats = append(floats, fvalue)
+	}
+	return floats
+}
+
 func parseOFV(line string, ofvDetails OfvDetails) OfvDetails {
 	if strings.Contains(line, "#OBJV:") {
 		result := strings.Replace(line, "*", "", -1)
@@ -30,6 +57,7 @@ func parseOFV(line string, ofvDetails OfvDetails) OfvDetails {
 // ParseLstEstimationFile parses the lst file
 func ParseLstEstimationFile(lines []string) LstData {
 	var ofvDetails OfvDetails
+	var shrinkageDetails ShrinkageDetails
 	var startParameterStructuresIndex int
 	var endParameterStucturesIndex int
 	var finalParameterEstimatesIndex int
@@ -67,6 +95,12 @@ func ParseLstEstimationFile(lines []string) LstData {
 			if covarianceMatrixEstimateIndex == 0 {
 				covarianceMatrixEstimateIndex = i + 3
 			}
+		case strings.Contains(line, "ETASHRINK"):
+			shrinkageDetails = parseShrinkage(line, shrinkageDetails)
+		case strings.Contains(line, "EBVSHRINK"):
+			shrinkageDetails = parseShrinkage(line, shrinkageDetails)
+		case strings.Contains(line, "EPSSHRINK"):
+			shrinkageDetails = parseShrinkage(line, shrinkageDetails)
 		default:
 			continue
 		}
@@ -100,6 +134,7 @@ func ParseLstEstimationFile(lines []string) LstData {
 		parameterStructures,
 		parameterNames,
 		ofvDetails,
+		shrinkageDetails,
 	}
 	return result
 }
