@@ -5,30 +5,32 @@ import (
 	"strings"
 )
 
-func parseOFV(line string, ofvDetails *OfvDetails) {
+func parseOFV(line string, ofvDetailsIn OfvDetails) OfvDetails {
+	ofvDetailsOut := ofvDetailsIn
 	if strings.Contains(line, "#OBJV:") {
 		result := strings.Replace(line, "*", "", -1)
-		ofvDetails.OFVNoConstant, _ = strconv.ParseFloat(
+		ofvDetailsOut.OFVNoConstant, _ = strconv.ParseFloat(
 			strings.TrimSpace(strings.Replace(result, "#OBJV:", "", -1)),
 			64)
 	} else if strings.Contains(line, "CONSTANT TO OBJECTIVE FUNCTION") {
-		ofvDetails.OFV, _ = strconv.ParseFloat(
+		ofvDetailsOut.OFV, _ = strconv.ParseFloat(
 			strings.TrimSpace(strings.Replace(line, "N*LOG(2PI) CONSTANT TO OBJECTIVE FUNCTION:", "", -1)),
 			64)
 	} else if strings.Contains(line, "OBJECTIVE FUNCTION VALUE WITHOUT CONSTANT") {
-		ofvDetails.OFVNoConstant, _ = strconv.ParseFloat(
+		ofvDetailsOut.OFVNoConstant, _ = strconv.ParseFloat(
 			strings.TrimSpace(strings.Replace(line, "OBJECTIVE FUNCTION VALUE WITHOUT CONSTANT:", "", -1)),
 			64)
 	} else if strings.Contains(line, "OBJECTIVE FUNCTION VALUE WITH CONSTANT") {
-		ofvDetails.OFVWithConstant, _ = strconv.ParseFloat(
+		ofvDetailsOut.OFVWithConstant, _ = strconv.ParseFloat(
 			strings.TrimSpace(strings.Replace(line, "OBJECTIVE FUNCTION VALUE WITH CONSTANT:", "", -1)),
 			64)
 	}
+	return ofvDetailsOut
 }
 
 // ParseLstEstimationFile parses the lst file
 func ParseLstEstimationFile(lines []string) LstData {
-	ofvDetails := new(OfvDetails)
+	var ofvDetails OfvDetails
 	var startParameterStructuresIndex int
 	var endParameterStucturesIndex int
 	var finalParameterEstimatesIndex int
@@ -48,13 +50,13 @@ func ParseLstEstimationFile(lines []string) LstData {
 		case strings.Contains(line, "0DEFAULT SIGMA BOUNDARY"):
 			endParameterStucturesIndex = i
 		case strings.Contains(line, "#OBJV"):
-			parseOFV(line, ofvDetails)
+			ofvDetails = parseOFV(line, ofvDetails)
 		case strings.Contains(line, "CONSTANT TO OBJECTIVE FUNCTION"):
-			parseOFV(line, ofvDetails)
+			ofvDetails = parseOFV(line, ofvDetails)
 		case strings.Contains(line, "OBJECTIVE FUNCTION VALUE WITHOUT CONSTANT"):
-			parseOFV(line, ofvDetails)
+			ofvDetails = parseOFV(line, ofvDetails)
 		case strings.Contains(line, "OBJECTIVE FUNCTION VALUE WITH CONSTANT"):
-			parseOFV(line, ofvDetails)
+			ofvDetails = parseOFV(line, ofvDetails)
 		case strings.Contains(line, "FINAL PARAMETER ESTIMATE"):
 			// want to go 3 more lines to get into text not labelled block
 			finalParameterEstimatesIndex = i + 3
@@ -98,7 +100,7 @@ func ParseLstEstimationFile(lines []string) LstData {
 		finalParameterStdErr,
 		parameterStructures,
 		parameterNames,
-		*ofvDetails,
+		ofvDetails,
 	}
 	return result
 }

@@ -7,24 +7,24 @@ import (
 )
 
 func TestParseOBJV(t *testing.T) {
-	ofvDetails := new(OfvDetails)
+	var ofvDetails OfvDetails
 	var expected OfvDetails
 
 	expected.OFVNoConstant = 821.705
-	parseOFV("OBJECTIVE FUNCTION VALUE WITHOUT CONSTANT: 821.705", ofvDetails)
-	assert.Equal(t, ofvDetails, &expected)
+	ofvDetails = parseOFV("OBJECTIVE FUNCTION VALUE WITHOUT CONSTANT: 821.705", ofvDetails)
+	assert.Equal(t, expected, ofvDetails)
 
 	expected.OFVWithConstant = 1639.561
-	parseOFV("OBJECTIVE FUNCTION VALUE WITH CONSTANT:       1639.561", ofvDetails)
-	assert.Equal(t, ofvDetails, &expected)
+	ofvDetails = parseOFV("OBJECTIVE FUNCTION VALUE WITH CONSTANT:       1639.561", ofvDetails)
+	assert.Equal(t, expected, ofvDetails)
 
 	expected.OFV = 817.855
-	parseOFV("N*LOG(2PI) CONSTANT TO OBJECTIVE FUNCTION:    817.855", ofvDetails)
-	assert.Equal(t, ofvDetails, &expected)
+	ofvDetails = parseOFV("N*LOG(2PI) CONSTANT TO OBJECTIVE FUNCTION:    817.855", ofvDetails)
+	assert.Equal(t, expected, ofvDetails)
 
 	expected.OFVNoConstant = -7913.528
-	parseOFV("#OBJV:********************************************    -7913.528       **************************************************", ofvDetails)
-	assert.Equal(t, ofvDetails, &expected)
+	ofvDetails = parseOFV("#OBJV:********************************************    -7913.528       **************************************************", ofvDetails)
+	assert.Equal(t, expected, ofvDetails)
 }
 
 func TestParTestParseOBJV2(t *testing.T) {
@@ -56,5 +56,5 @@ func TestParTestParseOBJV3(t *testing.T) {
 		OFVNoConstant:   821.705,
 	}
 	lstData := ParseLstEstimationFile(lines)
-	assert.Equal(t, lstData.OFV, expected)
+	assert.Equal(t, expected, lstData.OFV)
 }
