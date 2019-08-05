@@ -63,3 +63,13 @@ type OfvDetails struct {
 	OFVNoConstant   float64
 	OFVWithConstant float64
 }
+
+// LstData is the output struct from a lst file
+type LstData struct {
+	RunDetails              RunDetails
+	FinalParameterEstimates FinalParameterEstimates
+	FinalParameterStdErr    FinalParameterEstimates
+	ParameterStructures     ParameterStructures
+	ParameterNames          ParameterNames
+	OFV                     OfvDetails
+}
