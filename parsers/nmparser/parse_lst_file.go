@@ -5,27 +5,26 @@ import (
 	"strings"
 )
 
-func parseOFV(line string, ofvDetailsIn OfvDetails) OfvDetails {
-	ofvDetailsOut := ofvDetailsIn
+func parseOFV(line string, ofvDetails OfvDetails) OfvDetails {
 	if strings.Contains(line, "#OBJV:") {
 		result := strings.Replace(line, "*", "", -1)
-		ofvDetailsOut.OFVNoConstant, _ = strconv.ParseFloat(
+		ofvDetails.OFVNoConstant, _ = strconv.ParseFloat(
 			strings.TrimSpace(strings.Replace(result, "#OBJV:", "", -1)),
 			64)
 	} else if strings.Contains(line, "CONSTANT TO OBJECTIVE FUNCTION") {
-		ofvDetailsOut.OFV, _ = strconv.ParseFloat(
+		ofvDetails.OFV, _ = strconv.ParseFloat(
 			strings.TrimSpace(strings.Replace(line, "N*LOG(2PI) CONSTANT TO OBJECTIVE FUNCTION:", "", -1)),
 			64)
 	} else if strings.Contains(line, "OBJECTIVE FUNCTION VALUE WITHOUT CONSTANT") {
-		ofvDetailsOut.OFVNoConstant, _ = strconv.ParseFloat(
+		ofvDetails.OFVNoConstant, _ = strconv.ParseFloat(
 			strings.TrimSpace(strings.Replace(line, "OBJECTIVE FUNCTION VALUE WITHOUT CONSTANT:", "", -1)),
 			64)
 	} else if strings.Contains(line, "OBJECTIVE FUNCTION VALUE WITH CONSTANT") {
-		ofvDetailsOut.OFVWithConstant, _ = strconv.ParseFloat(
+		ofvDetails.OFVWithConstant, _ = strconv.ParseFloat(
 			strings.TrimSpace(strings.Replace(line, "OBJECTIVE FUNCTION VALUE WITH CONSTANT:", "", -1)),
 			64)
 	}
-	return ofvDetailsOut
+	return ofvDetails
 }
 
 // ParseLstEstimationFile parses the lst file
