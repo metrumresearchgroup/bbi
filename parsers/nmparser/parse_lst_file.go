@@ -69,7 +69,13 @@ func ParseLstEstimationFile(lines []string) LstData {
 	for i, line := range lines {
 		switch {
 		case strings.Contains(line, "$THETA") && startThetaIndex == 0:
-			startThetaIndex = i
+			fields := strings.Fields(line)
+			for _, field := range fields {
+				// can also have $THETAI/$THETAR/$THETAPV
+				if field == "$THETA" {
+					startThetaIndex = i
+				}
+			}
 		case strings.Contains(line, "$EST") && endSigmaIndex == 0:
 			endSigmaIndex = i
 		case strings.Contains(line, "0LENGTH OF THETA"):

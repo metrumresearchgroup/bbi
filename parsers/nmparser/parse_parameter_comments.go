@@ -1,6 +1,8 @@
 package parser
 
-import "strings"
+import (
+	"strings"
+)
 
 // ParameterNames containst the names of model parameters
 type ParameterNames struct {
