@@ -36,7 +36,7 @@ func (results LstData) Summary() bool {
 				aurora.Red(results.ParameterNames.Theta[i]),
 				aurora.Red(strconv.FormatFloat(numResult, 'f', -1, 64)),
 				aurora.Red(
-					fmt.Sprintf("%s (%s %%)",
+					fmt.Sprintf("%s (%s%%)",
 						strconv.FormatFloat(seResult, 'f', -1, 64),
 						strconv.FormatFloat(rse, 'f', 1, 64)),
 				),
@@ -46,7 +46,7 @@ func (results LstData) Summary() bool {
 				"TH "+strconv.Itoa(i+1),
 				results.ParameterNames.Theta[i],
 				strconv.FormatFloat(numResult, 'f', -1, 64),
-				fmt.Sprintf("%s (%s %%)",
+				fmt.Sprintf("%s (%s%%)",
 					strconv.FormatFloat(seResult, 'f', -1, 64),
 					strconv.FormatFloat(rse, 'f', 1, 64),
 				),
@@ -64,10 +64,19 @@ func (results LstData) Summary() bool {
 		if results.ParameterStructures.Omega[i] != 0 {
 			userEta++
 			val := results.FinalParameterEstimates.Omega[i]
-			omegaTable.AddRow("ETA "+strconv.Itoa(userEta),
-				val,
-				results.ShrinkageDetails.Eta.SD[userEta-1],
-			)
+			shrinkage := results.ShrinkageDetails.Eta.SD[userEta-1]
+			if shrinkage > 30 {
+				omegaTable.AddRow(
+					aurora.Red("ETA "+strconv.Itoa(userEta)),
+					aurora.Red(val),
+					aurora.Red(shrinkage),
+				)
+			} else {
+				omegaTable.AddRow("ETA "+strconv.Itoa(userEta),
+					val,
+					results.ShrinkageDetails.Eta.SD[userEta-1],
+				)
+			}
 		}
 
 	}
