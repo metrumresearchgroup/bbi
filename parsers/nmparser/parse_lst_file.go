@@ -98,7 +98,7 @@ func ParseLstEstimationFile(lines []string) LstData {
 		case strings.Contains(line, "COVARIANCE MATRIX OF ESTIMATE"):
 			// only want to set this the first time it is detected
 			// another block called "INVERSE COVARIANCE ...." will match this
-			if covarianceMatrixEstimateIndex == 0 {
+			if !strings.Contains(line, "INVERSE") {
 				covarianceMatrixEstimateIndex = i + 3
 			}
 		case strings.Contains(line, "ETASHRINK"):
