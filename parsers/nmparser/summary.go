@@ -7,6 +7,7 @@ import (
 
 	"github.com/apcera/termtables"
 	"github.com/logrusorgru/aurora"
+	"github.com/thoas/go-funk"
 )
 
 // Summary prints all results from the parsed LstData
@@ -20,13 +21,18 @@ func (results LstData) Summary() bool {
 	}
 	thetaTable := termtables.CreateTable()
 	thetaTable.AddHeaders("Theta", "Name", "Estimate", "StdErr (RSE)")
+	if len(results.FinalParameterEstimates.Theta) != len(results.FinalParameterStdErr.Theta) {
+		// if the standard errors aren't there, we should
+		// instead make an equal length slice so that looping to build the table won't blow
+		// up with an index out of bounds error
+		results.FinalParameterStdErr.Theta = make([]float64, len(results.FinalParameterEstimates.Theta))
+	}
 	for i := range results.FinalParameterEstimates.Theta {
 		numResult := results.FinalParameterEstimates.Theta[i]
 		seResult := results.FinalParameterStdErr.Theta[i]
 		var rse float64
 		if seResult != 0 && numResult != 0 {
 			rse = math.Abs(seResult / numResult * 100)
-
 		}
 
 		if rse > 30 {
@@ -58,23 +64,33 @@ func (results LstData) Summary() bool {
 	thetaTable.SetAlign(termtables.AlignLeft, 1)
 
 	omegaTable := termtables.CreateTable()
-	omegaTable.AddHeaders("Omega", "Estimate", "ShrinkageSD (%)")
-	userEta := 0
+	omegaTable.AddHeaders("Omega", "Eta", "Estimate", "ShrinkageSD (%)")
+	diagIndices := GetDiagonalElements(results.ParameterStructures.Omega)
 	for i := range results.FinalParameterEstimates.Omega {
+		omegaIndex, _ := omegaIndices[i]
 		if results.ParameterStructures.Omega[i] != 0 {
-			userEta++
 			val := results.FinalParameterEstimates.Omega[i]
-			shrinkage := results.ShrinkageDetails.Eta.SD[userEta-1]
+			var shrinkage float64
+			var etaName string
+			userEtaIndex := funk.IndexOfInt(diagIndices, i)
+			if userEtaIndex > -1 {
+				shrinkage = results.ShrinkageDetails.Eta.SD[userEtaIndex]
+				etaName = fmt.Sprintf("ETA%v", userEtaIndex+1)
+			}
 			if shrinkage > 30 {
 				omegaTable.AddRow(
-					aurora.Red("ETA "+strconv.Itoa(userEta)),
+					aurora.Red("O"+omegaIndex),
+					aurora.Red(etaName),
 					aurora.Red(val),
 					aurora.Red(shrinkage),
 				)
 			} else {
-				omegaTable.AddRow("ETA "+strconv.Itoa(userEta),
+				omegaTable.AddRow(
+					"O"+omegaIndex,
+					etaName,
+					//"ETA "+strconv.Itoa(userEtaIndex+1),
 					val,
-					results.ShrinkageDetails.Eta.SD[userEta-1],
+					shrinkage,
 				)
 			}
 		}
