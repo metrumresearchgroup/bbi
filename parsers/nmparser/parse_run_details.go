@@ -42,7 +42,7 @@ func parseLine(line string, n int) string {
 
 // ParseRunDetails parses run details such as start date/time and estimation time etc.
 func ParseRunDetails(lines []string) RunDetails {
-	nmversion := ""
+	version := ""
 	runStart := ""
 	runEnd := ""
 	estimationTime := 0.0
@@ -61,7 +61,7 @@ func ParseRunDetails(lines []string) RunDetails {
 	for i, line := range lines {
 		switch {
 		case strings.Contains(line, "1NONLINEAR MIXED EFFECTS MODEL PROGRAM (NONMEM) VERSION"):
-			nmversion = parseNMVersion(line)
+			version = parseNMVersion(line)
 		case strings.Contains(line, "NO. OF FUNCTION EVALUATIONS USED"):
 			functionEvaluations, _ = strconv.ParseInt(replaceTrim(line, "NO. OF FUNCTION EVALUATIONS USED:"), 10, 64)
 		case strings.Contains(line, "NO. OF SIG. DIGITS IN FINAL EST.:"):
@@ -101,14 +101,14 @@ func ParseRunDetails(lines []string) RunDetails {
 		}
 	}
 
-	if nmversion == "7.4.3" {
+	if version == "7.4.3" {
 		if runStart == "" {
 			runStart = lines[0]
 		}
 	}
 
 	return RunDetails{
-		NMversion:           nmversion,
+		Version:             version,
 		RunStart:            runStart,
 		RunEnd:              runEnd,
 		EstimationTime:      estimationTime,

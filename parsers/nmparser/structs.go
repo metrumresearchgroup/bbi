@@ -2,75 +2,75 @@ package parser
 
 // RunDetails contains key information about logistics of the model run
 type RunDetails struct {
-	NMversion           string
-	RunStart            string
-	RunEnd              string
-	EstimationTime      float64
-	CovarianceTime      float64
-	FunctionEvaluations int64
-	SignificantDigits   float64
-	ProblemText         string
-	ModFile             string
-	EstimationMethod    []string
-	DataSet             string
-	NumberOfPatients    int64
-	NumberOfObs         int64
-	NumberOfDataRecords int64
-	OutputTable         string
+	Version             string   `json:"version,omitempty"`
+	RunStart            string   `json:"run_start,omitempty"`
+	RunEnd              string   `json:"run_end,omitempty"`
+	EstimationTime      float64  `json:"estimation_time,omitempty"`
+	CovarianceTime      float64  `json:"covariance_time,omitempty"`
+	FunctionEvaluations int64    `json:"function_evaluations,omitempty"`
+	SignificantDigits   float64  `json:"significant_digits,omitempty"`
+	ProblemText         string   `json:"problem_text,omitempty"`
+	ModFile             string   `json:"mod_file,omitempty"`
+	EstimationMethod    []string `json:"estimation_method,omitempty"`
+	DataSet             string   `json:"data_set,omitempty"`
+	NumberOfPatients    int64    `json:"number_of_patients,omitempty"`
+	NumberOfObs         int64    `json:"number_of_obs,omitempty"`
+	NumberOfDataRecords int64    `json:"number_of_data_records,omitempty"`
+	OutputTable         string   `json:"output_table,omitempty"`
 }
 
 // CompletionDetails ...
 type CompletionDetails struct {
-	Shrinkage                 ShrinkageDetails
-	Ofv                       OfvDetails
-	ZeroGradientDetected      bool
-	FinalZeroGradientDetected bool
-	CovStepComplete           bool
-	Messages                  []string
+	Shrinkage                 ShrinkageDetails `json:"shrinkage,omitempty"`
+	Ofv                       OfvDetails       `json:"ofv,omitempty"`
+	ZeroGradientDetected      bool             `json:"zero_gradient_detected,omitempty"`
+	FinalZeroGradientDetected bool             `json:"final_zero_gradient_detected,omitempty"`
+	CovStepComplete           bool             `json:"cov_step_complete,omitempty"`
+	Messages                  []string         `json:"messages,omitempty"`
 }
 
 // ShrinkageDetails ...
 type ShrinkageDetails struct {
-	Eta Shrinkage
-	Ebv Shrinkage
-	Eps Shrinkage
+	Eta Shrinkage `json:"eta,omitempty"`
+	Ebv Shrinkage `json:"ebv,omitempty"`
+	Eps Shrinkage `json:"eps,omitempty"`
 }
 
 // GradientDetails ...
 type GradientDetails struct {
-	Zero  bool
-	Start string
-	End   float64
+	Zero  bool    `json:"zero,omitempty"`
+	Start string  `json:"start,omitempty"`
+	End   float64 `json:"end,omitempty"`
 }
 
 // CovarianceStep ...
 type CovarianceStep struct {
-	Attempted  bool
-	MatrixType string
-	OK         bool
-	Errors     []string
+	Attempted  bool     `json:"attempted,omitempty"`
+	MatrixType string   `json:"matrix_type,omitempty"`
+	OK         bool     `json:"ok,omitempty"`
+	Errors     []string `json:"errors,omitempty"`
 }
 
 // Shrinkage ...
 type Shrinkage struct {
-	SD []float64
-	VR []float64
+	SD []float64 `json:"sd,omitempty"`
+	VR []float64 `json:"vr,omitempty"`
 }
 
 // OfvDetails ...
 type OfvDetails struct {
-	OFV             float64
-	OFVNoConstant   float64
-	OFVWithConstant float64
+	OFV             float64 `json:"ofv,omitempty"`
+	OFVNoConstant   float64 `json:"ofv_no_constant,omitempty"`
+	OFVWithConstant float64 `json:"ofv_with_constant,omitempty"`
 }
 
 // LstData is the output struct from a lst file
 type LstData struct {
-	RunDetails              RunDetails
-	FinalParameterEstimates FinalParameterEstimates
-	FinalParameterStdErr    FinalParameterEstimates
-	ParameterStructures     ParameterStructures
-	ParameterNames          ParameterNames
-	OFV                     OfvDetails
-	ShrinkageDetails        ShrinkageDetails
+	RunDetails              RunDetails              `json:"run_details,omitempty"`
+	FinalParameterEstimates FinalParameterEstimates `json:"final_parameter_estimates,omitempty"`
+	FinalParameterStdErr    FinalParameterEstimates `json:"final_parameter_std_err,omitempty"`
+	ParameterStructures     ParameterStructures     `json:"parameter_structures,omitempty"`
+	ParameterNames          ParameterNames          `json:"parameter_names,omitempty"`
+	OFV                     OfvDetails              `json:"ofv,omitempty"`
+	ShrinkageDetails        ShrinkageDetails        `json:"shrinkage_details,omitempty"`
 }
