@@ -64,13 +64,13 @@ type OfvDetails struct {
 	OFVWithConstant float64 `json:"ofv_with_constant,omitempty"`
 }
 
-// LstData is the output struct from a lst file
-type LstData struct {
-	RunDetails              RunDetails              `json:"run_details,omitempty"`
-	FinalParameterEstimates FinalParameterEstimates `json:"final_parameter_estimates,omitempty"`
-	FinalParameterStdErr    FinalParameterEstimates `json:"final_parameter_std_err,omitempty"`
-	ParameterStructures     ParameterStructures     `json:"parameter_structures,omitempty"`
-	ParameterNames          ParameterNames          `json:"parameter_names,omitempty"`
-	OFV                     OfvDetails              `json:"ofv,omitempty"`
-	ShrinkageDetails        ShrinkageDetails        `json:"shrinkage_details,omitempty"`
+// ModelOutput is the output struct from a lst file
+type ModelOutput struct {
+	RunDetails              RunDetails          `json:"run_details,omitempty"`
+	FinalParameterEstimates ParameterEstimates  `json:"final_parameter_estimates,omitempty"`
+	FinalParameterStdErr    ParameterEstimates  `json:"final_parameter_std_err,omitempty"`
+	ParameterStructures     ParameterStructures `json:"parameter_structures,omitempty"`
+	ParameterNames          ParameterNames      `json:"parameter_names,omitempty"`
+	OFV                     OfvDetails          `json:"ofv,omitempty"`
+	ShrinkageDetails        ShrinkageDetails    `json:"shrinkage_details,omitempty"`
 }

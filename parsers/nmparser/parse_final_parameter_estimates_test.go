@@ -65,16 +65,14 @@ var finalParameterEstimates01 = []string{
 	"1",
 }
 
-var finalParameterEstimates01Results = FinalParameterEstimates{
+var finalParameterEstimates01Results = ParameterEstimates{
 	[]float64{4.79, 90.2, 7.47, 105},
 	[]float64{0.158, 0.122, 0.133},
 	[]float64{1450, 0, 0.00739},
-	[]float64{0.398, 0.842, 0.365},
-	[]float64{38.1, 0, 0.0860},
 }
 
 func TestParseFinalParameterEstimates(t *testing.T) {
-	parsedData := ParseFinalParameterEstimates(finalParameterEstimates01)
+	parsedData := ParseFinalParameterEstimatesFromLst(finalParameterEstimates01)
 	if !reflect.DeepEqual(parsedData.Theta, finalParameterEstimates01Results.Theta) {
 		t.Log("Got: ", parsedData.Theta, "Expected: ", finalParameterEstimates01Results.Theta)
 		t.Fail()
@@ -85,14 +83,6 @@ func TestParseFinalParameterEstimates(t *testing.T) {
 	}
 	if !reflect.DeepEqual(parsedData.Sigma, finalParameterEstimates01Results.Sigma) {
 		t.Log("Got: ", parsedData.Sigma, "Expected: ", finalParameterEstimates01Results.Sigma)
-		t.Fail()
-	}
-	if !reflect.DeepEqual(parsedData.OmegaCorr, finalParameterEstimates01Results.OmegaCorr) {
-		t.Log("Got: ", parsedData.OmegaCorr, "Expected: ", finalParameterEstimates01Results.OmegaCorr)
-		t.Fail()
-	}
-	if !reflect.DeepEqual(parsedData.SigmaCorr, finalParameterEstimates01Results.SigmaCorr) {
-		t.Log("Got: ", parsedData.SigmaCorr, "Expected: ", finalParameterEstimates01Results.SigmaCorr)
 		t.Fail()
 	}
 }

@@ -11,7 +11,7 @@ import (
 )
 
 // Summary prints all results from the parsed LstData
-func (results LstData) Summary() bool {
+func (results ModelOutput) Summary() bool {
 	termtables.DefaultStyle = &termtables.TableStyle{
 		SkipBorder: false,
 		BorderX:    "-", BorderY: "|", BorderI: "+",
