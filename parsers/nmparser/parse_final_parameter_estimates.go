@@ -4,15 +4,8 @@ import (
 	"strings"
 )
 
-// ParameterEstimates contains the final parameter estimate values
-type ParameterEstimates struct {
-	Theta []float64
-	Omega []float64
-	Sigma []float64
-}
-
 // ParseFinalParameterEstimatesFromLst parses the final estimates of model parameters from lst file
-func ParseFinalParameterEstimatesFromLst(lines []string) ParameterEstimates {
+func ParseFinalParameterEstimatesFromLst(lines []string) ParametersResult {
 	var thetaStart int
 	var omegaStart int
 	var sigmaStart int
@@ -32,5 +25,5 @@ func ParseFinalParameterEstimatesFromLst(lines []string) ParameterEstimates {
 	omegaParsed := ParseBlockResults(lines[omegaStart:sigmaStart])
 	sigmaParsed := ParseBlockResults(lines[sigmaStart:])
 
-	return ParameterEstimates{thetaParsed, omegaParsed, sigmaParsed}
+	return ParametersResult{thetaParsed, omegaParsed, sigmaParsed}
 }

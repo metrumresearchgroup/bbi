@@ -1,5 +1,28 @@
 package parser
 
+// ParametersResult contains data about the parameter values for a model
+type ParametersResult struct {
+	Theta []float64
+	Omega []float64
+	Sigma []float64
+}
+type RandomEffectResult struct {
+	Omega []float64
+	Sigma []float64
+}
+
+type ParametersData struct {
+	Estimates ParametersResult `json:"final_parameter_estimates,omitempty"`
+	StdErr    ParametersResult `json:"final_parameter_std_err,omitempty"`
+	// indicates this line contains the OMEGA and SIGMA elements in
+	// standard deviation/correlation format
+	RandomEffectSD RandomEffectResult
+	// indicates this line contains the standard errors to the OMEGA and
+	// SIGMA elements in standard deviation/correlation format
+	RandomEffectSDSE RandomEffectResult
+	Fixed            bool
+}
+
 // RunDetails contains key information about logistics of the model run
 type RunDetails struct {
 	Version             string   `json:"version,omitempty"`
@@ -66,11 +89,18 @@ type OfvDetails struct {
 
 // ModelOutput is the output struct from a lst file
 type ModelOutput struct {
-	RunDetails              RunDetails          `json:"run_details,omitempty"`
-	FinalParameterEstimates ParameterEstimates  `json:"final_parameter_estimates,omitempty"`
-	FinalParameterStdErr    ParameterEstimates  `json:"final_parameter_std_err,omitempty"`
-	ParameterStructures     ParameterStructures `json:"parameter_structures,omitempty"`
-	ParameterNames          ParameterNames      `json:"parameter_names,omitempty"`
-	OFV                     OfvDetails          `json:"ofv,omitempty"`
-	ShrinkageDetails        ShrinkageDetails    `json:"shrinkage_details,omitempty"`
+	RunDetails          RunDetails `json:"run_details,omitempty"`
+	FinalParametersData ParametersData
+	ParameterStructures ParameterStructures `json:"parameter_structures,omitempty"`
+	ParameterNames      ParameterNames      `json:"parameter_names,omitempty"`
+	OFV                 OfvDetails          `json:"ofv,omitempty"`
+	ShrinkageDetails    ShrinkageDetails    `json:"shrinkage_details,omitempty"`
+}
+
+// ExtData provides an intermediate representation of the ExtData after iterations have been stripped out
+// and the various tables broken out
+type ExtData struct {
+	EstimationMethods []string
+	ParameterNames    []string
+	EstimationLines   [][]string
 }

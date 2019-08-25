@@ -21,15 +21,15 @@ func (results ModelOutput) Summary() bool {
 	}
 	thetaTable := termtables.CreateTable()
 	thetaTable.AddHeaders("Theta", "Name", "Estimate", "StdErr (RSE)")
-	if len(results.FinalParameterEstimates.Theta) != len(results.FinalParameterStdErr.Theta) {
+	if len(results.FinalParametersData.Estimates.Theta) != len(results.FinalParametersData.StdErr.Theta) {
 		// if the standard errors aren't there, we should
 		// instead make an equal length slice so that looping to build the table won't blow
 		// up with an index out of bounds error
-		results.FinalParameterStdErr.Theta = make([]float64, len(results.FinalParameterEstimates.Theta))
+		results.FinalParametersData.StdErr.Theta = make([]float64, len(results.FinalParametersData.Estimates.Theta))
 	}
-	for i := range results.FinalParameterEstimates.Theta {
-		numResult := results.FinalParameterEstimates.Theta[i]
-		seResult := results.FinalParameterStdErr.Theta[i]
+	for i := range results.FinalParametersData.Estimates.Theta {
+		numResult := results.FinalParametersData.Estimates.Theta[i]
+		seResult := results.FinalParametersData.StdErr.Theta[i]
 		var rse float64
 		if seResult != 0 && numResult != 0 {
 			rse = math.Abs(seResult / numResult * 100)
@@ -66,10 +66,10 @@ func (results ModelOutput) Summary() bool {
 	omegaTable := termtables.CreateTable()
 	omegaTable.AddHeaders("Omega", "Eta", "Estimate", "ShrinkageSD (%)")
 	diagIndices := GetDiagonalElements(results.ParameterStructures.Omega)
-	for i := range results.FinalParameterEstimates.Omega {
+	for i := range results.FinalParametersData.Estimates.Omega {
 		omegaIndex, _ := omegaIndices[i]
 		if results.ParameterStructures.Omega[i] != 0 {
-			val := results.FinalParameterEstimates.Omega[i]
+			val := results.FinalParametersData.Estimates.Omega[i]
 			var shrinkage float64
 			var etaName string
 			userEtaIndex := funk.IndexOfInt(diagIndices, i)

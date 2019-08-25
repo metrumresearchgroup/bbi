@@ -55,7 +55,7 @@ func parseOFV(line string, ofvDetails OfvDetails) OfvDetails {
 }
 
 // ParseLstEstimationFile parses the lst file
-func ParseLstEstimationFile(lines []string) LstData {
+func ParseLstEstimationFile(lines []string) ModelOutput {
 	var ofvDetails OfvDetails
 	var shrinkageDetails ShrinkageDetails
 	var startParameterStructuresIndex int
@@ -112,17 +112,17 @@ func ParseLstEstimationFile(lines []string) LstData {
 		}
 	}
 
-	var finalParameterEst FinalParameterEstimates
-	var finalParameterStdErr FinalParameterEstimates
+	var finalParameterEst ParametersResult
+	var finalParameterStdErr ParametersResult
 	var parameterStructures ParameterStructures
 	var parameterNames ParameterNames
 
 	if standardErrorEstimateIndex > finalParameterEstimatesIndex {
-		finalParameterEst = ParseFinalParameterEstimates(lines[finalParameterEstimatesIndex:standardErrorEstimateIndex])
+		finalParameterEst = ParseFinalParameterEstimatesFromLst(lines[finalParameterEstimatesIndex:standardErrorEstimateIndex])
 	}
 
 	if covarianceMatrixEstimateIndex > standardErrorEstimateIndex {
-		finalParameterStdErr = ParseFinalParameterEstimates(lines[standardErrorEstimateIndex:covarianceMatrixEstimateIndex])
+		finalParameterStdErr = ParseFinalParameterEstimatesFromLst(lines[standardErrorEstimateIndex:covarianceMatrixEstimateIndex])
 	}
 
 	if (endParameterStucturesIndex) > startParameterStructuresIndex {
@@ -132,15 +132,17 @@ func ParseLstEstimationFile(lines []string) LstData {
 	if endSigmaIndex > startThetaIndex {
 		parameterNames = ParseParameterNames(lines[startThetaIndex:endSigmaIndex])
 	}
-
-	result := LstData{
-		ParseRunDetails(lines),
-		finalParameterEst,
-		finalParameterStdErr,
-		parameterStructures,
-		parameterNames,
-		ofvDetails,
-		shrinkageDetails,
+	// TODO re-replace parameter data from lst
+	result := ModelOutput{
+		RunDetails: ParseRunDetails(lines),
+		FinalParametersData: ParametersData{
+			Estimates: finalParameterEst,
+			StdErr:    finalParameterStdErr,
+		},
+		ParameterStructures: parameterStructures,
+		ParameterNames:      parameterNames,
+		OFV:                 ofvDetails,
+		ShrinkageDetails:    shrinkageDetails,
 	}
 	return result
 }
