@@ -21,15 +21,16 @@ func (results ModelOutput) Summary() bool {
 	}
 	thetaTable := termtables.CreateTable()
 	thetaTable.AddHeaders("Theta", "Name", "Estimate", "StdErr (RSE)")
-	if len(results.FinalParametersData.Estimates.Theta) != len(results.FinalParametersData.StdErr.Theta) {
+	finalEstimationMethodIndex := len(results.ParametersData) - 1
+	if len(results.ParametersData[finalEstimationMethodIndex].Estimates.Theta) != len(results.ParametersData[finalEstimationMethodIndex].StdErr.Theta) {
 		// if the standard errors aren't there, we should
 		// instead make an equal length slice so that looping to build the table won't blow
 		// up with an index out of bounds error
-		results.FinalParametersData.StdErr.Theta = make([]float64, len(results.FinalParametersData.Estimates.Theta))
+		results.ParametersData[finalEstimationMethodIndex].StdErr.Theta = make([]float64, len(results.ParametersData[finalEstimationMethodIndex].Estimates.Theta))
 	}
-	for i := range results.FinalParametersData.Estimates.Theta {
-		numResult := results.FinalParametersData.Estimates.Theta[i]
-		seResult := results.FinalParametersData.StdErr.Theta[i]
+	for i := range results.ParametersData[finalEstimationMethodIndex].Estimates.Theta {
+		numResult := results.ParametersData[finalEstimationMethodIndex].Estimates.Theta[i]
+		seResult := results.ParametersData[finalEstimationMethodIndex].StdErr.Theta[i]
 		var rse float64
 		if seResult != 0 && numResult != 0 {
 			rse = math.Abs(seResult / numResult * 100)
@@ -66,10 +67,10 @@ func (results ModelOutput) Summary() bool {
 	omegaTable := termtables.CreateTable()
 	omegaTable.AddHeaders("Omega", "Eta", "Estimate", "ShrinkageSD (%)")
 	diagIndices := GetDiagonalElements(results.ParameterStructures.Omega)
-	for i := range results.FinalParametersData.Estimates.Omega {
+	for i := range results.ParametersData[finalEstimationMethodIndex].Estimates.Omega {
 		omegaIndex, _ := omegaIndices[i]
 		if results.ParameterStructures.Omega[i] != 0 {
-			val := results.FinalParametersData.Estimates.Omega[i]
+			val := results.ParametersData[finalEstimationMethodIndex].Estimates.Omega[i]
 			var shrinkage float64
 			var etaName string
 			userEtaIndex := funk.IndexOfInt(diagIndices, i)

@@ -135,9 +135,11 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 	// TODO re-replace parameter data from lst
 	result := ModelOutput{
 		RunDetails: ParseRunDetails(lines),
-		FinalParametersData: ParametersData{
-			Estimates: finalParameterEst,
-			StdErr:    finalParameterStdErr,
+		ParametersData: []ParametersData{
+			ParametersData{
+				Estimates: finalParameterEst,
+				StdErr:    finalParameterStdErr,
+			},
 		},
 		ParameterStructures: parameterStructures,
 		ParameterNames:      parameterNames,

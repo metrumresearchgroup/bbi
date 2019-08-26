@@ -1,26 +1,38 @@
 package parser
 
+// ParameterNames containst the names of model parameters
+type ParameterNames struct {
+	Theta []string `json:"theta,omitempty"`
+	Omega []string `json:"omega,omitempty"`
+	Sigma []string `json:"sigma,omitempty"`
+}
+
 // ParametersResult contains data about the parameter values for a model
 type ParametersResult struct {
-	Theta []float64
-	Omega []float64
-	Sigma []float64
+	Theta []float64 `json:"theta,omitempty"`
+	Omega []float64 `json:"omega,omitempty"`
+	Sigma []float64 `json:"sigma,omitempty"`
 }
 type RandomEffectResult struct {
-	Omega []float64
-	Sigma []float64
+	Omega []float64 `json:"omega,omitempty"`
+	Sigma []float64 `json:"sigma,omitempty"`
 }
 
 type ParametersData struct {
-	Estimates ParametersResult `json:"final_parameter_estimates,omitempty"`
-	StdErr    ParametersResult `json:"final_parameter_std_err,omitempty"`
+	Estimates ParametersResult `json:"estimates,omitempty"`
+	StdErr    ParametersResult `json:"std_err,omitempty"`
 	// indicates this line contains the OMEGA and SIGMA elements in
 	// standard deviation/correlation format
-	RandomEffectSD RandomEffectResult
+	RandomEffectSD RandomEffectResult `json:"random_effect_sd,omitempty"`
 	// indicates this line contains the standard errors to the OMEGA and
 	// SIGMA elements in standard deviation/correlation format
-	RandomEffectSDSE RandomEffectResult
-	Fixed            bool
+	RandomEffectSDSE RandomEffectResult `json:"random_effect_sdse,omitempty"`
+	Fixed            bool               `json:"fixed,omitempty"`
+}
+
+type RunHeuristics struct {
+	HasZeroGradient        bool `json:"has_zero_gradient,omitempty"`
+	MinimizationSuccessful bool `json:"minimization_successful,omitempty"`
 }
 
 // RunDetails contains key information about logistics of the model run
@@ -89,8 +101,9 @@ type OfvDetails struct {
 
 // ModelOutput is the output struct from a lst file
 type ModelOutput struct {
-	RunDetails          RunDetails `json:"run_details,omitempty"`
-	FinalParametersData ParametersData
+	RunDetails          RunDetails          `json:"run_details,omitempty"`
+	RunHeuristics       RunHeuristics       `json:"run_heuristics,omitempty"`
+	ParametersData      []ParametersData    `json:"parameters_data,omitempty"`
 	ParameterStructures ParameterStructures `json:"parameter_structures,omitempty"`
 	ParameterNames      ParameterNames      `json:"parameter_names,omitempty"`
 	OFV                 OfvDetails          `json:"ofv,omitempty"`
