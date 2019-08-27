@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"strconv"
 	"strings"
 )
 
@@ -19,12 +20,13 @@ func ParseExtLines(lines []string) ExtData {
 				estimationStep = []string{} //reset
 			}
 		} else {
-			if strings.HasPrefix(line, " ITER") && len(paramNames) == 0 {
-				paramNames = strings.Fields(line)
-			} else {
+			if strings.HasPrefix(line, " ITER") {
+				if len(paramNames) == 0 {
+					paramNames = strings.Fields(line)
+				}
 				continue
 			}
-			estimationStep = append(estimationStep, line)
+			estimationStep = append(estimationStep, strings.TrimSpace(line))
 		}
 	}
 	estimationSteps = append(estimationSteps, estimationStep)
@@ -36,8 +38,107 @@ func ParseExtLines(lines []string) ExtData {
 	}
 }
 
-// GetFinalParameterEstimates returns the ExtData in the structure of final parameter estimates
-// func GetFinalParameterEstimates(extData ExtData) {
-// 	var finalParameterEstimates ParametersData
-// 	var finalParameterStdErr ParametersData
-// }
+//ParseExtData returns the ExtData in the structure of final parameter estimates
+// the parameter names correspond to the names per the ext file (THETA1, THETA2, etc)
+// per nonmem 7.4 the following information will be grabbed
+// 1) Theburn-in iterations of the MCMCBayesian analysis are given negative values,starting at –NBURN, the number of burn-in iterations requested by the user. These are followed by positive iterations of the stationary phase.
+// 2) The stochastic iterations of the SAEM analysis are given negative values. These are followed by positive iterations of the accumulation phase.
+// 3) Iteration -1000000000 (negative one billion) indicates that this line contains the final result (thetas, omegas, and sigmas, and objective function) of the particular analysis. For BAYES analysis, this is the mean of the non-negative iterations (stationary samples) listed before it.
+// 4) Iteration -1000000001 indicates that this line contains the standard errors of the final population parameters. For BAYES, it is the sample standard deviation of the stationary samples.
+// 5) Iteration -1000000002 indicates that this line contains the eigenvalues of the correlation matrix of the variances of the final parameters.
+// 6) Iteration -1000000003 indicates that this line contains the condition number , lowest, highest, Eigen values of the correlation matrix of the variances of the final parameters.
+// 7) Iteration -1000000004 indicates this line contains the OMEGA and SIGMA elements in
+// standard deviation/correlation format
+// 8) Iteration-1000000005indicatesthislinecontainsthestandarderrorstotheOMEGAand
+// SIGMA elements in standard deviation/correlation format
+// 9) Iteration -1000000006 indicates 1 if parameter was fixed in estimation, 0 otherwise.
+// 10) Iteration -1000000007 lists termination status (first item) followed by termination codes.
+// See I.54 $EST: Additional Output Files Produced under root.xml (NM72) for interpreting the codes.
+// nm741.doc 174 of 284
+// NONMEM Users Guide: Introduction to NONMEM 7.4.1
+// 11) Iteration -1000000008 lists the partial derivative of the likelihood (-1/2 OFV) with respect to each estimated parameter. This may be useful for using tests like the Lagrange multiplier test.
+// 12) Additional special iteration number lines may be added in future versions of NONMEM.
+func ParseExtData(ed ExtData) ([]ParametersData, ParameterNames) {
+	var allParametersData []ParametersData
+	// order in ext is theta/sigma/omega
+	var thetas []string
+	var sigmas []string
+	var omegas []string
+	for _, name := range ed.ParameterNames {
+		switch {
+		case strings.HasPrefix(name, "THETA"):
+			thetas = append(thetas, name)
+		case strings.HasPrefix(name, "OMEGA"):
+			omegas = append(omegas, name)
+		case strings.HasPrefix(name, "SIGMA"):
+			sigmas = append(sigmas, name)
+		default:
+			continue
+		}
+	}
+	for estIndex, method := range ed.EstimationMethods {
+		parametersData := ParametersData{
+			Method: method,
+		}
+		for _, line := range ed.EstimationLines[estIndex] {
+			fields := strings.Fields(line)
+			result := make([]float64, len(fields)-2)
+			var step int
+			for i, val := range fields {
+				// for the 0th element, this will be the nonmem flag
+				// to declare what is on the line
+				if i == 0 {
+					step, _ = strconv.Atoi(val)
+					continue
+				}
+				if i == len(fields)-1 {
+					// this is the OBJ which we've gotten elsewhere
+					continue
+				}
+				if n, err := strconv.ParseFloat(val, 64); err == nil {
+					result[i-1] = n
+				} else {
+					panic("error converting value in ext file to number: " + val)
+				}
+			}
+			switch {
+			case step == -1000000000:
+				parametersData.Estimates = ParametersResult{
+					Theta: result[0:(len(thetas) - 1)],
+					Omega: result[len(thetas)+len(sigmas):],
+					Sigma: result[len(thetas):(len(thetas) + len(sigmas) - 1)],
+				}
+			case step == -1000000001:
+				parametersData.StdErr = ParametersResult{
+					Theta: result[:(len(thetas) - 1)],
+					Omega: result[len(thetas)+len(sigmas):],
+					Sigma: result[len(thetas):(len(thetas) + len(sigmas) - 1)],
+				}
+			case step == -1000000004:
+				parametersData.RandomEffectSD = RandomEffectResult{
+					Omega: result[len(thetas)+len(sigmas):],
+					Sigma: result[len(thetas):(len(thetas) + len(sigmas) - 1)],
+				}
+			case step == -1000000005:
+				parametersData.RandomEffectSDSE = RandomEffectResult{
+					Omega: result[len(thetas)+len(sigmas):],
+					Sigma: result[len(thetas):(len(thetas) + len(sigmas) - 1)],
+				}
+			case step == -1000000006:
+				parametersData.Fixed = ParametersResult{
+					Theta: result[0:(len(thetas) - 1)],
+					Omega: result[len(thetas)+len(sigmas):],
+					Sigma: result[len(thetas):(len(thetas) + len(sigmas) - 1)],
+				}
+			default:
+				continue
+			}
+		}
+		allParametersData = append(allParametersData, parametersData)
+	}
+	return allParametersData, ParameterNames{
+		Theta: thetas,
+		Omega: omegas,
+		Sigma: sigmas,
+	}
+}

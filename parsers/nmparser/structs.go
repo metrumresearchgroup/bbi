@@ -19,6 +19,7 @@ type RandomEffectResult struct {
 }
 
 type ParametersData struct {
+	Method    string           `json:"method,omitempty"`
 	Estimates ParametersResult `json:"estimates,omitempty"`
 	StdErr    ParametersResult `json:"std_err,omitempty"`
 	// indicates this line contains the OMEGA and SIGMA elements in
@@ -27,7 +28,7 @@ type ParametersData struct {
 	// indicates this line contains the standard errors to the OMEGA and
 	// SIGMA elements in standard deviation/correlation format
 	RandomEffectSDSE RandomEffectResult `json:"random_effect_sdse,omitempty"`
-	Fixed            bool               `json:"fixed,omitempty"`
+	Fixed            ParametersResult   `json:"fixed,omitempty"`
 }
 
 type RunHeuristics struct {
