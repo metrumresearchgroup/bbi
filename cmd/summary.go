@@ -53,11 +53,18 @@ func summary(cmd *cobra.Command, args []string) {
 	runNum, _ := utils.FileAndExt(filePath)
 	dir, _ := filepath.Abs(filepath.Dir(filePath))
 	outputFilePath := strings.Join([]string{filepath.Join(dir, runNum), ".lst"}, "")
+	extFilePath := strings.Join([]string{filepath.Join(dir, runNum), ".ext"}, "")
 	if verbose {
 		log.Printf("base dir: %s", dir)
 	}
 	fileLines, _ := utils.ReadLinesFS(AppFs, outputFilePath)
+	extLines, err := utils.ReadParamsAndOutputFromExt(extFilePath)
+	if err != nil {
+		panic(err)
+	}
+	extData, _ := parser.ParseExtData(parser.ParseExtLines(extLines))
 	results := parser.ParseLstEstimationFile(fileLines)
+	results.ParametersData = extData
 	if summaryTree {
 		jsonRes, _ := json.MarshalIndent(results, "", "\t")
 		fmt.Printf("%s\n", jsonRes)
