@@ -56,7 +56,8 @@ func TestSummary(t *testing.T) {
 		var bbiSummary parser.ModelOutput
 		err = json.Unmarshal(stdout, &bbiSummary)
 		assert.Equal(t, nil, err, fmt.Sprintf("[%s] fail to unmarshal summary: %s", context, err))
-		assert.Equal(t, nil, err, fmt.Sprintf("[%s] fail to marshal summary ParametersData: %s", context, err))
+
+		//compare objects
 		assert.Equal(t, goldenSummary.ParametersData, bbiSummary.ParametersData, fmt.Sprintf("[%s] parametersData not equal", context))
 		assert.Equal(t, goldenSummary.ParameterStructures, bbiSummary.ParameterStructures, fmt.Sprintf("[%s] parametersStructures not equal", context))
 		assert.Equal(t, goldenSummary.ParameterNames, bbiSummary.ParameterNames, fmt.Sprintf("[%s] parametersStructures not equal", context))
