@@ -5,6 +5,33 @@ import (
 	"strings"
 )
 
+func parseShrinkage(line string, shrinkageDetails ShrinkageDetails) ShrinkageDetails {
+	if strings.Contains(line, "ETASHRINKSD(%)") {
+		shrinkageDetails.Eta.SD = parseFloats(line, "ETASHRINKSD(%)")
+	} else if strings.Contains(line, "ETASHRINKVR(%)") {
+		shrinkageDetails.Eta.VR = parseFloats(line, "ETASHRINKVR(%)")
+	} else if strings.Contains(line, "EBVSHRINKSD(%)") {
+		shrinkageDetails.Ebv.SD = parseFloats(line, "EBVSHRINKSD(%)")
+	} else if strings.Contains(line, "EBVSHRINKVR(%)") {
+		shrinkageDetails.Ebv.VR = parseFloats(line, "EBVSHRINKVR(%)")
+	} else if strings.Contains(line, "EPSSHRINKSD(%)") {
+		shrinkageDetails.Eps.SD = parseFloats(line, "EPSSHRINKSD(%)")
+	} else if strings.Contains(line, "EPSSHRINKVR(%)") {
+		shrinkageDetails.Eps.VR = parseFloats(line, "EPSSHRINKVR(%)")
+	}
+	return shrinkageDetails
+}
+
+func parseFloats(line, name string) []float64 {
+	var floats []float64
+	values := strings.Fields(strings.TrimSpace(strings.Replace(line, name, "", -1)))
+	for _, value := range values {
+		fvalue, _ := strconv.ParseFloat(value, 64)
+		floats = append(floats, fvalue)
+	}
+	return floats
+}
+
 func parseOFV(line string, ofvDetails OfvDetails) OfvDetails {
 	if strings.Contains(line, "#OBJV:") {
 		result := strings.Replace(line, "*", "", -1)
@@ -28,8 +55,9 @@ func parseOFV(line string, ofvDetails OfvDetails) OfvDetails {
 }
 
 // ParseLstEstimationFile parses the lst file
-func ParseLstEstimationFile(lines []string) LstData {
+func ParseLstEstimationFile(lines []string) ModelOutput {
 	var ofvDetails OfvDetails
+	var shrinkageDetails ShrinkageDetails
 	var startParameterStructuresIndex int
 	var endParameterStucturesIndex int
 	var finalParameterEstimatesIndex int
@@ -41,7 +69,13 @@ func ParseLstEstimationFile(lines []string) LstData {
 	for i, line := range lines {
 		switch {
 		case strings.Contains(line, "$THETA") && startThetaIndex == 0:
-			startThetaIndex = i
+			fields := strings.Fields(line)
+			for _, field := range fields {
+				// can also have $THETAI/$THETAR/$THETAPV
+				if field == "$THETA" {
+					startThetaIndex = i
+				}
+			}
 		case strings.Contains(line, "$EST") && endSigmaIndex == 0:
 			endSigmaIndex = i
 		case strings.Contains(line, "0LENGTH OF THETA"):
@@ -64,25 +98,31 @@ func ParseLstEstimationFile(lines []string) LstData {
 		case strings.Contains(line, "COVARIANCE MATRIX OF ESTIMATE"):
 			// only want to set this the first time it is detected
 			// another block called "INVERSE COVARIANCE ...." will match this
-			if covarianceMatrixEstimateIndex == 0 {
+			if !strings.Contains(line, "INVERSE") {
 				covarianceMatrixEstimateIndex = i + 3
 			}
+		case strings.Contains(line, "ETASHRINK"):
+			shrinkageDetails = parseShrinkage(line, shrinkageDetails)
+		case strings.Contains(line, "EBVSHRINK"):
+			shrinkageDetails = parseShrinkage(line, shrinkageDetails)
+		case strings.Contains(line, "EPSSHRINK"):
+			shrinkageDetails = parseShrinkage(line, shrinkageDetails)
 		default:
 			continue
 		}
 	}
 
-	var finalParameterEst FinalParameterEstimates
-	var finalParameterStdErr FinalParameterEstimates
+	var finalParameterEst ParametersResult
+	var finalParameterStdErr ParametersResult
 	var parameterStructures ParameterStructures
 	var parameterNames ParameterNames
 
 	if standardErrorEstimateIndex > finalParameterEstimatesIndex {
-		finalParameterEst = ParseFinalParameterEstimates(lines[finalParameterEstimatesIndex:standardErrorEstimateIndex])
+		finalParameterEst = ParseFinalParameterEstimatesFromLst(lines[finalParameterEstimatesIndex:standardErrorEstimateIndex])
 	}
 
 	if covarianceMatrixEstimateIndex > standardErrorEstimateIndex {
-		finalParameterStdErr = ParseFinalParameterEstimates(lines[standardErrorEstimateIndex:covarianceMatrixEstimateIndex])
+		finalParameterStdErr = ParseFinalParameterEstimatesFromLst(lines[standardErrorEstimateIndex:covarianceMatrixEstimateIndex])
 	}
 
 	if (endParameterStucturesIndex) > startParameterStructuresIndex {
@@ -92,14 +132,19 @@ func ParseLstEstimationFile(lines []string) LstData {
 	if endSigmaIndex > startThetaIndex {
 		parameterNames = ParseParameterNames(lines[startThetaIndex:endSigmaIndex])
 	}
-
-	result := LstData{
-		ParseRunDetails(lines),
-		finalParameterEst,
-		finalParameterStdErr,
-		parameterStructures,
-		parameterNames,
-		ofvDetails,
+	// TODO re-replace parameter data from lst
+	result := ModelOutput{
+		RunDetails: ParseRunDetails(lines),
+		ParametersData: []ParametersData{
+			ParametersData{
+				Estimates: finalParameterEst,
+				StdErr:    finalParameterStdErr,
+			},
+		},
+		ParameterStructures: parameterStructures,
+		ParameterNames:      parameterNames,
+		OFV:                 ofvDetails,
+		ShrinkageDetails:    shrinkageDetails,
 	}
 	return result
 }

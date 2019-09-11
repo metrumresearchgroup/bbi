@@ -1,13 +1,8 @@
 package parser
 
-import "strings"
-
-// ParameterNames containst the names of model parameters
-type ParameterNames struct {
-	Theta []string
-	Omega []string
-	Sigma []string
-}
+import (
+	"strings"
+)
 
 // ParseThetaComments will parse out the names from theta parameters
 func ParseThetaComments(lines []string) []string {

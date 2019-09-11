@@ -1,0 +1,175 @@
+{
+	"run_details": {
+		"version": "7.4.3",
+		"run_start": "Tue Sep 10 09:29:30 EDT 2019",
+		"run_end": "Tue Sep 10 09:31:07 EDT 2019",
+		"estimation_time": 47.42,
+		"covariance_time": 0.19,
+		"function_evaluations": 664,
+		"significant_digits": 3.2,
+		"problem_text": "RUN# 1 PARALLEL (NONLINEAR+LINEAR) CLEARANCE MODEL",
+		"estimation_method": [
+			"First Order Conditional Estimation"
+		],
+		"data_set": "../nonlinCL.csv",
+		"number_of_patients": 36,
+		"number_of_obs": 792,
+		"number_of_data_records": 936
+	},
+	"run_heuristics": {},
+	"parameters_data": [
+		{
+			"method": "TABLE NO.     1: First Order Conditional Estimation: Goal Function=MINIMUM VALUE OF OBJECTIVE FUNCTION: Problem=1 Subproblem=0 Superproblem1=0 Iteration1=0 Superproblem2=0 Iteration2=0",
+			"estimates": {
+				"theta": [
+					0.537132,
+					4.21636,
+					0.0147802,
+					4.04147,
+					2.77028,
+					0.117643,
+					1.13286,
+					0.622554,
+					0.444664
+				],
+				"omega": [
+					0.176584,
+					0,
+					0.372226,
+					0,
+					0,
+					0.0474339
+				]
+			},
+			"std_err": {
+				"theta": [
+					0.175082,
+					2.52945,
+					0.00432382,
+					0.201386,
+					0.21145,
+					0.010412,
+					1.31386,
+					1.58526,
+					0.287625
+				],
+				"omega": [
+					0.0942832,
+					10000000000,
+					0.142712,
+					10000000000,
+					10000000000,
+					0.0089937
+				]
+			},
+			"random_effect_sd": {
+				"omega": [
+					0.420219,
+					0,
+					0.610103,
+					0,
+					0,
+					0.217793
+				]
+			},
+			"random_effect_sdse": {
+				"omega": [
+					0.112183,
+					10000000000,
+					0.116957,
+					10000000000,
+					10000000000,
+					0.0206473
+				]
+			},
+			"fixed": {
+				"theta": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"omega": [
+					0,
+					1,
+					0,
+					1,
+					1,
+					0
+				]
+			}
+		}
+	],
+	"parameter_structures": {
+		"Theta": 10,
+		"Omega": [
+			1,
+			0,
+			1,
+			0,
+			0,
+			1
+		],
+		"Sigma": [
+			1
+		]
+	},
+	"parameter_names": {
+		"theta": [
+			"VMAX (MG/HR)",
+			"KM (MG/L)",
+			"CLL (L/HR)",
+			"V1 (L)",
+			"V2 (L)",
+			"Q (L/HR)",
+			"WGT~VMAX",
+			"WGT~CLL",
+			"WGT~V1",
+			"WGT~V2"
+		]
+	},
+	"ofv": {
+		"ofv": 1455.5986365962015,
+		"ofv_no_constant": 4259.607,
+		"ofv_with_constant": 5715.205165463795
+	},
+	"shrinkage_details": {
+		"eta": {
+			"sd": [
+				37.468,
+				16.435,
+				3.3027
+			],
+			"vr": [
+				60.898,
+				30.17,
+				6.4964
+			]
+		},
+		"ebv": {
+			"sd": [
+				35.09,
+				15.671,
+				3.8428
+			],
+			"vr": [
+				57.867,
+				28.886,
+				7.5379
+			]
+		},
+		"eps": {
+			"sd": [
+				4.7622
+			],
+			"vr": [
+				9.2977
+			]
+		}
+	}
+}
