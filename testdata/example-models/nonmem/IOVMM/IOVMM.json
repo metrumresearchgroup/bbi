@@ -1,10 +1,10 @@
 {
 	"run_details": {
 		"version": "7.4.3",
-		"run_start": "Thu Sep  5 14:38:15 EDT 2019",
-		"run_end": "Thu Sep  5 14:38:31 EDT 2019",
-		"estimation_time": 10.94,
-		"covariance_time": 0.57,
+		"run_start": "Thu Sep 12 13:09:51 EDT 2019",
+		"run_end": "Thu Sep 12 13:10:08 EDT 2019",
+		"estimation_time": 11.29,
+		"covariance_time": 0.6,
 		"function_evaluations": 367,
 		"significant_digits": 3.1,
 		"problem_text": "LEM 10 mixture model and IOV on CL",
@@ -50,7 +50,36 @@
 					0
 				]
 			},
-			"std_err": {},
+			"std_err": {
+				"theta": [
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"omega": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"sigma": [
+					0,
+					0
+				]
+			},
 			"random_effect_sd": {
 				"omega": [
 					0.221439,

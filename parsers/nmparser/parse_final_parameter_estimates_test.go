@@ -65,10 +65,10 @@ var finalParameterEstimates01 = []string{
 	"1",
 }
 
-var finalParameterEstimates01Results = ParameterEstimates{
+var finalParameterEstimates01Results = ParametersResult{
 	[]float64{4.79, 90.2, 7.47, 105},
 	[]float64{0.158, 0.122, 0.133},
-	[]float64{1450, 0, 0.00739},
+	[]float64{1450, 0, 0.00739, 0.398, 0.842, 0.365, 38.1, 0, 0.086},
 }
 
 func TestParseFinalParameterEstimates(t *testing.T) {
