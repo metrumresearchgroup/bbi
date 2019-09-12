@@ -15,6 +15,7 @@ require (
 	github.com/logrusorgru/aurora v0.0.0-20190428105938-cea283e61946
 	github.com/magiconair/properties v1.8.1 // indirect
 	github.com/mattn/go-runewidth v0.0.4 // indirect
+	github.com/olekukonko/tablewriter v0.0.1
 	github.com/pelletier/go-toml v1.4.0 // indirect
 	github.com/spf13/afero v1.2.2
 	github.com/spf13/cobra v0.0.5
