@@ -43,7 +43,7 @@ func summary(cmd *cobra.Command, args []string) {
 
 	results := parser.GetModelOutput(args[0], verbose, true)
 
-	if summaryTree {
+	if Json {
 		jsonRes, _ := json.MarshalIndent(results, "", "\t")
 		fmt.Printf("%s\n", jsonRes)
 	} else {
@@ -53,5 +53,4 @@ func summary(cmd *cobra.Command, args []string) {
 }
 func init() {
 	RootCmd.AddCommand(summaryCmd)
-	summaryCmd.Flags().BoolVar(&summaryTree, "tree", false, "show a json tree of parsed results from the lst file instead of summary tables")
 }
