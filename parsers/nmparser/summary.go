@@ -13,12 +13,14 @@ import (
 
 // Summary prints all results from the parsed LstData
 func (results ModelOutput) Summary() bool {
-	anyRseOver := false
-	anyShrinkageOver := false
 	thetaTable := tablewriter.NewWriter(os.Stdout)
 	thetaTable.SetAlignment(tablewriter.ALIGN_LEFT)
 	thetaTable.SetColWidth(100)
 	thetaTable.SetHeader([]string{"Theta", "Name", "Estimate", "StdErr (RSE)"})
+	// required for color, prevents newline in row
+	thetaTable.SetAutoWrapText(false)
+	red := "\x1b[31;1m"
+	none := "\x1b[0m"
 
 	finalEstimationMethodIndex := len(results.ParametersData) - 1
 	if len(results.ParametersData[finalEstimationMethodIndex].Estimates.Theta) != len(results.ParametersData[finalEstimationMethodIndex].StdErr.Theta) {
@@ -35,34 +37,26 @@ func (results ModelOutput) Summary() bool {
 			rse = math.Abs(seResult / numResult * 100)
 		}
 
+		var s4 string
 		if rse > 30.0 {
-			anyRseOver = true
+			s4 = fmt.Sprintf("%s%s (%s%%)%s", red, strconv.FormatFloat(seResult, 'f', -1, 64), strconv.FormatFloat(rse, 'f', 1, 64), none)
+		} else {
+			s4 = fmt.Sprintf("%s (%s%%)", strconv.FormatFloat(seResult, 'f', -1, 64), strconv.FormatFloat(rse, 'f', 1, 64))
 		}
 
 		thetaTable.Append([]string{
 			string("TH " + strconv.Itoa(i+1)),
 			results.ParameterNames.Theta[i],
 			strconv.FormatFloat(numResult, 'f', -1, 64),
-			fmt.Sprintf("%s (%s%%)", strconv.FormatFloat(seResult, 'f', -1, 64), strconv.FormatFloat(rse, 'f', 1, 64))})
-	}
-
-	if anyRseOver {
-		thetaTable.SetColumnColor(
-			tablewriter.Colors{tablewriter.Bold, tablewriter.FgHiRedColor},
-			tablewriter.Colors{tablewriter.Bold, tablewriter.FgHiRedColor},
-			tablewriter.Colors{tablewriter.Bold, tablewriter.FgHiRedColor},
-			tablewriter.Colors{tablewriter.Bold, tablewriter.FgHiRedColor})
-	} else {
-		thetaTable.SetColumnColor(tablewriter.Colors{tablewriter.FgHiBlackColor},
-			tablewriter.Colors{tablewriter.FgHiBlackColor},
-			tablewriter.Colors{tablewriter.FgHiBlackColor},
-			tablewriter.Colors{tablewriter.FgHiBlackColor})
+			s4})
 	}
 
 	omegaTable := tablewriter.NewWriter(os.Stdout)
 	omegaTable.SetAlignment(tablewriter.ALIGN_LEFT)
 	omegaTable.SetColWidth(100)
 	omegaTable.SetHeader([]string{"Omega", "Eta", "Estimate", "ShrinkageSD (%)"})
+	// required for color, prevents newline in row
+	thetaTable.SetAutoWrapText(false)
 
 	diagIndices := GetDiagonalElements(results.ParameterStructures.Omega)
 	for i := range results.ParametersData[finalEstimationMethodIndex].Estimates.Omega {
@@ -78,24 +72,14 @@ func (results ModelOutput) Summary() bool {
 				etaName = fmt.Sprintf("ETA%v", userEtaIndex+1)
 			}
 
+			var s4 string
 			if shrinkage > 30.0 {
-				anyShrinkageOver = true
+				s4 = fmt.Sprintf("%s%f%s", red, shrinkage, none)
+			} else {
+				s4 = fmt.Sprintf("%f", shrinkage)
 			}
-			omegaTable.Append([]string{string("O" + omegaIndex), etaName, fmt.Sprintf("%f", val), fmt.Sprintf("%f", shrinkage)})
+			omegaTable.Append([]string{string("O" + omegaIndex), etaName, fmt.Sprintf("%f", val), s4})
 		}
-	}
-
-	if anyShrinkageOver {
-		omegaTable.SetColumnColor(
-			tablewriter.Colors{tablewriter.Bold, tablewriter.FgHiRedColor},
-			tablewriter.Colors{tablewriter.Bold, tablewriter.FgHiRedColor},
-			tablewriter.Colors{tablewriter.Bold, tablewriter.FgHiRedColor},
-			tablewriter.Colors{tablewriter.Bold, tablewriter.FgHiRedColor})
-	} else {
-		omegaTable.SetColumnColor(tablewriter.Colors{tablewriter.FgHiBlackColor},
-			tablewriter.Colors{tablewriter.FgHiBlackColor},
-			tablewriter.Colors{tablewriter.FgHiBlackColor},
-			tablewriter.Colors{tablewriter.FgHiBlackColor})
 	}
 
 	fmt.Println(results.RunDetails.ProblemText)
