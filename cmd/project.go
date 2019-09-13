@@ -66,7 +66,7 @@ func probs(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	modelSummaries := modSummaries(AppFs, modelFiles, dir)
-	if tree {
+	if Json {
 		jsonRes, _ := json.MarshalIndent(modelSummaries, "", "\t")
 		fmt.Printf("%s\n", jsonRes)
 	} else {
