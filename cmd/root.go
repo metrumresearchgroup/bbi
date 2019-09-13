@@ -24,7 +24,7 @@ import (
 )
 
 // VERSION is the current bbi version
-var VERSION string = "1.0.0"
+var VERSION string = "2.0.0-alpha.1"
 
 var (
 	// name of config file
@@ -33,7 +33,7 @@ var (
 	verbose bool
 	debug   bool
 	threads int
-	tree    bool
+	Json    bool
 	preview bool
 )
 
@@ -68,7 +68,7 @@ func init() {
 	RootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
 	RootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "debug mode")
 	RootCmd.PersistentFlags().IntVar(&threads, "threads", 0, "number of threads to execute with")
-	RootCmd.PersistentFlags().BoolVarP(&tree, "tree", "t", false, "json tree of output, if possible")
+	RootCmd.PersistentFlags().BoolVar(&Json, "json", false, "json tree of output, if possible")
 	RootCmd.PersistentFlags().BoolVarP(&preview, "preview", "p", false, "preview action, but don't actually run command")
 
 	// Cobra also supports local flags, which will only run
