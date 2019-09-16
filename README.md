@@ -141,6 +141,25 @@ or human readable tabular formats such as:
 +-----------+----------+-------------------+--------------+---------------------+
 ```
 
+### Installation under MacOS:
+
+First install [Homebrew](https://github.com/Homebrew), a package manager for macOS, if you do not already have it installed. Open terminal and paste:
+
+```
+ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+ ```
+Add the `metrumresearchgroup/homebrew-tap` repository to the list of brew formulae:
+
+```
+brew tap metrumresearchgroup/homebrew-tap
+```
+
+Next, install babylon-cli:
+
+```
+brew install bbi
+```
+
 
 ### Development
 
