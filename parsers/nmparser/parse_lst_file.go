@@ -54,10 +54,38 @@ func parseOFV(line string, ofvDetails OfvDetails) OfvDetails {
 	return ofvDetails
 }
 
+func parseGradient(lines []string) (hasZero *bool, hasFinalZero *bool) {
+	var anyZero, anyFinalZero *bool
+
+	if len(lines) > 0 {
+		anyZero = new(bool)
+		anyFinalZero = new(bool)
+	}
+
+	for n, line := range lines {
+		for _, g := range strings.Fields(strings.TrimSpace(strings.Replace(line, "GRADIENT:", "", -1))) {
+			gradient, _ := strconv.ParseFloat(g, 64)
+			if gradient == 0 {
+				*anyZero = true
+				if n == len(lines)-1 {
+					*anyFinalZero = true
+				}
+			}
+		}
+	}
+	return anyZero, anyFinalZero
+}
+
+func newBool(value bool) *bool {
+	b := value
+	return &b
+}
+
 // ParseLstEstimationFile parses the lst file
 func ParseLstEstimationFile(lines []string) ModelOutput {
 	var ofvDetails OfvDetails
 	var shrinkageDetails ShrinkageDetails
+	var runHeuristics RunHeuristics
 	var startParameterStructuresIndex int
 	var endParameterStucturesIndex int
 	var finalParameterEstimatesIndex int
@@ -65,6 +93,7 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 	var covarianceMatrixEstimateIndex int
 	var startThetaIndex int
 	var endSigmaIndex int
+	var gradientLines []string
 
 	for i, line := range lines {
 		switch {
@@ -107,10 +136,16 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 			shrinkageDetails = parseShrinkage(line, shrinkageDetails)
 		case strings.Contains(line, "EPSSHRINK"):
 			shrinkageDetails = parseShrinkage(line, shrinkageDetails)
+		case strings.Contains(line, "0MINIMIZATION SUCCESSFUL"):
+			runHeuristics.MinimizationSuccessful = true
+		case strings.Contains(line, "GRADIENT:"):
+			gradientLines = append(gradientLines, line)
 		default:
 			continue
 		}
 	}
+
+	runHeuristics.HasZeroGradient, runHeuristics.HasFinalZeroGradient = parseGradient(gradientLines)
 
 	var finalParameterEst ParametersResult
 	var finalParameterStdErr ParametersResult
@@ -134,7 +169,8 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 	}
 	// TODO re-replace parameter data from lst
 	result := ModelOutput{
-		RunDetails: ParseRunDetails(lines),
+		RunHeuristics: runHeuristics,
+		RunDetails:    ParseRunDetails(lines),
 		ParametersData: []ParametersData{
 			ParametersData{
 				Estimates: finalParameterEst,

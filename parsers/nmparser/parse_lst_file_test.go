@@ -114,3 +114,74 @@ func TestParTestParseShrinkage2(t *testing.T) {
 	lstData := ParseLstEstimationFile(lines)
 	assert.Equal(t, expected, lstData.ShrinkageDetails)
 }
+
+func TestParseGradient(t *testing.T) {
+
+	var tests = []struct {
+		lines                []string
+		hasZeroGradient      *bool
+		hasZeroFinalGradient *bool
+		context              string
+	}{
+		{
+			lines: []string{
+				"GRADIENT:  -3.8561E+01  4.3326E+01  2.3360E+02  2.1230E+02  2.1296E+02 -5.0598E+00  2.8695E+01 -1.5814E+01  6.8174E+01",
+				"GRADIENT:   8.7727E+01  1.2173E+02 -7.6623E+01 -3.8494E+01  1.1100E+01  1.4942E+00 -7.9555E-01 -7.8345E+00 -1.7576E+01",
+				"GRADIENT:   4.8447E+01  5.7713E+01 -3.7520E+01 -9.4538E+00 -3.7976E+00  6.1177E+00 -3.1052E+00  3.6826E+00 -2.0215E+01",
+				"GRADIENT:   1.0154E-02  1.2524E-03  1.9361E-02 -6.2542E-02  4.4554E-02 -1.4700E-02 -2.3183E-02 -5.9024E-03 -5.8699E-03",
+			},
+			hasZeroGradient:      newBool(false),
+			hasZeroFinalGradient: newBool(false),
+			context:              "no zero gradient",
+		},
+		{
+			lines: []string{
+				"GRADIENT:   0           4.3326E+01  2.3360E+02  2.1230E+02  2.1296E+02 -5.0598E+00  2.8695E+01 -1.5814E+01  6.8174E+01",
+				"GRADIENT:   8.7727E+01  1.2173E+02 -7.6623E+01 -3.8494E+01  1.1100E+01  1.4942E+00 -7.9555E-01 -7.8345E+00 -1.7576E+01",
+				"GRADIENT:   4.8447E+01  5.7713E+01 -3.7520E+01 -9.4538E+00 -3.7976E+00  6.1177E+00 -3.1052E+00  3.6826E+00 -2.0215E+01",
+				"GRADIENT:   1.0154E-02  1.2524E-03  1.9361E-02 -6.2542E-02  4.4554E-02 -1.4700E-02 -2.3183E-02 -5.9024E-03 -5.8699E-03",
+			},
+			hasZeroGradient:      newBool(true),
+			hasZeroFinalGradient: newBool(false),
+			context:              "zero gradient",
+		},
+		{
+			lines: []string{
+				"GRADIENT:  -3.8561E+01  4.3326E+01  2.3360E+02  2.1230E+02  2.1296E+02 -5.0598E+00  2.8695E+01 -1.5814E+01  6.8174E+01",
+				"GRADIENT:   8.7727E+01  1.2173E+02 -7.6623E+01 -3.8494E+01  1.1100E+01  1.4942E+00 -7.9555E-01 -7.8345E+00 -1.7576E+01",
+				"GRADIENT:   4.8447E+01  5.7713E+01 -3.7520E+01 -9.4538E+00 -3.7976E+00  6.1177E+00 -3.1052E+00  3.6826E+00 -2.0215E+01",
+				"GRADIENT:   0           1.2524E-03  1.9361E-02 -6.2542E-02  4.4554E-02 -1.4700E-02 -2.3183E-02 -5.9024E-03 -5.8699E-03",
+			},
+			hasZeroGradient:      newBool(true),
+			hasZeroFinalGradient: newBool(true),
+			context:              "zero final gradient",
+		},
+		{
+			lines: []string{
+				"GRADIENT:   0  4.3326E+01  2.3360E+02  2.1230E+02  2.1296E+02 -5.0598E+00  2.8695E+01 -1.5814E+01  6.8174E+01",
+				"GRADIENT:   0  1.2173E+02 -7.6623E+01 -3.8494E+01  1.1100E+01  1.4942E+00 -7.9555E-01 -7.8345E+00 -1.7576E+01",
+				"GRADIENT:   0  5.7713E+01 -3.7520E+01 -9.4538E+00 -3.7976E+00  6.1177E+00 -3.1052E+00  3.6826E+00 -2.0215E+01",
+				"GRADIENT:   0  1.2524E-03  1.9361E-02 -6.2542E-02  4.4554E-02 -1.4700E-02 -2.3183E-02 -5.9024E-03 -5.8699E-03",
+			},
+			hasZeroGradient:      newBool(true),
+			hasZeroFinalGradient: newBool(true),
+			context:              "zero gradients and zero final gradient",
+		},
+		{
+			hasZeroGradient:      nil,
+			hasZeroFinalGradient: nil,
+			context:              "zero gradients and zero final gradient",
+		},
+	}
+
+	for _, tt := range tests {
+		noZero, noZeroFinal := parseGradient(tt.lines)
+		assert.Equal(t, tt.hasZeroGradient, noZero, "Fail hasZeroGradient:"+tt.context)
+		assert.Equal(t, tt.hasZeroFinalGradient, noZeroFinal, "Fail hasZeroFinalGradient: "+tt.context)
+	}
+}
+
+func newBool(value bool) *bool {
+	b := value
+	return &b
+}

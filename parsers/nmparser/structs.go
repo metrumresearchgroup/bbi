@@ -32,8 +32,9 @@ type ParametersData struct {
 }
 
 type RunHeuristics struct {
-	HasZeroGradient        bool `json:"has_zero_gradient,omitempty"`
-	MinimizationSuccessful bool `json:"minimization_successful,omitempty"`
+	HasZeroGradient        *bool `json:"has_zero_gradient,omitempty"`
+	HasFinalZeroGradient   *bool `json:"has_final_zero_gradient,omitempty"`
+	MinimizationSuccessful bool  `json:"minimization_successful,omitempty"`
 }
 
 // RunDetails contains key information about logistics of the model run
