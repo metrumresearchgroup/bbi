@@ -3,24 +3,25 @@ package parser
 import (
 	"fmt"
 	"math"
+	"os"
 	"strconv"
 
-	"github.com/apcera/termtables"
-	"github.com/logrusorgru/aurora"
+	"github.com/olekukonko/tablewriter"
+
 	"github.com/thoas/go-funk"
 )
 
 // Summary prints all results from the parsed LstData
 func (results ModelOutput) Summary() bool {
-	termtables.DefaultStyle = &termtables.TableStyle{
-		SkipBorder: false,
-		BorderX:    "-", BorderY: "|", BorderI: "+",
-		PaddingLeft: 3, PaddingRight: 3,
-		Width:     100,
-		Alignment: termtables.AlignRight,
-	}
-	thetaTable := termtables.CreateTable()
-	thetaTable.AddHeaders("Theta", "Name", "Estimate", "StdErr (RSE)")
+	thetaTable := tablewriter.NewWriter(os.Stdout)
+	thetaTable.SetAlignment(tablewriter.ALIGN_LEFT)
+	thetaTable.SetColWidth(100)
+	thetaTable.SetHeader([]string{"Theta", "Name", "Estimate", "StdErr (RSE)"})
+	// required for color, prevents newline in row
+	thetaTable.SetAutoWrapText(false)
+	red := "\x1b[31;1m"
+	none := "\x1b[0m"
+
 	finalEstimationMethodIndex := len(results.ParametersData) - 1
 	if len(results.ParametersData[finalEstimationMethodIndex].Estimates.Theta) != len(results.ParametersData[finalEstimationMethodIndex].StdErr.Theta) {
 		// if the standard errors aren't there, we should
@@ -36,38 +37,30 @@ func (results ModelOutput) Summary() bool {
 			rse = math.Abs(seResult / numResult * 100)
 		}
 
-		if rse > 30 {
-			//theta, _ := fmt.Printf("%.3E", results.FinalParameterEstimates.Theta[i])
-			thetaTable.AddRow(
-				aurora.Red("TH "+strconv.Itoa(i+1)),
-				aurora.Red(results.ParameterNames.Theta[i]),
-				aurora.Red(strconv.FormatFloat(numResult, 'f', -1, 64)),
-				aurora.Red(
-					fmt.Sprintf("%s (%s%%)",
-						strconv.FormatFloat(seResult, 'f', -1, 64),
-						strconv.FormatFloat(rse, 'f', 1, 64)),
-				),
-			)
+		var s4 string
+		if rse > 30.0 {
+			s4 = fmt.Sprintf("%s%s (%s%%)%s", red, strconv.FormatFloat(seResult, 'f', -1, 64), strconv.FormatFloat(rse, 'f', 1, 64), none)
 		} else {
-			thetaTable.AddRow(
-				"TH "+strconv.Itoa(i+1),
-				results.ParameterNames.Theta[i],
-				strconv.FormatFloat(numResult, 'f', -1, 64),
-				fmt.Sprintf("%s (%s%%)",
-					strconv.FormatFloat(seResult, 'f', -1, 64),
-					strconv.FormatFloat(rse, 'f', 1, 64),
-				),
-			)
-
+			s4 = fmt.Sprintf("%s (%s%%)", strconv.FormatFloat(seResult, 'f', -1, 64), strconv.FormatFloat(rse, 'f', 1, 64))
 		}
 
+		thetaTable.Append([]string{
+			string("TH " + strconv.Itoa(i+1)),
+			results.ParameterNames.Theta[i],
+			strconv.FormatFloat(numResult, 'f', -1, 64),
+			s4})
 	}
-	thetaTable.SetAlign(termtables.AlignLeft, 1)
 
-	omegaTable := termtables.CreateTable()
-	omegaTable.AddHeaders("Omega", "Eta", "Estimate", "ShrinkageSD (%)")
+	omegaTable := tablewriter.NewWriter(os.Stdout)
+	omegaTable.SetAlignment(tablewriter.ALIGN_LEFT)
+	omegaTable.SetColWidth(100)
+	omegaTable.SetHeader([]string{"Omega", "Eta", "Estimate", "ShrinkageSD (%)"})
+	// required for color, prevents newline in row
+	thetaTable.SetAutoWrapText(false)
+
 	diagIndices := GetDiagonalElements(results.ParameterStructures.Omega)
 	for i := range results.ParametersData[finalEstimationMethodIndex].Estimates.Omega {
+
 		omegaIndex, _ := omegaIndices[i]
 		if results.ParameterStructures.Omega[i] != 0 {
 			val := results.ParametersData[finalEstimationMethodIndex].Estimates.Omega[i]
@@ -78,25 +71,17 @@ func (results ModelOutput) Summary() bool {
 				shrinkage = results.ShrinkageDetails.Eta.SD[userEtaIndex]
 				etaName = fmt.Sprintf("ETA%v", userEtaIndex+1)
 			}
-			if shrinkage > 30 {
-				omegaTable.AddRow(
-					aurora.Red("O"+omegaIndex),
-					aurora.Red(etaName),
-					aurora.Red(val),
-					aurora.Red(shrinkage),
-				)
-			} else {
-				omegaTable.AddRow(
-					"O"+omegaIndex,
-					etaName,
-					//"ETA "+strconv.Itoa(userEtaIndex+1),
-					val,
-					shrinkage,
-				)
-			}
-		}
 
+			var s4 string
+			if shrinkage > 30.0 {
+				s4 = fmt.Sprintf("%s%f%s", red, shrinkage, none)
+			} else {
+				s4 = fmt.Sprintf("%f", shrinkage)
+			}
+			omegaTable.Append([]string{string("O" + omegaIndex), etaName, fmt.Sprintf("%f", val), s4})
+		}
 	}
+
 	fmt.Println(results.RunDetails.ProblemText)
 	fmt.Println("Dataset: " + results.RunDetails.DataSet)
 	fmt.Println(fmt.Sprintf("Records: %v   Observations: %v  Patients: %v",
@@ -108,8 +93,8 @@ func (results ModelOutput) Summary() bool {
 	for _, em := range results.RunDetails.EstimationMethod {
 		fmt.Println(" - " + em)
 	}
-	omegaTable.SetAlign(termtables.AlignLeft, 1)
-	fmt.Println(thetaTable.Render())
-	fmt.Println(omegaTable.Render())
+
+	thetaTable.Render()
+	omegaTable.Render()
 	return true
 }
