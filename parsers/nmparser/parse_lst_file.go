@@ -76,11 +76,6 @@ func parseGradient(lines []string) (hasZero *bool, hasFinalZero *bool) {
 	return anyZero, anyFinalZero
 }
 
-func newBool(value bool) *bool {
-	b := value
-	return &b
-}
-
 // ParseLstEstimationFile parses the lst file
 func ParseLstEstimationFile(lines []string) ModelOutput {
 	var ofvDetails OfvDetails
