@@ -181,7 +181,67 @@ func TestParseGradient(t *testing.T) {
 	}
 }
 
-func newBool(value bool) *bool {
-	b := value
-	return &b
+func TestSetLargeConditionNumber(t *testing.T) {
+	var tests = []struct {
+		lines                []string
+		n                    int
+		largeConditionNumber *bool
+		context              string
+	}{
+		{
+			lines: []string{
+				"************************************************************************************************************************",
+				"********************                                                                                ********************",
+				"********************               FIRST ORDER CONDITIONAL ESTIMATION WITH INTERACTION              ********************",
+				"********************                      EIGENVALUES OF COR MATRIX OF ESTIMATE                     ********************",
+				"********************                                                                                ********************",
+				"************************************************************************************************************************",
+				"                                                                                                                        ",
+				"                                                                                                                        ",
+				"            1         2         3         4         5         6         7         8         9                           ",
+				"                                                                                                                        ",
+				"        2.53E-01  4.29E-01  6.19E-01  7.76E-01  8.79E-01  9.30E-01  1.19E+00  1.31E+00  2.61E+00                        ",
+				"                                                                                                                        ",
+				" Elapsed finaloutput time in seconds:     0.16                                                                           ",
+			},
+			n:                    3,
+			largeConditionNumber: newBool(false),
+			context:              "not large",
+		},
+		{
+			lines: []string{
+				"************************************************************************************************************************",
+				"********************                                                                                ********************",
+				"********************               FIRST ORDER CONDITIONAL ESTIMATION WITH INTERACTION              ********************",
+				"********************                      EIGENVALUES OF COR MATRIX OF ESTIMATE                     ********************",
+				"********************                                                                                ********************",
+				"************************************************************************************************************************",
+				"                                                                                                                        ",
+				"                                                                                                                        ",
+				"            1         2         3         4         5         6         7         8         9                           ",
+				"                                                                                                                        ",
+				"        2.53E-01  4.29E-01  6.19E-01  7.76E-01  8.79E-01  9.30E-01  1.19E+00  1.31E+00  2.61E+03                        ",
+				"                                                                                                                        ",
+				" Elapsed finaloutput time in seconds:     0.16                                                                           ",
+			},
+			n:                    3,
+			largeConditionNumber: newBool(true),
+			context:              "large",
+		},
+		{
+			lines:                []string{"", ""},
+			n:                    0,
+			largeConditionNumber: nil,
+			context:              "not set",
+		},
+	}
+
+	for _, tt := range tests {
+		var largeConditionNumber *bool
+		if tt.largeConditionNumber != nil {
+			largeConditionNumber = newBool(*tt.largeConditionNumber)
+		}
+		setLargeConditionNumber(tt.lines, tt.n, largeConditionNumber)
+		assert.Equal(t, tt.largeConditionNumber, largeConditionNumber, "Fail :"+tt.context)
+	}
 }

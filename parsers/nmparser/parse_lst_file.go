@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -54,6 +55,54 @@ func parseOFV(line string, ofvDetails OfvDetails) OfvDetails {
 	return ofvDetails
 }
 
+func setLargeConditionNumber(lines []string, start int, largeConditionNumber *bool) {
+
+	// go until line of ints
+	for i, line := range lines[start:] {
+		sub := strings.Trim(line, " ")
+		if len(sub) > 0 {
+			vals := strings.Fields(sub)
+			if len(vals) > 1 {
+				one, err := strconv.Atoi(vals[0])
+				if err == nil && one == 1 {
+					two, err := strconv.Atoi(vals[1])
+					if err == nil && two == 2 {
+						start = start + i
+						break
+					}
+				}
+			}
+		}
+	}
+
+	// go until blank line
+	for i, line := range lines[start:] {
+		sub := strings.Trim(line, " ")
+		if len(sub) == 0 {
+			start = start + i + 1
+			break
+		}
+	}
+
+	var eigenvalues []float64
+	for _, s := range strings.Fields(lines[start]) {
+		eigenvalue, err := strconv.ParseFloat(s, 64)
+		if err == nil {
+			eigenvalues = append(eigenvalues, eigenvalue)
+		}
+	}
+
+	if len(eigenvalues) >= 2 {
+		sort.Float64s(eigenvalues)
+		ratio := eigenvalues[len(eigenvalues)-1] / eigenvalues[0]
+		// TODO: get largeConditionNumber threshold from config
+		// or derive. something like (number of parameters) * 10
+		if ratio > 1000.0 {
+			*largeConditionNumber = true
+		}
+	}
+}
+
 func parseGradient(lines []string) (hasZero *bool, hasFinalZero *bool) {
 	var anyZero, anyFinalZero *bool
 
@@ -74,6 +123,11 @@ func parseGradient(lines []string) (hasZero *bool, hasFinalZero *bool) {
 		}
 	}
 	return anyZero, anyFinalZero
+}
+
+func newBool(value bool) *bool {
+	b := value
+	return &b
 }
 
 // ParseLstEstimationFile parses the lst file
@@ -135,6 +189,16 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 			runHeuristics.MinimizationSuccessful = true
 		case strings.Contains(line, "GRADIENT:"):
 			gradientLines = append(gradientLines, line)
+		case strings.Contains(line, "RESET HESSIAN"):
+			runHeuristics.HessianReset = true
+		case strings.Contains(line, "PARAMETER ESTIMATE IS NEAR ITS BOUNDARY"):
+			runHeuristics.ParameterNearBoundary = true
+		case strings.Contains(line, "COVARIANCE STEP OMITTED: NO"):
+			runHeuristics.CovarianceStepOmitted = newBool(true)
+		case strings.Contains(line, "EIGENVALUES OF COR MATRIX OF ESTIMATE"):
+			runHeuristics.LargeConditionNumber = newBool(false)
+			setLargeConditionNumber(lines, i, runHeuristics.LargeConditionNumber)
+
 		default:
 			continue
 		}
