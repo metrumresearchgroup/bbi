@@ -34,9 +34,9 @@ type ParametersData struct {
 // RunHeuristics ...
 // some values are defined as pointers to support tri-state: true, false, nil
 type RunHeuristics struct {
-	CovarianceStepOmitted *bool `json:"covariance_step_omitted,omitempty"`
-	LargeConditionNumber  *bool `json:"large_condition_number,omitempty"`
-	// Correlations
+	CovarianceStepOmitted  *bool `json:"covariance_step_omitted,omitempty"`
+	LargeConditionNumber   *bool `json:"large_condition_number,omitempty"`
+	CorrelationsOk         *bool `json:"correlations_ok,omitempty"`
 	ParameterNearBoundary  bool  `json:"parameter_near_boundary,omitempty"`
 	HessianReset           bool  `json:"hessian_reset,omitempty"`
 	HasZeroGradient        *bool `json:"has_zero_gradient,omitempty"`
