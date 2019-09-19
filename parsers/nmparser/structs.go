@@ -34,14 +34,13 @@ type ParametersData struct {
 // RunHeuristics ...
 // some values are defined as pointers to support tri-state: true, false, nil
 type RunHeuristics struct {
-	CovarianceStepOmitted  *bool `json:"covariance_step_omitted,omitempty"`
-	LargeConditionNumber   *bool `json:"large_condition_number,omitempty"`
-	CorrelationsOk         *bool `json:"correlations_ok,omitempty"`
-	ParameterNearBoundary  bool  `json:"parameter_near_boundary,omitempty"`
-	HessianReset           bool  `json:"hessian_reset,omitempty"`
-	HasZeroGradient        *bool `json:"has_zero_gradient,omitempty"`
-	HasFinalZeroGradient   *bool `json:"has_final_zero_gradient,omitempty"`
-	MinimizationSuccessful bool  `json:"minimization_successful,omitempty"`
+	CovarianceStepOmitted  string `json:"covariance_step_omitted,omitempty"`
+	LargeConditionNumber   string `json:"large_condition_number,omitempty"`
+	CorrelationsOk         string `json:"correlations_ok,omitempty"`
+	ParameterNearBoundary  string `json:"parameter_near_boundary,omitempty"`
+	HessianReset           string `json:"hessian_reset,omitempty"`
+	HasFinalZeroGradient   string `json:"has_final_zero_gradient,omitempty"`
+	MinimizationSuccessful string `json:"minimization_successful,omitempty"`
 }
 
 // RunDetails contains key information about logistics of the model run
@@ -61,6 +60,7 @@ type RunDetails struct {
 	NumberOfObs         int64    `json:"number_of_obs,omitempty"`
 	NumberOfDataRecords int64    `json:"number_of_data_records,omitempty"`
 	OutputTable         string   `json:"output_table,omitempty"`
+	OutputFilesUsed     []string `json:"output_files_used,omitempty"`
 }
 
 // CompletionDetails ...
@@ -126,3 +126,27 @@ type ExtData struct {
 	ParameterNames    []string
 	EstimationLines   [][]string
 }
+
+// Status supports extended states beyond true and false
+type Status int
+
+const (
+	// Undefined Status, default value, not set to true or false
+	Undefined Status = iota
+	// True Status, explicitly set to true
+	True
+	// False Status, explicitly set to true
+	False
+)
+
+func (s Status) String() string {
+	return [...]string{"Undefined", "True", "False"}[s]
+}
+
+// // ToBool convert status to bool
+// func (s *Status) ToBool() bool {
+// 	if *s == True {
+// 		return true
+// 	}
+// 	return false
+// }

@@ -98,3 +98,13 @@ func WriteLinesFS(fs afero.Fs, lines []string, path string) error {
 	}
 	return w.Flush()
 }
+
+// HasZero returns true if any float in the slice is zero
+func HasZero(floats []float64) bool {
+	for _, f := range floats {
+		if f == 0 {
+			return true
+		}
+	}
+	return false
+}

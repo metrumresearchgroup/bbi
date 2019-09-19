@@ -55,7 +55,7 @@ func parseOFV(line string, ofvDetails OfvDetails) OfvDetails {
 	return ofvDetails
 }
 
-func setLargeConditionNumber(lines []string, start int, largeConditionNumber *bool) {
+func setLargeConditionNumber(lines []string, start int) Status {
 
 	// go until line of ints
 	for i, line := range lines[start:] {
@@ -98,12 +98,14 @@ func setLargeConditionNumber(lines []string, start int, largeConditionNumber *bo
 		// TODO: get largeConditionNumber threshold from config
 		// or derive. something like (number of parameters) * 10
 		if ratio > 1000.0 {
-			*largeConditionNumber = true
+			return True
 		}
 	}
+
+	return False
 }
 
-func setCorrelationsOk(lines []string, start int, largeConditionNumber *bool) {
+func setCorrelationsOk(lines []string, start int) Status {
 
 	// go until line of TH ints
 	for i, line := range lines[start:] {
@@ -142,36 +144,28 @@ func setCorrelationsOk(lines []string, start int, largeConditionNumber *bool) {
 		// TODO: get largeConditionNumber threshold from config
 		// or derive. something like (number of parameters) * 10
 		if ratio > 1000.0 {
-			*largeConditionNumber = true
+			return True
 		}
 	}
+	return False
 }
 
-func parseGradient(lines []string) (hasZero *bool, hasFinalZero *bool) {
-	var anyZero, anyFinalZero *bool
+func parseGradient(lines []string) (hasFinalZero Status) {
 
-	if len(lines) > 0 {
-		anyZero = new(bool)
-		anyFinalZero = new(bool)
+	if len(lines) == 0 {
+		return Undefined
 	}
 
-	for n, line := range lines {
-		for _, g := range strings.Fields(strings.TrimSpace(strings.Replace(line, "GRADIENT:", "", -1))) {
-			gradient, _ := strconv.ParseFloat(g, 64)
-			if gradient == 0 {
-				*anyZero = true
-				if n == len(lines)-1 {
-					*anyFinalZero = true
-				}
-			}
+	fields := strings.Fields(strings.TrimSpace(strings.Replace(lines[len(lines)-1], "GRADIENT:", "", -1)))
+	if len(fields) > 0 {
+		result := make([]float64, len(fields))
+		for i, val := range fields {
+			n, _ := strconv.ParseFloat(val, 64)
+			result[i] = n
 		}
+		return HasZeroGradient(result)
 	}
-	return anyZero, anyFinalZero
-}
-
-func newBool(value bool) *bool {
-	b := value
-	return &b
+	return False
 }
 
 // ParseLstEstimationFile parses the lst file
@@ -230,28 +224,26 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 		case strings.Contains(line, "EPSSHRINK"):
 			shrinkageDetails = parseShrinkage(line, shrinkageDetails)
 		case strings.Contains(line, "0MINIMIZATION SUCCESSFUL"):
-			runHeuristics.MinimizationSuccessful = true
+			runHeuristics.MinimizationSuccessful = True.String()
 		case strings.Contains(line, "GRADIENT:"):
 			gradientLines = append(gradientLines, line)
 		case strings.Contains(line, "RESET HESSIAN"):
-			runHeuristics.HessianReset = true
+			runHeuristics.HessianReset = True.String()
 		case strings.Contains(line, "PARAMETER ESTIMATE IS NEAR ITS BOUNDARY"):
-			runHeuristics.ParameterNearBoundary = true
+			runHeuristics.ParameterNearBoundary = True.String()
 		case strings.Contains(line, "COVARIANCE STEP OMITTED: NO"):
-			runHeuristics.CovarianceStepOmitted = newBool(true)
+			runHeuristics.CovarianceStepOmitted = True.String()
 		case strings.Contains(line, "EIGENVALUES OF COR MATRIX OF ESTIMATE"):
-			runHeuristics.LargeConditionNumber = newBool(false)
-			setLargeConditionNumber(lines, i, runHeuristics.LargeConditionNumber)
+			runHeuristics.LargeConditionNumber = setLargeConditionNumber(lines, i).String()
 		case strings.Contains(line, "CORRELATION MATRIX OF ESTIMATE"):
-			runHeuristics.CorrelationsOk = newBool(false)
-			setCorrelationsOk(lines, i, runHeuristics.CorrelationsOk)
+			runHeuristics.CorrelationsOk = setCorrelationsOk(lines, i).String()
 
 		default:
 			continue
 		}
 	}
 
-	runHeuristics.HasZeroGradient, runHeuristics.HasFinalZeroGradient = parseGradient(gradientLines)
+	runHeuristics.HasFinalZeroGradient = parseGradient(gradientLines).String()
 
 	var finalParameterEst ParametersResult
 	var finalParameterStdErr ParametersResult

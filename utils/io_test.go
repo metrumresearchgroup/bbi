@@ -35,3 +35,47 @@ func TestReadExt(t *testing.T) {
 		assert.Equal(t, d.extlength, len(extLines), fmt.Sprintf("%s-ext", d.input))
 	}
 }
+
+func TestHasZero(t *testing.T) {
+	type test struct {
+		floats   []float64
+		expected bool
+		context  string
+	}
+	tests := []test{
+		{
+			[]float64{0, 0, 0, 0, 0, 0},
+			true,
+			"all zeroes",
+		},
+		{
+			[]float64{10, 10, 10, 10, 10, 10},
+			false,
+			"no zero",
+		},
+		{
+			[]float64{},
+			false,
+			"empty",
+		},
+		{
+			[]float64{0, 10, 10, 10, 10, 10},
+			true,
+			"first zero",
+		},
+		{
+			[]float64{10, 10, 10, 10, 10, 0},
+			true,
+			"last zero",
+		},
+		{
+			[]float64{10, 0, 10},
+			true,
+			"middle zero",
+		},
+	}
+
+	for _, tt := range tests {
+		assert.Equal(t, tt.expected, HasZero(tt.floats), "failed: "+tt.context)
+	}
+}

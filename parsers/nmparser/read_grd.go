@@ -3,6 +3,8 @@ package parser
 import (
 	"strconv"
 	"strings"
+
+	"github.com/metrumresearchgroup/babylon/utils"
 )
 
 // ParseGrdLines parses out the ext lines into a data structure for final parameter processing.
@@ -79,4 +81,12 @@ func ParseGrdData(ed ExtData) ([]ParametersData, ParameterNames) {
 	return allParametersData, ParameterNames{
 		Theta: thetas,
 	}
+}
+
+// HasZeroGradient returns Status.True if any float in the slice is zero
+func HasZeroGradient(floats []float64) Status {
+	if utils.HasZero(floats) == true {
+		return True
+	}
+	return False
 }
