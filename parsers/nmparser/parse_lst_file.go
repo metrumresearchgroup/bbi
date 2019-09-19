@@ -55,7 +55,7 @@ func parseOFV(line string, ofvDetails OfvDetails) OfvDetails {
 	return ofvDetails
 }
 
-func setLargeConditionNumber(lines []string, start int) Status {
+func setLargeConditionNumber(lines []string, start int, largeNumberLimit float64) Status {
 
 	// go until line of ints
 	for i, line := range lines[start:] {
@@ -95,9 +95,7 @@ func setLargeConditionNumber(lines []string, start int) Status {
 	if len(eigenvalues) >= 2 {
 		sort.Float64s(eigenvalues)
 		ratio := eigenvalues[len(eigenvalues)-1] / eigenvalues[0]
-		// TODO: get largeConditionNumber threshold from config
-		// or derive. something like (number of parameters) * 10
-		if ratio > 1000.0 {
+		if ratio > largeNumberLimit {
 			return True
 		}
 	}
@@ -234,7 +232,9 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 		case strings.Contains(line, "COVARIANCE STEP OMITTED: NO"):
 			runHeuristics.CovarianceStepOmitted = True.String()
 		case strings.Contains(line, "EIGENVALUES OF COR MATRIX OF ESTIMATE"):
-			runHeuristics.LargeConditionNumber = setLargeConditionNumber(lines, i).String()
+			// TODO: get largeNumberLimit from config
+			// or derive. something like (number of parameters) * 10
+			runHeuristics.LargeConditionNumber = setLargeConditionNumber(lines, i, 1000.0).String()
 		case strings.Contains(line, "CORRELATION MATRIX OF ESTIMATE"):
 			runHeuristics.CorrelationsOk = setCorrelationsOk(lines, i).String()
 
