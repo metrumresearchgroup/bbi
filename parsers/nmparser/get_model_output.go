@@ -39,7 +39,7 @@ func GetModelOutput(filePath string, verbose bool) ModelOutput {
 	grdLines, err := utils.ReadParamsAndOutputFromExt(grdFilePath)
 	if err == nil {
 		parametersData, _ := ParseGrdData(ParseGrdLines(grdLines))
-		results.RunHeuristics.HasFinalZeroGradient = HasZeroGradient(parametersData[len(parametersData)-1].Fixed.Theta).String()
+		results.RunHeuristics.HasFinalZeroGradient = HasZeroGradient(parametersData[len(parametersData)-1].Fixed.Theta)
 		results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, grdFilePath)
 	}
 

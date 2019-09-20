@@ -1,5 +1,7 @@
 package parser
 
+import "bytes"
+
 // ParameterNames containst the names of model parameters
 type ParameterNames struct {
 	Theta []string `json:"theta,omitempty"`
@@ -34,13 +36,13 @@ type ParametersData struct {
 // RunHeuristics ...
 // some values are defined as pointers to support tri-state: true, false, nil
 type RunHeuristics struct {
-	CovarianceStepOmitted  string `json:"covariance_step_omitted,omitempty"`
-	LargeConditionNumber   string `json:"large_condition_number,omitempty"`
-	CorrelationsOk         string `json:"correlations_ok,omitempty"`
-	ParameterNearBoundary  string `json:"parameter_near_boundary,omitempty"`
-	HessianReset           string `json:"hessian_reset,omitempty"`
-	HasFinalZeroGradient   string `json:"has_final_zero_gradient,omitempty"`
-	MinimizationSuccessful string `json:"minimization_successful,omitempty"`
+	CovarianceStepOmitted  HeuristicStatus `json:"covariance_step_omitted,omitempty"`
+	LargeConditionNumber   HeuristicStatus `json:"large_condition_number,omitempty"`
+	CorrelationsOk         HeuristicStatus `json:"correlations_ok,omitempty"`
+	ParameterNearBoundary  HeuristicStatus `json:"parameter_near_boundary,omitempty"`
+	HessianReset           HeuristicStatus `json:"hessian_reset,omitempty"`
+	HasFinalZeroGradient   HeuristicStatus `json:"has_final_zero_gradient,omitempty"`
+	MinimizationSuccessful HeuristicStatus `json:"minimization_successful,omitempty"`
 }
 
 // RunDetails contains key information about logistics of the model run
@@ -127,26 +129,38 @@ type ExtData struct {
 	EstimationLines   [][]string
 }
 
-// Status supports extended states beyond true and false
-type Status int
+// HeuristicStatus supports extended states beyond true and false
+type HeuristicStatus int
 
 const (
-	// Undefined Status, default value, not set to true or false
-	Undefined Status = iota
-	// True Status, explicitly set to true
-	True
-	// False Status, explicitly set to true
-	False
+	// HeuristicUndefined default value, not set to true or false
+	HeuristicUndefined HeuristicStatus = iota
+	// HeuristicTrue explicitly set to true
+	HeuristicTrue
+	// HeuristicFalse explicitly set to true
+	HeuristicFalse
 )
 
-func (s Status) String() string {
-	return [...]string{"Undefined", "True", "False"}[s]
+func (s HeuristicStatus) String() string {
+	return toString[s]
 }
 
-// // ToBool convert status to bool
-// func (s *Status) ToBool() bool {
-// 	if *s == True {
-// 		return true
-// 	}
-// 	return false
-// }
+var toString = map[HeuristicStatus]string{
+	HeuristicUndefined: "HeuristicUndefined",
+	HeuristicTrue:      "HeuristicTrue",
+	HeuristicFalse:     "HeuristicFalse",
+}
+
+var toID = map[string]HeuristicStatus{
+	"HeuristicUndefined": HeuristicUndefined,
+	"HeuristicTrue":      HeuristicTrue,
+	"HeuristicFalse":     HeuristicFalse,
+}
+
+// MarshalJSON marshals the enum as a quoted json string
+func (s HeuristicStatus) MarshalJSON() ([]byte, error) {
+	buffer := bytes.NewBufferString(`"`)
+	buffer.WriteString(toString[s])
+	buffer.WriteString(`"`)
+	return buffer.Bytes(), nil
+}

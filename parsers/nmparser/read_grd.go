@@ -84,9 +84,9 @@ func ParseGrdData(ed ExtData) ([]ParametersData, ParameterNames) {
 }
 
 // HasZeroGradient returns Status.True if any float in the slice is zero
-func HasZeroGradient(floats []float64) Status {
+func HasZeroGradient(floats []float64) HeuristicStatus {
 	if utils.HasZero(floats) == true {
-		return True
+		return HeuristicTrue
 	}
-	return False
+	return HeuristicFalse
 }

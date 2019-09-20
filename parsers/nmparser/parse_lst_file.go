@@ -55,11 +55,11 @@ func parseOFV(line string, ofvDetails OfvDetails) OfvDetails {
 	return ofvDetails
 }
 
-func setLargeConditionNumber(lines []string, start int, largeNumberLimit float64) Status {
+func setLargeConditionNumber(lines []string, start int, largeNumberLimit float64) HeuristicStatus {
 
 	// go until line of ints
 	for i, line := range lines[start:] {
-		sub := strings.Trim(line, " ")
+		sub := strings.TrimSpace(line)
 		if len(sub) > 0 {
 			vals := strings.Fields(sub)
 			if len(vals) > 1 {
@@ -77,7 +77,7 @@ func setLargeConditionNumber(lines []string, start int, largeNumberLimit float64
 
 	// go until blank line
 	for i, line := range lines[start:] {
-		sub := strings.Trim(line, " ")
+		sub := strings.TrimSpace(line)
 		if len(sub) == 0 {
 			start = start + i + 1
 			break
@@ -96,62 +96,134 @@ func setLargeConditionNumber(lines []string, start int, largeNumberLimit float64
 		sort.Float64s(eigenvalues)
 		ratio := eigenvalues[len(eigenvalues)-1] / eigenvalues[0]
 		if ratio > largeNumberLimit {
-			return True
+			return HeuristicTrue
 		}
 	}
 
-	return False
+	return HeuristicFalse
 }
 
-func setCorrelationsOk(lines []string, start int) Status {
+func setCorrelationsOk(lines []string, start int, correlationLimit float64) HeuristicStatus {
 
-	// go until line of TH ints
-	for i, line := range lines[start:] {
-		sub := strings.Trim(line, " ")
-		if len(sub) > 0 {
-			vals := strings.Fields(sub)
-			if len(vals) > 0 {
-				if vals[0] == "TH" {
-					start = start + i
-					break
-				}
-			}
-		}
-	}
+	// var matrix [][]float64
 
-	// go until blank line
-	for i, line := range lines[start:] {
-		sub := strings.Trim(line, " ")
-		if len(sub) == 0 {
-			start = start + i + 1
-			break
-		}
-	}
+	// // go until blank line
+	// for i, line := range lines[start:] {
+	// 	sub := strings.TrimSpace(line)
+	// 	if len(sub) == 0 {
+	// 		start = start + i
+	// 		break
+	// 	}
+	// }
 
-	var eigenvalues []float64
-	for _, s := range strings.Fields(lines[start]) {
-		eigenvalue, err := strconv.ParseFloat(s, 64)
-		if err == nil {
-			eigenvalues = append(eigenvalues, eigenvalue)
-		}
-	}
+	// // go until not blank line
+	// for i, line := range lines[start:] {
+	// 	sub := strings.TrimSpace(line)
+	// 	if len(sub) > 0 {
+	// 		start = start + i
+	// 		break
+	// 	}
+	// }
 
-	if len(eigenvalues) >= 2 {
-		sort.Float64s(eigenvalues)
-		ratio := eigenvalues[len(eigenvalues)-1] / eigenvalues[0]
-		// TODO: get largeConditionNumber threshold from config
-		// or derive. something like (number of parameters) * 10
-		if ratio > 1000.0 {
-			return True
-		}
-	}
-	return False
+	// // go until not blank line, should be names of columns: TH 1      TH 2      TH 3 ....
+	// // and get lines until next blank line
+	// var columns []string
+	// for i, line := range lines[start:] {
+	// 	sub := strings.TrimSpace(line)
+	// 	if len(sub) > 0 {
+	// 		c := strings.Split(sub, "    ")
+	// 		for _, col := range c {
+	// 			columns = append(columns, strings.TrimSpace(col))
+	// 		}
+	// 		//columns = append(columns, strings.Split(sub, "    ")...)
+	// 		start = start + i
+	// 	} else {
+	// 		start = start + i
+	// 		break
+	// 	}
+	// }
+
+	// dim := len(columns)
+	// if dim > 0 {
+	// 	matrix = make([][]float64, dim)
+	// 	for i := range matrix {
+	// 		matrix[i] = make([]float64, dim)
+	// 	}
+	// 	// get lines that start with + and collect until blank line
+	// 	var rows []string
+	// 	for _, line := range lines[start:] {
+
+	// 		clean := strings.TrimSpace(line)
+	// 		if clean == "" {
+	// 			continue
+	// 		}
+
+	// 		if contains(columns, clean) {
+	// 			continue
+	// 		}
+
+	// 		clean = strings.TrimSpace(strings.Replace(strings.Replace(line, "+", "", -1), ",", "", -1))
+
+	// 		// if clean does not contain +, append to last row
+	// 		rows = append(rows, strings.Split(clean, "    ")...)
+
+	// 		// if strings.HasPrefix(line, "+") {
+	// 		// 	clean := strings.TrimSpace(strings.Replace(strings.Replace(line, "+", "", -1), ",", "", -1))
+	// 		// 	rows = append(rows, strings.Split(clean, "    ")...)
+	// 		// } else {
+	// 		// 	clean := strings.TrimSpace(line)
+	// 		// 	if strings.TrimSpace(clean) == "" || contains(columns, clean) { // or col name
+	// 		// 		break
+	// 		// 	} else {
+	// 		// 		rows = append(rows, strings.Split(clean, "    ")...)
+	// 		// 	}
+	// 		// }
+	// 	}
+
+	// 	// populate matrix
+	// 	for j, row := range rows {
+
+	// 		fmt.Println("row:" + row)
+
+	// 		for k, cell := range strings.Fields(row) {
+	// 			value, err := strconv.ParseFloat(cell, 64)
+	// 			if err == nil {
+	// 				matrix[j][k] = value
+	// 			} else {
+	// 				matrix[j][k] = 0
+	// 			}
+	// 		}
+	// 	}
+
+	// 	// check for large numbers (close to 1) in the off-diagonal values of the correlation matrix
+	// 	for j := range matrix {
+	// 		for k, cell := range matrix[j] {
+	// 			if k == j || cell == 0 {
+	// 				continue
+	// 			}
+	// 			if math.Abs(cell) >= correlationLimit {
+	// 				return HeuristicFalse
+	// 			}
+	// 		}
+	// 	}
+
+	// }
+	return HeuristicTrue
 }
 
-func parseGradient(lines []string) (hasFinalZero Status) {
+func contains(a []string, value string) bool {
+	for _, s := range a {
+		if strings.TrimSpace(s) == strings.TrimSpace(value) {
+			return true
+		}
+	}
+	return false
+}
+
+func parseGradient(lines []string) (hasFinalZero HeuristicStatus) {
 
 	if len(lines) == 0 {
-		return Undefined
+		return HeuristicUndefined
 	}
 
 	fields := strings.Fields(strings.TrimSpace(strings.Replace(lines[len(lines)-1], "GRADIENT:", "", -1)))
@@ -163,7 +235,7 @@ func parseGradient(lines []string) (hasFinalZero Status) {
 		}
 		return HasZeroGradient(result)
 	}
-	return False
+	return HeuristicFalse
 }
 
 // ParseLstEstimationFile parses the lst file
@@ -222,28 +294,28 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 		case strings.Contains(line, "EPSSHRINK"):
 			shrinkageDetails = parseShrinkage(line, shrinkageDetails)
 		case strings.Contains(line, "0MINIMIZATION SUCCESSFUL"):
-			runHeuristics.MinimizationSuccessful = True.String()
+			runHeuristics.MinimizationSuccessful = HeuristicTrue
 		case strings.Contains(line, "GRADIENT:"):
 			gradientLines = append(gradientLines, line)
 		case strings.Contains(line, "RESET HESSIAN"):
-			runHeuristics.HessianReset = True.String()
+			runHeuristics.HessianReset = HeuristicTrue
 		case strings.Contains(line, "PARAMETER ESTIMATE IS NEAR ITS BOUNDARY"):
-			runHeuristics.ParameterNearBoundary = True.String()
+			runHeuristics.ParameterNearBoundary = HeuristicTrue
 		case strings.Contains(line, "COVARIANCE STEP OMITTED: NO"):
-			runHeuristics.CovarianceStepOmitted = True.String()
+			runHeuristics.CovarianceStepOmitted = HeuristicTrue
 		case strings.Contains(line, "EIGENVALUES OF COR MATRIX OF ESTIMATE"):
 			// TODO: get largeNumberLimit from config
 			// or derive. something like (number of parameters) * 10
-			runHeuristics.LargeConditionNumber = setLargeConditionNumber(lines, i, 1000.0).String()
+			runHeuristics.LargeConditionNumber = setLargeConditionNumber(lines, i, 1000.0)
 		case strings.Contains(line, "CORRELATION MATRIX OF ESTIMATE"):
-			runHeuristics.CorrelationsOk = setCorrelationsOk(lines, i).String()
+			runHeuristics.CorrelationsOk = setCorrelationsOk(lines, i, 0.95)
 
 		default:
 			continue
 		}
 	}
 
-	runHeuristics.HasFinalZeroGradient = parseGradient(gradientLines).String()
+	runHeuristics.HasFinalZeroGradient = parseGradient(gradientLines)
 
 	var finalParameterEst ParametersResult
 	var finalParameterStdErr ParametersResult

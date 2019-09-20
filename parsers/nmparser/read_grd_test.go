@@ -12,7 +12,7 @@ func TestReadParseGrdLines(t *testing.T) {
 	var tests = []struct {
 		lines    []string
 		expected bool
-		status   Status
+		status   HeuristicStatus
 		context  string
 	}{
 		{
@@ -39,7 +39,7 @@ func TestReadParseGrdLines(t *testing.T) {
 				"		  15  1.01544E-02  1.25236E-03  1.93608E-02 -6.25415E-02  4.45540E-02 -1.47003E-02 -2.31826E-02 -5.90237E-03 -5.86988E-03",
 			},
 			expected: false,
-			status:   False,
+			status:   HeuristicFalse,
 			context:  "no zero",
 		},
 		{
@@ -66,7 +66,7 @@ func TestReadParseGrdLines(t *testing.T) {
 				"		  15  1.01544E-02  1.25236E-03  1.93608E-02 -6.25415E-02  4.45540E-02 -1.47003E-02 -2.31826E-02 -5.90237E-03 -5.86988E-03",
 			},
 			expected: false,
-			status:   False,
+			status:   HeuristicFalse,
 			context:  "zero, not final",
 		},
 		{
@@ -93,7 +93,7 @@ func TestReadParseGrdLines(t *testing.T) {
 				"		  15  0.000000000  1.25236E-03  1.93608E-02 -6.25415E-02  4.45540E-02 -1.47003E-02 -2.31826E-02 -5.90237E-03 -5.86988E-03",
 			},
 			expected: true,
-			status:   True,
+			status:   HeuristicTrue,
 			context:  "final zero",
 		},
 	}
