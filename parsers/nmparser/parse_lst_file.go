@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"math"
 	"sort"
 	"strconv"
 	"strings"
@@ -105,109 +106,107 @@ func setLargeConditionNumber(lines []string, start int, largeNumberLimit float64
 
 func setCorrelationsOk(lines []string, start int, correlationLimit float64) HeuristicStatus {
 
-	// var matrix [][]float64
+	var matrix [][]float64
 
-	// // go until blank line
-	// for i, line := range lines[start:] {
-	// 	sub := strings.TrimSpace(line)
-	// 	if len(sub) == 0 {
-	// 		start = start + i
-	// 		break
-	// 	}
-	// }
+	// go until blank line
+	for i, line := range lines[start:] {
+		sub := strings.TrimSpace(line)
+		if len(sub) == 0 {
+			start = start + i
+			break
+		}
+	}
 
-	// // go until not blank line
-	// for i, line := range lines[start:] {
-	// 	sub := strings.TrimSpace(line)
-	// 	if len(sub) > 0 {
-	// 		start = start + i
-	// 		break
-	// 	}
-	// }
+	// go until not blank line
+	for i, line := range lines[start:] {
+		sub := strings.TrimSpace(line)
+		if len(sub) > 0 {
+			start = start + i
+			break
+		}
+	}
 
-	// // go until not blank line, should be names of columns: TH 1      TH 2      TH 3 ....
-	// // and get lines until next blank line
-	// var columns []string
-	// for i, line := range lines[start:] {
-	// 	sub := strings.TrimSpace(line)
-	// 	if len(sub) > 0 {
-	// 		c := strings.Split(sub, "    ")
-	// 		for _, col := range c {
-	// 			columns = append(columns, strings.TrimSpace(col))
-	// 		}
-	// 		//columns = append(columns, strings.Split(sub, "    ")...)
-	// 		start = start + i
-	// 	} else {
-	// 		start = start + i
-	// 		break
-	// 	}
-	// }
+	// go until not a blank line, should be names of columns: TH 1      TH 2      TH 3 ....
+	// and get lines until the next blank line is found (columns names can span more than one line)
+	var columns []string
+	for i, line := range lines[start:] {
+		sub := strings.TrimSpace(line)
+		if len(sub) > 0 {
+			c := strings.Split(sub, "    ")
+			for _, col := range c {
+				columns = append(columns, strings.TrimSpace(col))
+			}
+			start = start + i
+		} else {
+			start = start + i
+			break
+		}
+	}
 
-	// dim := len(columns)
-	// if dim > 0 {
-	// 	matrix = make([][]float64, dim)
-	// 	for i := range matrix {
-	// 		matrix[i] = make([]float64, dim)
-	// 	}
-	// 	// get lines that start with + and collect until blank line
-	// 	var rows []string
-	// 	for _, line := range lines[start:] {
+	dim := len(columns)
+	if dim > 0 {
+		matrix = make([][]float64, dim)
+		for i := range matrix {
+			matrix[i] = make([]float64, dim)
+		}
+		// get lines that start with + and collect until blank line
+		// (row values can span more than one line)
+		var rows []string
+		for _, line := range lines[start:] {
 
-	// 		clean := strings.TrimSpace(line)
-	// 		if clean == "" {
-	// 			continue
-	// 		}
+			// skip blank line
+			clean := strings.TrimSpace(line)
+			if clean == "" {
+				continue
+			}
 
-	// 		if contains(columns, clean) {
-	// 			continue
-	// 		}
+			// skip the name of the parameter
+			if contains(columns, clean) {
+				continue
+			}
 
-	// 		clean = strings.TrimSpace(strings.Replace(strings.Replace(line, "+", "", -1), ",", "", -1))
+			// this line is either the start of values (starts with +) or a continuation of values (starts with ..... or a value)
+			if strings.HasPrefix(clean, "+") {
+				clean = strings.TrimSpace(strings.Replace(strings.Replace(line, "+", "", -1), ",", "", -1))
+				rows = append(rows, clean)
+			} else {
+				// if there is not a +, append the values to the previous row
+				if len(rows) > 0 {
+					previousrow := len(rows) - 1
+					clean = strings.TrimSpace(strings.Replace(strings.Replace(line, "+", "", -1), ",", "", -1))
+					rows[previousrow] = rows[previousrow] + " " + clean
+				}
+			}
+		}
 
-	// 		// if clean does not contain +, append to last row
-	// 		rows = append(rows, strings.Split(clean, "    ")...)
+		// populate matrix
+		for j, row := range rows {
+			//fmt.Println("row:" + row)
+			for k, cell := range strings.Fields(row) {
+				value, err := strconv.ParseFloat(cell, 64)
+				if err == nil {
+					matrix[j][k] = value
+				} else {
+					matrix[j][k] = 0
+				}
+			}
+		}
 
-	// 		// if strings.HasPrefix(line, "+") {
-	// 		// 	clean := strings.TrimSpace(strings.Replace(strings.Replace(line, "+", "", -1), ",", "", -1))
-	// 		// 	rows = append(rows, strings.Split(clean, "    ")...)
-	// 		// } else {
-	// 		// 	clean := strings.TrimSpace(line)
-	// 		// 	if strings.TrimSpace(clean) == "" || contains(columns, clean) { // or col name
-	// 		// 		break
-	// 		// 	} else {
-	// 		// 		rows = append(rows, strings.Split(clean, "    ")...)
-	// 		// 	}
-	// 		// }
-	// 	}
+		// check for large numbers in the off-diagonal values of the correlation matrix
+		for j := range matrix {
+			for k, cell := range matrix[j] {
+				if k == j || cell == 0 {
+					continue
+				}
+				if math.Abs(cell) >= correlationLimit {
+					return HeuristicFalse
+				}
+			}
+		}
+	} else {
+		return HeuristicUndefined
+	}
 
-	// 	// populate matrix
-	// 	for j, row := range rows {
-
-	// 		fmt.Println("row:" + row)
-
-	// 		for k, cell := range strings.Fields(row) {
-	// 			value, err := strconv.ParseFloat(cell, 64)
-	// 			if err == nil {
-	// 				matrix[j][k] = value
-	// 			} else {
-	// 				matrix[j][k] = 0
-	// 			}
-	// 		}
-	// 	}
-
-	// 	// check for large numbers (close to 1) in the off-diagonal values of the correlation matrix
-	// 	for j := range matrix {
-	// 		for k, cell := range matrix[j] {
-	// 			if k == j || cell == 0 {
-	// 				continue
-	// 			}
-	// 			if math.Abs(cell) >= correlationLimit {
-	// 				return HeuristicFalse
-	// 			}
-	// 		}
-	// 	}
-
-	// }
 	return HeuristicTrue
 }
 
