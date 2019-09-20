@@ -12,7 +12,7 @@ import (
 // GetModelOutput populates and returns a ModelOutput object by parsing files
 // ParameterData is parsed from the ext file when useExtFile is true
 // ParameterData is parsed from the lst file when useExtFile is false
-func GetModelOutput(filePath string, verbose bool) ModelOutput {
+func GetModelOutput(filePath string, verbose bool, useExt bool, useGrd bool) ModelOutput {
 
 	AppFs := afero.NewOsFs()
 	runNum, _ := utils.FileAndExt(filePath)
@@ -27,17 +27,23 @@ func GetModelOutput(filePath string, verbose bool) ModelOutput {
 	results := ParseLstEstimationFile(fileLines)
 	results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, outputFilePath)
 
-	extFilePath := strings.Join([]string{filepath.Join(dir, runNum), ".ext"}, "")
-	extLines, err := utils.ReadParamsAndOutputFromExt(extFilePath)
-	if err == nil {
+	if useExt {
+		extFilePath := strings.Join([]string{filepath.Join(dir, runNum), ".ext"}, "")
+		extLines, err := utils.ReadParamsAndOutputFromExt(extFilePath)
+		if err != nil {
+			panic(err)
+		}
 		extData, _ := ParseExtData(ParseExtLines(extLines))
 		results.ParametersData = extData
 		results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, extFilePath)
 	}
 
-	grdFilePath := strings.Join([]string{filepath.Join(dir, runNum), ".grd"}, "")
-	grdLines, err := utils.ReadParamsAndOutputFromExt(grdFilePath)
-	if err == nil {
+	if useGrd {
+		grdFilePath := strings.Join([]string{filepath.Join(dir, runNum), ".grd"}, "")
+		grdLines, err := utils.ReadParamsAndOutputFromExt(grdFilePath)
+		if err != nil {
+			panic(err)
+		}
 		parametersData, _ := ParseGrdData(ParseGrdLines(grdLines))
 		results.RunHeuristics.HasFinalZeroGradient = HasZeroGradient(parametersData[len(parametersData)-1].Fixed.Theta)
 		results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, grdFilePath)

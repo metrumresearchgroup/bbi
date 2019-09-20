@@ -41,7 +41,7 @@ func summary(cmd *cobra.Command, args []string) {
 		viper.Debug()
 	}
 
-	results := parser.GetModelOutput(args[0], verbose)
+	results := parser.GetModelOutput(args[0], verbose, true, true)
 
 	if Json {
 		jsonRes, _ := json.MarshalIndent(results, "", "\t")
