@@ -1,6 +1,9 @@
 package parser
 
-import "bytes"
+import (
+	"bytes"
+	"encoding/json"
+)
 
 // ParameterNames containst the names of model parameters
 type ParameterNames struct {
@@ -163,4 +166,16 @@ func (s HeuristicStatus) MarshalJSON() ([]byte, error) {
 	buffer.WriteString(toString[s])
 	buffer.WriteString(`"`)
 	return buffer.Bytes(), nil
+}
+
+// UnmarshalJSON unmashals a quoted json string to the enum value
+func (s *HeuristicStatus) UnmarshalJSON(b []byte) error {
+	var j string
+	err := json.Unmarshal(b, &j)
+	if err != nil {
+		return err
+	}
+	// Note that if the string cannot be found then it will be set to the zero value, 'Created' in this case.
+	*s = toID[j]
+	return nil
 }
