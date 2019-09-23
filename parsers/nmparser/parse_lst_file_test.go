@@ -1,6 +1,8 @@
 package parser
 
 import (
+	"math"
+	"math/rand"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -232,7 +234,7 @@ func TestSetLargeConditionNumber(t *testing.T) {
 
 	for _, tt := range tests {
 
-		largeConditionNumber := setLargeConditionNumber(tt.lines, tt.n, 1000.0)
+		largeConditionNumber := getLargeConditionNumberStatus(tt.lines, tt.n, 1000.0)
 		assert.Equal(t, tt.largeConditionNumber, largeConditionNumber, "Fail :"+tt.context)
 	}
 }
@@ -464,7 +466,75 @@ func TestSetCorrelationsOk(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		correlationsOk := setCorrelationsOk(tt.lines, tt.n, 0.95)
+		correlationsOk := getCorrelationStatus(tt.lines, tt.n, 0.95)
 		assert.Equal(t, tt.correlationsOk, correlationsOk, "Fail :"+tt.context)
+		//assert.Equal(t, true, false, "Fail :"+tt.context)
 	}
+}
+
+// These tests show there is little improvement to be gained by optimizing the
+// code for a lower diagonal matrix, or using for loops instead of range
+func BenchmarkCheckMatrix1(b *testing.B) {
+	dim := 10000
+	matrix := make([][]float64, dim)
+	for i := range matrix {
+		matrix[i] = make([]float64, dim)
+	}
+	for j := range matrix {
+		for k := range matrix[j] {
+			matrix[j][k] = rand.Float64()
+		}
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		checkMatrix(matrix, 1)
+	}
+}
+func BenchmarkCheckMatrix2(b *testing.B) {
+	dim := 10000
+	matrix := make([][]float64, dim)
+	for i := range matrix {
+		matrix[i] = make([]float64, dim)
+	}
+	for j := range matrix {
+		for k := range matrix[j] {
+			matrix[j][k] = rand.Float64()
+		}
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		checkMatrix2(matrix, 1)
+	}
+}
+
+func checkMatrix(matrix [][]float64, limit float64) bool {
+	for j := range matrix {
+		for k, cell := range matrix[j] {
+			if k > (j + 1) {
+				break
+			}
+			if k == j || cell == 0 {
+				continue
+			}
+			if math.Abs(cell) >= limit {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+func checkMatrix2(matrix [][]float64, limit float64) bool {
+	dim := len(matrix)
+	for j := 0; j < dim; j++ {
+		for k := 0; k < j; k++ {
+			if k == j || matrix[j][k] == 0 {
+				continue
+			}
+			if math.Abs(matrix[j][k]) >= limit {
+				return false
+			}
+		}
+	}
+	return true
 }

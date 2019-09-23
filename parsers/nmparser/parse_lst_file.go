@@ -56,7 +56,7 @@ func parseOFV(line string, ofvDetails OfvDetails) OfvDetails {
 	return ofvDetails
 }
 
-func setLargeConditionNumber(lines []string, start int, largeNumberLimit float64) HeuristicStatus {
+func getLargeConditionNumberStatus(lines []string, start int, largeNumberLimit float64) HeuristicStatus {
 
 	// go until line of ints
 	for i, line := range lines[start:] {
@@ -104,7 +104,7 @@ func setLargeConditionNumber(lines []string, start int, largeNumberLimit float64
 	return HeuristicFalse
 }
 
-func setCorrelationsOk(lines []string, start int, correlationLimit float64) HeuristicStatus {
+func getCorrelationStatus(lines []string, start int, correlationLimit float64) HeuristicStatus {
 
 	var matrix [][]float64
 
@@ -181,7 +181,6 @@ func setCorrelationsOk(lines []string, start int, correlationLimit float64) Heur
 
 		// populate matrix
 		for j, row := range rows {
-			//fmt.Println("row:" + row)
 			for k, cell := range strings.Fields(row) {
 				value, err := strconv.ParseFloat(cell, 64)
 				if err == nil {
@@ -305,9 +304,10 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 		case strings.Contains(line, "EIGENVALUES OF COR MATRIX OF ESTIMATE"):
 			// TODO: get largeNumberLimit from config
 			// or derive. something like (number of parameters) * 10
-			runHeuristics.LargeConditionNumber = setLargeConditionNumber(lines, i, 1000.0)
+			runHeuristics.LargeConditionNumber = getLargeConditionNumberStatus(lines, i, 1000.0)
 		case strings.Contains(line, "CORRELATION MATRIX OF ESTIMATE"):
-			runHeuristics.CorrelationsOk = setCorrelationsOk(lines, i, 0.95)
+			// TODO: get correlationLimit from config
+			runHeuristics.CorrelationsOk = getCorrelationStatus(lines, i, 0.95)
 
 		default:
 			continue
