@@ -69,7 +69,7 @@ func (results ModelOutput) Summary() bool {
 
 			userEtaIndex := funk.IndexOfInt(diagIndices, i)
 			if userEtaIndex > -1 {
-				if len(results.ShrinkageDetails.Eta.SD) > 0 {
+				if len(results.ShrinkageDetails.Eta.SD) > userEtaIndex {
 					shrinkage = results.ShrinkageDetails.Eta.SD[userEtaIndex]
 					etaName = fmt.Sprintf("ETA%v", userEtaIndex+1)
 				}
