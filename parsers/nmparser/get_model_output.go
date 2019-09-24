@@ -47,5 +47,35 @@ func GetModelOutput(filePath string, verbose bool, useExtFile bool) ModelOutput 
 			results.ParametersData[i].StdErr.Sigma = make([]float64, len(results.ParametersData[i].Estimates.Sigma))
 		}
 	}
+
+	if len(results.ShrinkageDetails.Eta.SD) == 0 {
+		dim := 0
+		for i := range results.ParameterStructures.Omega {
+			if results.ParameterStructures.Omega[i] > 0 {
+				dim++
+			}
+		}
+		if dim > 0 {
+			results.ShrinkageDetails.Eta.SD = make([]float64, dim)
+			results.ShrinkageDetails.Eta.VR = make([]float64, dim)
+			// Ebv follows Eta
+			results.ShrinkageDetails.Ebv.SD = make([]float64, dim)
+			results.ShrinkageDetails.Ebv.VR = make([]float64, dim)
+		}
+	}
+
+	if len(results.ShrinkageDetails.Eps.SD) == 0 {
+		dim := 0
+		for i := range results.ParameterStructures.Sigma {
+			if results.ParameterStructures.Sigma[i] > 0 {
+				dim++
+			}
+		}
+		if dim > 0 {
+			results.ShrinkageDetails.Eps.SD = make([]float64, dim)
+			results.ShrinkageDetails.Eps.VR = make([]float64, dim)
+		}
+	}
+
 	return results
 }
