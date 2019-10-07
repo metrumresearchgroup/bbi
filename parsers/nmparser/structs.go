@@ -31,9 +31,16 @@ type ParametersData struct {
 	Fixed            ParametersResult   `json:"fixed,omitempty"`
 }
 
+// RunHeuristics ...
+// some values are defined as pointers to support tri-state: true, false, nil
 type RunHeuristics struct {
-	HasZeroGradient        bool `json:"has_zero_gradient,omitempty"`
-	MinimizationSuccessful bool `json:"minimization_successful,omitempty"`
+	CovarianceStepOmitted  HeuristicStatus `json:"covariance_step_omitted,omitempty"`
+	LargeConditionNumber   HeuristicStatus `json:"large_condition_number,omitempty"`
+	CorrelationsOk         HeuristicStatus `json:"correlations_ok,omitempty"`
+	ParameterNearBoundary  HeuristicStatus `json:"parameter_near_boundary,omitempty"`
+	HessianReset           HeuristicStatus `json:"hessian_reset,omitempty"`
+	HasFinalZeroGradient   HeuristicStatus `json:"has_final_zero_gradient,omitempty"`
+	MinimizationSuccessful HeuristicStatus `json:"minimization_successful,omitempty"`
 }
 
 // RunDetails contains key information about logistics of the model run
@@ -53,6 +60,7 @@ type RunDetails struct {
 	NumberOfObs         int64    `json:"number_of_obs,omitempty"`
 	NumberOfDataRecords int64    `json:"number_of_data_records,omitempty"`
 	OutputTable         string   `json:"output_table,omitempty"`
+	OutputFilesUsed     []string `json:"output_files_used,omitempty"`
 }
 
 // CompletionDetails ...
