@@ -172,6 +172,10 @@ func getCorrelationStatus(lines []string, start int, correlationLimit float64) H
 			} else {
 				// if there is not a +, append the values to the previous row
 				if len(rows) > 0 {
+					// section ends with a line with "1"
+					if clean == "1" {
+						break
+					}
 					previousrow := len(rows) - 1
 					clean = strings.TrimSpace(strings.Replace(strings.Replace(line, "+", "", -1), ",", "", -1))
 					rows[previousrow] = rows[previousrow] + " " + clean
