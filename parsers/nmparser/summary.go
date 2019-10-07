@@ -66,10 +66,13 @@ func (results ModelOutput) Summary() bool {
 			val := results.ParametersData[finalEstimationMethodIndex].Estimates.Omega[i]
 			var shrinkage float64
 			var etaName string
+
 			userEtaIndex := funk.IndexOfInt(diagIndices, i)
 			if userEtaIndex > -1 {
-				shrinkage = results.ShrinkageDetails.Eta.SD[userEtaIndex]
-				etaName = fmt.Sprintf("ETA%v", userEtaIndex+1)
+				if len(results.ShrinkageDetails.Eta.SD) > userEtaIndex {
+					shrinkage = results.ShrinkageDetails.Eta.SD[userEtaIndex]
+					etaName = fmt.Sprintf("ETA%v", userEtaIndex+1)
+				}
 			}
 
 			var s4 string
