@@ -307,7 +307,7 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 			runHeuristics.LargeConditionNumber = getLargeConditionNumberStatus(lines, i, 1000.0)
 		case strings.Contains(line, "CORRELATION MATRIX OF ESTIMATE"):
 			// TODO: get correlationLimit from config
-			runHeuristics.CorrelationsOk = getCorrelationStatus(lines, i, 0.95)
+			runHeuristics.CorrelationsOk = getCorrelationStatus(lines, i, 0.90)
 
 		default:
 			continue

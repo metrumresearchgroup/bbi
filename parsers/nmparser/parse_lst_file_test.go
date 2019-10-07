@@ -466,7 +466,7 @@ func TestSetCorrelationsOk(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		correlationsOk := getCorrelationStatus(tt.lines, tt.n, 0.95)
+		correlationsOk := getCorrelationStatus(tt.lines, tt.n, 0.90)
 		assert.Equal(t, tt.correlationsOk, correlationsOk, "Fail :"+tt.context)
 		//assert.Equal(t, true, false, "Fail :"+tt.context)
 	}
