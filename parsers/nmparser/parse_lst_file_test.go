@@ -317,6 +317,8 @@ func TestSetCorrelationsOk(t *testing.T) {
 				"+       -3.78E-02  8.42E-02 -1.56E-01 -1.15E-01  9.65E-02 ......... ......... ......... ......... -1.93E-01 ......... .........",
 				"         9.53E-03 ......... -7.70E-02  7.34E-05",
 				"",
+				"",
+				"1",
 			},
 			n:              3,
 			correlationsOk: HeuristicTrue,
@@ -537,4 +539,143 @@ func checkMatrix2(matrix [][]float64, limit float64) bool {
 		}
 	}
 	return true
+}
+
+func TestCheckMatrix(t *testing.T) {
+	dim := 3
+	matrix := make([][]float64, dim)
+	for i := range matrix {
+		matrix[i] = make([]float64, dim)
+	}
+
+	count := 1.0
+	for j := range matrix {
+		for k := range matrix[j] {
+			matrix[j][k] = count
+			count++
+		}
+	}
+
+	count = 1.0
+	for j := range matrix {
+		for k := range matrix[j] {
+			assert.Equal(t, matrix[j][k], count, "Fail")
+			count++
+		}
+	}
+
+	// change to column major
+	matrix = transpose(matrix)
+	count = 1.0
+	for k := range matrix {
+		for j := range matrix[k] {
+			assert.Equal(t, matrix[j][k], count, "Fail")
+			count++
+		}
+	}
+}
+
+func transpose(slice [][]float64) [][]float64 {
+	xl := len(slice[0])
+	yl := len(slice)
+	result := make([][]float64, xl)
+	for i := range result {
+		result[i] = make([]float64, yl)
+	}
+	for i := 0; i < xl; i++ {
+		for j := 0; j < yl; j++ {
+			result[i][j] = slice[j][i]
+		}
+	}
+	return result
+}
+
+func TestSetCov(t *testing.T) {
+	var tests = []struct {
+		lines   []string
+		n       int
+		context string
+	}{
+
+		{
+			lines: []string{
+				"************************************************************************************************************************",
+				"********************                                                                                ********************",
+				"********************               FIRST ORDER CONDITIONAL ESTIMATION WITH INTERACTION              ********************",
+				"********************                          CORRELATION MATRIX OF ESTIMATE                        ********************",
+				"********************                                                                                ********************",
+				"************************************************************************************************************************",
+				"                                                                                                                        ",
+				"                                                                                                                        ",
+				"		   TH 1      TH 2      TH 3      TH 4      TH 5      TH 6      TH 7      TH 8      TH 9      OM11      OM12      OM13",
+				"			OM22      OM23      OM33      SG11",
+				"",
+				" TH 1",
+				"+        6.09E-01",
+				"",
+				" TH 2",
+				"+       -7.99E-02  4.41E+00",
+				"",
+				" TH 3",
+				"+       -1.06E-01 -3.44E-01  2.33E+00",
+				"",
+				" TH 4",
+				"+       -3.91E-02 -4.46E-01  6.10E-01  1.01E+00",
+				"",
+				" TH 5",
+				"+        8.05E-02  3.89E-01 -5.73E-01 -7.30E-01  2.13E-02",
+				"",
+				" TH 6",
+				"+       6.0 ......... ......... ......... ......... .........",
+				"",
+				" TH 7",
+				"+       7.0 ......... ......... ......... ......... ......... .........",
+				"",
+				" TH 8",
+				"+       8.0 ......... ......... ......... ......... ......... ......... .........",
+				"",
+				" TH 9",
+				"+       9.0 ......... ......... ......... ......... ......... ......... ......... 9.9",
+				"",
+				" OM11",
+				"+        6.62E-02 -5.65E-02 -2.33E-02  7.85E-02  3.10E-02 ......... ......... ......... .........  9.59E-03",
+				"",
+				" OM12",
+				"+       ......... ......... ......... ......... ......... ......... ......... ......... ......... ......... .........",
+				"",
+				" OM13",
+				"+       ......... ......... ......... ......... ......... ......... ......... ......... ......... ......... ......... .........",
+				"",
+				" OM22",
+				"+       -1.25E-01  1.41E-01  3.34E-02  2.03E-02  3.38E-02 ......... ......... ......... .........  1.05E-01 ......... .........",
+				"         3.53E-03",
+				"",
+				" OM23",
+				"+       ......... ......... ......... ......... ......... ......... ......... ......... ......... ......... ......... .........",
+				"         ......... .........",
+				"",
+				" OM33",
+				"+        9.00E-02 -2.64E-02  4.10E-02 -2.81E-02  6.29E-02 ......... ......... ......... .........  8.87E-02 ......... .........",
+				"         -4.90E-02 .........  1.86E-03",
+				"",
+				" SG11",
+				"+       -3.78E-02  8.42E-02 -1.56E-01 -1.15E-01  9.65E-02 ......... ......... ......... ......... -1.93E-01 ......... .........",
+				"         9.53E-03 ......... -7.70E-02  7.34E-05",
+				"",
+				"",
+				"1",
+			},
+			n:       3,
+			context: "OK",
+		},
+	}
+
+	for _, tt := range tests {
+		covTheta := getCovarianceThetaValues(tt.lines, tt.n)
+		assert.Equal(t, 2, covTheta.Dim, "Fail :"+tt.context)
+		assert.Equal(t, 0.609, covTheta.Values[0], "Fail :"+tt.context)
+		assert.Equal(t, -0.0799, covTheta.Values[9], "Fail :"+tt.context)
+		assert.Equal(t, 0.0213, covTheta.Values[40], "Fail :"+tt.context)
+		assert.Equal(t, 9.9, covTheta.Values[80], "Fail :"+tt.context)
+	}
 }

@@ -13,11 +13,14 @@ type ParametersResult struct {
 	Omega []float64 `json:"omega,omitempty"`
 	Sigma []float64 `json:"sigma,omitempty"`
 }
+
+// RandomEffectResult ...
 type RandomEffectResult struct {
 	Omega []float64 `json:"omega,omitempty"`
 	Sigma []float64 `json:"sigma,omitempty"`
 }
 
+// ParametersData contains data for each method
 type ParametersData struct {
 	Method    string           `json:"method,omitempty"`
 	Estimates ParametersResult `json:"estimates,omitempty"`
@@ -117,6 +120,7 @@ type ModelOutput struct {
 	ParameterNames      ParameterNames      `json:"parameter_names,omitempty"`
 	OFV                 OfvDetails          `json:"ofv,omitempty"`
 	ShrinkageDetails    ShrinkageDetails    `json:"shrinkage_details,omitempty"`
+	CovariateTheta      []FlatArray         `json:"covariate_theta,omitempty"`
 }
 
 // ExtData provides an intermediate representation of the ExtData after iterations have been stripped out
@@ -125,4 +129,38 @@ type ExtData struct {
 	EstimationMethods []string
 	ParameterNames    []string
 	EstimationLines   [][]string
+}
+
+// MatrixData ...
+type MatrixData struct {
+	Values     [][]float64
+	ThetaCount int
+	OmageCount int
+	SigmaCount int
+}
+
+// FlatArray ... to be consumed by R as matrix(Values, nrow=Dim)
+type FlatArray struct {
+	Values []float64
+	Dim    int
+}
+
+// MakeFlatArray ...
+func MakeFlatArray(matrix [][]float64, length int, dim int) FlatArray {
+	if length > len(matrix) {
+		panic("error making FlatArray")
+	}
+
+	values := make([]float64, length*length)
+	k := 0
+	for i := 0; i < length; i++ {
+		for j := 0; j < length; j++ {
+			values[k] = matrix[i][j]
+			k++
+		}
+	}
+	return FlatArray{
+		Values: values,
+		Dim:    dim,
+	}
 }

@@ -12,7 +12,7 @@ import (
 // GetModelOutput populates and returns a ModelOutput object by parsing files
 // ParameterData is parsed from the ext file when useExtFile is true
 // ParameterData is parsed from the lst file when useExtFile is false
-func GetModelOutput(filePath string, verbose bool, useExt bool, useGrd bool) ModelOutput {
+func GetModelOutput(filePath string, verbose bool, useExt bool, useGrd bool, useCov bool) ModelOutput {
 
 	AppFs := afero.NewOsFs()
 	runNum, _ := utils.FileAndExt(filePath)
@@ -47,6 +47,15 @@ func GetModelOutput(filePath string, verbose bool, useExt bool, useGrd bool) Mod
 		parametersData, _ := ParseGrdData(ParseGrdLines(grdLines))
 		results.RunHeuristics.HasFinalZeroGradient = HasZeroGradient(parametersData[len(parametersData)-1].Fixed.Theta)
 		results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, grdFilePath)
+	}
+
+	if useCov {
+		covFilePath := strings.Join([]string{filepath.Join(dir, runNum), ".cov"}, "")
+		covLines, err := utils.ReadLines(covFilePath)
+		if err != nil {
+			panic(err)
+		}
+		results.CovariateTheta = GetThetaValues(covLines)
 	}
 
 	for i := range results.ParametersData {
