@@ -120,7 +120,7 @@ type ModelOutput struct {
 	ParameterNames      ParameterNames      `json:"parameter_names,omitempty"`
 	OFV                 OfvDetails          `json:"ofv,omitempty"`
 	ShrinkageDetails    ShrinkageDetails    `json:"shrinkage_details,omitempty"`
-	CovariateTheta      []FlatArray         `json:"covariate_theta,omitempty"`
+	CovarianceTheta     []FlatArray         `json:"covariance_theta,omitempty"`
 }
 
 // ExtData provides an intermediate representation of the ExtData after iterations have been stripped out

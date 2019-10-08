@@ -392,7 +392,7 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 		ParameterNames:      parameterNames,
 		OFV:                 ofvDetails,
 		ShrinkageDetails:    shrinkageDetails,
-		CovariateTheta:      []FlatArray{covTheta},
+		CovarianceTheta:     []FlatArray{covTheta},
 	}
 	return result
 }

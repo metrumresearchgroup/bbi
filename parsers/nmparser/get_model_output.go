@@ -55,7 +55,7 @@ func GetModelOutput(filePath string, verbose bool, useExt bool, useGrd bool, use
 		if err != nil {
 			panic(err)
 		}
-		results.CovariateTheta = GetThetaValues(covLines)
+		results.CovarianceTheta = GetThetaValues(covLines)
 	}
 
 	for i := range results.ParametersData {
