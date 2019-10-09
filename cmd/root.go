@@ -35,6 +35,10 @@ var (
 	threads int
 	Json    bool
 	preview bool
+	noExt   bool
+	noGrd   bool
+	noCov   bool
+	noCor   bool
 )
 
 // RootCmd represents the base command when called without any subcommands
@@ -70,6 +74,10 @@ func init() {
 	RootCmd.PersistentFlags().IntVar(&threads, "threads", 0, "number of threads to execute with")
 	RootCmd.PersistentFlags().BoolVar(&Json, "json", false, "json tree of output, if possible")
 	RootCmd.PersistentFlags().BoolVarP(&preview, "preview", "p", false, "preview action, but don't actually run command")
+	RootCmd.PersistentFlags().BoolVarP(&noExt, "no-ext", "", false, "do not use ext file")
+	RootCmd.PersistentFlags().BoolVarP(&noGrd, "no-grd", "", false, "do not use grd file")
+	RootCmd.PersistentFlags().BoolVarP(&noCov, "no-cov", "", false, "do not use cov file")
+	RootCmd.PersistentFlags().BoolVarP(&noCor, "no-cor", "", false, "do not use cor file")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.

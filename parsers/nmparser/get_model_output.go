@@ -12,7 +12,7 @@ import (
 // GetModelOutput populates and returns a ModelOutput object by parsing files
 // ParameterData is parsed from the ext file when useExtFile is true
 // ParameterData is parsed from the lst file when useExtFile is false
-func GetModelOutput(filePath string, verbose bool, useExt bool, useGrd bool, useCoX bool) ModelOutput {
+func GetModelOutput(filePath string, verbose bool, noExt bool, noGrd bool, noCov bool, noCor bool) ModelOutput {
 
 	AppFs := afero.NewOsFs()
 	runNum, _ := utils.FileAndExt(filePath)
@@ -27,7 +27,7 @@ func GetModelOutput(filePath string, verbose bool, useExt bool, useGrd bool, use
 	results := ParseLstEstimationFile(fileLines)
 	results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, outputFilePath)
 
-	if useExt {
+	if !noExt {
 		extFilePath := strings.Join([]string{filepath.Join(dir, runNum), ".ext"}, "")
 		extLines, err := utils.ReadParamsAndOutputFromExt(extFilePath)
 		if err != nil {
@@ -38,7 +38,7 @@ func GetModelOutput(filePath string, verbose bool, useExt bool, useGrd bool, use
 		results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, extFilePath)
 	}
 
-	if useGrd {
+	if !noGrd {
 		grdFilePath := strings.Join([]string{filepath.Join(dir, runNum), ".grd"}, "")
 		grdLines, err := utils.ReadParamsAndOutputFromExt(grdFilePath)
 		if err != nil {
@@ -49,18 +49,22 @@ func GetModelOutput(filePath string, verbose bool, useExt bool, useGrd bool, use
 		results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, grdFilePath)
 	}
 
-	if useCoX {
+	if !noCov {
 		covFilePath := strings.Join([]string{filepath.Join(dir, runNum), ".cov"}, "")
 		covLines, err := utils.ReadLines(covFilePath)
-		if err == nil {
-			results.CovarianceTheta = GetThetaValues(covLines)
+		if err != nil {
+			panic(err)
 		}
+		results.CovarianceTheta = GetThetaValues(covLines)
+	}
 
+	if !noCor {
 		corFilePath := strings.Join([]string{filepath.Join(dir, runNum), ".cor"}, "")
 		corLines, err := utils.ReadLines(corFilePath)
-		if err == nil {
-			results.CorrelationTheta = GetThetaValues(corLines)
+		if err != nil {
+			panic(err)
 		}
+		results.CorrelationTheta = GetThetaValues(corLines)
 	}
 
 	for i := range results.ParametersData {
