@@ -656,8 +656,8 @@ func TestSetCov(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		covTheta := getCovarianceThetaValues(tt.lines, tt.n)
-		assert.Equal(t, 2, covTheta.Dim, "Fail :"+tt.context)
+		covTheta := getThetaValues(tt.lines, tt.n)
+		assert.Equal(t, 9, covTheta.Dim, "Fail :"+tt.context)
 		assert.Equal(t, 0.609, covTheta.Values[0], "Fail :"+tt.context)
 		assert.Equal(t, -0.0799, covTheta.Values[1], "Fail :"+tt.context)
 		assert.Equal(t, 8.0, covTheta.Values[7], "Fail :"+tt.context)
@@ -678,7 +678,7 @@ func TestSetCov2(t *testing.T) {
 
 	for _, tt := range tests {
 		lines, _ := readLines(tt.filename)
-		covTheta := getCovarianceThetaValues(lines, tt.n)
+		covTheta := getThetaValues(lines, tt.n)
 		assert.Equal(t, 0.379, covTheta.Values[0], "Fail :"+tt.context)
 	}
 }

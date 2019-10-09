@@ -70,7 +70,7 @@ func GetThetaValues(lines []string) []FlatArray {
 
 	for _, d := range data.EstimationLines {
 		m := getThetaMatrix(d)
-		thetas := MakeFlatArray(m, len(m), 2)
+		thetas := MakeFlatArray(m, len(m))
 		result = append(result, thetas)
 	}
 	return result

@@ -245,9 +245,9 @@ func getCorrelationStatus(lines []string, start int, correlationLimit float64) H
 	return HeuristicTrue
 }
 
-func getCovarianceThetaValues(lines []string, start int) FlatArray {
+func getThetaValues(lines []string, start int) FlatArray {
 	matrixData := getMatrixData(lines, start)
-	thetas := MakeFlatArray(matrixData.Values, matrixData.ThetaCount, 2)
+	thetas := MakeFlatArray(matrixData.Values, matrixData.ThetaCount)
 	return thetas
 }
 
@@ -303,6 +303,7 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 	var finalParameterEstimatesIndex int
 	var standardErrorEstimateIndex int
 	var covarianceMatrixEstimateIndex int
+	var correlationMatrixEstimateIndex int
 	var startThetaIndex int
 	var endSigmaIndex int
 	var gradientLines []string
@@ -363,6 +364,7 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 			// or derive. something like (number of parameters) * 10
 			runHeuristics.LargeConditionNumber = getLargeConditionNumberStatus(lines, i, 1000.0)
 		case strings.Contains(line, "CORRELATION MATRIX OF ESTIMATE"):
+			correlationMatrixEstimateIndex = i
 			// TODO: get correlationLimit from config
 			runHeuristics.CorrelationsOk = getCorrelationStatus(lines, i, 0.90)
 
@@ -377,14 +379,18 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 	var finalParameterStdErr ParametersResult
 	var parameterStructures ParameterStructures
 	var parameterNames ParameterNames
-	var covTheta FlatArray
+	var covTheta, corTheta FlatArray
 
 	if standardErrorEstimateIndex > finalParameterEstimatesIndex {
 		finalParameterEst = ParseFinalParameterEstimatesFromLst(lines[finalParameterEstimatesIndex:standardErrorEstimateIndex])
 	}
 
 	if covarianceMatrixEstimateIndex > 0 {
-		covTheta = getCovarianceThetaValues(lines, covarianceMatrixEstimateIndex)
+		covTheta = getThetaValues(lines, covarianceMatrixEstimateIndex)
+	}
+
+	if correlationMatrixEstimateIndex > 0 {
+		corTheta = getThetaValues(lines, correlationMatrixEstimateIndex)
 	}
 
 	if covarianceMatrixEstimateIndex > standardErrorEstimateIndex {
@@ -413,6 +419,7 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 		OFV:                 ofvDetails,
 		ShrinkageDetails:    shrinkageDetails,
 		CovarianceTheta:     []FlatArray{covTheta},
+		CorrelationTheta:    []FlatArray{corTheta},
 	}
 	return result
 }
