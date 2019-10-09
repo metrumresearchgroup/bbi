@@ -59,6 +59,7 @@ func getThetaMatrix(lines []string) [][]float64 {
 			matrix = append(matrix, thetas)
 		}
 	}
+	// no transpose required to create column-major matrix as this matrix is symmetrical
 	return matrix
 }
 

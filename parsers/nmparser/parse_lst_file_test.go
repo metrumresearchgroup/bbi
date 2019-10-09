@@ -575,21 +575,6 @@ func TestCheckMatrix(t *testing.T) {
 	}
 }
 
-func transpose(slice [][]float64) [][]float64 {
-	xl := len(slice[0])
-	yl := len(slice)
-	result := make([][]float64, xl)
-	for i := range result {
-		result[i] = make([]float64, yl)
-	}
-	for i := 0; i < xl; i++ {
-		for j := 0; j < yl; j++ {
-			result[i][j] = slice[j][i]
-		}
-	}
-	return result
-}
-
 func TestSetCov(t *testing.T) {
 	var tests = []struct {
 		lines   []string
@@ -674,8 +659,26 @@ func TestSetCov(t *testing.T) {
 		covTheta := getCovarianceThetaValues(tt.lines, tt.n)
 		assert.Equal(t, 2, covTheta.Dim, "Fail :"+tt.context)
 		assert.Equal(t, 0.609, covTheta.Values[0], "Fail :"+tt.context)
-		assert.Equal(t, -0.0799, covTheta.Values[9], "Fail :"+tt.context)
-		assert.Equal(t, 0.0213, covTheta.Values[40], "Fail :"+tt.context)
+		assert.Equal(t, -0.0799, covTheta.Values[1], "Fail :"+tt.context)
+		assert.Equal(t, 8.0, covTheta.Values[7], "Fail :"+tt.context)
 		assert.Equal(t, 9.9, covTheta.Values[80], "Fail :"+tt.context)
+	}
+}
+
+func TestSetCov2(t *testing.T) {
+	var tests = []struct {
+		filename string
+		n        int
+		context  string
+	}{{
+		filename: "../../testdata/example-models/nonmem/contpkpd/1.lst",
+		n:        497,
+		context:  "contpkpd",
+	}}
+
+	for _, tt := range tests {
+		lines, _ := readLines(tt.filename)
+		covTheta := getCovarianceThetaValues(lines, tt.n)
+		assert.Equal(t, 0.379, covTheta.Values[0], "Fail :"+tt.context)
 	}
 }

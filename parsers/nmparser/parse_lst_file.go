@@ -141,7 +141,7 @@ func getMatrixData(lines []string, start int) MatrixData {
 			}
 			start = start + i
 		} else {
-			start = start + i
+			start = start + 1
 			break
 		}
 	}
@@ -209,6 +209,11 @@ func getMatrixData(lines []string, start int) MatrixData {
 		}
 	}
 
+	// a symmetric matrix is equal to its transpose, however in the case of the lst file
+	// the upper diagonal elements are omitted, so a transpose is required to deliver
+	// a column-major matrix
+	matrix = transpose(matrix)
+
 	return MatrixData{
 		Values:     matrix,
 		ThetaCount: thetaCount,
@@ -244,6 +249,21 @@ func getCovarianceThetaValues(lines []string, start int) FlatArray {
 	matrixData := getMatrixData(lines, start)
 	thetas := MakeFlatArray(matrixData.Values, matrixData.ThetaCount, 2)
 	return thetas
+}
+
+func transpose(slice [][]float64) [][]float64 {
+	xl := len(slice[0])
+	yl := len(slice)
+	result := make([][]float64, xl)
+	for i := range result {
+		result[i] = make([]float64, yl)
+	}
+	for i := 0; i < xl; i++ {
+		for j := 0; j < yl; j++ {
+			result[i][j] = slice[j][i]
+		}
+	}
+	return result
 }
 
 func contains(a []string, value string) bool {

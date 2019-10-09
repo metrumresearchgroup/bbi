@@ -52,10 +52,9 @@ func GetModelOutput(filePath string, verbose bool, useExt bool, useGrd bool, use
 	if useCov {
 		covFilePath := strings.Join([]string{filepath.Join(dir, runNum), ".cov"}, "")
 		covLines, err := utils.ReadLines(covFilePath)
-		if err != nil {
-			panic(err)
+		if err == nil {
+			results.CovarianceTheta = GetThetaValues(covLines)
 		}
-		results.CovarianceTheta = GetThetaValues(covLines)
 	}
 
 	for i := range results.ParametersData {
