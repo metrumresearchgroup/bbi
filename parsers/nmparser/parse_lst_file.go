@@ -20,7 +20,17 @@ func parseShrinkage(line string, shrinkageDetails ShrinkageDetails) ShrinkageDet
 		shrinkageDetails.Eps.SD = parseFloats(line, "EPSSHRINKSD(%)")
 	} else if strings.Contains(line, "EPSSHRINKVR(%)") {
 		shrinkageDetails.Eps.VR = parseFloats(line, "EPSSHRINKVR(%)")
+	} else if strings.Contains(line, "ETAshrink(%)") {
+		line = strings.Replace(line, ":", "", 1)
+		shrinkageDetails.Eta.SD = parseFloats(line, "ETAshrink(%)")
+	} else if strings.Contains(line, "EBVshrink(%)") {
+		line = strings.Replace(line, ":", "", 1)
+		shrinkageDetails.Ebv.SD = parseFloats(line, "EBVshrink(%)")
+	} else if strings.Contains(line, "EPSshrink(%)") {
+		line = strings.Replace(line, ":", "", 1)
+		shrinkageDetails.Eps.VR = parseFloats(line, "EPSshrink(%)")
 	}
+
 	return shrinkageDetails
 }
 
@@ -349,6 +359,13 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 			shrinkageDetails = parseShrinkage(line, shrinkageDetails)
 		case strings.Contains(line, "EPSSHRINK"):
 			shrinkageDetails = parseShrinkage(line, shrinkageDetails)
+		case strings.Contains(line, "ETAshrink"):
+			shrinkageDetails = parseShrinkage(line, shrinkageDetails)
+		case strings.Contains(line, "EBVshrink"):
+			shrinkageDetails = parseShrinkage(line, shrinkageDetails)
+		case strings.Contains(line, "EPSshrink"):
+			shrinkageDetails = parseShrinkage(line, shrinkageDetails)
+
 		case strings.Contains(line, "0MINIMIZATION SUCCESSFUL"):
 			runHeuristics.MinimizationSuccessful = HeuristicTrue
 		case strings.Contains(line, "GRADIENT:"):

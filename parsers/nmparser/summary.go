@@ -8,8 +8,6 @@ import (
 
 	"github.com/logrusorgru/aurora"
 	"github.com/olekukonko/tablewriter"
-
-	"github.com/thoas/go-funk"
 )
 
 // Summary prints all results from the parsed LstData
@@ -57,28 +55,29 @@ func (results ModelOutput) Summary() bool {
 	// required for color, prevents newline in row
 	thetaTable.SetAutoWrapText(false)
 
-	diagIndices := GetDiagonalElements(results.ParameterStructures.Omega)
-	for i := range results.ParametersData[finalEstimationMethodIndex].Estimates.Omega {
+	diagIndices := GetDiagonalIndices(results.ParameterStructures.Omega)
+	for n, omegaIndex := range diagIndices {
 
-		omegaIndex, _ := omegaIndices[i]
-		if results.ParameterStructures.Omega[i] != 0 {
-			val := results.ParametersData[finalEstimationMethodIndex].Estimates.Omega[i]
-			var shrinkage float64
-			var etaName string
-			userEtaIndex := funk.IndexOfInt(diagIndices, i)
-			if userEtaIndex > -1 {
-				shrinkage = results.ShrinkageDetails.Eta.SD[userEtaIndex]
-				etaName = fmt.Sprintf("ETA%v", userEtaIndex+1)
-			}
-
-			var s4 string
-			if shrinkage > 30.0 {
-				s4 = aurora.Sprintf(aurora.Red("%s"), fmt.Sprintf("%f", shrinkage))
-			} else {
-				s4 = fmt.Sprintf("%f", shrinkage)
-			}
-			omegaTable.Append([]string{string("O" + omegaIndex), etaName, fmt.Sprintf("%f", val), s4})
+		if n >= len(results.ShrinkageDetails.Eta.SD) {
+			panic("ShrinkageDetails.Eta.SD range error")
 		}
+
+		if omegaIndex >= len(results.ParametersData[finalEstimationMethodIndex].Estimates.Omega) {
+			panic("results.ParametersData[].Estimates.Omega range error")
+		}
+
+		shrinkage := results.ShrinkageDetails.Eta.SD[n]
+		var s4 string
+		if shrinkage > 30.0 {
+			s4 = aurora.Sprintf(aurora.Red("%s"), fmt.Sprintf("%f", shrinkage))
+		} else {
+			s4 = fmt.Sprintf("%f", shrinkage)
+		}
+
+		val := results.ParametersData[finalEstimationMethodIndex].Estimates.Omega[omegaIndex]
+		etaName := fmt.Sprintf("ETA%v", n+1)
+		omegaIndices := fmt.Sprintf("(%s,%s)", strconv.Itoa(n), strconv.Itoa(n))
+		omegaTable.Append([]string{string("O" + omegaIndices), etaName, fmt.Sprintf("%f", val), s4})
 	}
 
 	fmt.Println(results.RunDetails.ProblemText)
