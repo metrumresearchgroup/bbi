@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	parser "github.com/babylon/parsers/nmparser"
+	parser "github.com/metrumresearchgroup/babylon/parsers/nmparser"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 )
@@ -49,7 +49,7 @@ func TestSummary(t *testing.T) {
 		assert.Equal(t, nil, err, fmt.Sprintf("[%s] fail to unmarshal goldenSummary: %s", context, err))
 
 		// execute bbi and capture summary output as string
-		stdout, err := exec.Command(bbiExe, "summary", "--tree", tt.modFile).Output()
+		stdout, err := exec.Command(bbiExe, "summary", "--json", tt.modFile).Output()
 		assert.Equal(t, nil, err, fmt.Sprintf("[%s] fail exec %s: %s", context, bbiExe, err))
 
 		// unmarshal summary output
