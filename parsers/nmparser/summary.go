@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/logrusorgru/aurora"
 	"github.com/olekukonko/tablewriter"
 
 	"github.com/thoas/go-funk"
@@ -19,8 +20,6 @@ func (results ModelOutput) Summary() bool {
 	thetaTable.SetHeader([]string{"Theta", "Name", "Estimate", "StdErr (RSE)"})
 	// required for color, prevents newline in row
 	thetaTable.SetAutoWrapText(false)
-	red := "\x1b[31;1m"
-	none := "\x1b[0m"
 
 	finalEstimationMethodIndex := len(results.ParametersData) - 1
 	if len(results.ParametersData[finalEstimationMethodIndex].Estimates.Theta) != len(results.ParametersData[finalEstimationMethodIndex].StdErr.Theta) {
@@ -39,7 +38,7 @@ func (results ModelOutput) Summary() bool {
 
 		var s4 string
 		if rse > 30.0 {
-			s4 = fmt.Sprintf("%s%s (%s%%)%s", red, strconv.FormatFloat(seResult, 'f', -1, 64), strconv.FormatFloat(rse, 'f', 1, 64), none)
+			s4 = aurora.Sprintf(aurora.Red("%s"), fmt.Sprintf("%s (%s%%)", strconv.FormatFloat(seResult, 'f', -1, 64), strconv.FormatFloat(rse, 'f', 1, 64)))
 		} else {
 			s4 = fmt.Sprintf("%s (%s%%)", strconv.FormatFloat(seResult, 'f', -1, 64), strconv.FormatFloat(rse, 'f', 1, 64))
 		}
@@ -66,18 +65,15 @@ func (results ModelOutput) Summary() bool {
 			val := results.ParametersData[finalEstimationMethodIndex].Estimates.Omega[i]
 			var shrinkage float64
 			var etaName string
-
 			userEtaIndex := funk.IndexOfInt(diagIndices, i)
 			if userEtaIndex > -1 {
-				if len(results.ShrinkageDetails.Eta.SD) > userEtaIndex {
-					shrinkage = results.ShrinkageDetails.Eta.SD[userEtaIndex]
-					etaName = fmt.Sprintf("ETA%v", userEtaIndex+1)
-				}
+				shrinkage = results.ShrinkageDetails.Eta.SD[userEtaIndex]
+				etaName = fmt.Sprintf("ETA%v", userEtaIndex+1)
 			}
 
 			var s4 string
 			if shrinkage > 30.0 {
-				s4 = fmt.Sprintf("%s%f%s", red, shrinkage, none)
+				s4 = aurora.Sprintf(aurora.Red("%s"), fmt.Sprintf("%f", shrinkage))
 			} else {
 				s4 = fmt.Sprintf("%f", shrinkage)
 			}
