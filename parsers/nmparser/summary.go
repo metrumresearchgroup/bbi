@@ -8,6 +8,8 @@ import (
 
 	"github.com/logrusorgru/aurora"
 	"github.com/olekukonko/tablewriter"
+
+	"github.com/thoas/go-funk"
 )
 
 // Summary prints all results from the parsed LstData
@@ -55,7 +57,7 @@ func (results ModelOutput) Summary() bool {
 	// required for color, prevents newline in row
 	thetaTable.SetAutoWrapText(false)
 
-	userEtaIndex := 0
+	diagIndices := GetDiagonalElements(results.ParameterStructures.Omega)
 	for i := range results.ParametersData[finalEstimationMethodIndex].Estimates.Omega {
 
 		omegaIndex, _ := omegaIndices[i]
@@ -63,11 +65,11 @@ func (results ModelOutput) Summary() bool {
 			val := results.ParametersData[finalEstimationMethodIndex].Estimates.Omega[i]
 			var shrinkage float64
 			var etaName string
-			if userEtaIndex < len(results.ShrinkageDetails.Eta.SD) {
+			userEtaIndex := funk.IndexOfInt(diagIndices, i)
+			if userEtaIndex > -1 {
 				shrinkage = results.ShrinkageDetails.Eta.SD[userEtaIndex]
 				etaName = fmt.Sprintf("ETA%v", userEtaIndex+1)
 			}
-			userEtaIndex++
 
 			var s4 string
 			if shrinkage > 30.0 {
