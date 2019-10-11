@@ -25,7 +25,7 @@ func GetModelOutput(filePath string, verbose bool, noExt bool, noGrd bool, noCov
 
 	fileLines, _ := utils.ReadLinesFS(AppFs, outputFilePath)
 	results := ParseLstEstimationFile(fileLines)
-	results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, outputFilePath)
+	results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, filepath.Base(outputFilePath))
 
 	if !noExt {
 		extFilePath := strings.Join([]string{filepath.Join(dir, runNum), ".ext"}, "")
@@ -35,7 +35,7 @@ func GetModelOutput(filePath string, verbose bool, noExt bool, noGrd bool, noCov
 		}
 		extData, _ := ParseExtData(ParseExtLines(extLines))
 		results.ParametersData = extData
-		results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, extFilePath)
+		results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, filepath.Base(extFilePath))
 	}
 
 	if !noGrd {
@@ -46,7 +46,7 @@ func GetModelOutput(filePath string, verbose bool, noExt bool, noGrd bool, noCov
 		}
 		parametersData, _ := ParseGrdData(ParseGrdLines(grdLines))
 		results.RunHeuristics.HasFinalZeroGradient = HasZeroGradient(parametersData[len(parametersData)-1].Fixed.Theta)
-		results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, grdFilePath)
+		results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, filepath.Base(grdFilePath))
 	}
 
 	if !noCov {
@@ -54,14 +54,16 @@ func GetModelOutput(filePath string, verbose bool, noExt bool, noGrd bool, noCov
 		covLines, err := utils.ReadLines(covFilePath)
 		if err == nil {
 			results.CovarianceTheta = GetThetaValues(covLines)
+			results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, filepath.Base(covFilePath))
 		}
 	}
 
 	if !noCor {
 		corFilePath := strings.Join([]string{filepath.Join(dir, runNum), ".cor"}, "")
 		corLines, err := utils.ReadLines(corFilePath)
-		if err != nil {
+		if err == nil {
 			results.CorrelationTheta = GetThetaValues(corLines)
+			results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, filepath.Base(corFilePath))
 		}
 	}
 
