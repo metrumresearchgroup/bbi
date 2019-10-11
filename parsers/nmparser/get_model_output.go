@@ -52,19 +52,17 @@ func GetModelOutput(filePath string, verbose bool, noExt bool, noGrd bool, noCov
 	if !noCov {
 		covFilePath := strings.Join([]string{filepath.Join(dir, runNum), ".cov"}, "")
 		covLines, err := utils.ReadLines(covFilePath)
-		if err != nil {
-			panic(err)
+		if err == nil {
+			results.CovarianceTheta = GetThetaValues(covLines)
 		}
-		results.CovarianceTheta = GetThetaValues(covLines)
 	}
 
 	if !noCor {
 		corFilePath := strings.Join([]string{filepath.Join(dir, runNum), ".cor"}, "")
 		corLines, err := utils.ReadLines(corFilePath)
 		if err != nil {
-			panic(err)
+			results.CorrelationTheta = GetThetaValues(corLines)
 		}
-		results.CorrelationTheta = GetThetaValues(corLines)
 	}
 
 	for i := range results.ParametersData {
