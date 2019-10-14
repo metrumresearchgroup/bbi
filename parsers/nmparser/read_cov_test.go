@@ -8,9 +8,8 @@ import (
 
 func TestReadParseCovLines(t *testing.T) {
 	var tests = []struct {
-		lines    []string
-		expected bool
-		context  string
+		lines   []string
+		context string
 	}{
 		{
 			lines: []string{
@@ -71,18 +70,20 @@ func TestReadParseCovLines(t *testing.T) {
 				" OMEGA(3,2)    0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00",
 				" OMEGA(3,3)    1.02250E-04 -2.16771E-04  1.78136E-04 -5.31316E-05  2.49581E-06  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00 -1.05448E-08  1.58649E-06  0.00000E+00 -3.22735E-07  0.00000E+00  0.00000E+00  3.47626E-06",
 			},
-			expected: false,
-			context:  "no zero",
+			context: "no zero",
 		},
 	}
 
 	for _, tt := range tests {
 		extData := parseCovLines(tt.lines)
 		assert.Equal(t, tt.lines[0], extData.EstimationMethods[0], "Fail :"+tt.context)
+		assert.Equal(t, "TABLE NO.     2: First Order Conditional Estimation with Interaction: Problem=1 Subproblem=0 Superproblem1=0 Iteration1=0 Superproblem2=0 Iteration2=0", extData.EstimationMethods[1], "Fail :"+tt.context)
+		assert.Equal(t, "TABLE NO.     3: First Order Conditional Estimation with Interaction: Problem=1 Subproblem=0 Superproblem1=0 Iteration1=0 Superproblem2=0 Iteration2=0", extData.EstimationMethods[2], "Fail :"+tt.context)
 
 		res := GetThetaValues(tt.lines)
 		for _, fa := range res {
 			assert.Equal(t, -0.214341, fa.Values[9], "Fail :"+tt.context)
+			assert.Equal(t, 9, fa.Dim, "Fail :"+tt.context)
 		}
 
 	}
