@@ -58,26 +58,31 @@ func (results ModelOutput) Summary() bool {
 	diagIndices := GetDiagonalIndices(results.ParameterStructures.Omega)
 	for n, omegaIndex := range diagIndices {
 
-		if n >= len(results.ShrinkageDetails.Eta.SD) {
-			panic("ShrinkageDetails.Eta.SD range error")
-		}
+		shrinkageValue := "0"
+		if len(results.ShrinkageDetails) > 0 {
 
-		if omegaIndex >= len(results.ParametersData[finalEstimationMethodIndex].Estimates.Omega) {
-			panic("results.ParametersData[].Estimates.Omega range error")
-		}
+			shrinkageDetails := results.ShrinkageDetails[len(results.ShrinkageDetails)-1]
 
-		shrinkage := results.ShrinkageDetails.Eta.SD[n]
-		var s4 string
-		if shrinkage > 30.0 {
-			s4 = aurora.Sprintf(aurora.Red("%s"), fmt.Sprintf("%f", shrinkage))
-		} else {
-			s4 = fmt.Sprintf("%f", shrinkage)
+			if n >= len(shrinkageDetails.Eta.SD) {
+				panic("ShrinkageDetails.Eta.SD range error")
+			}
+
+			if omegaIndex >= len(results.ParametersData[finalEstimationMethodIndex].Estimates.Omega) {
+				panic("results.ParametersData[].Estimates.Omega range error")
+			}
+
+			shrinkage := shrinkageDetails.Eta.SD[n]
+			if shrinkage > 30.0 {
+				shrinkageValue = aurora.Sprintf(aurora.Red("%s"), fmt.Sprintf("%f", shrinkage))
+			} else {
+				shrinkageValue = fmt.Sprintf("%f", shrinkage)
+			}
 		}
 
 		val := results.ParametersData[finalEstimationMethodIndex].Estimates.Omega[omegaIndex]
 		etaName := fmt.Sprintf("ETA%v", n+1)
 		omegaIndices := fmt.Sprintf("(%s,%s)", strconv.Itoa(n), strconv.Itoa(n))
-		omegaTable.Append([]string{string("O" + omegaIndices), etaName, fmt.Sprintf("%f", val), s4})
+		omegaTable.Append([]string{string("O" + omegaIndices), etaName, fmt.Sprintf("%f", val), shrinkageValue})
 	}
 
 	fmt.Println(results.RunDetails.ProblemText)

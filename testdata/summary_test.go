@@ -18,6 +18,14 @@ func TestSummary(t *testing.T) {
 		goldenFile string
 	}{
 		{
+			modFile:    "./example-models/nonmem/meropenem1001/1001.mod",
+			goldenFile: "./example-models/nonmem/meropenem1001/1001.json",
+		},
+		{
+			modFile:    "./example-models/nonmem/meropenem/meropenem.mod",
+			goldenFile: "./example-models/nonmem/meropenem/meropenem.json",
+		},
+		{
 			modFile:    "./example-models/nonmem/BQL/2.mod",
 			goldenFile: "./example-models/nonmem/BQL/BQL.json",
 		},
@@ -63,5 +71,12 @@ func TestSummary(t *testing.T) {
 		assert.Equal(t, goldenSummary.ParameterNames, bbiSummary.ParameterNames, fmt.Sprintf("[%s] parametersStructures not equal", context))
 		assert.Equal(t, goldenSummary.OFV, bbiSummary.OFV, fmt.Sprintf("[%s] parametersStructures not equal", context))
 		assert.Equal(t, goldenSummary.ShrinkageDetails, bbiSummary.ShrinkageDetails, fmt.Sprintf("[%s] parametersStructures not equal", context))
+
+		//compare file
+		b := assert.ObjectsAreEqual(goldenJSON, stdout)
+		assert.Equal(t, true, b, fmt.Sprintf("[%s] JSON goldenfile not equal to JSON output", tt.goldenFile))
+		if b == false {
+			fmt.Printf("%s", string(stdout))
+		}
 	}
 }
