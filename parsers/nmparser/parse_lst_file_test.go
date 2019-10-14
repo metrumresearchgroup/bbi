@@ -114,7 +114,7 @@ func TestParTestParseShrinkage2(t *testing.T) {
 		},
 	}
 	lstData := ParseLstEstimationFile(lines)
-	assert.Equal(t, expected, lstData.ShrinkageDetails)
+	assert.Equal(t, expected, lstData.ShrinkageDetails[0])
 }
 
 func TestParseGradient(t *testing.T) {
