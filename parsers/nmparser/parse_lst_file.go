@@ -217,12 +217,11 @@ func getMatrixData(lines []string, start int) MatrixData {
 				}
 			}
 		}
+		// a symmetric matrix is equal to its transpose, however in the case of the lst file
+		// the upper diagonal elements are omitted, so a transpose is required to deliver
+		// a column-major matrix
+		matrix = transpose(matrix)
 	}
-
-	// a symmetric matrix is equal to its transpose, however in the case of the lst file
-	// the upper diagonal elements are omitted, so a transpose is required to deliver
-	// a column-major matrix
-	matrix = transpose(matrix)
 
 	return MatrixData{
 		Values:     matrix,
