@@ -1,0 +1,9 @@
+TABLE NO.     1: First Order Conditional Estimation with Interaction: Problem=1 Subproblem=0 Superproblem1=0 Iteration1=0 Superproblem2=0 Iteration2=0
+TYPE          SUBPOP       ETA(1)       ETA(2)       ETA(3)       ETA(4)
+            1            1 -3.68999E-03 -3.91756E-03 -8.00759E-03 -1.94709E-03
+            2            1  3.19724E-02  2.60976E-02  1.62709E-02  1.90001E-02
+            3            1  9.08119E-01  8.80676E-01  6.22620E-01  9.18377E-01
+            4            1  3.82966E+00  2.52934E+01  5.46455E+01  3.69107E+01
+            5            1  1.32697E+01  0.00000E+00  0.00000E+00  0.00000E+00
+            6            1  3.79756E+00  2.56477E+01  5.45731E+01  3.71120E+01
+            7            1  7.90000E+01  7.90000E+01  7.90000E+01  7.90000E+01

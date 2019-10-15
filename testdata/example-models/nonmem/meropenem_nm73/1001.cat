@@ -1,0 +1,7 @@
+Wed Jul 26 20:52:09 2017
+cannot locate *.tab in control stream for run 
+cannot locate *par.tab in control stream for run 
+cannot locate *.msf in control stream for run 
+perl -S /opt/NONMEM/nm73/nmqual/autolog.pl /opt/NONMEM/nm73/nmqual/log.xml run ce /data/kyleb/meropenem/1001 1001
+Run 1001 has exit code 0
+cannot locate *.tab in control stream for run 1001
