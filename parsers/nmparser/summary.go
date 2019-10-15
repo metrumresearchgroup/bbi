@@ -20,12 +20,6 @@ func (results ModelOutput) Summary() bool {
 	thetaTable.SetAutoWrapText(false)
 
 	finalEstimationMethodIndex := len(results.ParametersData) - 1
-	if len(results.ParametersData[finalEstimationMethodIndex].Estimates.Theta) != len(results.ParametersData[finalEstimationMethodIndex].StdErr.Theta) {
-		// if the standard errors aren't there, we should
-		// instead make an equal length slice so that looping to build the table won't blow
-		// up with an index out of bounds error
-		results.ParametersData[finalEstimationMethodIndex].StdErr.Theta = make([]float64, len(results.ParametersData[finalEstimationMethodIndex].Estimates.Theta))
-	}
 	for i := range results.ParametersData[finalEstimationMethodIndex].Estimates.Theta {
 		numResult := results.ParametersData[finalEstimationMethodIndex].Estimates.Theta[i]
 		seResult := results.ParametersData[finalEstimationMethodIndex].StdErr.Theta[i]
@@ -57,8 +51,10 @@ func (results ModelOutput) Summary() bool {
 
 	diagIndices := GetDiagonalIndices(results.ParameterStructures.Omega)
 	for n, omegaIndex := range diagIndices {
-		shrinkageValue := "0"
-		val := 0.0
+		//shrinkageValue := "0"
+		var shrinkageValue string
+		//val := 0.0
+		var val float64
 		if len(results.ShrinkageDetails) > 0 {
 			// get the data for the last method
 			shrinkageDetails := results.ShrinkageDetails[len(results.ShrinkageDetails)-1]
@@ -70,9 +66,7 @@ func (results ModelOutput) Summary() bool {
 					shrinkageValue = fmt.Sprintf("%f", shrinkage)
 				}
 			}
-			if omegaIndex < len(results.ParametersData[finalEstimationMethodIndex].Estimates.Omega) {
-				val = results.ParametersData[finalEstimationMethodIndex].Estimates.Omega[omegaIndex]
-			}
+			val = results.ParametersData[finalEstimationMethodIndex].Estimates.Omega[omegaIndex]
 		}
 
 		etaName := fmt.Sprintf("ETA%v", n+1)

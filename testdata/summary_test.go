@@ -96,7 +96,7 @@ func TestSummaryTable(t *testing.T) {
 		},
 		{
 			modFile:    "./example-models/nonmem/BQL/2.mod",
-			goldenFile: "./example-models/nonmem/BQL/BQL_summary.txt",
+			goldenFile: "./example-models/nonmem/BQL/BQL_table.txt",
 		},
 		{
 			modFile:    "./example-models/nonmem/IOVMM/10.mod",
