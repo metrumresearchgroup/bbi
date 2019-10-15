@@ -115,28 +115,14 @@ var diagonalIndices = map[int]bool{
 // 0.04
 // 0.001 0.04
 // and should return []int{0, 1, 3}
-func GetDiagonalElements(el []int) []int {
+func GetDiagonalIndices(el []int) []int {
 	if len(el) == 0 {
 		return []int{}
 	}
-	// the 0th element will always be a diagonal since it will
-	// be the first block or diag matrix
 	var diagElements []int
-	matrixVal := 0
-	matrixIndex := 0
-	for index, val := range el {
-		if val > matrixVal {
+	for index := range el {
+		if diagonalIndices[index+1] {
 			diagElements = append(diagElements, index)
-			matrixVal++
-			matrixIndex = 1
-			continue
-		}
-		if val == matrixVal {
-			matrixIndex++
-			_, isDiag := diagonalIndices[matrixIndex]
-			if isDiag {
-				diagElements = append(diagElements, index)
-			}
 		}
 	}
 	return diagElements

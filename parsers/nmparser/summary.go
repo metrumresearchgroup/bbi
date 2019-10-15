@@ -6,9 +6,8 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/logrusorgru/aurora"
 	"github.com/olekukonko/tablewriter"
-
-	"github.com/thoas/go-funk"
 )
 
 // Summary prints all results from the parsed LstData
@@ -19,16 +18,8 @@ func (results ModelOutput) Summary() bool {
 	thetaTable.SetHeader([]string{"Theta", "Name", "Estimate", "StdErr (RSE)"})
 	// required for color, prevents newline in row
 	thetaTable.SetAutoWrapText(false)
-	red := "\x1b[31;1m"
-	none := "\x1b[0m"
 
 	finalEstimationMethodIndex := len(results.ParametersData) - 1
-	if len(results.ParametersData[finalEstimationMethodIndex].Estimates.Theta) != len(results.ParametersData[finalEstimationMethodIndex].StdErr.Theta) {
-		// if the standard errors aren't there, we should
-		// instead make an equal length slice so that looping to build the table won't blow
-		// up with an index out of bounds error
-		results.ParametersData[finalEstimationMethodIndex].StdErr.Theta = make([]float64, len(results.ParametersData[finalEstimationMethodIndex].Estimates.Theta))
-	}
 	for i := range results.ParametersData[finalEstimationMethodIndex].Estimates.Theta {
 		numResult := results.ParametersData[finalEstimationMethodIndex].Estimates.Theta[i]
 		seResult := results.ParametersData[finalEstimationMethodIndex].StdErr.Theta[i]
@@ -39,7 +30,7 @@ func (results ModelOutput) Summary() bool {
 
 		var s4 string
 		if rse > 30.0 {
-			s4 = fmt.Sprintf("%s%s (%s%%)%s", red, strconv.FormatFloat(seResult, 'f', -1, 64), strconv.FormatFloat(rse, 'f', 1, 64), none)
+			s4 = aurora.Sprintf(aurora.Red("%s"), fmt.Sprintf("%s (%s%%)", strconv.FormatFloat(seResult, 'f', -1, 64), strconv.FormatFloat(rse, 'f', 1, 64)))
 		} else {
 			s4 = fmt.Sprintf("%s (%s%%)", strconv.FormatFloat(seResult, 'f', -1, 64), strconv.FormatFloat(rse, 'f', 1, 64))
 		}
@@ -58,31 +49,29 @@ func (results ModelOutput) Summary() bool {
 	// required for color, prevents newline in row
 	thetaTable.SetAutoWrapText(false)
 
-	diagIndices := GetDiagonalElements(results.ParameterStructures.Omega)
-	for i := range results.ParametersData[finalEstimationMethodIndex].Estimates.Omega {
-
-		omegaIndex, _ := omegaIndices[i]
-		if results.ParameterStructures.Omega[i] != 0 {
-			val := results.ParametersData[finalEstimationMethodIndex].Estimates.Omega[i]
-			var shrinkage float64
-			var etaName string
-
-			userEtaIndex := funk.IndexOfInt(diagIndices, i)
-			if userEtaIndex > -1 {
-				if len(results.ShrinkageDetails.Eta.SD) > userEtaIndex {
-					shrinkage = results.ShrinkageDetails.Eta.SD[userEtaIndex]
-					etaName = fmt.Sprintf("ETA%v", userEtaIndex+1)
+	diagIndices := GetDiagonalIndices(results.ParameterStructures.Omega)
+	for n, omegaIndex := range diagIndices {
+		//shrinkageValue := "0"
+		var shrinkageValue string
+		//val := 0.0
+		var val float64
+		if len(results.ShrinkageDetails) > 0 {
+			// get the data for the last method
+			shrinkageDetails := results.ShrinkageDetails[len(results.ShrinkageDetails)-1]
+			if n < len(shrinkageDetails.Eta.SD) {
+				shrinkage := shrinkageDetails.Eta.SD[n]
+				if shrinkage > 30.0 {
+					shrinkageValue = aurora.Sprintf(aurora.Red("%s"), fmt.Sprintf("%f", shrinkage))
+				} else {
+					shrinkageValue = fmt.Sprintf("%f", shrinkage)
 				}
 			}
-
-			var s4 string
-			if shrinkage > 30.0 {
-				s4 = fmt.Sprintf("%s%f%s", red, shrinkage, none)
-			} else {
-				s4 = fmt.Sprintf("%f", shrinkage)
-			}
-			omegaTable.Append([]string{string("O" + omegaIndex), etaName, fmt.Sprintf("%f", val), s4})
+			val = results.ParametersData[finalEstimationMethodIndex].Estimates.Omega[omegaIndex]
 		}
+
+		etaName := fmt.Sprintf("ETA%v", n+1)
+		omegaIndices := fmt.Sprintf("(%s,%s)", strconv.Itoa(n), strconv.Itoa(n))
+		omegaTable.Append([]string{string("O" + omegaIndices), etaName, fmt.Sprintf("%f", val), shrinkageValue})
 	}
 
 	fmt.Println(results.RunDetails.ProblemText)

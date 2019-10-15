@@ -14,9 +14,17 @@
 		"data_set": "../MixSim.CSV",
 		"number_of_patients": 300,
 		"number_of_obs": 12600,
-		"number_of_data_records": 13500
+		"number_of_data_records": 13500,
+		"output_files_used": [
+			"10.lst",
+			"10.ext",
+			"10.grd"
+		]
 	},
-	"run_heuristics": {},
+	"run_heuristics": {
+		"has_final_zero_gradient": "HeuristicFalse",
+		"minimization_successful": "HeuristicTrue"
+	},
 	"parameters_data": [
 		{
 			"method": "TABLE NO.     1: First Order: Goal Function=MINIMUM VALUE OF OBJECTIVE FUNCTION: Problem=1 Subproblem=0 Superproblem1=0 Iteration1=0 Superproblem2=0 Iteration2=0",
@@ -176,48 +184,23 @@
 		"ofv_no_constant": 17485.751,
 		"ofv_with_constant": 40643.001566747465
 	},
-	"shrinkage_details": {
-		"eta": {
-			"sd": [
-				0,
-				0,
-				0,
-				0,
-				0
-			],
-			"vr": [
-				0,
-				0,
-				0,
-				0,
-				0
-			]
-		},
-		"ebv": {
-			"sd": [
-				0,
-				0,
-				0,
-				0,
-				0
-			],
-			"vr": [
-				0,
-				0,
-				0,
-				0,
-				0
-			]
-		},
-		"eps": {
-			"sd": [
-				0,
-				0
-			],
-			"vr": [
-				0,
-				0
-			]
+	"shrinkage_details": [
+		{
+			"eta": {},
+			"ebv": {},
+			"eps": {}
 		}
-	}
+	],
+	"covariance_theta": [
+		{
+			"Values": null,
+			"Dim": 0
+		}
+	],
+	"correlation_theta": [
+		{
+			"Values": null,
+			"Dim": 0
+		}
+	]
 }

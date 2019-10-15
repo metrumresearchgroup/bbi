@@ -13,11 +13,14 @@ type ParametersResult struct {
 	Omega []float64 `json:"omega,omitempty"`
 	Sigma []float64 `json:"sigma,omitempty"`
 }
+
+// RandomEffectResult ...
 type RandomEffectResult struct {
 	Omega []float64 `json:"omega,omitempty"`
 	Sigma []float64 `json:"sigma,omitempty"`
 }
 
+// ParametersData contains data for each method
 type ParametersData struct {
 	Method    string           `json:"method,omitempty"`
 	Estimates ParametersResult `json:"estimates,omitempty"`
@@ -65,12 +68,12 @@ type RunDetails struct {
 
 // CompletionDetails ...
 type CompletionDetails struct {
-	Shrinkage                 ShrinkageDetails `json:"shrinkage,omitempty"`
-	Ofv                       OfvDetails       `json:"ofv,omitempty"`
-	ZeroGradientDetected      bool             `json:"zero_gradient_detected,omitempty"`
-	FinalZeroGradientDetected bool             `json:"final_zero_gradient_detected,omitempty"`
-	CovStepComplete           bool             `json:"cov_step_complete,omitempty"`
-	Messages                  []string         `json:"messages,omitempty"`
+	Shrinkage                 []ShrinkageDetails `json:"shrinkage,omitempty"`
+	Ofv                       OfvDetails         `json:"ofv,omitempty"`
+	ZeroGradientDetected      bool               `json:"zero_gradient_detected,omitempty"`
+	FinalZeroGradientDetected bool               `json:"final_zero_gradient_detected,omitempty"`
+	CovStepComplete           bool               `json:"cov_step_complete,omitempty"`
+	Messages                  []string           `json:"messages,omitempty"`
 }
 
 // ShrinkageDetails ...
@@ -116,7 +119,9 @@ type ModelOutput struct {
 	ParameterStructures ParameterStructures `json:"parameter_structures,omitempty"`
 	ParameterNames      ParameterNames      `json:"parameter_names,omitempty"`
 	OFV                 OfvDetails          `json:"ofv,omitempty"`
-	ShrinkageDetails    ShrinkageDetails    `json:"shrinkage_details,omitempty"`
+	ShrinkageDetails    []ShrinkageDetails  `json:"shrinkage_details,omitempty"`
+	CovarianceTheta     []FlatArray         `json:"covariance_theta,omitempty"`
+	CorrelationTheta    []FlatArray         `json:"correlation_theta,omitempty"`
 }
 
 // ExtData provides an intermediate representation of the ExtData after iterations have been stripped out
@@ -125,4 +130,12 @@ type ExtData struct {
 	EstimationMethods []string
 	ParameterNames    []string
 	EstimationLines   [][]string
+}
+
+// MatrixData ...
+type MatrixData struct {
+	Values     [][]float64
+	ThetaCount int
+	OmageCount int
+	SigmaCount int
 }

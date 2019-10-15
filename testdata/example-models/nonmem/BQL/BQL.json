@@ -1,9 +1,9 @@
 {
 	"run_details": {
 		"version": "7.4.3",
-		"run_start": "Thu Sep  5 11:08:58 EDT 2019",
-		"run_end": "Thu Sep  5 11:09:11 EDT 2019",
-		"estimation_time": 4.01,
+		"run_start": "Wed Sep 11 10:19:21 EDT 2019",
+		"run_end": "Wed Sep 11 10:19:35 EDT 2019",
+		"estimation_time": 4.04,
 		"covariance_time": 0.06,
 		"function_evaluations": 189,
 		"significant_digits": 3.4,
@@ -14,9 +14,21 @@
 		"data_set": "../nobqldata.csv",
 		"number_of_patients": 193,
 		"number_of_obs": 2702,
-		"number_of_data_records": 2895
+		"number_of_data_records": 2895,
+		"output_files_used": [
+			"2.lst",
+			"2.ext",
+			"2.grd",
+			"2.cov",
+			"2.cor"
+		]
 	},
-	"run_heuristics": {},
+	"run_heuristics": {
+		"large_condition_number": "HeuristicFalse",
+		"correlations_ok": "HeuristicTrue",
+		"has_final_zero_gradient": "HeuristicFalse",
+		"minimization_successful": "HeuristicTrue"
+	},
 	"parameters_data": [
 		{
 			"method": "TABLE NO.     1: First Order Conditional Estimation with Interaction: Goal Function=MINIMUM VALUE OF OBJECTIVE FUNCTION: Problem=1 Subproblem=0 Superproblem1=0 Iteration1=0 Superproblem2=0 Iteration2=0",
@@ -134,38 +146,216 @@
 		"ofv_no_constant": -14346.006,
 		"ofv_with_constant": -9380.062196247563
 	},
-	"shrinkage_details": {
-		"eta": {
-			"sd": [
-				0.40632,
-				2.0606,
-				18.484
-			],
-			"vr": [
-				0.81099,
-				4.0787,
-				33.551
-			]
-		},
-		"ebv": {
-			"sd": [
-				0.49256,
-				2.1487,
-				18.703
-			],
-			"vr": [
-				0.98269,
-				4.2512,
-				33.908
-			]
-		},
-		"eps": {
-			"sd": [
-				9.7026
-			],
-			"vr": [
-				18.464
-			]
+	"shrinkage_details": [
+		{
+			"eta": {
+				"sd": [
+					0.40632,
+					2.0606,
+					18.484
+				],
+				"vr": [
+					0.81099,
+					4.0787,
+					33.551
+				]
+			},
+			"ebv": {
+				"sd": [
+					0.49256,
+					2.1487,
+					18.703
+				],
+				"vr": [
+					0.98269,
+					4.2512,
+					33.908
+				]
+			},
+			"eps": {
+				"sd": [
+					9.7026
+				],
+				"vr": [
+					18.464
+				]
+			}
 		}
-	}
+	],
+	"covariance_theta": [
+		{
+			"Values": [
+				0.370979,
+				-0.214341,
+				-0.150899,
+				-0.0241113,
+				0.00104312,
+				0,
+				0,
+				0,
+				0,
+				-0.214341,
+				19.4116,
+				-3.53392,
+				-1.9927,
+				0.0364529,
+				0,
+				0,
+				0,
+				0,
+				-0.150899,
+				-3.53392,
+				5.42576,
+				1.44045,
+				-0.0283908,
+				0,
+				0,
+				0,
+				0,
+				-0.0241113,
+				-1.9927,
+				1.44045,
+				1.02609,
+				-0.0157357,
+				0,
+				0,
+				0,
+				0,
+				0.00104312,
+				0.0364529,
+				-0.0283908,
+				-0.0157357,
+				0.000452737,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0
+			],
+			"Dim": 9
+		}
+	],
+	"correlation_theta": [
+		{
+			"Values": [
+				0.60908,
+				-0.079873,
+				-0.10636,
+				-0.0390799,
+				0.0804893,
+				0,
+				0,
+				0,
+				0,
+				-0.079873,
+				4.40586,
+				-0.344346,
+				-0.446497,
+				0.388847,
+				0,
+				0,
+				0,
+				0,
+				-0.10636,
+				-0.344346,
+				2.32933,
+				0.610485,
+				-0.572828,
+				0,
+				0,
+				0,
+				0,
+				-0.0390799,
+				-0.446497,
+				0.610485,
+				1.01296,
+				-0.730081,
+				0,
+				0,
+				0,
+				0,
+				0.0804893,
+				0.388847,
+				-0.572828,
+				-0.730081,
+				0.0212776,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0
+			],
+			"Dim": 9
+		}
+	]
 }

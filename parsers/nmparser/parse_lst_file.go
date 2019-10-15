@@ -20,7 +20,17 @@ func parseShrinkage(line string, shrinkageDetails ShrinkageDetails) ShrinkageDet
 		shrinkageDetails.Eps.SD = parseFloats(line, "EPSSHRINKSD(%)")
 	} else if strings.Contains(line, "EPSSHRINKVR(%)") {
 		shrinkageDetails.Eps.VR = parseFloats(line, "EPSSHRINKVR(%)")
+	} else if strings.Contains(line, "ETAshrink(%)") {
+		line = strings.Replace(line, ":", "", 1)
+		shrinkageDetails.Eta.SD = parseFloats(line, "ETAshrink(%)")
+	} else if strings.Contains(line, "EBVshrink(%)") {
+		line = strings.Replace(line, ":", "", 1)
+		shrinkageDetails.Ebv.SD = parseFloats(line, "EBVshrink(%)")
+	} else if strings.Contains(line, "EPSshrink(%)") {
+		line = strings.Replace(line, ":", "", 1)
+		shrinkageDetails.Eps.VR = parseFloats(line, "EPSshrink(%)")
 	}
+
 	return shrinkageDetails
 }
 
@@ -104,9 +114,12 @@ func getLargeConditionNumberStatus(lines []string, start int, largeNumberLimit f
 	return HeuristicFalse
 }
 
-func getCorrelationStatus(lines []string, start int, correlationLimit float64) HeuristicStatus {
+func getMatrixData(lines []string, start int) MatrixData {
 
 	var matrix [][]float64
+	var thetaCount int
+	var omegaCount int
+	var sigmaCount int
 
 	// go until blank line
 	for i, line := range lines[start:] {
@@ -138,8 +151,18 @@ func getCorrelationStatus(lines []string, start int, correlationLimit float64) H
 			}
 			start = start + i
 		} else {
-			start = start + i
+			start = start + 1
 			break
+		}
+	}
+
+	for _, column := range columns {
+		if strings.HasPrefix(column, "TH") {
+			thetaCount++
+		} else if strings.HasPrefix(column, "OM") {
+			omegaCount++
+		} else if strings.HasPrefix(column, "SG") {
+			sigmaCount++
 		}
 	}
 
@@ -194,7 +217,25 @@ func getCorrelationStatus(lines []string, start int, correlationLimit float64) H
 				}
 			}
 		}
+		// a symmetric matrix is equal to its transpose, however in the case of the lst file
+		// the upper diagonal elements are omitted, so a transpose is required to deliver
+		// a column-major matrix
+		matrix = transpose(matrix)
+	}
 
+	return MatrixData{
+		Values:     matrix,
+		ThetaCount: thetaCount,
+		OmageCount: omegaCount,
+		SigmaCount: sigmaCount,
+	}
+}
+
+func getCorrelationStatus(lines []string, start int, correlationLimit float64) HeuristicStatus {
+
+	matrix := getMatrixData(lines, start).Values
+
+	if len(matrix) > 0 {
 		// check for large numbers in the off-diagonal values of the correlation matrix
 		for j := range matrix {
 			for k, cell := range matrix[j] {
@@ -211,6 +252,27 @@ func getCorrelationStatus(lines []string, start int, correlationLimit float64) H
 	}
 
 	return HeuristicTrue
+}
+
+func getThetaValues(lines []string, start int) FlatArray {
+	matrixData := getMatrixData(lines, start)
+	thetas := MakeFlatArray(matrixData.Values, matrixData.ThetaCount)
+	return thetas
+}
+
+func transpose(slice [][]float64) [][]float64 {
+	xl := len(slice[0])
+	yl := len(slice)
+	result := make([][]float64, xl)
+	for i := range result {
+		result[i] = make([]float64, yl)
+	}
+	for i := 0; i < xl; i++ {
+		for j := 0; j < yl; j++ {
+			result[i][j] = slice[j][i]
+		}
+	}
+	return result
 }
 
 func contains(a []string, value string) bool {
@@ -250,6 +312,7 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 	var finalParameterEstimatesIndex int
 	var standardErrorEstimateIndex int
 	var covarianceMatrixEstimateIndex int
+	var correlationMatrixEstimateIndex int
 	var startThetaIndex int
 	var endSigmaIndex int
 	var gradientLines []string
@@ -295,6 +358,13 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 			shrinkageDetails = parseShrinkage(line, shrinkageDetails)
 		case strings.Contains(line, "EPSSHRINK"):
 			shrinkageDetails = parseShrinkage(line, shrinkageDetails)
+		case strings.Contains(line, "ETAshrink"):
+			shrinkageDetails = parseShrinkage(line, shrinkageDetails)
+		case strings.Contains(line, "EBVshrink"):
+			shrinkageDetails = parseShrinkage(line, shrinkageDetails)
+		case strings.Contains(line, "EPSshrink"):
+			shrinkageDetails = parseShrinkage(line, shrinkageDetails)
+
 		case strings.Contains(line, "0MINIMIZATION SUCCESSFUL"):
 			runHeuristics.MinimizationSuccessful = HeuristicTrue
 		case strings.Contains(line, "GRADIENT:"):
@@ -310,6 +380,7 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 			// or derive. something like (number of parameters) * 10
 			runHeuristics.LargeConditionNumber = getLargeConditionNumberStatus(lines, i, 1000.0)
 		case strings.Contains(line, "CORRELATION MATRIX OF ESTIMATE"):
+			correlationMatrixEstimateIndex = i
 			// TODO: get correlationLimit from config
 			runHeuristics.CorrelationsOk = getCorrelationStatus(lines, i, 0.90)
 
@@ -324,9 +395,18 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 	var finalParameterStdErr ParametersResult
 	var parameterStructures ParameterStructures
 	var parameterNames ParameterNames
+	var covTheta, corTheta FlatArray
 
 	if standardErrorEstimateIndex > finalParameterEstimatesIndex {
 		finalParameterEst = ParseFinalParameterEstimatesFromLst(lines[finalParameterEstimatesIndex:standardErrorEstimateIndex])
+	}
+
+	if covarianceMatrixEstimateIndex > 0 {
+		covTheta = getThetaValues(lines, covarianceMatrixEstimateIndex)
+	}
+
+	if correlationMatrixEstimateIndex > 0 {
+		corTheta = getThetaValues(lines, correlationMatrixEstimateIndex)
 	}
 
 	if covarianceMatrixEstimateIndex > standardErrorEstimateIndex {
@@ -353,7 +433,9 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 		ParameterStructures: parameterStructures,
 		ParameterNames:      parameterNames,
 		OFV:                 ofvDetails,
-		ShrinkageDetails:    shrinkageDetails,
+		ShrinkageDetails:    []ShrinkageDetails{shrinkageDetails},
+		CovarianceTheta:     []FlatArray{covTheta},
+		CorrelationTheta:    []FlatArray{corTheta},
 	}
 	return result
 }
