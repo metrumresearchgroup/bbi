@@ -80,3 +80,55 @@ func TestSummary(t *testing.T) {
 		}
 	}
 }
+
+func TestSummaryTable(t *testing.T) {
+	var tests = []struct {
+		modFile    string
+		goldenFile string
+	}{
+		{
+			modFile:    "./example-models/nonmem/meropenem1001/1001.mod",
+			goldenFile: "./example-models/nonmem/meropenem1001/meropenem1001_table.txt",
+		},
+		{
+			modFile:    "./example-models/nonmem/meropenem/meropenem.mod",
+			goldenFile: "./example-models/nonmem/meropenem/meropenem_table.txt",
+		},
+		{
+			modFile:    "./example-models/nonmem/BQL/2.mod",
+			goldenFile: "./example-models/nonmem/BQL/BQL_summary.txt",
+		},
+		{
+			modFile:    "./example-models/nonmem/IOVMM/10.mod",
+			goldenFile: "./example-models/nonmem/IOVMM/IOVMM_table.txt",
+		},
+		{
+			modFile:    "./example-models/nonmem/TMDD/1.mod",
+			goldenFile: "./example-models/nonmem/TMDD/TMDD_table.txt",
+		},
+		{
+			modFile:    "./example-models/nonmem/NonLinearCL/1.mod",
+			goldenFile: "./example-models/nonmem/NonLinearCL/NonLinearCL_table.txt",
+		},
+	}
+	bbiExe := "bbi"
+	osFs := afero.NewOsFs()
+	for _, tt := range tests {
+		context := filepath.Base(tt.goldenFile)
+
+		// read bytes from golden txt
+		goldenJSON, err := afero.ReadFile(osFs, tt.goldenFile)
+		assert.Equal(t, nil, err, fmt.Sprintf("[%s] file error %s: %s", context, tt.goldenFile, err))
+
+		// execute bbi and capture summary output as string
+		stdout, err := exec.Command(bbiExe, "summary", tt.modFile).Output()
+		assert.Equal(t, nil, err, fmt.Sprintf("[%s] fail exec %s: %s", context, bbiExe, err))
+
+		//compare file
+		b := assert.ObjectsAreEqual(goldenJSON, stdout)
+		assert.Equal(t, true, b, fmt.Sprintf("[%s] txt  goldenfile not equal to table output", tt.goldenFile))
+		if b == false {
+			fmt.Printf("%s", string(stdout))
+		}
+	}
+}
