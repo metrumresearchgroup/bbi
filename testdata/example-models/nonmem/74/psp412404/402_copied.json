@@ -1,0 +1,54 @@
+[
+	{
+		"file": "402.clt",
+		"level": 1
+	},
+	{
+		"file": "402.coi",
+		"level": 1
+	},
+	{
+		"file": "402.cor",
+		"level": 2
+	},
+	{
+		"file": "402.cov",
+		"level": 2
+	},
+	{
+		"file": "402.cpu",
+		"level": 1
+	},
+	{
+		"file": "402.ext",
+		"level": 3
+	},
+	{
+		"file": "402.grd",
+		"level": 1
+	},
+	{
+		"file": "402.lst",
+		"level": 3
+	},
+	{
+		"file": "402.phi",
+		"level": 1
+	},
+	{
+		"file": "402.shk",
+		"level": 1
+	},
+	{
+		"file": "402.shm",
+		"level": 1
+	},
+	{
+		"file": "402.tab",
+		"level": 1
+	},
+	{
+		"file": "402.xml",
+		"level": 2
+	}
+]
