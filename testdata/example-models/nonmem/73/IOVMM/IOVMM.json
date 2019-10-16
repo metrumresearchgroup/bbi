@@ -1,0 +1,240 @@
+{
+	"run_details": {
+		"version": "7.3.0",
+		"run_end": "Tue Oct 15 13:37:09 UTC 2019",
+		"estimation_time": 25.24,
+		"function_evaluations": 367,
+		"significant_digits": 3.1,
+		"problem_text": "LEM    10 mixture model and IOV on CL",
+		"estimation_method": [
+			"First Order"
+		],
+		"data_set": "MixSim.csv",
+		"number_of_patients": 300,
+		"number_of_obs": 12600,
+		"number_of_data_records": 13500,
+		"output_files_used": [
+			"10.lst",
+			"10.ext"
+		]
+	},
+	"run_heuristics": {
+		"has_final_zero_gradient": "HeuristicFalse",
+		"minimization_successful": "HeuristicTrue"
+	},
+	"parameters_data": [
+		{
+			"method": "TABLE NO.     1: First Order: Goal Function=MINIMUM VALUE OF OBJECTIVE FUNCTION: Problem=1 Subproblem=0 Superproblem1=0 Iteration1=0 Superproblem2=0 Iteration2=0",
+			"estimates": {
+				"theta": [
+					14.2204,
+					100.996,
+					0.824135,
+					0.988974,
+					1.70925
+				],
+				"omega": [
+					0.0490352,
+					0,
+					0.0482149,
+					0,
+					0,
+					0.0359252,
+					0,
+					0,
+					0,
+					0.0359252,
+					0,
+					0,
+					0,
+					0,
+					0.0359252
+				],
+				"sigma": [
+					0.0458045,
+					0
+				]
+			},
+			"std_err": {
+				"theta": [
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"omega": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"sigma": [
+					0,
+					0
+				]
+			},
+			"random_effect_sd": {
+				"omega": [
+					0.221439,
+					0,
+					0.219579,
+					0,
+					0,
+					0.189539,
+					0,
+					0,
+					0,
+					0.189539,
+					0,
+					0,
+					0,
+					0,
+					0.189539
+				],
+				"sigma": [
+					0.21402,
+					0
+				]
+			},
+			"random_effect_sdse": {},
+			"fixed": {
+				"theta": [
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"omega": [
+					0,
+					1,
+					0,
+					1,
+					1,
+					0,
+					1,
+					1,
+					1,
+					1,
+					1,
+					1,
+					1,
+					1,
+					1
+				],
+				"sigma": [
+					0,
+					1
+				]
+			}
+		}
+	],
+	"parameter_structures": {
+		"Theta": 6,
+		"Omega": [
+			1,
+			0,
+			2,
+			0,
+			0,
+			3,
+			0,
+			0,
+			0,
+			3,
+			0,
+			0,
+			0,
+			0,
+			3
+		],
+		"Sigma": [
+			1,
+			0,
+			1
+		]
+	},
+	"parameter_names": {
+		"theta": [
+			"1. CL POP 1",
+			"2. V",
+			"3. WT ON CL",
+			"4. WT ON V",
+			"5. CL POP 2",
+			"6. PROB POP 1"
+		]
+	},
+	"ofv": {
+		"ofv_no_constant": 17485.751
+	},
+	"shrinkage_details": [
+		{
+			"eta": {
+				"sd": [
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"vr": [
+					0,
+					0,
+					0,
+					0,
+					0
+				]
+			},
+			"ebv": {
+				"sd": [
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"vr": [
+					0,
+					0,
+					0,
+					0,
+					0
+				]
+			},
+			"eps": {
+				"sd": [
+					0,
+					0
+				],
+				"vr": [
+					0,
+					0
+				]
+			}
+		}
+	],
+	"covariance_theta": [
+		{
+			"Values": null,
+			"Dim": 0
+		}
+	],
+	"correlation_theta": [
+		{
+			"Values": null,
+			"Dim": 0
+		}
+	]
+}
