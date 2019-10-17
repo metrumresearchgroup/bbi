@@ -69,14 +69,11 @@ func GetModelOutput(filePath string, verbose, noExt, noGrd, noCov, noCor, noShk 
 
 	if !noShk {
 		shkFilePath := strings.Join([]string{filepath.Join(dir, runNum), ".shk"}, "")
-		shkLines, err := utils.ReadParamsAndOutputFromExt(shkFilePath)
+		shkLines, err := utils.ReadLines(shkFilePath)
 		if err != nil {
 			panic(err)
 		}
-		if shkLines != nil {
-
-		}
-		// parse shkLines
+		results.ShrinkageDetails = ParseShkData(ParseShkLines(shkLines))
 	}
 
 	for i := range results.ParametersData {
