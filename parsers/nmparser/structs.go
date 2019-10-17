@@ -76,6 +76,15 @@ type CompletionDetails struct {
 	Messages                  []string           `json:"messages,omitempty"`
 }
 
+// ShrinkageDetailsExt ...
+type ShrinkageDetailsExt struct {
+	EtaBar     []float64 `json:"eta_bar,omitempty"`
+	EtaBarSe   []float64 `json:"ebv_bar_se,omitempty"`
+	Pval       []float64 `json:"pval,omitempty"`
+	PercentEta []float64 `json:"percent_eta,omitempty"`
+	PercentEps []float64 `json:"percent_eps,omitempty"`
+}
+
 // ShrinkageDetails ...
 type ShrinkageDetails struct {
 	Eta Shrinkage `json:"eta,omitempty"`
