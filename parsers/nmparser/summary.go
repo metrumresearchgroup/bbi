@@ -58,8 +58,8 @@ func (results ModelOutput) Summary() bool {
 		if len(results.ShrinkageDetails) > 0 {
 			// get the data for the last method
 			shrinkageDetails := results.ShrinkageDetails[len(results.ShrinkageDetails)-1]
-			if n < len(shrinkageDetails.Eta.SD) {
-				shrinkage := shrinkageDetails.Eta.SD[n]
+			if n < len(shrinkageDetails.EtaSD) {
+				shrinkage := shrinkageDetails.EtaSD[n]
 				if shrinkage > 30.0 {
 					shrinkageValue = aurora.Sprintf(aurora.Red("%s"), fmt.Sprintf("%f", shrinkage))
 				} else {

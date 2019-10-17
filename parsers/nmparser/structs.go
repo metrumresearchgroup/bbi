@@ -76,21 +76,47 @@ type CompletionDetails struct {
 	Messages                  []string           `json:"messages,omitempty"`
 }
 
-// ShrinkageDetailsExt ...
-type ShrinkageDetailsExt struct {
-	EtaBar     []float64 `json:"eta_bar,omitempty"`
-	EtaBarSe   []float64 `json:"ebv_bar_se,omitempty"`
-	Pval       []float64 `json:"pval,omitempty"`
-	PercentEta []float64 `json:"percent_eta,omitempty"`
-	PercentEps []float64 `json:"percent_eps,omitempty"`
-}
+// Shrinkage Types
+// Type 1=etabar
+// Type 2=Etabar SE
+// Type 3=P val
+// Type 4=%Eta shrinkage SD version
+// Type 5=%EPS shrinkage SD version
+// Type 6=%Eta shrinkage based on empirical Bayes Variance (SD version)
+// Type 7=number of subjects used.
+// Type 8=%Eta shrinkage variance version
+// Type 9=%EPS shrinkage variance version
+// Type 10=%Eta shrinkage based on empirical Bayes Variance (variance version)
+
+// Types 1-7 are supported in NOMMEM 73
+// All types are supported in NONMEM 74
 
 // ShrinkageDetails ...
 type ShrinkageDetails struct {
-	Eta Shrinkage `json:"eta,omitempty"`
-	Ebv Shrinkage `json:"ebv,omitempty"`
-	Eps Shrinkage `json:"eps,omitempty"`
+	EtaBar      []float64 `json:"eta_bar,omitempty"`
+	EtaBarSE    []float64 `json:"ebv_bar_se,omitempty"`
+	Pval        []float64 `json:"pval,omitempty"`
+	EtaSD       []float64 `json:"eta_sd,omitempty"`
+	EpsSD       []float64 `json:"eps_sd,omitempty"`
+	EbvSD       []float64 `json:"ebv_sd,omitempty"`
+	NumSubjects []float64 `json:"num_subjects,omitempty"`
+	EtaVR       []float64 `json:"eta_vr,omitempty"`
+	EpsVR       []float64 `json:"eps_vr,omitempty"`
+	EbvVR       []float64 `json:"ebv_vr,omitempty"`
 }
+
+// // ShrinkageDetails ...
+// type ShrinkageDetails struct {
+// 	Eta Shrinkage `json:"eta,omitempty"` // SD = EtaSD  VR = EtaVR
+// 	Ebv Shrinkage `json:"ebv,omitempty"` // SD = EbvSD  VR = EbvVR
+// 	Eps Shrinkage `json:"eps,omitempty"` // SD = EpsSD  VR = EpsVR
+// }
+
+// // Shrinkage ...
+// type Shrinkage struct {
+// 	SD []float64 `json:"sd,omitempty"`
+// 	VR []float64 `json:"vr,omitempty"`
+// }
 
 // GradientDetails ...
 type GradientDetails struct {
@@ -105,12 +131,6 @@ type CovarianceStep struct {
 	MatrixType string   `json:"matrix_type,omitempty"`
 	OK         bool     `json:"ok,omitempty"`
 	Errors     []string `json:"errors,omitempty"`
-}
-
-// Shrinkage ...
-type Shrinkage struct {
-	SD []float64 `json:"sd,omitempty"`
-	VR []float64 `json:"vr,omitempty"`
 }
 
 // OfvDetails ...

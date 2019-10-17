@@ -80,7 +80,7 @@ func GetModelOutput(filePath string, verbose bool, noExt bool, noGrd bool, noCov
 	}
 
 	for n := 0; n < len(results.ShrinkageDetails); n++ {
-		if len(results.ShrinkageDetails[n].Eta.SD) == 0 {
+		if len(results.ShrinkageDetails[n].EtaSD) == 0 {
 			dim := 0
 			for i := range results.ParameterStructures.Omega {
 				if results.ParameterStructures.Omega[i] > 0 {
@@ -88,15 +88,15 @@ func GetModelOutput(filePath string, verbose bool, noExt bool, noGrd bool, noCov
 				}
 			}
 			if dim > 0 {
-				results.ShrinkageDetails[n].Eta.SD = make([]float64, dim)
-				results.ShrinkageDetails[n].Eta.VR = make([]float64, dim)
+				results.ShrinkageDetails[n].EtaSD = make([]float64, dim)
+				results.ShrinkageDetails[n].EtaVR = make([]float64, dim)
 				// Ebv follows Eta
-				results.ShrinkageDetails[n].Ebv.SD = make([]float64, dim)
-				results.ShrinkageDetails[n].Ebv.VR = make([]float64, dim)
+				results.ShrinkageDetails[n].EbvSD = make([]float64, dim)
+				results.ShrinkageDetails[n].EbvVR = make([]float64, dim)
 			}
 		}
 
-		if len(results.ShrinkageDetails[n].Eps.SD) == 0 {
+		if len(results.ShrinkageDetails[n].EpsSD) == 0 {
 			dim := 0
 			for i := range results.ParameterStructures.Sigma {
 				if results.ParameterStructures.Sigma[i] > 0 {
@@ -104,8 +104,8 @@ func GetModelOutput(filePath string, verbose bool, noExt bool, noGrd bool, noCov
 				}
 			}
 			if dim > 0 {
-				results.ShrinkageDetails[n].Eps.SD = make([]float64, dim)
-				results.ShrinkageDetails[n].Eps.VR = make([]float64, dim)
+				results.ShrinkageDetails[n].EpsSD = make([]float64, dim)
+				results.ShrinkageDetails[n].EpsVR = make([]float64, dim)
 			}
 		}
 	}

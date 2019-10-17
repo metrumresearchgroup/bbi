@@ -9,26 +9,26 @@ import (
 
 func parseShrinkage(line string, shrinkageDetails ShrinkageDetails) ShrinkageDetails {
 	if strings.Contains(line, "ETASHRINKSD(%)") {
-		shrinkageDetails.Eta.SD = parseFloats(line, "ETASHRINKSD(%)")
+		shrinkageDetails.EtaSD = parseFloats(line, "ETASHRINKSD(%)")
 	} else if strings.Contains(line, "ETASHRINKVR(%)") {
-		shrinkageDetails.Eta.VR = parseFloats(line, "ETASHRINKVR(%)")
+		shrinkageDetails.EtaVR = parseFloats(line, "ETASHRINKVR(%)")
 	} else if strings.Contains(line, "EBVSHRINKSD(%)") {
-		shrinkageDetails.Ebv.SD = parseFloats(line, "EBVSHRINKSD(%)")
+		shrinkageDetails.EbvSD = parseFloats(line, "EBVSHRINKSD(%)")
 	} else if strings.Contains(line, "EBVSHRINKVR(%)") {
-		shrinkageDetails.Ebv.VR = parseFloats(line, "EBVSHRINKVR(%)")
+		shrinkageDetails.EbvVR = parseFloats(line, "EBVSHRINKVR(%)")
 	} else if strings.Contains(line, "EPSSHRINKSD(%)") {
-		shrinkageDetails.Eps.SD = parseFloats(line, "EPSSHRINKSD(%)")
+		shrinkageDetails.EpsSD = parseFloats(line, "EPSSHRINKSD(%)")
 	} else if strings.Contains(line, "EPSSHRINKVR(%)") {
-		shrinkageDetails.Eps.VR = parseFloats(line, "EPSSHRINKVR(%)")
+		shrinkageDetails.EpsVR = parseFloats(line, "EPSSHRINKVR(%)")
 	} else if strings.Contains(line, "ETAshrink(%)") {
 		line = strings.Replace(line, ":", "", 1)
-		shrinkageDetails.Eta.SD = parseFloats(line, "ETAshrink(%)")
+		shrinkageDetails.EtaSD = parseFloats(line, "ETAshrink(%)")
 	} else if strings.Contains(line, "EBVshrink(%)") {
 		line = strings.Replace(line, ":", "", 1)
-		shrinkageDetails.Ebv.SD = parseFloats(line, "EBVshrink(%)")
+		shrinkageDetails.EbvSD = parseFloats(line, "EBVshrink(%)")
 	} else if strings.Contains(line, "EPSshrink(%)") {
 		line = strings.Replace(line, ":", "", 1)
-		shrinkageDetails.Eps.VR = parseFloats(line, "EPSshrink(%)")
+		shrinkageDetails.EpsVR = parseFloats(line, "EPSshrink(%)")
 	}
 
 	return shrinkageDetails
