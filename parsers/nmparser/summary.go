@@ -51,9 +51,7 @@ func (results ModelOutput) Summary() bool {
 
 	diagIndices := GetDiagonalIndices(results.ParameterStructures.Omega)
 	for n, omegaIndex := range diagIndices {
-		//shrinkageValue := "0"
 		var shrinkageValue string
-		//val := 0.0
 		var val float64
 		if len(results.ShrinkageDetails) > 0 {
 			// get the data for the last method
@@ -70,7 +68,7 @@ func (results ModelOutput) Summary() bool {
 		}
 
 		etaName := fmt.Sprintf("ETA%v", n+1)
-		omegaIndices := fmt.Sprintf("(%s,%s)", strconv.Itoa(n), strconv.Itoa(n))
+		omegaIndices := fmt.Sprintf("(%s,%s)", strconv.Itoa(n+1), strconv.Itoa(n+1))
 		omegaTable.Append([]string{string("O" + omegaIndices), etaName, fmt.Sprintf("%f", val), shrinkageValue})
 	}
 

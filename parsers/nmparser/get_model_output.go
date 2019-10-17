@@ -3,6 +3,7 @@ package parser
 import (
 	"log"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/metrumresearchgroup/babylon/utils"
@@ -33,8 +34,14 @@ func GetModelOutput(filePath string, verbose bool, noExt bool, noGrd bool, noCov
 		if err != nil {
 			panic(err)
 		}
-		extData, _ := ParseExtData(ParseExtLines(extLines))
+		extData, parameterNames := ParseExtData(ParseExtLines(extLines))
 		results.ParametersData = extData
+
+		// check for Omega
+		if results.ParameterStructures.Omega == nil {
+			dim := getDimension(parameterNames.Omega[len(parameterNames.Omega)-1])
+			results.ParameterStructures.Omega = createDiagonalBlock(dim)
+		}
 		results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, filepath.Base(extFilePath))
 	}
 
@@ -109,6 +116,17 @@ func GetModelOutput(filePath string, verbose bool, noExt bool, noGrd bool, noCov
 			}
 		}
 	}
-
 	return results
+}
+
+// item looks like: OMEGA(18,18)
+func getDimension(item string) int {
+	var dim int
+	s := strings.Replace(item, "OMEGA(", "", 1)
+	s = strings.Replace(s, ")", "", 1)
+	vals := strings.Split(s, ",")
+	if len(vals) > 0 {
+		dim, _ = strconv.Atoi(vals[0])
+	}
+	return dim
 }

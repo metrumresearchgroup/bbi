@@ -13,6 +13,11 @@ type ParameterStructures struct {
 }
 
 func parseParameterStructure(lines []string) []int {
+
+	if len(lines) == 0 {
+		return nil
+	}
+
 	if strings.Contains(lines[0], "SIMPLE") {
 		omegaLength, _ := strconv.Atoi(strings.TrimSpace(strings.SplitAfter(lines[0], ":")[1]))
 		return createDiagonalBlock(omegaLength)
