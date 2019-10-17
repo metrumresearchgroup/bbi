@@ -105,19 +105,6 @@ type ShrinkageDetails struct {
 	EbvVR       []float64 `json:"ebv_vr,omitempty"`
 }
 
-// // ShrinkageDetails ...
-// type ShrinkageDetails struct {
-// 	Eta Shrinkage `json:"eta,omitempty"` // SD = EtaSD  VR = EtaVR
-// 	Ebv Shrinkage `json:"ebv,omitempty"` // SD = EbvSD  VR = EbvVR
-// 	Eps Shrinkage `json:"eps,omitempty"` // SD = EpsSD  VR = EpsVR
-// }
-
-// // Shrinkage ...
-// type Shrinkage struct {
-// 	SD []float64 `json:"sd,omitempty"`
-// 	VR []float64 `json:"vr,omitempty"`
-// }
-
 // GradientDetails ...
 type GradientDetails struct {
 	Zero  bool    `json:"zero,omitempty"`

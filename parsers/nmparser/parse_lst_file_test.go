@@ -65,27 +65,27 @@ func TestParTestParseShrinkage(t *testing.T) {
 	var shrinkageDetails ShrinkageDetails
 	var expected ShrinkageDetails
 
-	expected.Eta.SD = []float64{4.0774, 29.015, 11.401}
+	expected.EtaSD = []float64{4.0774, 29.015, 11.401}
 	shrinkageDetails = parseShrinkage("ETASHRINKSD(%)  4.0774E+00  2.9015E+01  1.1401E+01", shrinkageDetails)
 	assert.Equal(t, expected, shrinkageDetails)
 
-	expected.Eta.VR = []float64{7.9885, 49.611, 21.502}
+	expected.EtaVR = []float64{7.9885, 49.611, 21.502}
 	shrinkageDetails = parseShrinkage("ETASHRINKVR(%)  7.9885E+00  4.9611E+01  2.1502E+01", shrinkageDetails)
 	assert.Equal(t, expected, shrinkageDetails)
 
-	expected.Ebv.SD = []float64{4.0725, 28.322, 12.255}
+	expected.EbvSD = []float64{4.0725, 28.322, 12.255}
 	shrinkageDetails = parseShrinkage("EBVSHRINKSD(%)  4.0725E+00  2.8322E+01  1.2255E+01", shrinkageDetails)
 	assert.Equal(t, expected, shrinkageDetails)
 
-	expected.Ebv.VR = []float64{7.9791, 48.623, 23.009}
+	expected.EbvVR = []float64{7.9791, 48.623, 23.009}
 	shrinkageDetails = parseShrinkage("EBVSHRINKVR(%)  7.9791E+00  4.8623E+01  2.3009E+01", shrinkageDetails)
 	assert.Equal(t, expected, shrinkageDetails)
 
-	expected.Eps.SD = []float64{12.507, 12.507}
+	expected.EpsSD = []float64{12.507, 12.507}
 	shrinkageDetails = parseShrinkage("EPSSHRINKSD(%)  1.2507E+01  1.2507E+01", shrinkageDetails)
 	assert.Equal(t, expected, shrinkageDetails)
 
-	expected.Eps.VR = []float64{23.451, 23.451}
+	expected.EpsVR = []float64{23.451, 23.451}
 	shrinkageDetails = parseShrinkage("EPSSHRINKVR(%)  2.3451E+01  2.3451E+01", shrinkageDetails)
 	assert.Equal(t, expected, shrinkageDetails)
 }
@@ -100,18 +100,14 @@ func TestParTestParseShrinkage2(t *testing.T) {
 		"EPSSHRINKVR(%)  2.3451E+01  2.3451E+01",
 	}
 	expected := ShrinkageDetails{
-		Eta: Shrinkage{
-			SD: []float64{4.0774, 29.015, 11.401},
-			VR: []float64{7.9885, 49.611, 21.502},
-		},
-		Ebv: Shrinkage{
-			SD: []float64{4.0725, 28.322, 12.255},
-			VR: []float64{7.9791, 48.623, 23.009},
-		},
-		Eps: Shrinkage{
-			SD: []float64{12.507, 12.507},
-			VR: []float64{23.451, 23.451},
-		},
+		EtaSD: []float64{4.0774, 29.015, 11.401},
+		EtaVR: []float64{7.9885, 49.611, 21.502},
+
+		EbvSD: []float64{4.0725, 28.322, 12.255},
+		EbvVR: []float64{7.9791, 48.623, 23.009},
+
+		EpsSD: []float64{12.507, 12.507},
+		EpsVR: []float64{23.451, 23.451},
 	}
 	lstData := ParseLstEstimationFile(lines)
 	assert.Equal(t, expected, lstData.ShrinkageDetails[0])

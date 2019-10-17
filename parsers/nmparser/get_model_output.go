@@ -12,7 +12,7 @@ import (
 // GetModelOutput populates and returns a ModelOutput object by parsing files
 // ParameterData is parsed from the ext file when useExtFile is true
 // ParameterData is parsed from the lst file when useExtFile is false
-func GetModelOutput(filePath string, verbose bool, noExt bool, noGrd bool, noCov bool, noCor bool) ModelOutput {
+func GetModelOutput(filePath string, verbose, noExt, noGrd, noCov, noCor, noShk bool) ModelOutput {
 
 	AppFs := afero.NewOsFs()
 	runNum, _ := utils.FileAndExt(filePath)
@@ -65,6 +65,18 @@ func GetModelOutput(filePath string, verbose bool, noExt bool, noGrd bool, noCov
 			results.CorrelationTheta = GetThetaValues(corLines)
 			results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, filepath.Base(corFilePath))
 		}
+	}
+
+	if !noShk {
+		shkFilePath := strings.Join([]string{filepath.Join(dir, runNum), ".shk"}, "")
+		shkLines, err := utils.ReadParamsAndOutputFromExt(shkFilePath)
+		if err != nil {
+			panic(err)
+		}
+		if shkLines != nil {
+
+		}
+		// parse shkLines
 	}
 
 	for i := range results.ParametersData {

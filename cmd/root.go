@@ -39,6 +39,7 @@ var (
 	noGrd   bool
 	noCov   bool
 	noCor   bool
+	noShk   bool
 )
 
 // RootCmd represents the base command when called without any subcommands
@@ -78,6 +79,7 @@ func init() {
 	RootCmd.PersistentFlags().BoolVarP(&noGrd, "no-grd-file", "", false, "do not use grd file")
 	RootCmd.PersistentFlags().BoolVarP(&noCov, "no-cov-file", "", false, "do not use cov file")
 	RootCmd.PersistentFlags().BoolVarP(&noCor, "no-cor-file", "", false, "do not use cor file")
+	RootCmd.PersistentFlags().BoolVarP(&noShk, "no-shk-file", "", false, "do not use shk file")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
