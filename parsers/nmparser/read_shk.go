@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"log"
 	"strconv"
 	"strings"
 )
@@ -96,7 +97,7 @@ func ParseShrinkage(lines []string) ShrinkageDetails {
 					shrinkageDetails.EbvVR = append(shrinkageDetails.EbvVR, strToFloat(fields[n]))
 				}
 			default:
-				// TODO: logrus
+				log.Printf("ParseShrinkage, unknown field type: %s", fields[0])
 			}
 		}
 	}
