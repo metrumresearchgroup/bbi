@@ -39,6 +39,7 @@ func GetModelOutput(filePath string, verbose bool, noExt bool, noGrd bool, noCov
 
 		// check for Omega
 		if results.ParameterStructures.Omega == nil {
+			log.Printf("Error parsing Omega parameter structure, falling back to temporary solution, please notify the babylon development team")
 			dim := getDimension(parameterNames.Omega[len(parameterNames.Omega)-1])
 			results.ParameterStructures.Omega = createDiagonalBlock(dim)
 		}
