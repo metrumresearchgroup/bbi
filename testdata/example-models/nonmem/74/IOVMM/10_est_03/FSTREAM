@@ -1,0 +1,5 @@
+DATA    FDATA                                                                   
+MSFO    ./10.msf                                                                
+TABL    ../10par.tab                                                            
+TABL    ../10.tab                                                               
+****                                                                            

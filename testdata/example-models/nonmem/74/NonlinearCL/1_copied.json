@@ -1,0 +1,50 @@
+[
+	{
+		"file": "1.clt",
+		"level": 1
+	},
+	{
+		"file": "1.coi",
+		"level": 1
+	},
+	{
+		"file": "1.cor",
+		"level": 2
+	},
+	{
+		"file": "1.cov",
+		"level": 2
+	},
+	{
+		"file": "1.cpu",
+		"level": 1
+	},
+	{
+		"file": "1.ext",
+		"level": 3
+	},
+	{
+		"file": "1.grd",
+		"level": 1
+	},
+	{
+		"file": "1.lst",
+		"level": 3
+	},
+	{
+		"file": "1.phi",
+		"level": 1
+	},
+	{
+		"file": "1.shk",
+		"level": 1
+	},
+	{
+		"file": "1.shm",
+		"level": 1
+	},
+	{
+		"file": "1.xml",
+		"level": 2
+	}
+]
