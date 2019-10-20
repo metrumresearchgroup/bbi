@@ -1,10 +1,10 @@
 {
 	"run_details": {
 		"version": "7.4.3",
-		"run_start": "Wed Oct  9 09:41:07 EDT 2019",
-		"run_end": "Wed Oct  9 09:41:23 EDT 2019",
-		"estimation_time": 10.93,
-		"covariance_time": 0.65,
+		"run_start": "Sun Oct 20 15:25:04 EDT 2019",
+		"run_end": "Sun Oct 20 15:25:21 EDT 2019",
+		"estimation_time": 10.95,
+		"covariance_time": 0.58,
 		"function_evaluations": 367,
 		"significant_digits": 3.1,
 		"problem_text": "LEM 10 mixture model and IOV on CL",
@@ -17,8 +17,7 @@
 		"number_of_data_records": 13500,
 		"output_files_used": [
 			"10.lst",
-			"10.ext",
-			"10.grd"
+			"10.ext"
 		]
 	},
 	"run_heuristics": {
@@ -182,52 +181,46 @@
 	"ofv": {
 		"ofv": 23157.251036757752,
 		"ofv_no_constant": 17485.751,
-		"ofv_with_constant": 40643.001566747495
+		"ofv_with_constant": 40643.001566747465
 	},
 	"shrinkage_details": [
 		{
-			"eta": {
-				"sd": [
-					0,
-					0,
-					0,
-					0,
-					0
-				],
-				"vr": [
-					0,
-					0,
-					0,
-					0,
-					0
-				]
-			},
-			"ebv": {
-				"sd": [
-					0,
-					0,
-					0,
-					0,
-					0
-				],
-				"vr": [
-					0,
-					0,
-					0,
-					0,
-					0
-				]
-			},
-			"eps": {
-				"sd": [
-					0,
-					0
-				],
-				"vr": [
-					0,
-					0
-				]
-			}
+			"eta_sd": [
+				0,
+				0,
+				0,
+				0,
+				0
+			],
+			"eps_sd": [
+				0,
+				0
+			],
+			"ebv_sd": [
+				0,
+				0,
+				0,
+				0,
+				0
+			],
+			"eta_vr": [
+				0,
+				0,
+				0,
+				0,
+				0
+			],
+			"eps_vr": [
+				0,
+				0
+			],
+			"ebv_vr": [
+				0,
+				0,
+				0,
+				0,
+				0
+			]
 		}
 	],
 	"covariance_theta": [
