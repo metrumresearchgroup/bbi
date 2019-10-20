@@ -671,7 +671,7 @@ func TestSetCov2(t *testing.T) {
 		n        int
 		context  string
 	}{{
-		filename: "../../testdata/example-models/nonmem/contpkpd/1.lst",
+		filename: "../../testdata/example-models/nonmem/74/contpkpd/1.lst",
 		n:        497,
 		context:  "contpkpd",
 	}}
