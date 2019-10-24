@@ -5,7 +5,7 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:schemaLocation="http://namespaces.oreilly.com/xmlnut/address output.xsd"
 xmlns:nm="http://namespaces.oreilly.com/xmlnut/address"
 >
-<nm:start_datetime>2019-10-20T15:25:09.121</nm:start_datetime>
+<nm:start_datetime>2019-10-09T09:41:11.287</nm:start_datetime>
 <nm:control_stream><![CDATA[
 $PROBLEM 10 mixture model and IOV on CL
 $INPUT C ID DV AMT II ADDL TIME RATE HT WT CLCR SEX AGE
@@ -74,8 +74,8 @@ ID TIME IPRED EVID MDV
 <nm:license_information><![CDATA[
 License Registered to: Metrum Research Group
 Expiration Date:    14 JUL 2020
-Current Date:       20 OCT 2019
-Days until program expires : 269
+Current Date:        9 OCT 2019
+Days until program expires : 280
 ]]></nm:license_information>
 <nm:program_information><![CDATA[
 1NONLINEAR MIXED EFFECTS MODEL PROGRAM (NONMEM) VERSION 7.4.3
@@ -299,16 +299,16 @@ Days until program expires : 269
 />
 <nm:monitor>
 <nm:obj nm:iteration='0'>38988.889446908783</nm:obj>
-<nm:obj nm:iteration='5'>19368.658427935334</nm:obj>
-<nm:obj nm:iteration='10'>19200.482282181489</nm:obj>
-<nm:obj nm:iteration='15'>17624.232013713263</nm:obj>
-<nm:obj nm:iteration='20'>17486.441958026051</nm:obj>
-<nm:obj nm:iteration='25'>17485.792713441926</nm:obj>
-<nm:obj nm:iteration='30'>17485.750529989709</nm:obj>
+<nm:obj nm:iteration='5'>19368.658427936163</nm:obj>
+<nm:obj nm:iteration='10'>19200.482282219418</nm:obj>
+<nm:obj nm:iteration='15'>17624.232013604989</nm:obj>
+<nm:obj nm:iteration='20'>17486.441958407708</nm:obj>
+<nm:obj nm:iteration='25'>17485.792713457555</nm:obj>
+<nm:obj nm:iteration='30'>17485.750529989746</nm:obj>
 </nm:monitor>
 <nm:termination_status>0</nm:termination_status>
 <nm:termination_nfuncevals>367</nm:termination_nfuncevals>
-<nm:termination_sigdigits>3.0710375607950420</nm:termination_sigdigits>
+<nm:termination_sigdigits>3.0710362517989038</nm:termination_sigdigits>
 <nm:termination_information><![CDATA[
 0MINIMIZATION SUCCESSFUL
  NO. OF FUNCTION EVALUATIONS USED:      367
@@ -317,96 +317,96 @@ Days until program expires : 269
 <nm:termination_txtmsg>
 <nm:val nm:name='1'>37</nm:val>
 </nm:termination_txtmsg>
-<nm:estimation_elapsed_time>10.95</nm:estimation_elapsed_time>
+<nm:estimation_elapsed_time>10.93</nm:estimation_elapsed_time>
 <nm:final_objective_function_text>MINIMUM VALUE OF OBJECTIVE FUNCTION</nm:final_objective_function_text>
-<nm:final_objective_function>17485.750529989709</nm:final_objective_function>
+<nm:final_objective_function>17485.750529989746</nm:final_objective_function>
 <nm:theta>
-<nm:val nm:name='1'>14.220391607986350</nm:val>
-<nm:val nm:name='2'>100.99615021665014</nm:val>
-<nm:val nm:name='3'>0.82413496447766643</nm:val>
-<nm:val nm:name='4'>0.98897412639224969</nm:val>
-<nm:val nm:name='5'>1.7092532834297369</nm:val>
-<nm:val nm:name='6'>0.84661900505149890</nm:val>
+<nm:val nm:name='1'>14.220391606786075</nm:val>
+<nm:val nm:name='2'>100.99615022710569</nm:val>
+<nm:val nm:name='3'>0.82413496454280499</nm:val>
+<nm:val nm:name='4'>0.98897412684282326</nm:val>
+<nm:val nm:name='5'>1.7092532830036204</nm:val>
+<nm:val nm:name='6'>0.84661900515669297</nm:val>
 </nm:theta>
 <nm:omega>
 <nm:row nm:rname='1'>
-<nm:col nm:cname='1'>4.9035172095245064E-002</nm:col>
+<nm:col nm:cname='1'>4.9035172054055214E-002</nm:col>
 </nm:row>
 <nm:row nm:rname='2'>
 <nm:col nm:cname='1'>0.0000000000000000</nm:col>
-<nm:col nm:cname='2'>4.8214900392093231E-002</nm:col>
+<nm:col nm:cname='2'>4.8214900378358835E-002</nm:col>
 </nm:row>
 <nm:row nm:rname='3'>
 <nm:col nm:cname='1'>0.0000000000000000</nm:col>
 <nm:col nm:cname='2'>0.0000000000000000</nm:col>
-<nm:col nm:cname='3'>3.5925161078123276E-002</nm:col>
+<nm:col nm:cname='3'>3.5925161064832595E-002</nm:col>
 </nm:row>
 <nm:row nm:rname='4'>
 <nm:col nm:cname='1'>0.0000000000000000</nm:col>
 <nm:col nm:cname='2'>0.0000000000000000</nm:col>
 <nm:col nm:cname='3'>0.0000000000000000</nm:col>
-<nm:col nm:cname='4'>3.5925161078123276E-002</nm:col>
+<nm:col nm:cname='4'>3.5925161064832595E-002</nm:col>
 </nm:row>
 <nm:row nm:rname='5'>
 <nm:col nm:cname='1'>0.0000000000000000</nm:col>
 <nm:col nm:cname='2'>0.0000000000000000</nm:col>
 <nm:col nm:cname='3'>0.0000000000000000</nm:col>
 <nm:col nm:cname='4'>0.0000000000000000</nm:col>
-<nm:col nm:cname='5'>3.5925161078123276E-002</nm:col>
+<nm:col nm:cname='5'>3.5925161064832595E-002</nm:col>
 </nm:row>
 </nm:omega>
 <nm:sigma>
 <nm:row nm:rname='1'>
-<nm:col nm:cname='1'>4.5804478534945937E-002</nm:col>
+<nm:col nm:cname='1'>4.5804478502829822E-002</nm:col>
 </nm:row>
 <nm:row nm:rname='2'>
 <nm:col nm:cname='1'>0.0000000000000000</nm:col>
-<nm:col nm:cname='2'>2.2739473161235375E-002</nm:col>
+<nm:col nm:cname='2'>2.2739473195239720E-002</nm:col>
 </nm:row>
 </nm:sigma>
 <nm:omegac>
 <nm:row nm:rname='1'>
-<nm:col nm:cname='1'>0.22143886762545789</nm:col>
+<nm:col nm:cname='1'>0.22143886753245287</nm:col>
 </nm:row>
 <nm:row nm:rname='2'>
 <nm:col nm:cname='1'>0.0000000000000000</nm:col>
-<nm:col nm:cname='2'>0.21957891609189903</nm:col>
+<nm:col nm:cname='2'>0.21957891606062463</nm:col>
 </nm:row>
 <nm:row nm:rname='3'>
 <nm:col nm:cname='1'>0.0000000000000000</nm:col>
 <nm:col nm:cname='2'>0.0000000000000000</nm:col>
-<nm:col nm:cname='3'>0.18953933913075480</nm:col>
+<nm:col nm:cname='3'>0.18953933909569431</nm:col>
 </nm:row>
 <nm:row nm:rname='4'>
 <nm:col nm:cname='1'>0.0000000000000000</nm:col>
 <nm:col nm:cname='2'>0.0000000000000000</nm:col>
 <nm:col nm:cname='3'>0.0000000000000000</nm:col>
-<nm:col nm:cname='4'>0.18953933913075480</nm:col>
+<nm:col nm:cname='4'>0.18953933909569431</nm:col>
 </nm:row>
 <nm:row nm:rname='5'>
 <nm:col nm:cname='1'>0.0000000000000000</nm:col>
 <nm:col nm:cname='2'>0.0000000000000000</nm:col>
 <nm:col nm:cname='3'>0.0000000000000000</nm:col>
 <nm:col nm:cname='4'>0.0000000000000000</nm:col>
-<nm:col nm:cname='5'>0.18953933913075480</nm:col>
+<nm:col nm:cname='5'>0.18953933909569431</nm:col>
 </nm:row>
 </nm:omegac>
 <nm:sigmac>
 <nm:row nm:rname='1'>
-<nm:col nm:cname='1'>0.21401980874429810</nm:col>
+<nm:col nm:cname='1'>0.21401980866926740</nm:col>
 </nm:row>
 <nm:row nm:rname='2'>
 <nm:col nm:cname='1'>0.0000000000000000</nm:col>
-<nm:col nm:cname='2'>0.15079613112157544</nm:col>
+<nm:col nm:cname='2'>0.15079613123432484</nm:col>
 </nm:row>
 </nm:sigmac>
 </nm:estimation>
 <nm:post_process_times>
-<nm:post_elapsed_time>0.58</nm:post_elapsed_time>
-<nm:finaloutput_elapsed_time>0.66</nm:finaloutput_elapsed_time>
+<nm:post_elapsed_time>0.65</nm:post_elapsed_time>
+<nm:finaloutput_elapsed_time>0.80</nm:finaloutput_elapsed_time>
 </nm:post_process_times>
 </nm:problem>
 </nm:nonmem>
-<nm:stop_datetime>2019-10-20T15:25:21.466</nm:stop_datetime>
-<nm:total_cputime>12.335</nm:total_cputime>
+<nm:stop_datetime>2019-10-09T09:41:23.819</nm:stop_datetime>
+<nm:total_cputime>12.456</nm:total_cputime>
 </nm:output>
