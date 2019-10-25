@@ -90,11 +90,11 @@ func GetModelOutput(filePath string, verbose, noExt, noGrd, noCov, noCor, noShk 
 		results.ShrinkageDetails = ParseShkData(ParseShkLines(shkLines), etaCount, epsCount)
 	}
 
-	setDefaultValues(&results, etaCount, epsCount)
+	setMissingValuesToDefault(&results, etaCount, epsCount)
 	return results
 }
 
-func setDefaultValues(results *ModelOutput, etaCount, epsCount int) {
+func setMissingValuesToDefault(results *ModelOutput, etaCount, epsCount int) {
 	// method name
 	for i := range results.ParametersData {
 		if len(results.ParametersData[i].Method) == 0 {
@@ -111,6 +111,8 @@ func setDefaultValues(results *ModelOutput, etaCount, epsCount int) {
 		sigmaCount := len(results.ParametersData[i].Estimates.Sigma)
 
 		// stderr
+		// if the "stderr" slice has less values than the "estimates" slice,
+		// then pad the stderr slice with default values to match the dimesion
 		nameCount = len(results.ParametersData[i].StdErr.Theta)
 		for n := nameCount; n < thetaCount; n++ {
 			results.ParametersData[i].StdErr.Theta = append(results.ParametersData[i].StdErr.Theta, 0)
@@ -125,6 +127,8 @@ func setDefaultValues(results *ModelOutput, etaCount, epsCount int) {
 		}
 
 		// RandomEffectSD
+		// if the "RandomEffectSD" slice has less values than the "estimates" slice,
+		// then pad the RandomEffectSD slice with default values to match the dimesion
 		nameCount = len(results.ParametersData[i].RandomEffectSD.Omega)
 		for n := nameCount; n < omegaCount; n++ {
 			results.ParametersData[i].RandomEffectSD.Omega = append(results.ParametersData[i].RandomEffectSD.Omega, 0)
@@ -135,6 +139,8 @@ func setDefaultValues(results *ModelOutput, etaCount, epsCount int) {
 		}
 
 		// RandomEffectSDSE
+		// if the "RandomEffectSDSE" slice has less values than the "estimates" slice,
+		// then pad the RandomEffectSDSE slice with default values to match the dimesion
 		nameCount = len(results.ParametersData[i].RandomEffectSDSE.Omega)
 		for n := nameCount; n < omegaCount; n++ {
 			results.ParametersData[i].RandomEffectSDSE.Omega = append(results.ParametersData[i].RandomEffectSDSE.Omega, 0)
@@ -145,6 +151,8 @@ func setDefaultValues(results *ModelOutput, etaCount, epsCount int) {
 		}
 
 		// parameter names
+		// if the "ParameterNames" slice has less values than the "estimates" slice,
+		// then pad the ParameterNames slice with default values to match the dimesion
 		nameCount = len(results.ParameterNames.Theta)
 		for n := nameCount; n < thetaCount; n++ {
 			results.ParameterNames.Theta = append(results.ParameterNames.Theta, fmt.Sprintf("Theta%v", n+1))
