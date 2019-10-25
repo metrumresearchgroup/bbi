@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"log"
 	"path/filepath"
 	"strings"
@@ -89,23 +90,42 @@ func GetModelOutput(filePath string, verbose, noExt, noGrd, noCov, noCor, noShk 
 		results.ShrinkageDetails = ParseShkData(ParseShkLines(shkLines), etaCount, epsCount)
 	}
 
-	setDefaultValues(results, etaCount, epsCount)
+	setDefaultValues(&results, etaCount, epsCount)
 	return results
 }
 
-func setDefaultValues(results ModelOutput, etaCount, epsCount int) {
+func setDefaultValues(results *ModelOutput, etaCount, epsCount int) {
 
 	// stderr
 	for i := range results.ParametersData {
-		if len(results.ParametersData[i].Estimates.Theta) != len(results.ParametersData[i].StdErr.Theta) {
-			results.ParametersData[i].StdErr.Theta = make([]float64, len(results.ParametersData[i].Estimates.Theta))
+		thetaCount := len(results.ParametersData[i].Estimates.Theta)
+		omegaCount := len(results.ParametersData[i].Estimates.Omega)
+		sigmaCount := len(results.ParametersData[i].Estimates.Sigma)
+
+		if thetaCount != len(results.ParametersData[i].StdErr.Theta) {
+			results.ParametersData[i].StdErr.Theta = make([]float64, thetaCount)
 		}
-		if len(results.ParametersData[i].Estimates.Omega) != len(results.ParametersData[i].StdErr.Omega) {
-			results.ParametersData[i].StdErr.Omega = make([]float64, len(results.ParametersData[i].Estimates.Omega))
+		if omegaCount != len(results.ParametersData[i].StdErr.Omega) {
+			results.ParametersData[i].StdErr.Omega = make([]float64, omegaCount)
 		}
-		if len(results.ParametersData[i].Estimates.Sigma) != len(results.ParametersData[i].StdErr.Sigma) {
-			results.ParametersData[i].StdErr.Sigma = make([]float64, len(results.ParametersData[i].Estimates.Sigma))
+		if sigmaCount != len(results.ParametersData[i].StdErr.Sigma) {
+			results.ParametersData[i].StdErr.Sigma = make([]float64, sigmaCount)
 		}
+		var nameCount int
+
+		nameCount = len(results.ParameterNames.Theta)
+		for n := nameCount; n < thetaCount; n++ {
+			results.ParameterNames.Theta = append(results.ParameterNames.Theta, fmt.Sprintf("Theta%v", n+1))
+		}
+		nameCount = len(results.ParameterNames.Omega)
+		for n := nameCount; n < omegaCount; n++ {
+			results.ParameterNames.Omega = append(results.ParameterNames.Omega, fmt.Sprintf("Omega%v", n+1))
+		}
+		nameCount = len(results.ParameterNames.Sigma)
+		for n := nameCount; n < sigmaCount; n++ {
+			results.ParameterNames.Sigma = append(results.ParameterNames.Sigma, fmt.Sprintf("Sigma%v", n+1))
+		}
+
 	}
 
 	// shrinkage eta's
