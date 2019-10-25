@@ -67,15 +67,35 @@ func GetModelOutput(filePath string, verbose, noExt, noGrd, noCov, noCor, noShk 
 		}
 	}
 
+	epsCount := 0
+	for i := range results.ParameterStructures.Sigma {
+		if results.ParameterStructures.Sigma[i] > 0 {
+			epsCount++
+		}
+	}
+	etaCount := 0
+	for i := range results.ParameterStructures.Omega {
+		if results.ParameterStructures.Omega[i] > 0 {
+			etaCount++
+		}
+	}
+
 	if !noShk {
 		shkFilePath := strings.Join([]string{filepath.Join(dir, runNum), ".shk"}, "")
 		shkLines, err := utils.ReadLines(shkFilePath)
 		if err != nil {
 			panic(err)
 		}
-		results.ShrinkageDetails = ParseShkData(ParseShkLines(shkLines))
+		results.ShrinkageDetails = ParseShkData(ParseShkLines(shkLines), etaCount, epsCount)
 	}
 
+	setDefaultValues(results, etaCount, epsCount)
+	return results
+}
+
+func setDefaultValues(results ModelOutput, etaCount, epsCount int) {
+
+	// stderr
 	for i := range results.ParametersData {
 		if len(results.ParametersData[i].Estimates.Theta) != len(results.ParametersData[i].StdErr.Theta) {
 			results.ParametersData[i].StdErr.Theta = make([]float64, len(results.ParametersData[i].Estimates.Theta))
@@ -88,36 +108,45 @@ func GetModelOutput(filePath string, verbose, noExt, noGrd, noCov, noCor, noShk 
 		}
 	}
 
-	for n := 0; n < len(results.ShrinkageDetails); n++ {
-		if len(results.ShrinkageDetails[n].EtaSD) == 0 {
-			dim := 0
-			for i := range results.ParameterStructures.Omega {
-				if results.ParameterStructures.Omega[i] > 0 {
-					dim++
-				}
+	// shrinkage eta's
+	if etaCount > 0 {
+		for n := 0; n < len(results.ShrinkageDetails); n++ {
+			if len(results.ShrinkageDetails[n].EtaSD) == 0 {
+				results.ShrinkageDetails[n].EtaSD = make([]float64, etaCount)
 			}
-			if dim > 0 {
-				results.ShrinkageDetails[n].EtaSD = make([]float64, dim)
-				results.ShrinkageDetails[n].EtaVR = make([]float64, dim)
-				// Ebv follows Eta
-				results.ShrinkageDetails[n].EbvSD = make([]float64, dim)
-				results.ShrinkageDetails[n].EbvVR = make([]float64, dim)
+			if len(results.ShrinkageDetails[n].EtaVR) == 0 {
+				results.ShrinkageDetails[n].EtaVR = make([]float64, etaCount)
+			}
+			if len(results.ShrinkageDetails[n].EbvSD) == 0 {
+				results.ShrinkageDetails[n].EbvSD = make([]float64, etaCount)
+			}
+			if len(results.ShrinkageDetails[n].EbvVR) == 0 {
+				results.ShrinkageDetails[n].EbvVR = make([]float64, etaCount)
+			}
+			if len(results.ShrinkageDetails[n].EtaBar) == 0 {
+				results.ShrinkageDetails[n].EtaBar = make([]float64, etaCount)
+			}
+			if len(results.ShrinkageDetails[n].EtaBarSE) == 0 {
+				results.ShrinkageDetails[n].EtaBarSE = make([]float64, etaCount)
+			}
+			if len(results.ShrinkageDetails[n].Pval) == 0 {
+				results.ShrinkageDetails[n].Pval = make([]float64, etaCount)
+			}
+			if len(results.ShrinkageDetails[n].NumSubjects) == 0 {
+				results.ShrinkageDetails[n].NumSubjects = make([]float64, etaCount)
 			}
 		}
 
-		if len(results.ShrinkageDetails[n].EpsSD) == 0 {
-			dim := 0
-			for i := range results.ParameterStructures.Sigma {
-				if results.ParameterStructures.Sigma[i] > 0 {
-					dim++
+		// shrinkage eps's
+		if epsCount > 0 {
+			for n := 0; n < len(results.ShrinkageDetails); n++ {
+				if len(results.ShrinkageDetails[n].EpsSD) == 0 {
+					results.ShrinkageDetails[n].EpsSD = make([]float64, epsCount)
 				}
-			}
-			if dim > 0 {
-				results.ShrinkageDetails[n].EpsSD = make([]float64, dim)
-				results.ShrinkageDetails[n].EpsVR = make([]float64, dim)
+				if len(results.ShrinkageDetails[n].EpsVR) == 0 {
+					results.ShrinkageDetails[n].EpsVR = make([]float64, epsCount)
+				}
 			}
 		}
 	}
-
-	return results
 }
