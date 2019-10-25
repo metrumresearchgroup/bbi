@@ -98,21 +98,47 @@ func setDefaultValues(results *ModelOutput, etaCount, epsCount int) {
 
 	// stderr
 	for i := range results.ParametersData {
+		var nameCount int
+
 		thetaCount := len(results.ParametersData[i].Estimates.Theta)
 		omegaCount := len(results.ParametersData[i].Estimates.Omega)
 		sigmaCount := len(results.ParametersData[i].Estimates.Sigma)
 
-		if thetaCount != len(results.ParametersData[i].StdErr.Theta) {
-			results.ParametersData[i].StdErr.Theta = make([]float64, thetaCount)
+		// stderr
+		nameCount = len(results.ParametersData[i].StdErr.Theta)
+		for n := nameCount; n < thetaCount; n++ {
+			results.ParametersData[i].StdErr.Theta = append(results.ParametersData[i].StdErr.Theta, 0)
 		}
-		if omegaCount != len(results.ParametersData[i].StdErr.Omega) {
-			results.ParametersData[i].StdErr.Omega = make([]float64, omegaCount)
+		nameCount = len(results.ParametersData[i].StdErr.Omega)
+		for n := nameCount; n < omegaCount; n++ {
+			results.ParametersData[i].StdErr.Omega = append(results.ParametersData[i].StdErr.Omega, 0)
 		}
-		if sigmaCount != len(results.ParametersData[i].StdErr.Sigma) {
-			results.ParametersData[i].StdErr.Sigma = make([]float64, sigmaCount)
+		nameCount = len(results.ParametersData[i].StdErr.Sigma)
+		for n := nameCount; n < sigmaCount; n++ {
+			results.ParametersData[i].StdErr.Sigma = append(results.ParametersData[i].StdErr.Sigma, 0)
 		}
-		var nameCount int
 
+		// RandomEffectSD
+		nameCount = len(results.ParametersData[i].RandomEffectSD.Omega)
+		for n := nameCount; n < omegaCount; n++ {
+			results.ParametersData[i].RandomEffectSD.Omega = append(results.ParametersData[i].RandomEffectSD.Omega, 0)
+		}
+		nameCount = len(results.ParametersData[i].RandomEffectSD.Sigma)
+		for n := nameCount; n < sigmaCount; n++ {
+			results.ParametersData[i].RandomEffectSD.Sigma = append(results.ParametersData[i].RandomEffectSD.Sigma, 0)
+		}
+
+		// RandomEffectSDSE
+		nameCount = len(results.ParametersData[i].RandomEffectSDSE.Omega)
+		for n := nameCount; n < omegaCount; n++ {
+			results.ParametersData[i].RandomEffectSDSE.Omega = append(results.ParametersData[i].RandomEffectSDSE.Omega, 0)
+		}
+		nameCount = len(results.ParametersData[i].RandomEffectSDSE.Sigma)
+		for n := nameCount; n < sigmaCount; n++ {
+			results.ParametersData[i].RandomEffectSDSE.Sigma = append(results.ParametersData[i].RandomEffectSDSE.Sigma, 0)
+		}
+
+		// parameter names
 		nameCount = len(results.ParameterNames.Theta)
 		for n := nameCount; n < thetaCount; n++ {
 			results.ParameterNames.Theta = append(results.ParameterNames.Theta, fmt.Sprintf("Theta%v", n+1))
