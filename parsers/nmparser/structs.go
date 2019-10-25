@@ -193,3 +193,13 @@ func NewRunDetails() RunDetails {
 	}
 	return runDetails
 }
+
+// NewOfvDetails ...
+func NewOfvDetails() OfvDetails {
+	ofvDetails := OfvDetails{
+		OFV:             DefaultFloat64,
+		OFVNoConstant:   DefaultFloat64,
+		OFVWithConstant: DefaultFloat64,
+	}
+	return ofvDetails
+}

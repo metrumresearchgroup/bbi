@@ -304,7 +304,7 @@ func parseGradient(lines []string) (hasFinalZero HeuristicStatus) {
 
 // ParseLstEstimationFile parses the lst file
 func ParseLstEstimationFile(lines []string) ModelOutput {
-	var ofvDetails OfvDetails
+	ofvDetails := NewOfvDetails()
 	var shrinkageDetails ShrinkageDetails
 	var runHeuristics RunHeuristics
 	var startParameterStructuresIndex int
