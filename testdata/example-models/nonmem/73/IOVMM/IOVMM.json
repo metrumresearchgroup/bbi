@@ -1,57 +1,63 @@
 {
 	"run_details": {
 		"version": "7.3.0",
-		"run_end": "Tue Oct 15 13:37:09 UTC 2019",
-		"estimation_time": 25.24,
-		"function_evaluations": 367,
-		"significant_digits": 3.1,
-		"problem_text": "LEM    10 mixture model and IOV on CL",
+		"run_start": "-999999999",
+		"run_end": "Fri Oct 25 11:51:19 UTC 2019",
+		"estimation_time": 177.35,
+		"covariance_time": -999999999,
+		"function_evaluations": 355,
+		"significant_digits": 3,
+		"problem_text": "LEM 10 mixture model and IOV on CL",
+		"mod_file": "-999999999",
 		"estimation_method": [
-			"First Order"
+			"First Order Conditional Estimation"
 		],
-		"data_set": "MixSim.csv",
+		"data_set": "../MixSim.csv",
 		"number_of_patients": 300,
 		"number_of_obs": 12600,
 		"number_of_data_records": 13500,
+		"output_table": "-999999999",
 		"output_files_used": [
 			"10.lst",
-			"10.ext"
+			"10.ext",
+			"10.grd"
 		]
 	},
 	"run_heuristics": {
+		"parameter_near_boundary": "HeuristicTrue",
 		"has_final_zero_gradient": "HeuristicFalse",
 		"minimization_successful": "HeuristicTrue"
 	},
 	"parameters_data": [
 		{
-			"method": "TABLE NO.     1: First Order: Goal Function=MINIMUM VALUE OF OBJECTIVE FUNCTION: Problem=1 Subproblem=0 Superproblem1=0 Iteration1=0 Superproblem2=0 Iteration2=0",
+			"method": "TABLE NO.     1: First Order Conditional Estimation: Goal Function=MINIMUM VALUE OF OBJECTIVE FUNCTION: Problem=1 Subproblem=0 Superproblem1=0 Iteration1=0 Superproblem2=0 Iteration2=0",
 			"estimates": {
 				"theta": [
-					14.2204,
-					100.996,
-					0.824135,
-					0.988974,
-					1.70925
+					14.3605,
+					100.521,
+					0.822632,
+					1.0446,
+					1.67825
 				],
 				"omega": [
-					0.0490352,
+					0.0483607,
 					0,
-					0.0482149,
-					0,
-					0,
-					0.0359252,
+					0.0438123,
 					0,
 					0,
-					0,
-					0.0359252,
+					0.0384572,
 					0,
 					0,
 					0,
+					0.0384572,
 					0,
-					0.0359252
+					0,
+					0,
+					0,
+					0.0384572
 				],
 				"sigma": [
-					0.0458045,
+					0.0481582,
 					0
 				]
 			},
@@ -87,28 +93,50 @@
 			},
 			"random_effect_sd": {
 				"omega": [
-					0.221439,
+					0.219911,
 					0,
-					0.219579,
-					0,
-					0,
-					0.189539,
+					0.209314,
 					0,
 					0,
-					0,
-					0.189539,
+					0.196105,
 					0,
 					0,
 					0,
+					0.196105,
 					0,
-					0.189539
+					0,
+					0,
+					0,
+					0.196105
 				],
 				"sigma": [
-					0.21402,
+					0.21945,
 					0
 				]
 			},
-			"random_effect_sdse": {},
+			"random_effect_sdse": {
+				"omega": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"sigma": [
+					0,
+					0
+				]
+			},
 			"fixed": {
 				"theta": [
 					0,
@@ -174,55 +202,132 @@
 			"4. WT ON V",
 			"5. CL POP 2",
 			"6. PROB POP 1"
+		],
+		"omega": [
+			"Omega1",
+			"Omega2",
+			"Omega3",
+			"Omega4",
+			"Omega5",
+			"Omega6",
+			"Omega7",
+			"Omega8",
+			"Omega9",
+			"Omega10",
+			"Omega11",
+			"Omega12",
+			"Omega13",
+			"Omega14",
+			"Omega15"
+		],
+		"sigma": [
+			"Sigma1",
+			"Sigma2"
 		]
 	},
 	"ofv": {
-		"ofv_no_constant": 17485.751
+		"ofv": -999999999,
+		"ofv_no_constant": 14722.149,
+		"ofv_with_constant": -999999999
 	},
 	"shrinkage_details": [
 		{
-			"eta": {
-				"sd": [
-					0,
-					0,
-					0,
-					0,
-					0
-				],
-				"vr": [
-					0,
-					0,
-					0,
-					0,
-					0
-				]
-			},
-			"ebv": {
-				"sd": [
-					0,
-					0,
-					0,
-					0,
-					0
-				],
-				"vr": [
-					0,
-					0,
-					0,
-					0,
-					0
-				]
-			},
-			"eps": {
-				"sd": [
-					0,
-					0
-				],
-				"vr": [
-					0,
-					0
-				]
-			}
+			"eta_bar": [
+				0.0335571,
+				-0.0254748,
+				-0.00789954,
+				0.0132498,
+				0.0213349,
+				-0.0248427,
+				-0.0500264,
+				-0.0235087,
+				0.022875,
+				-0.0191217
+			],
+			"ebv_bar_se": [
+				0.0117781,
+				0.0124148,
+				0.00992398,
+				0.0101464,
+				0.010254,
+				0.0260659,
+				0.0304415,
+				0.0241468,
+				0.02206,
+				0.019262
+			],
+			"pval": [
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0
+			],
+			"eta_sd": [
+				13.9718,
+				4.73046,
+				18.7151,
+				16.8933,
+				16.0121,
+				21.3553,
+				3.50337,
+				18.3014,
+				25.3621,
+				34.8288
+			],
+			"eps_sd": [
+				5.73109,
+				5.73109,
+				4.90289,
+				4.90289
+			],
+			"ebv_sd": [
+				12.2587,
+				4.12702,
+				16.4387,
+				16.6523,
+				16.6926,
+				14.1556,
+				3.66952,
+				23.2258,
+				23.1938,
+				23.1651
+			],
+			"num_subjects": [
+				257,
+				257,
+				257,
+				257,
+				257,
+				43,
+				43,
+				43,
+				43,
+				43
+			],
+			"eta_vr": [
+				0,
+				0,
+				0,
+				0,
+				0
+			],
+			"eps_vr": [
+				0,
+				0
+			],
+			"ebv_vr": [
+				0,
+				0,
+				0,
+				0,
+				0
+			]
 		}
 	],
 	"covariance_theta": [

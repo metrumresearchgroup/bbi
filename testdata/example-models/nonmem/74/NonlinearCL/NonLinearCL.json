@@ -8,6 +8,7 @@
 		"function_evaluations": 664,
 		"significant_digits": 3.2,
 		"problem_text": "RUN# 1 PARALLEL (NONLINEAR+LINEAR) CLEARANCE MODEL",
+		"mod_file": "-999999999",
 		"estimation_method": [
 			"First Order Conditional Estimation"
 		],
@@ -15,6 +16,7 @@
 		"number_of_patients": 36,
 		"number_of_obs": 792,
 		"number_of_data_records": 936,
+		"output_table": "-999999999",
 		"output_files_used": [
 			"1.lst",
 			"1.ext",
@@ -142,6 +144,14 @@
 			"WGT~CLL",
 			"WGT~V1",
 			"WGT~V2"
+		],
+		"omega": [
+			"Omega1",
+			"Omega2",
+			"Omega3",
+			"Omega4",
+			"Omega5",
+			"Omega6"
 		]
 	},
 	"ofv": {
@@ -151,38 +161,52 @@
 	},
 	"shrinkage_details": [
 		{
-			"eta": {
-				"sd": [
-					37.468,
-					16.435,
-					3.3027
-				],
-				"vr": [
-					60.898,
-					30.17,
-					6.4964
-				]
-			},
-			"ebv": {
-				"sd": [
-					35.09,
-					15.671,
-					3.8428
-				],
-				"vr": [
-					57.867,
-					28.886,
-					7.5379
-				]
-			},
-			"eps": {
-				"sd": [
-					4.7622
-				],
-				"vr": [
-					9.2977
-				]
-			}
+			"eta_bar": [
+				0.0883038,
+				0.0908169,
+				-0.022925
+			],
+			"ebv_bar_se": [
+				0.0431825,
+				0.0837832,
+				0.0346091
+			],
+			"pval": [
+				0.0408647,
+				0.278386,
+				0.507716
+			],
+			"eta_sd": [
+				37.4683,
+				16.4355,
+				3.30274
+			],
+			"eps_sd": [
+				4.76224
+			],
+			"ebv_sd": [
+				35.0901,
+				15.6707,
+				3.8428
+			],
+			"num_subjects": [
+				36,
+				36,
+				36
+			],
+			"eta_vr": [
+				60.8978,
+				30.1697,
+				6.49639
+			],
+			"eps_vr": [
+				9.29769
+			],
+			"ebv_vr": [
+				57.867,
+				28.8857,
+				7.53792
+			]
 		}
 	],
 	"covariance_theta": [
