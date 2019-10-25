@@ -95,6 +95,12 @@ func GetModelOutput(filePath string, verbose, noExt, noGrd, noCov, noCor, noShk 
 }
 
 func setDefaultValues(results *ModelOutput, etaCount, epsCount int) {
+	// method name
+	for i := range results.ParametersData {
+		if len(results.ParametersData[i].Method) == 0 {
+			results.ParametersData[i].Method = fmt.Sprintf("Method%v", i+1)
+		}
+	}
 
 	// stderr
 	for i := range results.ParametersData {

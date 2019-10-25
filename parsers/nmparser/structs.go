@@ -155,3 +155,41 @@ type MatrixData struct {
 	OmageCount int
 	SigmaCount int
 }
+
+// DefaultInt ...
+const DefaultInt = int(-999999999)
+
+// DefaultInt32 ...
+const DefaultInt32 = int32(-999999999)
+
+// DefaultInt64 ...
+const DefaultInt64 = int64(-999999999)
+
+// DefaultFloat64 ...
+const DefaultFloat64 = float64(-999999999)
+
+// DefaultString ...
+const DefaultString = "-999999999"
+
+// NewRunDetails create RunDetails struct with default values
+func NewRunDetails() RunDetails {
+	runDetails := RunDetails{
+		Version:             DefaultString,
+		RunStart:            DefaultString,
+		RunEnd:              DefaultString,
+		EstimationTime:      DefaultFloat64,
+		CovarianceTime:      DefaultFloat64,
+		FunctionEvaluations: DefaultInt64,
+		SignificantDigits:   DefaultFloat64,
+		ProblemText:         DefaultString,
+		ModFile:             DefaultString,
+		EstimationMethod:    []string{},
+		DataSet:             DefaultString,
+		NumberOfPatients:    DefaultInt64,
+		NumberOfObs:         DefaultInt64,
+		NumberOfDataRecords: DefaultInt64,
+		OutputTable:         DefaultString,
+		OutputFilesUsed:     []string{},
+	}
+	return runDetails
+}

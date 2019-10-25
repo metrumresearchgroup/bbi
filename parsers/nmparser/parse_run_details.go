@@ -42,21 +42,21 @@ func parseLine(line string, n int) string {
 
 // ParseRunDetails parses run details such as start date/time and estimation time etc.
 func ParseRunDetails(lines []string) RunDetails {
-	version := ""
-	runStart := ""
-	runEnd := ""
-	estimationTime := 0.0
-	covarianceTime := 0.0
-	functionEvaluations := int64(0)
-	significantDigits := 0.0
-	problemText := ""
-	modFile := "" // TODO, pass in from caller
+	version := DefaultString
+	runStart := DefaultString
+	runEnd := DefaultString
+	estimationTime := DefaultFloat64
+	covarianceTime := DefaultFloat64
+	functionEvaluations := DefaultInt64
+	significantDigits := DefaultFloat64
+	problemText := DefaultString
+	modFile := DefaultString
 	estimationMethod := []string{}
-	dataSet := ""
-	numberOfPatients := int64(0)
-	numberOfObs := int64(0)
-	numberOfDataRecords := int64(0)
-	outputTable := ""
+	dataSet := DefaultString
+	numberOfPatients := DefaultInt64
+	numberOfObs := DefaultInt64
+	numberOfDataRecords := DefaultInt64
+	outputTable := DefaultString
 
 	for i, line := range lines {
 		switch {
@@ -83,6 +83,7 @@ func ParseRunDetails(lines []string) RunDetails {
 		case strings.Contains(line, "$PROB"):
 			problemText = replaceTrim(line, "$PROB")
 		case strings.Contains(line, "#METH:"):
+
 			estimationMethod = append(estimationMethod, replaceTrim(line, "#METH:"))
 		case strings.Contains(line, "$DATA"):
 			dataSet = parseLine(line, 1)
@@ -102,7 +103,7 @@ func ParseRunDetails(lines []string) RunDetails {
 	}
 
 	if version == "7.4.3" {
-		if runStart == "" {
+		if runStart == "" || runStart == DefaultString {
 			runStart = lines[0]
 		}
 	}
