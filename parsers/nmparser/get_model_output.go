@@ -98,7 +98,7 @@ func setDefaultValues(results *ModelOutput, etaCount, epsCount int) {
 	// method name
 	for i := range results.ParametersData {
 		if len(results.ParametersData[i].Method) == 0 {
-			results.ParametersData[i].Method = fmt.Sprintf("Method%v", i+1)
+			results.ParametersData[i].Method = "METHOD NOT DETECTED"
 		}
 	}
 

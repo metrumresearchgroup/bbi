@@ -42,57 +42,42 @@ func parseLine(line string, n int) string {
 
 // ParseRunDetails parses run details such as start date/time and estimation time etc.
 func ParseRunDetails(lines []string) RunDetails {
-	version := DefaultString
-	runStart := DefaultString
-	runEnd := DefaultString
-	estimationTime := DefaultFloat64
-	covarianceTime := DefaultFloat64
-	functionEvaluations := DefaultInt64
-	significantDigits := DefaultFloat64
-	problemText := DefaultString
-	modFile := DefaultString
-	estimationMethod := []string{}
-	dataSet := DefaultString
-	numberOfPatients := DefaultInt64
-	numberOfObs := DefaultInt64
-	numberOfDataRecords := DefaultInt64
-	outputTable := DefaultString
+	runDetails := NewRunDetails()
 
 	for i, line := range lines {
 		switch {
 		case strings.Contains(line, "1NONLINEAR MIXED EFFECTS MODEL PROGRAM (NONMEM) VERSION"):
-			version = parseNMVersion(line)
+			runDetails.Version = parseNMVersion(line)
 		case strings.Contains(line, "NO. OF FUNCTION EVALUATIONS USED"):
-			functionEvaluations, _ = strconv.ParseInt(replaceTrim(line, "NO. OF FUNCTION EVALUATIONS USED:"), 10, 64)
+			runDetails.FunctionEvaluations, _ = strconv.ParseInt(replaceTrim(line, "NO. OF FUNCTION EVALUATIONS USED:"), 10, 64)
 		case strings.Contains(line, "NO. OF SIG. DIGITS IN FINAL EST.:"):
-			significantDigits, _ = strconv.ParseFloat(replaceTrim(line, "NO. OF SIG. DIGITS IN FINAL EST.:"), 64)
+			runDetails.SignificantDigits, _ = strconv.ParseFloat(replaceTrim(line, "NO. OF SIG. DIGITS IN FINAL EST.:"), 64)
 		case strings.Contains(line, "Elapsed estimation"):
-			estimationTime = parseFinalTime(line)
+			runDetails.EstimationTime = parseFinalTime(line)
 		case strings.Contains(line, "Elapsed covariance time in seconds:"):
-			covarianceTime = parseFinalTime(line)
+			runDetails.CovarianceTime = parseFinalTime(line)
 		case strings.Contains(line, "Elapsed postprocess time in seconds:"):
-			covarianceTime = parseFinalTime(line)
+			runDetails.CovarianceTime = parseFinalTime(line)
 		case strings.Contains(line, "Started"):
-			runStart = replaceTrim(line, "Started")
+			runDetails.RunStart = replaceTrim(line, "Started")
 		case strings.Contains(line, "Finished"):
-			runEnd = replaceTrim(line, "Finished")
+			runDetails.RunEnd = replaceTrim(line, "Finished")
 		case strings.Contains(line, "Stop Time:"):
 			if i+1 < len(lines) {
-				runEnd = lines[i+1]
+				runDetails.RunEnd = lines[i+1]
 			}
 		case strings.Contains(line, "$PROB"):
-			problemText = replaceTrim(line, "$PROB")
+			runDetails.ProblemText = replaceTrim(line, "$PROB")
 		case strings.Contains(line, "#METH:"):
-
-			estimationMethod = append(estimationMethod, replaceTrim(line, "#METH:"))
+			runDetails.EstimationMethod = append(runDetails.EstimationMethod, replaceTrim(line, "#METH:"))
 		case strings.Contains(line, "$DATA"):
-			dataSet = parseLine(line, 1)
+			runDetails.DataSet = parseLine(line, 1)
 		case strings.Contains(line, "TOT. NO. OF INDIVIDUALS:"):
-			numberOfPatients, _ = strconv.ParseInt(replaceTrim(line, "TOT. NO. OF INDIVIDUALS:"), 10, 64)
+			runDetails.NumberOfPatients, _ = strconv.ParseInt(replaceTrim(line, "TOT. NO. OF INDIVIDUALS:"), 10, 64)
 		case strings.Contains(line, "TOT. NO. OF OBS RECS:"):
-			numberOfObs, _ = strconv.ParseInt(replaceTrim(line, "TOT. NO. OF OBS RECS:"), 10, 64)
+			runDetails.NumberOfObs, _ = strconv.ParseInt(replaceTrim(line, "TOT. NO. OF OBS RECS:"), 10, 64)
 		case strings.Contains(line, "NO. OF DATA RECS IN DATA SET:"):
-			numberOfDataRecords, _ = strconv.ParseInt(replaceTrim(line, "NO. OF DATA RECS IN DATA SET:"), 10, 64)
+			runDetails.NumberOfDataRecords, _ = strconv.ParseInt(replaceTrim(line, "NO. OF DATA RECS IN DATA SET:"), 10, 64)
 		// This is not reliable because TABLE statements can span multiple lines
 		// TODO: support using multi-line feature, when available
 		// case strings.Contains(line, "$TABLE NOPRINT ONEHEADER FILE="):
@@ -102,27 +87,11 @@ func ParseRunDetails(lines []string) RunDetails {
 		}
 	}
 
-	if version == "7.4.3" {
-		if runStart == "" || runStart == DefaultString {
-			runStart = lines[0]
+	if runDetails.Version == "7.4.3" {
+		if runDetails.RunStart == "" || runDetails.RunStart == DefaultString {
+			runDetails.RunStart = lines[0]
 		}
 	}
 
-	return RunDetails{
-		Version:             version,
-		RunStart:            runStart,
-		RunEnd:              runEnd,
-		EstimationTime:      estimationTime,
-		CovarianceTime:      covarianceTime,
-		FunctionEvaluations: functionEvaluations,
-		SignificantDigits:   significantDigits,
-		ProblemText:         problemText,
-		ModFile:             modFile,
-		EstimationMethod:    estimationMethod,
-		DataSet:             dataSet,
-		NumberOfPatients:    numberOfPatients,
-		NumberOfObs:         numberOfObs,
-		NumberOfDataRecords: numberOfDataRecords,
-		OutputTable:         outputTable,
-	}
+	return runDetails
 }
