@@ -24,7 +24,7 @@ func (results ModelOutput) Summary() bool {
 		numResult := results.ParametersData[finalEstimationMethodIndex].Estimates.Theta[i]
 		seResult := results.ParametersData[finalEstimationMethodIndex].StdErr.Theta[i]
 		var rse float64
-		if seResult != 0 && numResult != 0 {
+		if seResult != 0 && numResult != 0 && seResult != DefaultFloat64 && numResult != DefaultFloat64 {
 			rse = math.Abs(seResult / numResult * 100)
 		}
 
