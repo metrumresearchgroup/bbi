@@ -129,7 +129,7 @@ func strToFloat(s string) float64 {
 	var f float64
 	f, err := strconv.ParseFloat(s, 64)
 	if err != nil {
-		f = 0
+		f = DefaultFloat64
 	}
 	return f
 }

@@ -8,7 +8,10 @@ import (
 
 func parseFinalTime(line string) float64 {
 	re := regexp.MustCompile("[-+]?([0-9]*\\.[0-9]+|[0-9]+)$")
-	res, _ := strconv.ParseFloat(re.FindString(line), 64)
+	res, err := strconv.ParseFloat(re.FindString(line), 64)
+	if err != nil {
+		res = DefaultFloat64
+	}
 	return res
 }
 

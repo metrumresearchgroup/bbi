@@ -38,7 +38,10 @@ func parseFloats(line, name string) []float64 {
 	var floats []float64
 	values := strings.Fields(strings.TrimSpace(strings.Replace(line, name, "", -1)))
 	for _, value := range values {
-		fvalue, _ := strconv.ParseFloat(value, 64)
+		fvalue, err := strconv.ParseFloat(value, 64)
+		if err != nil {
+			fvalue = DefaultFloat64
+		}
 		floats = append(floats, fvalue)
 	}
 	return floats
@@ -294,7 +297,10 @@ func parseGradient(lines []string) (hasFinalZero HeuristicStatus) {
 	if len(fields) > 0 {
 		result := make([]float64, len(fields))
 		for i, val := range fields {
-			n, _ := strconv.ParseFloat(val, 64)
+			n, err := strconv.ParseFloat(val, 64)
+			if err != nil {
+				n = DefaultFloat64
+			}
 			result[i] = n
 		}
 		return HasZeroGradient(result)
