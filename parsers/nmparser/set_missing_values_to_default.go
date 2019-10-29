@@ -63,7 +63,7 @@ func setMissingValuesToDefault(results *ModelOutput, etaCount, epsCount int) {
 		// parameter names
 		if len(results.ParameterNames.Theta) == 0 {
 			for n := 0; n < thetaCount; n++ {
-				results.ParameterNames.Theta = append(results.ParameterNames.Theta, fmt.Sprintf("Theta%v", n+1))
+				results.ParameterNames.Theta = append(results.ParameterNames.Theta, fmt.Sprintf("THETA%v", n+1))
 			}
 		}
 		if len(results.ParameterNames.Omega) == 0 {
