@@ -129,7 +129,7 @@ func ParseExtData(ed ExtData) ([]ParametersData, ParameterNames) {
 				}
 			case step == -1000000006:
 				parametersData.Fixed = ParametersResult{
-					Theta: result[0:(len(thetas) - 0)],
+					Theta: result[0:(len(thetas))],
 					Omega: result[len(thetas)+len(sigmas):],
 					Sigma: result[len(thetas):(len(thetas) + len(sigmas))],
 				}
