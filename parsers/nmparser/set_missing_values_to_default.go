@@ -70,7 +70,7 @@ func setMissingValuesToDefault(results *ModelOutput, etaCount, epsCount int) {
 			results.ParameterNames.Omega = GetBlockParameterNames("OMEGA", omegaCount)
 		}
 		if len(results.ParameterNames.Sigma) == 0 {
-			results.ParameterNames.Sigma = GetBlockParameterNames("SIGMA", omegaCount)
+			results.ParameterNames.Sigma = GetBlockParameterNames("SIGMA", sigmaCount)
 		}
 	}
 
