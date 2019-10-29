@@ -33,8 +33,11 @@ func GetModelOutput(filePath string, verbose, noExt, noGrd, noCov, noCor, noShk 
 		if err != nil {
 			panic(err)
 		}
-		extData, _ := ParseExtData(ParseExtLines(extLines))
+		extData, parameterNames := ParseExtData(ParseExtLines(extLines))
 		results.ParametersData = extData
+		results.ParameterNames.Omega = parameterNames.Omega
+		results.ParameterNames.Sigma = parameterNames.Sigma
+
 		results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, filepath.Base(extFilePath))
 	}
 

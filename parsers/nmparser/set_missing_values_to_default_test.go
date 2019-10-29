@@ -138,8 +138,6 @@ func TestSetMissingValuesToDefaultParameterNameValues(t *testing.T) {
 				ParametersData: []ParametersData{ParametersData{
 					Estimates: ParametersResult{
 						Omega: []float64{1, 2, 4},
-						Sigma: []float64{5, 6},
-						Theta: []float64{7, 8, 9, 10, 11, 12, 13},
 					},
 				}},
 			},
@@ -150,12 +148,6 @@ func TestSetMissingValuesToDefaultParameterNameValues(t *testing.T) {
 		setMissingValuesToDefault(&tt.modelOutput, tt.etaCount, tt.epsCount)
 		for i := range tt.modelOutput.ParametersData[0].Estimates.Theta {
 			assert.Equal(t, fmt.Sprintf("Theta%d", i+1), tt.modelOutput.ParameterNames.Theta[i], "Fail :"+tt.context)
-		}
-		for i := range tt.modelOutput.ParametersData[0].Estimates.Sigma {
-			assert.Equal(t, fmt.Sprintf("Sigma%d", i+1), tt.modelOutput.ParameterNames.Sigma[i], "Fail :"+tt.context)
-		}
-		for i := range tt.modelOutput.ParametersData[0].Estimates.Omega {
-			assert.Equal(t, fmt.Sprintf("Omega%d", i+1), tt.modelOutput.ParameterNames.Omega[i], "Fail :"+tt.context)
 		}
 	}
 }

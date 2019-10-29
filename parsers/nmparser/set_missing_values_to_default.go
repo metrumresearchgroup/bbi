@@ -61,19 +61,16 @@ func setMissingValuesToDefault(results *ModelOutput, etaCount, epsCount int) {
 		}
 
 		// parameter names
-		// if the "ParameterNames" slice has less values than the "estimates" slice,
-		// then pad the ParameterNames slice with default values to match the dimension
-		nameCount = len(results.ParameterNames.Theta)
-		for n := nameCount; n < thetaCount; n++ {
-			results.ParameterNames.Theta = append(results.ParameterNames.Theta, fmt.Sprintf("Theta%v", n+1))
+		if len(results.ParameterNames.Theta) == 0 {
+			for n := 0; n < thetaCount; n++ {
+				results.ParameterNames.Theta = append(results.ParameterNames.Theta, fmt.Sprintf("Theta%v", n+1))
+			}
 		}
-		nameCount = len(results.ParameterNames.Omega)
-		for n := nameCount; n < omegaCount; n++ {
-			results.ParameterNames.Omega = append(results.ParameterNames.Omega, fmt.Sprintf("Omega%v", n+1))
+		if len(results.ParameterNames.Omega) == 0 {
+			results.ParameterNames.Omega = GetBlockParameterNames("OMEGA", omegaCount)
 		}
-		nameCount = len(results.ParameterNames.Sigma)
-		for n := nameCount; n < sigmaCount; n++ {
-			results.ParameterNames.Sigma = append(results.ParameterNames.Sigma, fmt.Sprintf("Sigma%v", n+1))
+		if len(results.ParameterNames.Sigma) == 0 {
+			results.ParameterNames.Sigma = GetBlockParameterNames("SIGMA", omegaCount)
 		}
 	}
 
