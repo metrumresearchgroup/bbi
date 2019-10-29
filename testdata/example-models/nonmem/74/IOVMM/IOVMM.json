@@ -212,26 +212,26 @@
 			"6. PROB POP 1"
 		],
 		"omega": [
-			"Omega1",
-			"Omega2",
-			"Omega3",
-			"Omega4",
-			"Omega5",
-			"Omega6",
-			"Omega7",
-			"Omega8",
-			"Omega9",
-			"Omega10",
-			"Omega11",
-			"Omega12",
-			"Omega13",
-			"Omega14",
-			"Omega15"
+			"OMEGA(1,1)",
+			"OMEGA(2,1)",
+			"OMEGA(2,2)",
+			"OMEGA(3,1)",
+			"OMEGA(3,2)",
+			"OMEGA(3,3)",
+			"OMEGA(4,1)",
+			"OMEGA(4,2)",
+			"OMEGA(4,3)",
+			"OMEGA(4,4)",
+			"OMEGA(5,1)",
+			"OMEGA(5,2)",
+			"OMEGA(5,3)",
+			"OMEGA(5,4)",
+			"OMEGA(5,5)"
 		],
 		"sigma": [
-			"Sigma1",
-			"Sigma2",
-			"Sigma3"
+			"SIGMA(1,1)",
+			"SIGMA(2,1)",
+			"SIGMA(2,2)"
 		]
 	},
 	"ofv": {

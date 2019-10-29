@@ -190,20 +190,20 @@
 			"9 KOFF (hr-1)"
 		],
 		"omega": [
-			"Omega1",
-			"Omega2",
-			"Omega3",
-			"Omega4",
-			"Omega5",
-			"Omega6"
+			"OMEGA(1,1)",
+			"OMEGA(2,1)",
+			"OMEGA(2,2)",
+			"OMEGA(3,1)",
+			"OMEGA(3,2)",
+			"OMEGA(3,3)"
 		],
 		"sigma": [
-			"Sigma1",
-			"Sigma2",
-			"Sigma3",
-			"Sigma4",
-			"Sigma5",
-			"Sigma6"
+			"SIGMA(1,1)",
+			"SIGMA(2,1)",
+			"SIGMA(2,2)",
+			"SIGMA(3,1)",
+			"SIGMA(3,2)",
+			"SIGMA(3,3)"
 		]
 	},
 	"ofv": {

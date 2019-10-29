@@ -164,15 +164,15 @@
 			"WGT~V2"
 		],
 		"omega": [
-			"Omega1",
-			"Omega2",
-			"Omega3",
-			"Omega4",
-			"Omega5",
-			"Omega6"
+			"OMEGA(1,1)",
+			"OMEGA(2,1)",
+			"OMEGA(2,2)",
+			"OMEGA(3,1)",
+			"OMEGA(3,2)",
+			"OMEGA(3,3)"
 		],
 		"sigma": [
-			"Sigma1"
+			"SIGMA(1,1)"
 		]
 	},
 	"ofv": {
