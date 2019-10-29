@@ -660,21 +660,3 @@ func TestSetCov(t *testing.T) {
 		assert.Equal(t, 9.9, covTheta.Values[80], "Fail :"+tt.context)
 	}
 }
-
-func TestSetCov2(t *testing.T) {
-	var tests = []struct {
-		filename string
-		n        int
-		context  string
-	}{{
-		filename: "../../testdata/example-models/nonmem/74/contpkpd/1.lst",
-		n:        497,
-		context:  "contpkpd",
-	}}
-
-	for _, tt := range tests {
-		lines, _ := readLines(tt.filename)
-		covTheta := getThetaValues(lines, tt.n)
-		assert.Equal(t, 0.379, covTheta.Values[0], "Fail :"+tt.context)
-	}
-}

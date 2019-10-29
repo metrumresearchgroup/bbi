@@ -32,6 +32,9 @@ var Tests = []struct {
 	{
 		modFile: "IOVMM/10.mod",
 	},
+	{
+		modFile: "contpkpd/1.mod",
+	},
 }
 
 func TestSummary(t *testing.T) {
