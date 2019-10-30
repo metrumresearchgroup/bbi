@@ -660,3 +660,28 @@ func TestSetCov(t *testing.T) {
 		assert.Equal(t, 9.9, covTheta.Values[80], "Fail :"+tt.context)
 	}
 }
+
+func TestGetGradientLine(t *testing.T) {
+	var tests = []struct {
+		lines    []string
+		n        int
+		expected string
+	}{
+		{
+			lines: []string{
+				"GRADIENT:  -2.9680E-01  6.9220E-01  3.9483E+00 -4.6290E+00  8.4163E-02  6.2807E-02  1.8689E-01  6.9662E-02  1.8307E-01  8.3694E-01",
+				"             0.0000E+00",
+				"",
+			},
+			n:        0,
+			expected: "GRADIENT:  -2.9680E-01  6.9220E-01  3.9483E+00 -4.6290E+00  8.4163E-02  6.2807E-02  1.8689E-01  6.9662E-02  1.8307E-01  8.3694E-01             0.0000E+00",
+		},
+	}
+
+	for _, tt := range tests {
+		line := getGradientLine(tt.lines, tt.n)
+		assert.Equal(t, tt.expected, line, "Fail :"+tt.expected)
+		hasZero := parseGradient([]string{line})
+		assert.Equal(t, HeuristicTrue, hasZero, "Fail :"+tt.expected)
+	}
+}

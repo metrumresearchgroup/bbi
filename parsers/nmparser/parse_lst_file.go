@@ -308,6 +308,19 @@ func parseGradient(lines []string) (hasFinalZero HeuristicStatus) {
 	return HeuristicFalse
 }
 
+// get gradient lines until a blank line is reached
+func getGradientLine(lines []string, start int) string {
+	var sb strings.Builder
+	sb.WriteString(lines[start])
+	for _, line := range lines[start+1:] {
+		if line == "" {
+			break
+		}
+		sb.WriteString(line)
+	}
+	return sb.String()
+}
+
 // ParseLstEstimationFile parses the lst file
 func ParseLstEstimationFile(lines []string) ModelOutput {
 	ofvDetails := NewOfvDetails()
@@ -374,7 +387,7 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 		case strings.Contains(line, "0MINIMIZATION SUCCESSFUL"):
 			runHeuristics.MinimizationSuccessful = HeuristicTrue
 		case strings.Contains(line, "GRADIENT:"):
-			gradientLines = append(gradientLines, line)
+			gradientLines = append(gradientLines, getGradientLine(lines, i))
 		case strings.Contains(line, "RESET HESSIAN"):
 			runHeuristics.HessianReset = HeuristicTrue
 		case strings.Contains(line, "PARAMETER ESTIMATE IS NEAR ITS BOUNDARY"):

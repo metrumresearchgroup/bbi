@@ -43,7 +43,7 @@ func GetModelOutput(filePath string, verbose, noExt, noGrd, noCov, noCor, noShk 
 
 	if !noGrd {
 		grdFilePath := strings.Join([]string{filepath.Join(dir, runNum), ".grd"}, "")
-		grdLines, err := utils.ReadParamsAndOutputFromExt(grdFilePath)
+		grdLines, err := utils.ReadLinesFS(AppFs, grdFilePath)
 		if err != nil {
 			panic(err)
 		}

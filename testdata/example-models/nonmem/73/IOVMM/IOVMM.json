@@ -25,7 +25,7 @@
 	},
 	"run_heuristics": {
 		"parameter_near_boundary": "HeuristicTrue",
-		"has_final_zero_gradient": "HeuristicFalse",
+		"has_final_zero_gradient": "HeuristicTrue",
 		"minimization_successful": "HeuristicTrue"
 	},
 	"parameters_data": [
