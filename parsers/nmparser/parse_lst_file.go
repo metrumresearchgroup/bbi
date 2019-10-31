@@ -325,7 +325,7 @@ func getGradientLine(lines []string, start int) string {
 func ParseLstEstimationFile(lines []string) ModelOutput {
 	ofvDetails := NewOfvDetails()
 	shrinkageDetails := make([]ShrinkageDetails, 1)
-	var runHeuristics RunHeuristics
+	runHeuristics := NewRunHeuristics()
 	var startParameterStructuresIndex int
 	var endParameterStucturesIndex int
 	var finalParameterEstimatesIndex int

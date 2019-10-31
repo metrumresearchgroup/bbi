@@ -194,3 +194,19 @@ func NewOfvDetails() OfvDetails {
 	}
 	return ofvDetails
 }
+
+// NewRunHeuristics ...
+func NewRunHeuristics() RunHeuristics {
+	runHeuristics := RunHeuristics{
+		CovarianceStepOmitted: HeuristicUndefined, 
+		LargeConditionNumber : HeuristicUndefined, 
+		CorrelationsOk : HeuristicUndefined,       
+		ParameterNearBoundary : HeuristicUndefined,
+		HessianReset : HeuristicUndefined,         
+		HasFinalZeroGradient : HeuristicUndefined, 
+		MinimizationSuccessful: HeuristicUndefined,
+	}
+	return runHeuristics
+}
+
+
