@@ -26,7 +26,11 @@
 		]
 	},
 	"run_heuristics": {
+		"covariance_step_omitted": "HeuristicUndefined",
+		"large_condition_number": "HeuristicUndefined",
 		"correlations_ok": "HeuristicFalse",
+		"parameter_near_boundary": "HeuristicUndefined",
+		"hessian_reset": "HeuristicUndefined",
 		"has_final_zero_gradient": "HeuristicFalse",
 		"minimization_successful": "HeuristicTrue"
 	},
