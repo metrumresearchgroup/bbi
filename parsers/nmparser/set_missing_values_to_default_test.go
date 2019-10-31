@@ -167,7 +167,7 @@ func TestSetMissingValuesToDefaultShrinkageEta(t *testing.T) {
 				ParametersData: []ParametersData{ParametersData{
 					Estimates: ParametersResult{},
 				}},
-				ShrinkageDetails: []ShrinkageDetails{ShrinkageDetails{}},
+				ShrinkageDetails: [][]ShrinkageDetails{{ShrinkageDetails{}}},
 			},
 			etaCount: 5,
 		},
@@ -175,8 +175,8 @@ func TestSetMissingValuesToDefaultShrinkageEta(t *testing.T) {
 
 	for _, tt := range tests {
 		setMissingValuesToDefault(&tt.modelOutput, tt.etaCount, tt.epsCount)
-		assert.Equal(t, tt.etaCount, len(tt.modelOutput.ShrinkageDetails[0].EtaBar), "Fail :"+tt.context)
-		assert.Equal(t, DefaultFloat64, tt.modelOutput.ShrinkageDetails[0].EtaBar[tt.etaCount-1], "Fail :"+tt.context)
+		assert.Equal(t, tt.etaCount, len(tt.modelOutput.ShrinkageDetails[0][0].EtaBar), "Fail :"+tt.context)
+		assert.Equal(t, DefaultFloat64, tt.modelOutput.ShrinkageDetails[0][0].EtaBar[tt.etaCount-1], "Fail :"+tt.context)
 	}
 }
 
@@ -193,7 +193,7 @@ func TestSetMissingValuesToDefaultShrinkageEps(t *testing.T) {
 				ParametersData: []ParametersData{ParametersData{
 					Estimates: ParametersResult{},
 				}},
-				ShrinkageDetails: []ShrinkageDetails{ShrinkageDetails{}},
+				ShrinkageDetails: [][]ShrinkageDetails{{ShrinkageDetails{}}},
 			},
 			epsCount: 5,
 		},
@@ -201,7 +201,7 @@ func TestSetMissingValuesToDefaultShrinkageEps(t *testing.T) {
 
 	for _, tt := range tests {
 		setMissingValuesToDefault(&tt.modelOutput, tt.etaCount, tt.epsCount)
-		assert.Equal(t, tt.epsCount, len(tt.modelOutput.ShrinkageDetails[0].EpsVR), "Fail :"+tt.context)
-		assert.Equal(t, DefaultFloat64, tt.modelOutput.ShrinkageDetails[0].EpsVR[tt.epsCount-1], "Fail :"+tt.context)
+		assert.Equal(t, tt.epsCount, len(tt.modelOutput.ShrinkageDetails[0][0].EpsVR), "Fail :"+tt.context)
+		assert.Equal(t, DefaultFloat64, tt.modelOutput.ShrinkageDetails[0][0].EpsVR[tt.epsCount-1], "Fail :"+tt.context)
 	}
 }

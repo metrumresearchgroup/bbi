@@ -110,7 +110,7 @@ func TestParTestParseShrinkage2(t *testing.T) {
 		EpsVR: []float64{23.451, 23.451},
 	}
 	lstData := ParseLstEstimationFile(lines)
-	assert.Equal(t, expected, lstData.ShrinkageDetails[0])
+	assert.Equal(t, expected, lstData.ShrinkageDetails[0][0])
 }
 
 func TestParseGradient(t *testing.T) {

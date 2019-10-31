@@ -324,7 +324,7 @@ func getGradientLine(lines []string, start int) string {
 // ParseLstEstimationFile parses the lst file
 func ParseLstEstimationFile(lines []string) ModelOutput {
 	ofvDetails := NewOfvDetails()
-	var shrinkageDetails ShrinkageDetails
+	shrinkageDetails := make([]ShrinkageDetails, 1)
 	var runHeuristics RunHeuristics
 	var startParameterStructuresIndex int
 	var endParameterStucturesIndex int
@@ -372,18 +372,17 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 				covarianceMatrixEstimateIndex = i + 3
 			}
 		case strings.Contains(line, "ETASHRINK"):
-			shrinkageDetails = parseShrinkage(line, shrinkageDetails)
+			shrinkageDetails[0] = parseShrinkage(line, shrinkageDetails[0])
 		case strings.Contains(line, "EBVSHRINK"):
-			shrinkageDetails = parseShrinkage(line, shrinkageDetails)
+			shrinkageDetails[0] = parseShrinkage(line, shrinkageDetails[0])
 		case strings.Contains(line, "EPSSHRINK"):
-			shrinkageDetails = parseShrinkage(line, shrinkageDetails)
+			shrinkageDetails[0] = parseShrinkage(line, shrinkageDetails[0])
 		case strings.Contains(line, "ETAshrink"):
-			shrinkageDetails = parseShrinkage(line, shrinkageDetails)
+			shrinkageDetails[0] = parseShrinkage(line, shrinkageDetails[0])
 		case strings.Contains(line, "EBVshrink"):
-			shrinkageDetails = parseShrinkage(line, shrinkageDetails)
+			shrinkageDetails[0] = parseShrinkage(line, shrinkageDetails[0])
 		case strings.Contains(line, "EPSshrink"):
-			shrinkageDetails = parseShrinkage(line, shrinkageDetails)
-
+			shrinkageDetails[0] = parseShrinkage(line, shrinkageDetails[0])
 		case strings.Contains(line, "0MINIMIZATION SUCCESSFUL"):
 			runHeuristics.MinimizationSuccessful = HeuristicTrue
 		case strings.Contains(line, "GRADIENT:"):
@@ -452,7 +451,7 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 		ParameterStructures: parameterStructures,
 		ParameterNames:      parameterNames,
 		OFV:                 ofvDetails,
-		ShrinkageDetails:    []ShrinkageDetails{shrinkageDetails},
+		ShrinkageDetails:    [][]ShrinkageDetails{shrinkageDetails},
 		CovarianceTheta:     []FlatArray{covTheta},
 		CorrelationTheta:    []FlatArray{corTheta},
 	}

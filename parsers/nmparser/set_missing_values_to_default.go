@@ -76,53 +76,55 @@ func setMissingValuesToDefault(results *ModelOutput, etaCount, epsCount int) {
 
 	// shrinkage eta's
 	if etaCount > 0 {
-		for n := range results.ShrinkageDetails {
-			if len(results.ShrinkageDetails[n].EtaSD) == 0 {
-				results.ShrinkageDetails[n].EtaSD = make([]float64, etaCount)
-				for i := range results.ShrinkageDetails[n].EtaSD {
-					results.ShrinkageDetails[n].EtaSD[i] = DefaultFloat64
+		for methodIndex := range results.ShrinkageDetails {
+			for subGroupIndex := range results.ShrinkageDetails[methodIndex] {
+				if len(results.ShrinkageDetails[methodIndex][subGroupIndex].EtaSD) == 0 {
+					results.ShrinkageDetails[methodIndex][subGroupIndex].EtaSD = make([]float64, etaCount)
+					for i := range results.ShrinkageDetails[methodIndex][subGroupIndex].EtaSD {
+						results.ShrinkageDetails[methodIndex][subGroupIndex].EtaSD[i] = DefaultFloat64
+					}
 				}
-			}
-			if len(results.ShrinkageDetails[n].EtaVR) == 0 {
-				results.ShrinkageDetails[n].EtaVR = make([]float64, etaCount)
-				for i := range results.ShrinkageDetails[n].EtaVR {
-					results.ShrinkageDetails[n].EtaVR[i] = DefaultFloat64
+				if len(results.ShrinkageDetails[methodIndex][subGroupIndex].EtaVR) == 0 {
+					results.ShrinkageDetails[methodIndex][subGroupIndex].EtaVR = make([]float64, etaCount)
+					for i := range results.ShrinkageDetails[methodIndex][subGroupIndex].EtaVR {
+						results.ShrinkageDetails[methodIndex][subGroupIndex].EtaVR[i] = DefaultFloat64
+					}
 				}
-			}
-			if len(results.ShrinkageDetails[n].EbvSD) == 0 {
-				results.ShrinkageDetails[n].EbvSD = make([]float64, etaCount)
-				for i := range results.ShrinkageDetails[n].EbvSD {
-					results.ShrinkageDetails[n].EbvSD[i] = DefaultFloat64
+				if len(results.ShrinkageDetails[methodIndex][subGroupIndex].EbvSD) == 0 {
+					results.ShrinkageDetails[methodIndex][subGroupIndex].EbvSD = make([]float64, etaCount)
+					for i := range results.ShrinkageDetails[methodIndex][subGroupIndex].EbvSD {
+						results.ShrinkageDetails[methodIndex][subGroupIndex].EbvSD[i] = DefaultFloat64
+					}
 				}
-			}
-			if len(results.ShrinkageDetails[n].EbvVR) == 0 {
-				results.ShrinkageDetails[n].EbvVR = make([]float64, etaCount)
-				for i := range results.ShrinkageDetails[n].EbvVR {
-					results.ShrinkageDetails[n].EbvVR[i] = DefaultFloat64
+				if len(results.ShrinkageDetails[methodIndex][subGroupIndex].EbvVR) == 0 {
+					results.ShrinkageDetails[methodIndex][subGroupIndex].EbvVR = make([]float64, etaCount)
+					for i := range results.ShrinkageDetails[methodIndex][subGroupIndex].EbvVR {
+						results.ShrinkageDetails[methodIndex][subGroupIndex].EbvVR[i] = DefaultFloat64
+					}
 				}
-			}
-			if len(results.ShrinkageDetails[n].EtaBar) == 0 {
-				results.ShrinkageDetails[n].EtaBar = make([]float64, etaCount)
-				for i := range results.ShrinkageDetails[n].EtaBar {
-					results.ShrinkageDetails[n].EtaBar[i] = DefaultFloat64
+				if len(results.ShrinkageDetails[methodIndex][subGroupIndex].EtaBar) == 0 {
+					results.ShrinkageDetails[methodIndex][subGroupIndex].EtaBar = make([]float64, etaCount)
+					for i := range results.ShrinkageDetails[methodIndex][subGroupIndex].EtaBar {
+						results.ShrinkageDetails[methodIndex][subGroupIndex].EtaBar[i] = DefaultFloat64
+					}
 				}
-			}
-			if len(results.ShrinkageDetails[n].EtaBarSE) == 0 {
-				results.ShrinkageDetails[n].EtaBarSE = make([]float64, etaCount)
-				for i := range results.ShrinkageDetails[n].EtaBarSE {
-					results.ShrinkageDetails[n].EtaBarSE[i] = DefaultFloat64
+				if len(results.ShrinkageDetails[methodIndex][subGroupIndex].EtaBarSE) == 0 {
+					results.ShrinkageDetails[methodIndex][subGroupIndex].EtaBarSE = make([]float64, etaCount)
+					for i := range results.ShrinkageDetails[methodIndex][subGroupIndex].EtaBarSE {
+						results.ShrinkageDetails[methodIndex][subGroupIndex].EtaBarSE[i] = DefaultFloat64
+					}
 				}
-			}
-			if len(results.ShrinkageDetails[n].Pval) == 0 {
-				results.ShrinkageDetails[n].Pval = make([]float64, etaCount)
-				for i := range results.ShrinkageDetails[n].Pval {
-					results.ShrinkageDetails[n].Pval[i] = DefaultFloat64
+				if len(results.ShrinkageDetails[methodIndex][subGroupIndex].Pval) == 0 {
+					results.ShrinkageDetails[methodIndex][subGroupIndex].Pval = make([]float64, etaCount)
+					for i := range results.ShrinkageDetails[methodIndex][subGroupIndex].Pval {
+						results.ShrinkageDetails[methodIndex][subGroupIndex].Pval[i] = DefaultFloat64
+					}
 				}
-			}
-			if len(results.ShrinkageDetails[n].NumSubjects) == 0 {
-				results.ShrinkageDetails[n].NumSubjects = make([]float64, etaCount)
-				for i := range results.ShrinkageDetails[n].NumSubjects {
-					results.ShrinkageDetails[n].NumSubjects[i] = DefaultFloat64
+				if len(results.ShrinkageDetails[methodIndex][subGroupIndex].NumSubjects) == 0 {
+					results.ShrinkageDetails[methodIndex][subGroupIndex].NumSubjects = make([]float64, etaCount)
+					for i := range results.ShrinkageDetails[methodIndex][subGroupIndex].NumSubjects {
+						results.ShrinkageDetails[methodIndex][subGroupIndex].NumSubjects[i] = DefaultFloat64
+					}
 				}
 			}
 		}
@@ -130,17 +132,19 @@ func setMissingValuesToDefault(results *ModelOutput, etaCount, epsCount int) {
 
 	// shrinkage eps's
 	if epsCount > 0 {
-		for n := range results.ShrinkageDetails {
-			if len(results.ShrinkageDetails[n].EpsSD) == 0 {
-				results.ShrinkageDetails[n].EpsSD = make([]float64, epsCount)
-				for i := range results.ShrinkageDetails[n].EpsSD {
-					results.ShrinkageDetails[n].EpsSD[i] = DefaultFloat64
+		for methodIndex := range results.ShrinkageDetails {
+			for subGroupIndex := range results.ShrinkageDetails[methodIndex] {
+				if len(results.ShrinkageDetails[methodIndex][subGroupIndex].EpsSD) == 0 {
+					results.ShrinkageDetails[methodIndex][subGroupIndex].EpsSD = make([]float64, epsCount)
+					for i := range results.ShrinkageDetails[methodIndex][subGroupIndex].EpsSD {
+						results.ShrinkageDetails[methodIndex][subGroupIndex].EpsSD[i] = DefaultFloat64
+					}
 				}
-			}
-			if len(results.ShrinkageDetails[n].EpsVR) == 0 {
-				results.ShrinkageDetails[n].EpsVR = make([]float64, epsCount)
-				for i := range results.ShrinkageDetails[n].EpsVR {
-					results.ShrinkageDetails[n].EpsVR[i] = DefaultFloat64
+				if len(results.ShrinkageDetails[methodIndex][subGroupIndex].EpsVR) == 0 {
+					results.ShrinkageDetails[methodIndex][subGroupIndex].EpsVR = make([]float64, epsCount)
+					for i := range results.ShrinkageDetails[methodIndex][subGroupIndex].EpsVR {
+						results.ShrinkageDetails[methodIndex][subGroupIndex].EpsVR[i] = DefaultFloat64
+					}
 				}
 			}
 		}

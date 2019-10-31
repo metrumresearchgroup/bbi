@@ -45,33 +45,33 @@ func (results ModelOutput) Summary() bool {
 	omegaTable := tablewriter.NewWriter(os.Stdout)
 	omegaTable.SetAlignment(tablewriter.ALIGN_LEFT)
 	omegaTable.SetColWidth(100)
-	omegaTable.SetHeader([]string{"Omega", "Eta", "Estimate", "ShrinkageSD (%)"})
+	omegaTable.SetHeader([]string{"Sub", "Omega", "Eta", "Estimate", "ShrinkageSD (%)"})
 	// required for color, prevents newline in row
 	thetaTable.SetAutoWrapText(false)
 
 	diagIndices := GetDiagonalIndices(results.ParameterStructures.Omega)
 	for n, omegaIndex := range diagIndices {
-		//shrinkageValue := "0"
 		var shrinkageValue string
-		//val := 0.0
 		var val float64
-		if len(results.ShrinkageDetails) > 0 {
-			// get the data for the last method
-			shrinkageDetails := results.ShrinkageDetails[len(results.ShrinkageDetails)-1]
-			if n < len(shrinkageDetails.EtaSD) {
-				shrinkage := shrinkageDetails.EtaSD[n]
-				if shrinkage > 30.0 {
-					shrinkageValue = aurora.Sprintf(aurora.Red("%s"), fmt.Sprintf("%f", shrinkage))
-				} else {
-					shrinkageValue = fmt.Sprintf("%f", shrinkage)
+		methodIndex := len(results.RunDetails.EstimationMethod) - 1
+		for subpop := range results.ShrinkageDetails[methodIndex] {
+			if len(results.ShrinkageDetails[methodIndex]) > 0 {
+				// get the data for the last method
+				shrinkageDetails := results.ShrinkageDetails[len(results.ShrinkageDetails)-1]
+				if n < len(shrinkageDetails[methodIndex].EtaSD) {
+					shrinkage := shrinkageDetails[subpop].EtaSD[n]
+					if shrinkage > 30.0 {
+						shrinkageValue = aurora.Sprintf(aurora.Red("%s"), fmt.Sprintf("%f", shrinkage))
+					} else {
+						shrinkageValue = fmt.Sprintf("%f", shrinkage)
+					}
 				}
+				val = results.ParametersData[finalEstimationMethodIndex].Estimates.Omega[omegaIndex]
 			}
-			val = results.ParametersData[finalEstimationMethodIndex].Estimates.Omega[omegaIndex]
+			etaName := fmt.Sprintf("ETA%v", n+1)
+			omegaIndices := fmt.Sprintf("(%s,%s)", strconv.Itoa(n), strconv.Itoa(n))
+			omegaTable.Append([]string{fmt.Sprintf("%d", subpop+1), string("O" + omegaIndices), etaName, fmt.Sprintf("%f", val), shrinkageValue})
 		}
-
-		etaName := fmt.Sprintf("ETA%v", n+1)
-		omegaIndices := fmt.Sprintf("(%s,%s)", strconv.Itoa(n), strconv.Itoa(n))
-		omegaTable.Append([]string{string("O" + omegaIndices), etaName, fmt.Sprintf("%f", val), shrinkageValue})
 	}
 
 	fmt.Println(results.RunDetails.ProblemText)

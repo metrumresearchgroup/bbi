@@ -90,6 +90,8 @@ func GetModelOutput(filePath string, verbose, noExt, noGrd, noCov, noCor, noShk 
 			panic(err)
 		}
 		results.ShrinkageDetails = ParseShkData(ParseShkLines(shkLines), etaCount, epsCount)
+	} else {
+		log.Printf("Shrinkage file not used. Mixture-model shrinkage data may not be accurate.")
 	}
 
 	setMissingValuesToDefault(&results, etaCount, epsCount)
