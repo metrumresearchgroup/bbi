@@ -1,4 +1,4 @@
-package cmd
+package parser
 
 import (
 	"fmt"
@@ -12,7 +12,7 @@ import (
 
 var Versions = []string{"73", "74"}
 var Exts = []string{".json", "_table.txt"}
-var TestFolder = string("./example-models/nonmem/")
+var TestFolder = string("../../testdata/example-models/nonmem/")
 var Tests = []struct {
 	modFile string
 	args    []string
