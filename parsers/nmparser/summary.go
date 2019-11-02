@@ -8,6 +8,7 @@ import (
 
 	"github.com/logrusorgru/aurora"
 	"github.com/olekukonko/tablewriter"
+	"github.com/thoas/go-funk"
 )
 
 // Summary prints all results from the parsed LstData
@@ -50,33 +51,46 @@ func (results ModelOutput) Summary() bool {
 	omegaTable := tablewriter.NewWriter(os.Stdout)
 	omegaTable.SetAlignment(tablewriter.ALIGN_LEFT)
 	omegaTable.SetColWidth(100)
-	omegaTable.SetHeader([]string{"Sub", "Omega", "Eta", "Estimate", "ShrinkageSD (%)"})
+	omegaHeaders := []string{"Omega", "Eta", "Estimate"}
+	nSubPopsForMixtureModels := len(results.ShrinkageDetails[len(results.RunDetails.EstimationMethod)-1])
+	if nSubPopsForMixtureModels > 1 {
+		for i := 0; i < nSubPopsForMixtureModels; i++ {
+			omegaHeaders = append(omegaHeaders, fmt.Sprintf("Pop%v Shrinkage (%%)", i+1))
+		}
+	} else {
+		// single population
+		omegaHeaders = append(omegaHeaders, "Shrinkage (%)")
+	}
+	omegaTable.SetHeader(omegaHeaders)
 	// required for color, prevents newline in row
 	thetaTable.SetAutoWrapText(false)
 
 	diagIndices := GetDiagonalIndices(results.ParameterStructures.Omega)
-	for n, omegaIndex := range diagIndices {
-		var shrinkageValue string
-		var val float64
-		methodIndex := len(results.RunDetails.EstimationMethod) - 1
-		for subpop := range results.ShrinkageDetails[methodIndex] {
-			if len(results.ShrinkageDetails[methodIndex]) > 0 {
-				// get the data for the last method
-				shrinkageDetails := results.ShrinkageDetails[len(results.ShrinkageDetails)-1]
-				if n < len(shrinkageDetails[methodIndex].EtaSD) {
-					shrinkage := shrinkageDetails[subpop].EtaSD[n]
+	methodIndex := len(results.RunDetails.EstimationMethod) - 1
+	for n := range results.ParametersData[finalEstimationMethodIndex].Estimates.Omega {
+		if results.ParameterStructures.Omega[n] == 0 {
+			continue
+		}
+		diagIndex := funk.IndexOfInt(diagIndices, n)
+		var shrinkageValues []string
+		var etaName string
+		val := results.ParametersData[finalEstimationMethodIndex].Estimates.Omega[n]
+		if diagIndex > -1 {
+			etaName = fmt.Sprintf("ETA%v", diagIndex+1)
+			for sp := range results.ShrinkageDetails[methodIndex] {
+				if len(results.ShrinkageDetails[methodIndex]) > 0 {
+					// get the data for the last method
+					shrinkageDetails := results.ShrinkageDetails[len(results.ShrinkageDetails)-1]
+					shrinkage := shrinkageDetails[sp].EtaSD[diagIndex]
 					if shrinkage > 30.0 {
-						shrinkageValue = aurora.Sprintf(aurora.Red("%s"), fmt.Sprintf("%f", shrinkage))
+						shrinkageValues = append(shrinkageValues, aurora.Sprintf(aurora.Red("%s"), fmt.Sprintf("%f", shrinkage)))
 					} else {
-						shrinkageValue = fmt.Sprintf("%f", shrinkage)
+						shrinkageValues = append(shrinkageValues, fmt.Sprintf("%f", shrinkage))
 					}
 				}
-				val = results.ParametersData[finalEstimationMethodIndex].Estimates.Omega[omegaIndex]
 			}
-			etaName := fmt.Sprintf("ETA%v", n+1)
-			omegaIndices := fmt.Sprintf("(%s,%s)", strconv.Itoa(n+1), strconv.Itoa(n+1))
-			omegaTable.Append([]string{fmt.Sprintf("%d", subpop+1), string("O" + omegaIndices), etaName, fmt.Sprintf("%f", val), shrinkageValue})
 		}
+		omegaTable.Append(append([]string{results.ParameterNames.Omega[n], etaName, fmt.Sprintf("%f", val)}, shrinkageValues...))
 	}
 
 	fmt.Println(results.RunDetails.ProblemText)
