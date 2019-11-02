@@ -1,0 +1,50 @@
+[
+	{
+		"file": "acop.clt",
+		"level": 2
+	},
+	{
+		"file": "acop.coi",
+		"level": 2
+	},
+	{
+		"file": "acop.cor",
+		"level": 3
+	},
+	{
+		"file": "acop.cov",
+		"level": 3
+	},
+	{
+		"file": "acop.cpu",
+		"level": 2
+	},
+	{
+		"file": "acop.ext",
+		"level": 3
+	},
+	{
+		"file": "acop.grd",
+		"level": 3
+	},
+	{
+		"file": "acop.lst",
+		"level": 3
+	},
+	{
+		"file": "acop.phi",
+		"level": 2
+	},
+	{
+		"file": "acop.shk",
+		"level": 3
+	},
+	{
+		"file": "acop.shm",
+		"level": 2
+	},
+	{
+		"file": "acop.xml",
+		"level": 3
+	}
+]
