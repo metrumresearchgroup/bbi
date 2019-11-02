@@ -92,28 +92,27 @@ func EstOutputFilesByRun(r string) map[string]int {
 	// fileExtLvls are based on 1 = lowest priority -> n = highest priority
 
 	fileExtsLvl1 := []string{
-		".clt",
-		".coi",
-		".clt",
-		".coi",
-		".cpu",
-		".grd",
-		".shk",
-		".shm",
-		".phi",
-		// these extensions don't fully jive with historical psn
-		// conventions, but will be a lot easier to consistently
-		// flag out by following the <runname><ext/suffix> convention
 		".msf",
 		"_ETAS.msf",
 		"_RMAT.msf",
 	}
 	fileExtsLvl2 := []string{
+		".clt",
+		".coi",
+		".clt",
+		".coi",
+		".cpu",
+		".shm",
+		".phi",
+	}
+
+	// parser now needs all these files + other tooling uses xml files
+	fileExtsLvl3 := []string{
 		".xml",
+		".grd",
+		".shk",
 		".cor",
 		".cov",
-	}
-	fileExtsLvl3 := []string{
 		".ext",
 		".lst",
 	}
