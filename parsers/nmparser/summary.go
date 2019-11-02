@@ -69,7 +69,7 @@ func (results ModelOutput) Summary() bool {
 				val = results.ParametersData[finalEstimationMethodIndex].Estimates.Omega[omegaIndex]
 			}
 			etaName := fmt.Sprintf("ETA%v", n+1)
-			omegaIndices := fmt.Sprintf("(%s,%s)", strconv.Itoa(n), strconv.Itoa(n))
+			omegaIndices := fmt.Sprintf("(%s,%s)", strconv.Itoa(n+1), strconv.Itoa(n+1))
 			omegaTable.Append([]string{fmt.Sprintf("%d", subpop+1), string("O" + omegaIndices), etaName, fmt.Sprintf("%f", val), shrinkageValue})
 		}
 	}
