@@ -23,13 +23,18 @@ func (results ModelOutput) Summary() bool {
 	for i := range results.ParametersData[finalEstimationMethodIndex].Estimates.Theta {
 		numResult := results.ParametersData[finalEstimationMethodIndex].Estimates.Theta[i]
 		seResult := results.ParametersData[finalEstimationMethodIndex].StdErr.Theta[i]
+		fixed := results.ParametersData[finalEstimationMethodIndex].Fixed.Theta[i]
 		var rse float64
-		if seResult != 0 && numResult != 0 && seResult != DefaultFloat64 && numResult != DefaultFloat64 {
+		if seResult != -999999999 && numResult != 0 && seResult != DefaultFloat64 && numResult != DefaultFloat64 {
 			rse = math.Abs(seResult / numResult * 100)
 		}
 
 		var s4 string
-		if rse > 30.0 {
+		if fixed == 1 {
+			s4 = "FIX"
+		} else if seResult == -999999999 {
+			s4 = "-"
+		} else if rse > 30.0 {
 			s4 = aurora.Sprintf(aurora.Red("%s"), fmt.Sprintf("%s (%s%%)", strconv.FormatFloat(seResult, 'f', -1, 64), strconv.FormatFloat(rse, 'f', 1, 64)))
 		} else {
 			s4 = fmt.Sprintf("%s (%s%%)", strconv.FormatFloat(seResult, 'f', -1, 64), strconv.FormatFloat(rse, 'f', 1, 64))
