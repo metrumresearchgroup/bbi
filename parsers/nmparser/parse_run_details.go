@@ -6,20 +6,12 @@ import (
 	"strings"
 )
 
-// RunDetails contains key information about logistics of the model run
-type RunDetails struct {
-	NMversion           string
-	RunStart            string
-	RunEnd              string
-	EstimationTime      float64
-	CovarianceTime      float64
-	FunctionEvaluations int64
-	SignificantDigits   float64
-}
-
 func parseFinalTime(line string) float64 {
 	re := regexp.MustCompile("[-+]?([0-9]*\\.[0-9]+|[0-9]+)$")
-	res, _ := strconv.ParseFloat(re.FindString(line), 64)
+	res, err := strconv.ParseFloat(re.FindString(line), 64)
+	if err != nil {
+		res = DefaultFloat64
+	}
 	return res
 }
 
@@ -33,43 +25,76 @@ func replaceTrim(line string, replacement string) string {
 	return strings.TrimSpace(strings.Replace(line, replacement, "", -1))
 }
 
+func parseValue(line string, value string) string {
+	tokens := strings.Fields(line)
+	for _, s := range tokens {
+		if strings.Contains(s, value) {
+			return replaceTrim(s, value)
+		}
+	}
+	return ""
+}
+
+func parseLine(line string, n int) string {
+	tokens := strings.Fields(line)
+	if len(tokens) >= n {
+		return tokens[n]
+	}
+	return ""
+}
+
 // ParseRunDetails parses run details such as start date/time and estimation time etc.
 func ParseRunDetails(lines []string) RunDetails {
-	nmversion := ""
-	runStart := ""
-	runEnd := ""
-	estimationTime := 0.0
-	covarianceTime := 0.0
-	functionEvaluations := int64(0)
-	significantDigits := 0.0
-	for _, line := range lines {
+	runDetails := NewRunDetails()
+
+	for i, line := range lines {
 		switch {
 		case strings.Contains(line, "1NONLINEAR MIXED EFFECTS MODEL PROGRAM (NONMEM) VERSION"):
-			nmversion = parseNMVersion(line)
+			runDetails.Version = parseNMVersion(line)
 		case strings.Contains(line, "NO. OF FUNCTION EVALUATIONS USED"):
-			functionEvaluations, _ = strconv.ParseInt(replaceTrim(line, "NO. OF FUNCTION EVALUATIONS USED:"), 10, 64)
+			runDetails.FunctionEvaluations, _ = strconv.ParseInt(replaceTrim(line, "NO. OF FUNCTION EVALUATIONS USED:"), 10, 64)
 		case strings.Contains(line, "NO. OF SIG. DIGITS IN FINAL EST.:"):
-			significantDigits, _ = strconv.ParseFloat(replaceTrim(line, "NO. OF SIG. DIGITS IN FINAL EST.:"), 64)
-		case strings.Contains(line, "Elapsed estimation time in seconds:"):
-			estimationTime = parseFinalTime(line)
+			runDetails.SignificantDigits, _ = strconv.ParseFloat(replaceTrim(line, "NO. OF SIG. DIGITS IN FINAL EST.:"), 64)
+		case strings.Contains(line, "Elapsed estimation"):
+			runDetails.EstimationTime = parseFinalTime(line)
 		case strings.Contains(line, "Elapsed covariance time in seconds:"):
-			covarianceTime = parseFinalTime(line)
+			runDetails.CovarianceTime = parseFinalTime(line)
+		case strings.Contains(line, "Elapsed postprocess time in seconds:"):
+			runDetails.CovarianceTime = parseFinalTime(line)
 		case strings.Contains(line, "Started"):
-			runStart = replaceTrim(line, "Started")
+			runDetails.RunStart = replaceTrim(line, "Started")
 		case strings.Contains(line, "Finished"):
-			runEnd = replaceTrim(line, "Finished")
+			runDetails.RunEnd = replaceTrim(line, "Finished")
+		case strings.Contains(line, "Stop Time:"):
+			if i+1 < len(lines) {
+				runDetails.RunEnd = lines[i+1]
+			}
+		case strings.Contains(line, "$PROB"):
+			runDetails.ProblemText = replaceTrim(line, "$PROB")
+		case strings.Contains(line, "#METH:"):
+			runDetails.EstimationMethod = append(runDetails.EstimationMethod, replaceTrim(line, "#METH:"))
+		case strings.Contains(line, "$DATA"):
+			runDetails.DataSet = parseLine(line, 1)
+		case strings.Contains(line, "TOT. NO. OF INDIVIDUALS:"):
+			runDetails.NumberOfPatients, _ = strconv.ParseInt(replaceTrim(line, "TOT. NO. OF INDIVIDUALS:"), 10, 64)
+		case strings.Contains(line, "TOT. NO. OF OBS RECS:"):
+			runDetails.NumberOfObs, _ = strconv.ParseInt(replaceTrim(line, "TOT. NO. OF OBS RECS:"), 10, 64)
+		case strings.Contains(line, "NO. OF DATA RECS IN DATA SET:"):
+			runDetails.NumberOfDataRecords, _ = strconv.ParseInt(replaceTrim(line, "NO. OF DATA RECS IN DATA SET:"), 10, 64)
+		// This is not reliable because TABLE statements can span multiple lines
+		// TODO: support using multi-line feature, when available
+		// case strings.Contains(line, "$TABLE NOPRINT ONEHEADER FILE="):
+		// 	outputTable = parseValue(line, "FILE=")
 		default:
 			continue
 		}
 	}
 
-	return RunDetails{
-		nmversion,
-		runStart,
-		runEnd,
-		estimationTime,
-		covarianceTime,
-		functionEvaluations,
-		significantDigits,
+	if runDetails.Version == "7.4.3" {
+		if runDetails.RunStart == "" || runDetails.RunStart == DefaultString {
+			runDetails.RunStart = lines[0]
+		}
 	}
+
+	return runDetails
 }

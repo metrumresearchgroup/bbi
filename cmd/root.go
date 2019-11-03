@@ -24,7 +24,7 @@ import (
 )
 
 // VERSION is the current bbi version
-const VERSION string = "1.0.0"
+var VERSION string = "2.0.0-alpha.2"
 
 var (
 	// name of config file
@@ -33,8 +33,13 @@ var (
 	verbose bool
 	debug   bool
 	threads int
-	tree    bool
+	Json    bool
 	preview bool
+	noExt   bool
+	noGrd   bool
+	noCov   bool
+	noCor   bool
+	noShk   bool
 )
 
 // RootCmd represents the base command when called without any subcommands
@@ -46,7 +51,11 @@ var RootCmd = &cobra.Command{
 
 // Execute adds all child commands to the root command sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute() {
+func Execute(build string) {
+	if build != "" {
+		VERSION = fmt.Sprintf("%s-%s", VERSION, build)
+	}
+	RootCmd.Long = fmt.Sprintf("bbi cli version %s", VERSION)
 	if err := RootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(-1)
@@ -64,8 +73,13 @@ func init() {
 	RootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
 	RootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "debug mode")
 	RootCmd.PersistentFlags().IntVar(&threads, "threads", 0, "number of threads to execute with")
-	RootCmd.PersistentFlags().BoolVarP(&tree, "tree", "t", false, "json tree of output, if possible")
+	RootCmd.PersistentFlags().BoolVar(&Json, "json", false, "json tree of output, if possible")
 	RootCmd.PersistentFlags().BoolVarP(&preview, "preview", "p", false, "preview action, but don't actually run command")
+	RootCmd.PersistentFlags().BoolVarP(&noExt, "no-ext-file", "", false, "do not use ext file")
+	RootCmd.PersistentFlags().BoolVarP(&noGrd, "no-grd-file", "", false, "do not use grd file")
+	RootCmd.PersistentFlags().BoolVarP(&noCov, "no-cov-file", "", false, "do not use cov file")
+	RootCmd.PersistentFlags().BoolVarP(&noCor, "no-cor-file", "", false, "do not use cor file")
+	RootCmd.PersistentFlags().BoolVarP(&noShk, "no-shk-file", "", false, "do not use shk file")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.

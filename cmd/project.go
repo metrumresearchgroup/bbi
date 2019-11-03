@@ -18,13 +18,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
 	"path/filepath"
 
-	"os"
+	"github.com/olekukonko/tablewriter"
 
 	"strings"
 
-	"github.com/apcera/termtables"
 	parser "github.com/metrumresearchgroup/babylon/parsers/nmparser"
 	"github.com/metrumresearchgroup/babylon/utils"
 	"github.com/spf13/afero"
@@ -66,7 +66,7 @@ func probs(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	modelSummaries := modSummaries(AppFs, modelFiles, dir)
-	if tree {
+	if Json {
 		jsonRes, _ := json.MarshalIndent(modelSummaries, "", "\t")
 		fmt.Printf("%s\n", jsonRes)
 	} else {
@@ -118,18 +118,14 @@ type modelSummary struct {
 
 // probSummary prints the problem statements from each model
 func probSummary(mp []modelSummary) {
-	termtables.DefaultStyle = &termtables.TableStyle{
-		SkipBorder: false,
-		BorderX:    "-", BorderY: "|", BorderI: "+",
-		PaddingLeft: 3, PaddingRight: 3,
-		Width:     100,
-		Alignment: termtables.AlignLeft,
-	}
-	probTable := termtables.CreateTable()
-	probTable.AddHeaders("Run", "Prob")
-	for _, m := range mp {
-		probTable.AddRow(m.ModelName, strings.TrimPrefix(m.Prob, "$PROB"))
-	}
 
-	fmt.Println(probTable.Render())
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetAlignment(tablewriter.ALIGN_LEFT)
+	table.SetColWidth(100)
+	table.SetHeader([]string{"Run", "Prob"})
+
+	for _, m := range mp {
+		table.Append([]string{m.ModelName, strings.TrimPrefix(m.Prob, "$PROB")})
+	}
+	table.Render()
 }

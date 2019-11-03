@@ -13,7 +13,7 @@ func LoadGlobalConfig(configFilename string) error {
 	viper.SetConfigName(configFilename)
 	viper.SetConfigType("toml")
 	viper.AutomaticEnv()
-	viper.SetEnvPrefix("bab")
+	viper.SetEnvPrefix("babylon")
 	viper.AddConfigPath(".")
 	viper.AddConfigPath("$HOME")
 	err := viper.ReadInConfig()

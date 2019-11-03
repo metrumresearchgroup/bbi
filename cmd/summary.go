@@ -17,13 +17,9 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
-	"log"
-	"path/filepath"
-	"strings"
 
 	parser "github.com/metrumresearchgroup/babylon/parsers/nmparser"
-	"github.com/metrumresearchgroup/babylon/utils"
-	"github.com/spf13/afero"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -45,20 +41,9 @@ func summary(cmd *cobra.Command, args []string) {
 		viper.Debug()
 	}
 
-	AppFs := afero.NewOsFs()
+	results := parser.GetModelOutput(args[0], verbose, noExt, noGrd, noCov, noCor, noShk)
 
-	filePath := args[0]
-
-	// create a new dir for model estimation
-	runNum, _ := utils.FileAndExt(filePath)
-	dir, _ := filepath.Abs(filepath.Dir(filePath))
-	outputFilePath := strings.Join([]string{filepath.Join(dir, runNum), ".lst"}, "")
-	if verbose {
-		log.Printf("base dir: %s", dir)
-	}
-	fileLines, _ := utils.ReadLinesFS(AppFs, outputFilePath)
-	results := parser.ParseLstEstimationFile(fileLines)
-	if summaryTree {
+	if Json {
 		jsonRes, _ := json.MarshalIndent(results, "", "\t")
 		fmt.Printf("%s\n", jsonRes)
 	} else {
@@ -68,5 +53,4 @@ func summary(cmd *cobra.Command, args []string) {
 }
 func init() {
 	RootCmd.AddCommand(summaryCmd)
-	summaryCmd.Flags().BoolVar(&summaryTree, "tree", false, "show a json tree of parsed results from the lst file instead of summary tables")
 }

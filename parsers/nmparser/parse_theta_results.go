@@ -18,7 +18,10 @@ func ParseThetaResults(lines []string) []float64 {
 	}
 	stringValues := strings.Fields(thetaLine)
 	for _, strVal := range stringValues {
-		parsedVal, _ := strconv.ParseFloat(strVal, 64)
+		parsedVal, err := strconv.ParseFloat(strVal, 64)
+		if err != nil {
+			parsedVal = DefaultFloat64
+		}
 		thetaValues = append(thetaValues, parsedVal)
 	}
 	return thetaValues

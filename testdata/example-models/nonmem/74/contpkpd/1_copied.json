@@ -1,0 +1,42 @@
+[
+	{
+		"file": "1.cpu",
+		"level": 1
+	},
+	{
+		"file": "1.ext",
+		"level": 3
+	},
+	{
+		"file": "1.grd",
+		"level": 1
+	},
+	{
+		"file": "1.lst",
+		"level": 3
+	},
+	{
+		"file": "1.msf",
+		"level": 2
+	},
+	{
+		"file": "1.phi",
+		"level": 1
+	},
+	{
+		"file": "1.shk",
+		"level": 1
+	},
+	{
+		"file": "1.shm",
+		"level": 1
+	},
+	{
+		"file": "1.xml",
+		"level": 2
+	},
+	{
+		"file": "1_ETAS.msf",
+		"level": 2
+	}
+]

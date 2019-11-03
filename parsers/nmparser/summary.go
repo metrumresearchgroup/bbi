@@ -3,75 +3,90 @@ package parser
 import (
 	"fmt"
 	"math"
+	"os"
 	"strconv"
 
-	"github.com/apcera/termtables"
 	"github.com/logrusorgru/aurora"
+	"github.com/olekukonko/tablewriter"
 )
 
 // Summary prints all results from the parsed LstData
-func (results LstData) Summary() bool {
-	termtables.DefaultStyle = &termtables.TableStyle{
-		SkipBorder: false,
-		BorderX:    "-", BorderY: "|", BorderI: "+",
-		PaddingLeft: 3, PaddingRight: 3,
-		Width:     100,
-		Alignment: termtables.AlignRight,
-	}
-	thetaTable := termtables.CreateTable()
-	thetaTable.AddHeaders("Theta", "Name", "Estimate (SN)", "Estimate", "StdErr (RSE)")
-	for i := range results.FinalParameterEstimates.Theta {
-		numResult := results.FinalParameterEstimates.Theta[i]
-		seResult := results.FinalParameterStdErr.Theta[i]
+func (results ModelOutput) Summary() bool {
+	thetaTable := tablewriter.NewWriter(os.Stdout)
+	thetaTable.SetAlignment(tablewriter.ALIGN_LEFT)
+	thetaTable.SetColWidth(100)
+	thetaTable.SetHeader([]string{"Theta", "Name", "Estimate", "StdErr (RSE)"})
+	// required for color, prevents newline in row
+	thetaTable.SetAutoWrapText(false)
+
+	finalEstimationMethodIndex := len(results.ParametersData) - 1
+	for i := range results.ParametersData[finalEstimationMethodIndex].Estimates.Theta {
+		numResult := results.ParametersData[finalEstimationMethodIndex].Estimates.Theta[i]
+		seResult := results.ParametersData[finalEstimationMethodIndex].StdErr.Theta[i]
 		var rse float64
-		if seResult != 0 && numResult != 0 {
+		if seResult != 0 && numResult != 0 && seResult != DefaultFloat64 && numResult != DefaultFloat64 {
 			rse = math.Abs(seResult / numResult * 100)
-
 		}
 
-		if rse > 30 {
-			//theta, _ := fmt.Printf("%.3E", results.FinalParameterEstimates.Theta[i])
-			thetaTable.AddRow(
-				aurora.Red("TH "+strconv.Itoa(i+1)),
-				aurora.Red(results.ParameterNames.Theta[i]),
-				aurora.Red(strconv.FormatFloat(numResult, 'E', 2, 64)),
-				aurora.Red(strconv.FormatFloat(numResult, 'f', -1, 64)),
-				aurora.Red(
-					fmt.Sprintf("%s (%s %%)",
-						strconv.FormatFloat(seResult, 'f', -1, 64),
-						strconv.FormatFloat(rse, 'f', 1, 64)),
-				),
-			)
+		var s4 string
+		if rse > 30.0 {
+			s4 = aurora.Sprintf(aurora.Red("%s"), fmt.Sprintf("%s (%s%%)", strconv.FormatFloat(seResult, 'f', -1, 64), strconv.FormatFloat(rse, 'f', 1, 64)))
 		} else {
-			thetaTable.AddRow(
-				"TH "+strconv.Itoa(i+1),
-				results.ParameterNames.Theta[i],
-				strconv.FormatFloat(numResult, 'E', 2, 64),
-				strconv.FormatFloat(numResult, 'f', -1, 64),
-				fmt.Sprintf("%s (%s %%)",
-					strconv.FormatFloat(seResult, 'f', -1, 64),
-					strconv.FormatFloat(rse, 'f', 1, 64),
-				),
-			)
-
+			s4 = fmt.Sprintf("%s (%s%%)", strconv.FormatFloat(seResult, 'f', -1, 64), strconv.FormatFloat(rse, 'f', 1, 64))
 		}
 
+		thetaTable.Append([]string{
+			string("TH " + strconv.Itoa(i+1)),
+			results.ParameterNames.Theta[i],
+			strconv.FormatFloat(numResult, 'f', -1, 64),
+			s4})
 	}
-	thetaTable.SetAlign(termtables.AlignLeft, 1)
 
-	omegaTable := termtables.CreateTable()
-	omegaTable.AddHeaders("Omega", "Estimate")
-	userEta := 0
-	for i := range results.FinalParameterEstimates.Omega {
-		if results.ParameterStructures.Omega[i] != 0 {
-			userEta++
-			val := results.FinalParameterEstimates.Omega[i]
-			omegaTable.AddRow("ETA "+strconv.Itoa(userEta), val)
+	omegaTable := tablewriter.NewWriter(os.Stdout)
+	omegaTable.SetAlignment(tablewriter.ALIGN_LEFT)
+	omegaTable.SetColWidth(100)
+	omegaTable.SetHeader([]string{"Sub", "Omega", "Eta", "Estimate", "ShrinkageSD (%)"})
+	// required for color, prevents newline in row
+	thetaTable.SetAutoWrapText(false)
+
+	diagIndices := GetDiagonalIndices(results.ParameterStructures.Omega)
+	for n, omegaIndex := range diagIndices {
+		var shrinkageValue string
+		var val float64
+		methodIndex := len(results.RunDetails.EstimationMethod) - 1
+		for subpop := range results.ShrinkageDetails[methodIndex] {
+			if len(results.ShrinkageDetails[methodIndex]) > 0 {
+				// get the data for the last method
+				shrinkageDetails := results.ShrinkageDetails[len(results.ShrinkageDetails)-1]
+				if n < len(shrinkageDetails[methodIndex].EtaSD) {
+					shrinkage := shrinkageDetails[subpop].EtaSD[n]
+					if shrinkage > 30.0 {
+						shrinkageValue = aurora.Sprintf(aurora.Red("%s"), fmt.Sprintf("%f", shrinkage))
+					} else {
+						shrinkageValue = fmt.Sprintf("%f", shrinkage)
+					}
+				}
+				val = results.ParametersData[finalEstimationMethodIndex].Estimates.Omega[omegaIndex]
+			}
+			etaName := fmt.Sprintf("ETA%v", n+1)
+			omegaIndices := fmt.Sprintf("(%s,%s)", strconv.Itoa(n), strconv.Itoa(n))
+			omegaTable.Append([]string{fmt.Sprintf("%d", subpop+1), string("O" + omegaIndices), etaName, fmt.Sprintf("%f", val), shrinkageValue})
 		}
-
 	}
-	omegaTable.SetAlign(termtables.AlignLeft, 1)
-	fmt.Println(thetaTable.Render())
-	fmt.Println(omegaTable.Render())
+
+	fmt.Println(results.RunDetails.ProblemText)
+	fmt.Println("Dataset: " + results.RunDetails.DataSet)
+	fmt.Println(fmt.Sprintf("Records: %v   Observations: %v  Patients: %v",
+		results.RunDetails.NumberOfDataRecords,
+		results.RunDetails.NumberOfObs,
+		results.RunDetails.NumberOfPatients,
+	))
+	fmt.Println("Estimation Method(s):")
+	for _, em := range results.RunDetails.EstimationMethod {
+		fmt.Println(" - " + em)
+	}
+
+	thetaTable.Render()
+	omegaTable.Render()
 	return true
 }

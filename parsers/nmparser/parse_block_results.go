@@ -19,7 +19,10 @@ func ParseBlockResults(lines []string) []float64 {
 	}
 	stringValues := strings.Fields(omegaLine)
 	for _, strVal := range stringValues {
-		parsedVal, _ := strconv.ParseFloat(strVal, 64)
+		parsedVal, err := strconv.ParseFloat(strVal, 64)
+		if err != nil {
+			parsedVal = DefaultFloat64
+		}
 		blockValues = append(blockValues, parsedVal)
 	}
 	return blockValues

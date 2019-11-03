@@ -4,9 +4,38 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/spf13/afero"
 )
+
+//ReadParamsAndOutputFromExt returns the lines associated
+// with either parameter table outputs or output lines (-100xxx lines)
+//
+func ReadParamsAndOutputFromExt(path string) ([]string, error) {
+	inFile, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer inFile.Close()
+	scanner := bufio.NewScanner(inFile)
+	scanner.Split(bufio.ScanLines)
+	var lines []string
+	for scanner.Scan() {
+		txt := scanner.Text()
+		switch {
+		case strings.HasPrefix(txt, "TABLE"):
+			lines = append(lines, scanner.Text())
+		case strings.HasPrefix(txt, " ITER"):
+			lines = append(lines, scanner.Text())
+		case strings.HasPrefix(txt, "  -100000000"):
+			lines = append(lines, scanner.Text())
+		default:
+			continue
+		}
+	}
+	return lines, nil
+}
 
 //ReadLines reads lines for a file at a given path
 func ReadLines(path string) ([]string, error) {
@@ -68,4 +97,14 @@ func WriteLinesFS(fs afero.Fs, lines []string, path string) error {
 		fmt.Fprintln(w, line)
 	}
 	return w.Flush()
+}
+
+// HasZero returns true if any float in the slice is zero
+func HasZero(floats []float64) bool {
+	for _, f := range floats {
+		if f == 0 {
+			return true
+		}
+	}
+	return false
 }
