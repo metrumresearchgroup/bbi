@@ -8,6 +8,7 @@
 		"function_evaluations": 917,
 		"significant_digits": 3.5,
 		"problem_text": "RUN# 1 FULL TMDD MODEL EXAMPLE",
+		"mod_file": "-999999999",
 		"estimation_method": [
 			"First Order Conditional Estimation"
 		],
@@ -15,6 +16,7 @@
 		"number_of_patients": 15,
 		"number_of_obs": 810,
 		"number_of_data_records": 825,
+		"output_table": "-999999999",
 		"output_files_used": [
 			"1.lst",
 			"1.ext",
@@ -24,7 +26,11 @@
 		]
 	},
 	"run_heuristics": {
+		"covariance_step_omitted": "HeuristicUndefined",
+		"large_condition_number": "HeuristicUndefined",
 		"correlations_ok": "HeuristicFalse",
+		"parameter_near_boundary": "HeuristicUndefined",
+		"hessian_reset": "HeuristicUndefined",
 		"has_final_zero_gradient": "HeuristicFalse",
 		"minimization_successful": "HeuristicTrue"
 	},
@@ -40,7 +46,8 @@
 					55.6524,
 					1.9617,
 					0.0799774,
-					0.15
+					0.15,
+					10.5
 				],
 				"omega": [
 					0.0482454,
@@ -55,7 +62,8 @@
 					0.0070622,
 					0.0424013,
 					0.00853857,
-					0.00457665
+					0.00457665,
+					0.0323783
 				]
 			},
 			"std_err": {
@@ -67,6 +75,7 @@
 					3.70915,
 					0.0396542,
 					0.00164947,
+					10000000000,
 					10000000000
 				],
 				"omega": [
@@ -82,7 +91,8 @@
 					0.00130221,
 					0.00644116,
 					0.00191623,
-					0.00220226
+					0.00220226,
+					0.00400288
 				]
 			},
 			"random_effect_sd": {
@@ -99,7 +109,8 @@
 					0.205431,
 					0.205916,
 					0.284232,
-					0.123518
+					0.123518,
+					0.17994
 				]
 			},
 			"random_effect_sdse": {
@@ -116,7 +127,8 @@
 					0.0395837,
 					0.0156403,
 					0.0557678,
-					0.0632085
+					0.0632085,
+					0.0111228
 				]
 			},
 			"fixed": {
@@ -128,6 +140,7 @@
 					0,
 					0,
 					0,
+					1,
 					1
 				],
 				"omega": [
@@ -139,6 +152,7 @@
 					0
 				],
 				"sigma": [
+					0,
 					0,
 					0,
 					0,
@@ -178,6 +192,22 @@
 			"7 KDEG (hr-1)",
 			"8 KON  (pM-1 hr-1)",
 			"9 KOFF (hr-1)"
+		],
+		"omega": [
+			"OMEGA(1,1)",
+			"OMEGA(2,1)",
+			"OMEGA(2,2)",
+			"OMEGA(3,1)",
+			"OMEGA(3,2)",
+			"OMEGA(3,3)"
+		],
+		"sigma": [
+			"SIGMA(1,1)",
+			"SIGMA(2,1)",
+			"SIGMA(2,2)",
+			"SIGMA(3,1)",
+			"SIGMA(3,2)",
+			"SIGMA(3,3)"
 		]
 	},
 	"ofv": {
@@ -186,44 +216,61 @@
 		"ofv_with_constant": 2890.35108105341
 	},
 	"shrinkage_details": [
-		{
-			"eta": {
-				"sd": [
+		[
+			{
+				"sub_pop": 1,
+				"eta_bar": [
+					-0.0688085,
+					0.0408231,
+					0.110011
+				],
+				"ebv_bar_se": [
+					0.0520412,
+					0.0529456,
+					0.0493068
+				],
+				"pval": [
+					0.186105,
+					0.440684,
+					0.0256708
+				],
+				"eta_sd": [
 					5.0168,
-					0.76145,
-					10.923
+					0.761452,
+					10.9229
 				],
-				"vr": [
-					9.7819,
-					1.5171,
-					20.653
-				]
-			},
-			"ebv": {
-				"sd": [
-					3.2923,
-					2.0776,
-					1.0487
+				"eps_sd": [
+					2.68352,
+					2.68352,
+					2.68352
 				],
-				"vr": [
-					6.4761,
-					4.1121,
-					2.0864
-				]
-			},
-			"eps": {
-				"sd": [
-					2.6835,
-					2.6835,
-					2.6835
+				"ebv_sd": [
+					3.29226,
+					2.07763,
+					1.04871
 				],
-				"vr": [
-					5.295,
-					5.295,
-					5.295
+				"num_subjects": [
+					15,
+					15,
+					15
+				],
+				"eta_vr": [
+					9.78191,
+					1.51711,
+					20.6528
+				],
+				"eps_vr": [
+					5.29503,
+					5.29503,
+					5.29503
+				],
+				"ebv_vr": [
+					6.47612,
+					4.11209,
+					2.08643
 				]
 			}
-		}
+		]
 	],
 	"covariance_theta": [
 		{

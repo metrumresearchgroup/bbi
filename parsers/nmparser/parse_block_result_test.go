@@ -30,7 +30,7 @@ var omegaResults02 = []string{
 
 var omegaResults02Parsed = []float64{
 	0.123,
-	0,
+	DefaultFloat64,
 	0.154,
 }
 

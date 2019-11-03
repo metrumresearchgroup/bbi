@@ -9,26 +9,26 @@ import (
 
 func parseShrinkage(line string, shrinkageDetails ShrinkageDetails) ShrinkageDetails {
 	if strings.Contains(line, "ETASHRINKSD(%)") {
-		shrinkageDetails.Eta.SD = parseFloats(line, "ETASHRINKSD(%)")
+		shrinkageDetails.EtaSD = parseFloats(line, "ETASHRINKSD(%)")
 	} else if strings.Contains(line, "ETASHRINKVR(%)") {
-		shrinkageDetails.Eta.VR = parseFloats(line, "ETASHRINKVR(%)")
+		shrinkageDetails.EtaVR = parseFloats(line, "ETASHRINKVR(%)")
 	} else if strings.Contains(line, "EBVSHRINKSD(%)") {
-		shrinkageDetails.Ebv.SD = parseFloats(line, "EBVSHRINKSD(%)")
+		shrinkageDetails.EbvSD = parseFloats(line, "EBVSHRINKSD(%)")
 	} else if strings.Contains(line, "EBVSHRINKVR(%)") {
-		shrinkageDetails.Ebv.VR = parseFloats(line, "EBVSHRINKVR(%)")
+		shrinkageDetails.EbvVR = parseFloats(line, "EBVSHRINKVR(%)")
 	} else if strings.Contains(line, "EPSSHRINKSD(%)") {
-		shrinkageDetails.Eps.SD = parseFloats(line, "EPSSHRINKSD(%)")
+		shrinkageDetails.EpsSD = parseFloats(line, "EPSSHRINKSD(%)")
 	} else if strings.Contains(line, "EPSSHRINKVR(%)") {
-		shrinkageDetails.Eps.VR = parseFloats(line, "EPSSHRINKVR(%)")
+		shrinkageDetails.EpsVR = parseFloats(line, "EPSSHRINKVR(%)")
 	} else if strings.Contains(line, "ETAshrink(%)") {
 		line = strings.Replace(line, ":", "", 1)
-		shrinkageDetails.Eta.SD = parseFloats(line, "ETAshrink(%)")
+		shrinkageDetails.EtaSD = parseFloats(line, "ETAshrink(%)")
 	} else if strings.Contains(line, "EBVshrink(%)") {
 		line = strings.Replace(line, ":", "", 1)
-		shrinkageDetails.Ebv.SD = parseFloats(line, "EBVshrink(%)")
+		shrinkageDetails.EbvSD = parseFloats(line, "EBVshrink(%)")
 	} else if strings.Contains(line, "EPSshrink(%)") {
 		line = strings.Replace(line, ":", "", 1)
-		shrinkageDetails.Eps.VR = parseFloats(line, "EPSshrink(%)")
+		shrinkageDetails.EpsVR = parseFloats(line, "EPSshrink(%)")
 	}
 
 	return shrinkageDetails
@@ -38,7 +38,10 @@ func parseFloats(line, name string) []float64 {
 	var floats []float64
 	values := strings.Fields(strings.TrimSpace(strings.Replace(line, name, "", -1)))
 	for _, value := range values {
-		fvalue, _ := strconv.ParseFloat(value, 64)
+		fvalue, err := strconv.ParseFloat(value, 64)
+		if err != nil {
+			fvalue = DefaultFloat64
+		}
 		floats = append(floats, fvalue)
 	}
 	return floats
@@ -294,7 +297,10 @@ func parseGradient(lines []string) (hasFinalZero HeuristicStatus) {
 	if len(fields) > 0 {
 		result := make([]float64, len(fields))
 		for i, val := range fields {
-			n, _ := strconv.ParseFloat(val, 64)
+			n, err := strconv.ParseFloat(val, 64)
+			if err != nil {
+				n = DefaultFloat64
+			}
 			result[i] = n
 		}
 		return HasZeroGradient(result)
@@ -302,11 +308,24 @@ func parseGradient(lines []string) (hasFinalZero HeuristicStatus) {
 	return HeuristicFalse
 }
 
+// get gradient lines until a blank line is reached
+func getGradientLine(lines []string, start int) string {
+	var sb strings.Builder
+	sb.WriteString(lines[start])
+	for _, line := range lines[start+1:] {
+		if line == "" {
+			break
+		}
+		sb.WriteString(line)
+	}
+	return sb.String()
+}
+
 // ParseLstEstimationFile parses the lst file
 func ParseLstEstimationFile(lines []string) ModelOutput {
-	var ofvDetails OfvDetails
-	var shrinkageDetails ShrinkageDetails
-	var runHeuristics RunHeuristics
+	ofvDetails := NewOfvDetails()
+	shrinkageDetails := make([]ShrinkageDetails, 1)
+	runHeuristics := NewRunHeuristics()
 	var startParameterStructuresIndex int
 	var endParameterStucturesIndex int
 	var finalParameterEstimatesIndex int
@@ -353,22 +372,21 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 				covarianceMatrixEstimateIndex = i + 3
 			}
 		case strings.Contains(line, "ETASHRINK"):
-			shrinkageDetails = parseShrinkage(line, shrinkageDetails)
+			shrinkageDetails[0] = parseShrinkage(line, shrinkageDetails[0])
 		case strings.Contains(line, "EBVSHRINK"):
-			shrinkageDetails = parseShrinkage(line, shrinkageDetails)
+			shrinkageDetails[0] = parseShrinkage(line, shrinkageDetails[0])
 		case strings.Contains(line, "EPSSHRINK"):
-			shrinkageDetails = parseShrinkage(line, shrinkageDetails)
+			shrinkageDetails[0] = parseShrinkage(line, shrinkageDetails[0])
 		case strings.Contains(line, "ETAshrink"):
-			shrinkageDetails = parseShrinkage(line, shrinkageDetails)
+			shrinkageDetails[0] = parseShrinkage(line, shrinkageDetails[0])
 		case strings.Contains(line, "EBVshrink"):
-			shrinkageDetails = parseShrinkage(line, shrinkageDetails)
+			shrinkageDetails[0] = parseShrinkage(line, shrinkageDetails[0])
 		case strings.Contains(line, "EPSshrink"):
-			shrinkageDetails = parseShrinkage(line, shrinkageDetails)
-
+			shrinkageDetails[0] = parseShrinkage(line, shrinkageDetails[0])
 		case strings.Contains(line, "0MINIMIZATION SUCCESSFUL"):
 			runHeuristics.MinimizationSuccessful = HeuristicTrue
 		case strings.Contains(line, "GRADIENT:"):
-			gradientLines = append(gradientLines, line)
+			gradientLines = append(gradientLines, getGradientLine(lines, i))
 		case strings.Contains(line, "RESET HESSIAN"):
 			runHeuristics.HessianReset = HeuristicTrue
 		case strings.Contains(line, "PARAMETER ESTIMATE IS NEAR ITS BOUNDARY"):
@@ -433,7 +451,7 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 		ParameterStructures: parameterStructures,
 		ParameterNames:      parameterNames,
 		OFV:                 ofvDetails,
-		ShrinkageDetails:    []ShrinkageDetails{shrinkageDetails},
+		ShrinkageDetails:    [][]ShrinkageDetails{shrinkageDetails},
 		CovarianceTheta:     []FlatArray{covTheta},
 		CorrelationTheta:    []FlatArray{corTheta},
 	}

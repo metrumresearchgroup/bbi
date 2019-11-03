@@ -10,7 +10,7 @@ type HeuristicStatus int
 
 const (
 	// HeuristicUndefined default value, not set to true or false
-	HeuristicUndefined HeuristicStatus = iota
+	HeuristicUndefined HeuristicStatus = iota + 1
 	// HeuristicTrue explicitly set to true
 	HeuristicTrue
 	// HeuristicFalse explicitly set to true

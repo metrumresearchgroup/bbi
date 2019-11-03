@@ -1,5 +1,59 @@
 package parser
 
+import "fmt"
+
+var lowerDiagonalLengthToDimension = map[int]int{
+	1:    1,
+	3:    2,
+	6:    3,
+	10:   4,
+	15:   5,
+	21:   6,
+	28:   7,
+	36:   8,
+	45:   9,
+	55:   10,
+	66:   11,
+	78:   12,
+	91:   13,
+	105:  14,
+	120:  15,
+	136:  16,
+	153:  17,
+	171:  18,
+	190:  19,
+	210:  20,
+	231:  21,
+	253:  22,
+	276:  23,
+	300:  24,
+	325:  25,
+	351:  26,
+	378:  27,
+	406:  28,
+	435:  29,
+	465:  30,
+	496:  31,
+	528:  32,
+	561:  33,
+	595:  34,
+	630:  35,
+	666:  36,
+	703:  37,
+	741:  38,
+	780:  39,
+	820:  40,
+	861:  41,
+	903:  42,
+	946:  43,
+	990:  44,
+	1035: 45,
+	1081: 46,
+	1128: 47,
+	1176: 48,
+	1225: 49,
+	1275: 50,
+}
 var diagonalIndices = map[int]bool{
 	1:    true,
 	3:    true,
@@ -103,7 +157,7 @@ var diagonalIndices = map[int]bool{
 	5050: true,
 }
 
-// GetDiagonalElements returns the indices of the diagonal elements
+// GetDiagonalIndices returns the indices of the diagonal elements
 // given a []int that represents which matrix various elements exist in
 // for example 1 0 2 0 0 3 would represent 3 diagonal elements
 // from something like $OMEGA 0.04 0.04 0.04
@@ -126,4 +180,21 @@ func GetDiagonalIndices(el []int) []int {
 		}
 	}
 	return diagElements
+}
+
+// GetBlockParameterNames builds a slice of parameter names
+// len is the number of elements in a lower triangular matrix
+// len is converted to the dimension of the full matrix
+// dimension = n, of a nxn block matrix
+func GetBlockParameterNames(name string, len int) []string {
+	var ret []string
+	dim := lowerDiagonalLengthToDimension[len]
+	for i := 1; i <= dim; i++ {
+		for j := 1; j <= dim; j++ {
+			if i >= j {
+				ret = append(ret, fmt.Sprintf("%s(%d,%d)", name, i, j))
+			}
+		}
+	}
+	return ret
 }

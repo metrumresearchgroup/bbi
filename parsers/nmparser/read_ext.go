@@ -103,34 +103,35 @@ func ParseExtData(ed ExtData) ([]ParametersData, ParameterNames) {
 					panic("error converting value in ext file to number: " + val)
 				}
 			}
+
 			switch {
 			case step == -1000000000:
 				parametersData.Estimates = ParametersResult{
-					Theta: result[0:(len(thetas) - 1)],
+					Theta: result[0:(len(thetas))],
 					Omega: result[len(thetas)+len(sigmas):],
-					Sigma: result[len(thetas):(len(thetas) + len(sigmas) - 1)],
+					Sigma: result[len(thetas):(len(thetas) + len(sigmas))],
 				}
 			case step == -1000000001:
 				parametersData.StdErr = ParametersResult{
-					Theta: result[:(len(thetas) - 1)],
+					Theta: result[:(len(thetas))],
 					Omega: result[len(thetas)+len(sigmas):],
-					Sigma: result[len(thetas):(len(thetas) + len(sigmas) - 1)],
+					Sigma: result[len(thetas):(len(thetas) + len(sigmas))],
 				}
 			case step == -1000000004:
 				parametersData.RandomEffectSD = RandomEffectResult{
 					Omega: result[len(thetas)+len(sigmas):],
-					Sigma: result[len(thetas):(len(thetas) + len(sigmas) - 1)],
+					Sigma: result[len(thetas):(len(thetas) + len(sigmas))],
 				}
 			case step == -1000000005:
 				parametersData.RandomEffectSDSE = RandomEffectResult{
 					Omega: result[len(thetas)+len(sigmas):],
-					Sigma: result[len(thetas):(len(thetas) + len(sigmas) - 1)],
+					Sigma: result[len(thetas):(len(thetas) + len(sigmas))],
 				}
 			case step == -1000000006:
 				parametersData.Fixed = ParametersResult{
-					Theta: result[0:(len(thetas) - 1)],
+					Theta: result[0:(len(thetas))],
 					Omega: result[len(thetas)+len(sigmas):],
-					Sigma: result[len(thetas):(len(thetas) + len(sigmas) - 1)],
+					Sigma: result[len(thetas):(len(thetas) + len(sigmas))],
 				}
 			default:
 				continue

@@ -40,13 +40,13 @@ var RunDetails01Results = RunDetails{
 	352,
 	3.4,
 	"3.mod, double inital estimates",
-	"",
+	"-999999999",
 	[]string{"First Order Conditional Estimation with Interaction"},
 	"../../derived/mock1.csv",
 	50,
 	442,
 	492,
-	"",
+	"-999999999",
 	[]string{""},
 }
 

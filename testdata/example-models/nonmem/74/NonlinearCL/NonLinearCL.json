@@ -8,6 +8,7 @@
 		"function_evaluations": 664,
 		"significant_digits": 3.2,
 		"problem_text": "RUN# 1 PARALLEL (NONLINEAR+LINEAR) CLEARANCE MODEL",
+		"mod_file": "-999999999",
 		"estimation_method": [
 			"First Order Conditional Estimation"
 		],
@@ -15,6 +16,7 @@
 		"number_of_patients": 36,
 		"number_of_obs": 792,
 		"number_of_data_records": 936,
+		"output_table": "-999999999",
 		"output_files_used": [
 			"1.lst",
 			"1.ext",
@@ -24,7 +26,11 @@
 		]
 	},
 	"run_heuristics": {
+		"covariance_step_omitted": "HeuristicUndefined",
+		"large_condition_number": "HeuristicUndefined",
 		"correlations_ok": "HeuristicFalse",
+		"parameter_near_boundary": "HeuristicUndefined",
+		"hessian_reset": "HeuristicUndefined",
 		"has_final_zero_gradient": "HeuristicFalse",
 		"minimization_successful": "HeuristicTrue"
 	},
@@ -41,7 +47,8 @@
 					0.117643,
 					1.13286,
 					0.622554,
-					0.444664
+					0.444664,
+					0.304779
 				],
 				"omega": [
 					0.176584,
@@ -50,6 +57,9 @@
 					0,
 					0,
 					0.0474339
+				],
+				"sigma": [
+					0.0217799
 				]
 			},
 			"std_err": {
@@ -62,7 +72,8 @@
 					0.010412,
 					1.31386,
 					1.58526,
-					0.287625
+					0.287625,
+					0.272889
 				],
 				"omega": [
 					0.0942832,
@@ -71,6 +82,9 @@
 					10000000000,
 					10000000000,
 					0.0089937
+				],
+				"sigma": [
+					0.001415
 				]
 			},
 			"random_effect_sd": {
@@ -81,6 +95,9 @@
 					0,
 					0,
 					0.217793
+				],
+				"sigma": [
+					0.14758
 				]
 			},
 			"random_effect_sdse": {
@@ -91,10 +108,14 @@
 					10000000000,
 					10000000000,
 					0.0206473
+				],
+				"sigma": [
+					0.00479399
 				]
 			},
 			"fixed": {
 				"theta": [
+					0,
 					0,
 					0,
 					0,
@@ -111,6 +132,9 @@
 					0,
 					1,
 					1,
+					0
+				],
+				"sigma": [
 					0
 				]
 			}
@@ -142,6 +166,17 @@
 			"WGT~CLL",
 			"WGT~V1",
 			"WGT~V2"
+		],
+		"omega": [
+			"OMEGA(1,1)",
+			"OMEGA(2,1)",
+			"OMEGA(2,2)",
+			"OMEGA(3,1)",
+			"OMEGA(3,2)",
+			"OMEGA(3,3)"
+		],
+		"sigma": [
+			"SIGMA(1,1)"
 		]
 	},
 	"ofv": {
@@ -150,40 +185,57 @@
 		"ofv_with_constant": 5715.205165463795
 	},
 	"shrinkage_details": [
-		{
-			"eta": {
-				"sd": [
-					37.468,
-					16.435,
-					3.3027
+		[
+			{
+				"sub_pop": 1,
+				"eta_bar": [
+					0.0883038,
+					0.0908169,
+					-0.022925
 				],
-				"vr": [
-					60.898,
-					30.17,
-					6.4964
-				]
-			},
-			"ebv": {
-				"sd": [
-					35.09,
-					15.671,
+				"ebv_bar_se": [
+					0.0431825,
+					0.0837832,
+					0.0346091
+				],
+				"pval": [
+					0.0408647,
+					0.278386,
+					0.507716
+				],
+				"eta_sd": [
+					37.4683,
+					16.4355,
+					3.30274
+				],
+				"eps_sd": [
+					4.76224
+				],
+				"ebv_sd": [
+					35.0901,
+					15.6707,
 					3.8428
 				],
-				"vr": [
-					57.867,
-					28.886,
-					7.5379
-				]
-			},
-			"eps": {
-				"sd": [
-					4.7622
+				"num_subjects": [
+					36,
+					36,
+					36
 				],
-				"vr": [
-					9.2977
+				"eta_vr": [
+					60.8978,
+					30.1697,
+					6.49639
+				],
+				"eps_vr": [
+					9.29769
+				],
+				"ebv_vr": [
+					57.867,
+					28.8857,
+					7.53792
 				]
 			}
-		}
+		]
 	],
 	"covariance_theta": [
 		{

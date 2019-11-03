@@ -12,7 +12,7 @@ import (
 // GetModelOutput populates and returns a ModelOutput object by parsing files
 // ParameterData is parsed from the ext file when useExtFile is true
 // ParameterData is parsed from the lst file when useExtFile is false
-func GetModelOutput(filePath string, verbose bool, noExt bool, noGrd bool, noCov bool, noCor bool) ModelOutput {
+func GetModelOutput(filePath string, verbose, noExt, noGrd, noCov, noCor, noShk bool) ModelOutput {
 
 	AppFs := afero.NewOsFs()
 	runNum, _ := utils.FileAndExt(filePath)
@@ -33,14 +33,17 @@ func GetModelOutput(filePath string, verbose bool, noExt bool, noGrd bool, noCov
 		if err != nil {
 			panic(err)
 		}
-		extData, _ := ParseExtData(ParseExtLines(extLines))
+		extData, parameterNames := ParseExtData(ParseExtLines(extLines))
 		results.ParametersData = extData
+		results.ParameterNames.Omega = parameterNames.Omega
+		results.ParameterNames.Sigma = parameterNames.Sigma
+
 		results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, filepath.Base(extFilePath))
 	}
 
 	if !noGrd {
 		grdFilePath := strings.Join([]string{filepath.Join(dir, runNum), ".grd"}, "")
-		grdLines, err := utils.ReadParamsAndOutputFromExt(grdFilePath)
+		grdLines, err := utils.ReadLinesFS(AppFs, grdFilePath)
 		if err != nil {
 			panic(err)
 		}
@@ -67,48 +70,30 @@ func GetModelOutput(filePath string, verbose bool, noExt bool, noGrd bool, noCov
 		}
 	}
 
-	for i := range results.ParametersData {
-		if len(results.ParametersData[i].Estimates.Theta) != len(results.ParametersData[i].StdErr.Theta) {
-			results.ParametersData[i].StdErr.Theta = make([]float64, len(results.ParametersData[i].Estimates.Theta))
+	epsCount := 0
+	for i := range results.ParameterStructures.Sigma {
+		if results.ParameterStructures.Sigma[i] > 0 {
+			epsCount++
 		}
-		if len(results.ParametersData[i].Estimates.Omega) != len(results.ParametersData[i].StdErr.Omega) {
-			results.ParametersData[i].StdErr.Omega = make([]float64, len(results.ParametersData[i].Estimates.Omega))
-		}
-		if len(results.ParametersData[i].Estimates.Sigma) != len(results.ParametersData[i].StdErr.Sigma) {
-			results.ParametersData[i].StdErr.Sigma = make([]float64, len(results.ParametersData[i].Estimates.Sigma))
+	}
+	etaCount := 0
+	for i := range results.ParameterStructures.Omega {
+		if results.ParameterStructures.Omega[i] > 0 {
+			etaCount++
 		}
 	}
 
-	for n := 0; n < len(results.ShrinkageDetails); n++ {
-		if len(results.ShrinkageDetails[n].Eta.SD) == 0 {
-			dim := 0
-			for i := range results.ParameterStructures.Omega {
-				if results.ParameterStructures.Omega[i] > 0 {
-					dim++
-				}
-			}
-			if dim > 0 {
-				results.ShrinkageDetails[n].Eta.SD = make([]float64, dim)
-				results.ShrinkageDetails[n].Eta.VR = make([]float64, dim)
-				// Ebv follows Eta
-				results.ShrinkageDetails[n].Ebv.SD = make([]float64, dim)
-				results.ShrinkageDetails[n].Ebv.VR = make([]float64, dim)
-			}
+	if !noShk {
+		shkFilePath := strings.Join([]string{filepath.Join(dir, runNum), ".shk"}, "")
+		shkLines, err := utils.ReadLines(shkFilePath)
+		if err != nil {
+			panic(err)
 		}
-
-		if len(results.ShrinkageDetails[n].Eps.SD) == 0 {
-			dim := 0
-			for i := range results.ParameterStructures.Sigma {
-				if results.ParameterStructures.Sigma[i] > 0 {
-					dim++
-				}
-			}
-			if dim > 0 {
-				results.ShrinkageDetails[n].Eps.SD = make([]float64, dim)
-				results.ShrinkageDetails[n].Eps.VR = make([]float64, dim)
-			}
-		}
+		results.ShrinkageDetails = ParseShkData(ParseShkLines(shkLines), etaCount, epsCount)
+	} else {
+		log.Printf("Shrinkage file not used. Mixture-model shrinkage data may not be accurate.")
 	}
 
+	setMissingValuesToDefault(&results, etaCount, epsCount)
 	return results
 }
