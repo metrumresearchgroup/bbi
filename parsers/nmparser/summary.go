@@ -73,7 +73,7 @@ func (results ModelOutput) Summary() bool {
 		}
 		diagIndex := funk.IndexOfInt(diagIndices, n)
 		var shrinkageValues []string
-		var etaName string
+		etaName := "-"
 		val := results.ParametersData[finalEstimationMethodIndex].Estimates.Omega[n]
 		if diagIndex > -1 {
 			etaName = fmt.Sprintf("ETA%v", diagIndex+1)
