@@ -33,7 +33,7 @@ func loadDefaultSettings() {
 	viper.SetDefault("cacheDir", "mdlcache")
 	viper.SetDefault("cacheExe", "")
 	viper.SetDefault("cleanLvl", 2)
-	viper.SetDefault("copyLvl", 2)
+	viper.SetDefault("copyLvl", 4)
 	viper.SetDefault("gitignoreLvl", 1)
 	viper.SetDefault("git", true)
 	viper.SetDefault("nmExecutable", "nmfe74")
