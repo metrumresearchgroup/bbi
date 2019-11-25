@@ -16,7 +16,6 @@ func FindNextEstDirNum(modelFile string, dirNames []string, padding int) NextDir
 	existingRunNums := []int{}
 	modelNameEst := strings.Join([]string{
 		filepath.Base(modelFile),
-		"_est_",
 	}, "")
 
 	for _, dirName := range dirNames {
