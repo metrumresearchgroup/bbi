@@ -12,29 +12,29 @@ var nextModelDirTests = []struct {
 	{
 		[]string{},
 		NextDirSuggestion{
-			"run001_est_01",
+			"run001_01",
 			false,
 			true,
 		},
 	},
 	{
 		[]string{
-			"run001_est_01",
-			"run001_est_02",
+			"run001_01",
+			"run001_02",
 		},
 		NextDirSuggestion{
-			"run001_est_03",
+			"run001_03",
 			false,
 			false,
 		},
 	},
 	{
 		[]string{
-			"run001_est_01",
-			"run001_est_05",
+			"run001_01",
+			"run001_05",
 		},
 		NextDirSuggestion{
-			"run001_est_06",
+			"run001_06",
 			true,
 			false,
 		},
