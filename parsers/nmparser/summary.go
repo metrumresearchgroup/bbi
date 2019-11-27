@@ -107,6 +107,15 @@ func (results ModelOutput) Summary() bool {
 	for _, em := range results.RunDetails.EstimationMethods {
 		fmt.Println(" - " + em)
 	}
+	if results.RunHeuristics.AnyTrue() {
+		fmt.Println("Heuristic Problems Detected: ")
+		issues := results.RunHeuristics.ErrorStrings()
+		for _, issue := range issues {
+			fmt.Println(" - " + issue)
+		}
+	} else {
+		fmt.Println("No Heuristic Problems Detected")
+	}
 
 	thetaTable.Render()
 	omegaTable.Render()
