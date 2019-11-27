@@ -46,13 +46,13 @@ type ParametersData struct {
 // RunHeuristics ...
 // some values are defined as pointers to support tri-state: true, false, nil
 type RunHeuristics struct {
-	CovarianceStepOmitted  HeuristicStatus `json:"covariance_step_omitted,omitempty"`
-	LargeConditionNumber   HeuristicStatus `json:"large_condition_number,omitempty"`
-	CorrelationsOk         HeuristicStatus `json:"correlations_ok,omitempty"`
-	ParameterNearBoundary  HeuristicStatus `json:"parameter_near_boundary,omitempty"`
-	HessianReset           HeuristicStatus `json:"hessian_reset,omitempty"`
-	HasFinalZeroGradient   HeuristicStatus `json:"has_final_zero_gradient,omitempty"`
-	MinimizationSuccessful HeuristicStatus `json:"minimization_successful,omitempty"`
+	CovarianceStepAborted  bool `json:"covariance_step_aborted"`
+	LargeConditionNumber   bool `json:"large_condition_number"`
+	CorrelationsNotOK      bool `json:"correlations_not_ok"`
+	ParameterNearBoundary  bool `json:"parameter_near_boundary"`
+	HessianReset           bool `json:"hessian_reset"`
+	HasFinalZeroGradient   bool `json:"has_final_zero_gradient"`
+	MinimizationTerminated bool `json:"minimization_terminated"`
 }
 
 // RunDetails contains key information about logistics of the model run
@@ -203,16 +203,18 @@ func NewOfvDetails() OfvDetails {
 	return ofvDetails
 }
 
-// NewRunHeuristics ...
+// NewRunHeuristics provides a new run heuristics struct
+// at the moment it just returns all defaults, however
+// this abstraction will allow more flexible refactoring
+// to control additional default logic if needed.
+// For now, the idea is to define the heuristic such that
+// given a true result, it is a negative outcome.
+// For example, rather than using a Heuristic CorrelationOK
+// in which a default false would cause significant logic
+// to test to make sure they were OK, where the implication
+// is that unless otherwise warned, they are.
+// Hence, using the Heuristic CorrelationNotOK allows
+// a reasonable default false, that can be detected true
 func NewRunHeuristics() RunHeuristics {
-	runHeuristics := RunHeuristics{
-		CovarianceStepOmitted:  HeuristicUndefined,
-		LargeConditionNumber:   HeuristicUndefined,
-		CorrelationsOk:         HeuristicUndefined,
-		ParameterNearBoundary:  HeuristicUndefined,
-		HessianReset:           HeuristicUndefined,
-		HasFinalZeroGradient:   HeuristicUndefined,
-		MinimizationSuccessful: HeuristicUndefined,
-	}
-	return runHeuristics
+	return RunHeuristics{}
 }

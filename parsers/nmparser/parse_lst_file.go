@@ -69,7 +69,7 @@ func parseOFV(line string, ofvDetails OfvDetails) OfvDetails {
 	return ofvDetails
 }
 
-func getLargeConditionNumberStatus(lines []string, start int, largeNumberLimit float64) HeuristicStatus {
+func getLargeConditionNumberStatus(lines []string, start int, largeNumberLimit float64) bool {
 
 	// go until line of ints
 	for i, line := range lines[start:] {
@@ -110,11 +110,11 @@ func getLargeConditionNumberStatus(lines []string, start int, largeNumberLimit f
 		sort.Float64s(eigenvalues)
 		ratio := eigenvalues[len(eigenvalues)-1] / eigenvalues[0]
 		if ratio > largeNumberLimit {
-			return HeuristicTrue
+			return true
 		}
 	}
 
-	return HeuristicFalse
+	return false
 }
 
 func getMatrixData(lines []string, start int) MatrixData {
@@ -234,7 +234,7 @@ func getMatrixData(lines []string, start int) MatrixData {
 	}
 }
 
-func getCorrelationStatus(lines []string, start int, correlationLimit float64) HeuristicStatus {
+func getCorrelationStatus(lines []string, start int, correlationLimit float64) bool {
 
 	matrix := getMatrixData(lines, start).Values
 
@@ -246,15 +246,15 @@ func getCorrelationStatus(lines []string, start int, correlationLimit float64) H
 					continue
 				}
 				if math.Abs(cell) >= correlationLimit {
-					return HeuristicFalse
+					return false
 				}
 			}
 		}
 	} else {
-		return HeuristicUndefined
+		return false
 	}
 
-	return HeuristicTrue
+	return true
 }
 
 func getThetaValues(lines []string, start int) FlatArray {
@@ -287,10 +287,9 @@ func contains(a []string, value string) bool {
 	return false
 }
 
-func parseGradient(lines []string) (hasFinalZero HeuristicStatus) {
-
+func parseGradient(lines []string) bool {
 	if len(lines) == 0 {
-		return HeuristicUndefined
+		return false
 	}
 
 	fields := strings.Fields(strings.TrimSpace(strings.Replace(lines[len(lines)-1], "GRADIENT:", "", -1)))
@@ -305,7 +304,7 @@ func parseGradient(lines []string) (hasFinalZero HeuristicStatus) {
 		}
 		return HasZeroGradient(result)
 	}
-	return HeuristicFalse
+	return false
 }
 
 // get gradient lines until a blank line is reached
@@ -363,16 +362,16 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 			if !strings.Contains(line, "INVERSE") {
 				covarianceMatrixEstimateIndex = i + 3
 			}
-		case strings.Contains(line, "0MINIMIZATION SUCCESSFUL"):
-			runHeuristics.MinimizationSuccessful = HeuristicTrue
+		case strings.Contains(line, "0MINIMIZATION TERMINATED"):
+			runHeuristics.MinimizationTerminated = true
 		case strings.Contains(line, "GRADIENT:"):
 			gradientLines = append(gradientLines, getGradientLine(lines, i))
 		case strings.Contains(line, "RESET HESSIAN"):
-			runHeuristics.HessianReset = HeuristicTrue
+			runHeuristics.HessianReset = true
 		case strings.Contains(line, "PARAMETER ESTIMATE IS NEAR ITS BOUNDARY"):
-			runHeuristics.ParameterNearBoundary = HeuristicTrue
-		case strings.Contains(line, "COVARIANCE STEP OMITTED: NO"):
-			runHeuristics.CovarianceStepOmitted = HeuristicTrue
+			runHeuristics.ParameterNearBoundary = true
+		case strings.Contains(line, "COVARIANCE STEP ABORTED"):
+			runHeuristics.CovarianceStepAborted = true
 		case strings.Contains(line, "EIGENVALUES OF COR MATRIX OF ESTIMATE"):
 			// TODO: get largeNumberLimit from config
 			// or derive. something like (number of parameters) * 10
