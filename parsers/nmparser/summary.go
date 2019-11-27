@@ -108,10 +108,10 @@ func (results ModelOutput) Summary() bool {
 		fmt.Println(" - " + em)
 	}
 	if results.RunHeuristics.AnyTrue() {
-		fmt.Println("Heuristic Problems Detected: ")
+		fmt.Println(aurora.Bold(aurora.Red("Heuristic Problems Detected: ")))
 		issues := results.RunHeuristics.ErrorStrings()
 		for _, issue := range issues {
-			fmt.Println(" - " + issue)
+			fmt.Println(aurora.Red(" - " + issue))
 		}
 	} else {
 		fmt.Println("No Heuristic Problems Detected")
