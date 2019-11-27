@@ -38,7 +38,8 @@ var (
 	gitignoreLvl int
 	git          bool
 	oneEst       bool
-	runDir       string
+	outputDir    string
+	overwrite    bool
 )
 
 // runCmd represents the run command
@@ -77,9 +78,13 @@ func run(cmd *cobra.Command, args []string) error {
 	if flagChanged(cmd.Flags(), "oneEst") {
 		viper.Set("oneEst", oneEst)
 	}
-	if flagChanged(cmd.Flags(), "runDir") {
-		viper.Set("runDir", runDir)
+	if flagChanged(cmd.Flags(), "outputDir") {
+		viper.Set("outputDir", outputDir)
 	}
+	if flagChanged(cmd.Flags(), "overwrite") {
+		viper.Set("overwrite", overwrite)
+	}
+
 	if debug {
 		viper.Debug()
 	}
@@ -194,7 +199,8 @@ func runModel(
 			ExeNameInCache:     viper.GetString("cacheExe"),
 			NmExecutableOrPath: viper.GetString("nmExecutable"),
 			OneEst:             viper.GetBool("oneEst"),
-			ProposedRunDir:     viper.GetString("runDir"),
+			OutputDir:          viper.GetString("outputDir"),
+			Overwrite:          viper.GetBool("overwrite"),
 		},
 	)
 	if runOutput.Error != nil {
@@ -217,15 +223,6 @@ func init() {
 	runCmd.Flags().IntVar(&gitignoreLvl, "gitignoreLvl", 0, "gitignore lvl for a given (set of) runs")
 	runCmd.Flags().BoolVar(&git, "git", false, "whether git is used")
 	runCmd.Flags().BoolVar(&oneEst, "oneEst", false, "whether to only run a model once, and skip if output directory present")
-	runCmd.Flags().StringVar(&runDir, "runDir", "", "run directory name")
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// runCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// runCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-
+	runCmd.Flags().StringVar(&outputDir, "outputDir", "{{ .Name }}", "Go template for the output directory to use for storging details of each executed model")
+	runCmd.Flags().BoolVar(&overwrite, "overwrite", true, "Whether or not to remove existing output directories if they are present")
 }
