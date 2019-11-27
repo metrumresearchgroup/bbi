@@ -326,8 +326,6 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 	ofvDetails := NewOfvDetails()
 	shrinkageDetails := make([]ShrinkageDetails, 1)
 	runHeuristics := NewRunHeuristics()
-	var startParameterStructuresIndex int
-	var endParameterStucturesIndex int
 	var finalParameterEstimatesIndex int
 	var standardErrorEstimateIndex int
 	var covarianceMatrixEstimateIndex int
@@ -348,10 +346,6 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 			}
 		case strings.Contains(line, "$EST") && endSigmaIndex == 0:
 			endSigmaIndex = i
-		case strings.Contains(line, "0LENGTH OF THETA"):
-			startParameterStructuresIndex = i
-		case strings.Contains(line, "0DEFAULT SIGMA BOUNDARY"):
-			endParameterStucturesIndex = i
 		case strings.Contains(line, "#OBJV"):
 			ofvDetails = parseOFV(line, ofvDetails)
 		case strings.Contains(line, "CONSTANT TO OBJECTIVE FUNCTION"):
@@ -411,8 +405,7 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 
 	var finalParameterEst ParametersResult
 	var finalParameterStdErr ParametersResult
-	var parameterStructures ParameterStructures
-	var parameterNames ParameterNames
+	//var parameterNames ParameterNames
 	var covTheta, corTheta FlatArray
 
 	if standardErrorEstimateIndex > finalParameterEstimatesIndex {
@@ -431,13 +424,10 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 		finalParameterStdErr = ParseFinalParameterEstimatesFromLst(lines[standardErrorEstimateIndex:covarianceMatrixEstimateIndex])
 	}
 
-	if (endParameterStucturesIndex) > startParameterStructuresIndex {
-		parameterStructures = ParseParameterStructures(lines[startParameterStructuresIndex : endParameterStucturesIndex+1])
-	}
-
-	if endSigmaIndex > startThetaIndex {
-		parameterNames = ParseParameterNames(lines[startThetaIndex:endSigmaIndex])
-	}
+	// TODO: replace parsing parameter names
+	// if endSigmaIndex > startThetaIndex {
+	// 	parameterNames = ParseParameterNames(lines[startThetaIndex:endSigmaIndex])
+	// }
 	// TODO re-replace parameter data from lst
 	result := ModelOutput{
 		RunHeuristics: runHeuristics,
@@ -448,12 +438,12 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 				StdErr:    finalParameterStdErr,
 			},
 		},
-		ParameterStructures: parameterStructures,
-		ParameterNames:      parameterNames,
-		OFV:                 ofvDetails,
-		ShrinkageDetails:    [][]ShrinkageDetails{shrinkageDetails},
-		CovarianceTheta:     []FlatArray{covTheta},
-		CorrelationTheta:    []FlatArray{corTheta},
+		ParameterNames: NewDefaultParameterNames(len(finalParameterEst.Theta), len(finalParameterEst.Omega), len(finalParameterEst.Sigma)),
+
+		OFV:              ofvDetails,
+		ShrinkageDetails: [][]ShrinkageDetails{shrinkageDetails},
+		CovarianceTheta:  []FlatArray{covTheta},
+		CorrelationTheta: []FlatArray{corTheta},
 	}
 	return result
 }

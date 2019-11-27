@@ -8,7 +8,6 @@ import (
 
 	"github.com/logrusorgru/aurora"
 	"github.com/olekukonko/tablewriter"
-	"github.com/thoas/go-funk"
 )
 
 // Summary prints all results from the parsed LstData
@@ -65,13 +64,12 @@ func (results ModelOutput) Summary() bool {
 	// required for color, prevents newline in row
 	thetaTable.SetAutoWrapText(false)
 
-	diagIndices := GetDiagonalIndices(results.ParameterStructures.Omega)
 	methodIndex := len(results.RunDetails.EstimationMethod) - 1
 	for n := range results.ParametersData[finalEstimationMethodIndex].Estimates.Omega {
-		if results.ParameterStructures.Omega[n] == 0 {
+		diagIndex, isDiag := diagonalIndices[n]
+		if !isDiag {
 			continue
 		}
-		diagIndex := funk.IndexOfInt(diagIndices, n)
 		var shrinkageValues []string
 		etaName := "-"
 		val := results.ParametersData[finalEstimationMethodIndex].Estimates.Omega[n]

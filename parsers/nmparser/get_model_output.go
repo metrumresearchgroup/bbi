@@ -70,18 +70,8 @@ func GetModelOutput(filePath string, verbose, noExt, noGrd, noCov, noCor, noShk 
 		}
 	}
 
-	epsCount := 0
-	for i := range results.ParameterStructures.Sigma {
-		if results.ParameterStructures.Sigma[i] > 0 {
-			epsCount++
-		}
-	}
-	etaCount := 0
-	for i := range results.ParameterStructures.Omega {
-		if results.ParameterStructures.Omega[i] > 0 {
-			etaCount++
-		}
-	}
+	epsCount := lowerDiagonalLengthToDimension[len(results.ParametersData[len(results.ParametersData)-1].Estimates.Sigma)-1]
+	etaCount := lowerDiagonalLengthToDimension[len(results.ParametersData[len(results.ParametersData)-1].Estimates.Omega)-1]
 
 	if !noShk {
 		shkFilePath := strings.Join([]string{filepath.Join(dir, runNum), ".shk"}, "")

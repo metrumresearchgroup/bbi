@@ -83,7 +83,7 @@ type RunDetails struct {
 
 // ShrinkageDetails ...
 type ShrinkageDetails struct {
-	SubPop      int64    `json:"sub_pop,omitempty"`
+	SubPop      int64     `json:"sub_pop,omitempty"`
 	EtaBar      []float64 `json:"eta_bar,omitempty"`
 	EtaBarSE    []float64 `json:"ebv_bar_se,omitempty"`
 	Pval        []float64 `json:"pval,omitempty"`
@@ -120,15 +120,14 @@ type OfvDetails struct {
 
 // ModelOutput is the output struct from a lst file
 type ModelOutput struct {
-	RunDetails          RunDetails           `json:"run_details,omitempty"`
-	RunHeuristics       RunHeuristics        `json:"run_heuristics,omitempty"`
-	ParametersData      []ParametersData     `json:"parameters_data,omitempty"`
-	ParameterStructures ParameterStructures  `json:"parameter_structures,omitempty"`
-	ParameterNames      ParameterNames       `json:"parameter_names,omitempty"`
-	OFV                 OfvDetails           `json:"ofv,omitempty"`
-	ShrinkageDetails    [][]ShrinkageDetails `json:"shrinkage_details,omitempty"`
-	CovarianceTheta     []FlatArray          `json:"covariance_theta,omitempty"`
-	CorrelationTheta    []FlatArray          `json:"correlation_theta,omitempty"`
+	RunDetails       RunDetails           `json:"run_details,omitempty"`
+	RunHeuristics    RunHeuristics        `json:"run_heuristics,omitempty"`
+	ParametersData   []ParametersData     `json:"parameters_data,omitempty"`
+	ParameterNames   ParameterNames       `json:"parameter_names,omitempty"`
+	OFV              OfvDetails           `json:"ofv,omitempty"`
+	ShrinkageDetails [][]ShrinkageDetails `json:"shrinkage_details,omitempty"`
+	CovarianceTheta  []FlatArray          `json:"covariance_theta,omitempty"`
+	CorrelationTheta []FlatArray          `json:"correlation_theta,omitempty"`
 }
 
 // ExtData provides an intermediate representation of the ExtData after iterations have been stripped out
@@ -198,15 +197,13 @@ func NewOfvDetails() OfvDetails {
 // NewRunHeuristics ...
 func NewRunHeuristics() RunHeuristics {
 	runHeuristics := RunHeuristics{
-		CovarianceStepOmitted: HeuristicUndefined, 
-		LargeConditionNumber : HeuristicUndefined, 
-		CorrelationsOk : HeuristicUndefined,       
-		ParameterNearBoundary : HeuristicUndefined,
-		HessianReset : HeuristicUndefined,         
-		HasFinalZeroGradient : HeuristicUndefined, 
+		CovarianceStepOmitted:  HeuristicUndefined,
+		LargeConditionNumber:   HeuristicUndefined,
+		CorrelationsOk:         HeuristicUndefined,
+		ParameterNearBoundary:  HeuristicUndefined,
+		HessianReset:           HeuristicUndefined,
+		HasFinalZeroGradient:   HeuristicUndefined,
 		MinimizationSuccessful: HeuristicUndefined,
 	}
 	return runHeuristics
 }
-
-
