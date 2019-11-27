@@ -72,7 +72,7 @@ func ParseRunDetails(lines []string) RunDetails {
 		case strings.Contains(line, "$PROB"):
 			runDetails.ProblemText = replaceTrim(line, "$PROB")
 		case strings.Contains(line, "#METH:"):
-			runDetails.EstimationMethod = append(runDetails.EstimationMethod, replaceTrim(line, "#METH:"))
+			runDetails.EstimationMethods = append(runDetails.EstimationMethods, replaceTrim(line, "#METH:"))
 		case strings.Contains(line, "$DATA"):
 			runDetails.DataSet = parseLine(line, 1)
 		case strings.Contains(line, "TOT. NO. OF INDIVIDUALS:"):

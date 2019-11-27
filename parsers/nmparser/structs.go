@@ -1,5 +1,14 @@
 package parser
 
+// FlatArray provides a slice of values meant to be coerced to a matrix
+// of the dimensions Dim
+// This allows easy coercion to matrices in languages like R
+// using matrix(Values, nrow = Dim)
+type FlatArray struct {
+	Values []float64 `json:"values,omitempty"`
+	Dim    int       `json:"dim,omitempty"`
+}
+
 // ParameterNames containst the names of model parameters
 type ParameterNames struct {
 	Theta []string `json:"theta,omitempty"`
@@ -57,7 +66,7 @@ type RunDetails struct {
 	SignificantDigits   float64  `json:"significant_digits,omitempty"`
 	ProblemText         string   `json:"problem_text,omitempty"`
 	ModFile             string   `json:"mod_file,omitempty"`
-	EstimationMethod    []string `json:"estimation_method,omitempty"`
+	EstimationMethods   []string `json:"estimation_method,omitempty"`
 	DataSet             string   `json:"data_set,omitempty"`
 	NumberOfPatients    int64    `json:"number_of_patients,omitempty"`
 	NumberOfObs         int64    `json:"number_of_obs,omitempty"`
@@ -173,7 +182,7 @@ func NewRunDetails() RunDetails {
 		SignificantDigits:   DefaultFloat64,
 		ProblemText:         DefaultString,
 		ModFile:             DefaultString,
-		EstimationMethod:    []string{},
+		EstimationMethods:   []string{},
 		DataSet:             DefaultString,
 		NumberOfPatients:    DefaultInt64,
 		NumberOfObs:         DefaultInt64,
