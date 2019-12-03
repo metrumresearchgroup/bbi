@@ -152,6 +152,9 @@ func EstimateModel(
 	}
 }
 
+//Processes the go template for the output directory and returns the processed string and any relative errors
+// name: The name of the model from which the template will be derived.
+// r: The RunSettings struct containing the configurations from the run.
 func processDirectoryTemplate(name string, r RunSettings) (string, error) {
 	var generated []byte
 	buf := bytes.NewBuffer(generated)
@@ -167,10 +170,14 @@ func processDirectoryTemplate(name string, r RunSettings) (string, error) {
 	t, err := template.New("outputfile").Parse(r.OutputDir)
 
 	if err != nil {
-		return "", err
+		return "", errors.New("There was an issue parsing the output directory template as provided by the run settings: " + err.Error())
 	}
 
-	t.Execute(buf, tc)
+	err = t.Execute(buf, tc)
+
+	if err != nil {
+		return "", errors.New("There was an issue processing the output directory template as provided by the run settings: " + err.Error())
+	}
 
 	return buf.String(), nil
 }
