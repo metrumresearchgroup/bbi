@@ -15,7 +15,9 @@
                 // "--outputDir",
                 // "{{.Name}}",
                 "--overwrite=true",
-                "/Users/darrellb/Documents/models/test_data/acop/acop.mod"
+                "--threads",
+                "10",
+                "/Users/darrellb/Documents/models/test_data/acop/acop[001:006].mod"
             ],
             "showLog": true
             

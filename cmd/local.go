@@ -365,6 +365,10 @@ func local(cmd *cobra.Command, args []string) {
 		}
 	}
 
+	if len(lo.Models) == 0 {
+		log.Fatal("No models were located or loaded. Please verify the arguments provided and try again")
+	}
+
 	//Display Summary
 
 	//Models Added
@@ -407,9 +411,9 @@ func local(cmd *cobra.Command, args []string) {
 
 	//Now we're doing the work. Is we done?
 
+	//Basically wait
 	for !m.IsComplete() {
-		fmt.Printf("\r%d of %d models completed", m.Completed, m.Iterations)
-		time.Sleep(2 * time.Second)
+		time.Sleep(5 * time.Millisecond)
 	}
 
 	fmt.Printf("\r%d models completed in %s", m.Completed, time.Since(now))
