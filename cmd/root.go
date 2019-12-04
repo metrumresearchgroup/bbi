@@ -24,7 +24,7 @@ import (
 )
 
 // VERSION is the current bbi version
-var VERSION string = "2.0.0-alpha.3"
+var VERSION string = "2.1.0-alpha0.0.1"
 
 var (
 	// name of config file
@@ -72,25 +72,19 @@ func init() {
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/babylonconfig.toml)")
 	RootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
 	RootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "debug mode")
-	RootCmd.PersistentFlags().IntVar(&threads, "threads", 0, "number of threads to execute with")
-	RootCmd.PersistentFlags().BoolVar(&Json, "json", false, "json tree of output, if possible")
-	RootCmd.PersistentFlags().BoolVarP(&preview, "preview", "p", false, "preview action, but don't actually run command")
+	RootCmd.PersistentFlags().IntVar(&threads, "threads", 4, "number of threads to execute with")
+	RootCmd.PersistentFlags().BoolVar(&Json, "json", false, "json tree of output, if possible")                           //TODO: Implement
+	RootCmd.PersistentFlags().BoolVarP(&preview, "preview", "p", false, "preview action, but don't actually run command") //TODO: Implement
+	//TODO: What are these actually doing?
 	RootCmd.PersistentFlags().BoolVarP(&noExt, "no-ext-file", "", false, "do not use ext file")
 	RootCmd.PersistentFlags().BoolVarP(&noGrd, "no-grd-file", "", false, "do not use grd file")
 	RootCmd.PersistentFlags().BoolVarP(&noCov, "no-cov-file", "", false, "do not use cov file")
 	RootCmd.PersistentFlags().BoolVarP(&noCor, "no-cor-file", "", false, "do not use cor file")
 	RootCmd.PersistentFlags().BoolVarP(&noShk, "no-shk-file", "", false, "do not use shk file")
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
 }
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	// if cfgFile != "" { // enable ability to specify config file via flag
-	// 	viper.SetConfigFile(cfgFile)
-	// }
-	// TODO: set config a little more flexibly
 	err := configlib.LoadGlobalConfig("babylonconfig")
 	if err != nil {
 		fmt.Println(fmt.Errorf("err initializing config %s", err))

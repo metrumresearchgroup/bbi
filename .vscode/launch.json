@@ -10,9 +10,10 @@
             "program": "${workspaceRoot}/cmd/bbi",
             "env": {},
             "args": [
-                "run",
+                "nonmem",
+                "local",
                 "--outputDir",
-                "{{.Name}}__Meow",
+                "{{.Name}}",
                 "--overwrite=true",
                 "/Users/darrellb/Documents/models/test_data/acop/acop.mod"
             ],
