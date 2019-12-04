@@ -12,8 +12,8 @@
             "args": [
                 "nonmem",
                 "local",
-                "--outputDir",
-                "{{.Name}}",
+                // "--outputDir",
+                // "{{.Name}}",
                 "--overwrite=true",
                 "/Users/darrellb/Documents/models/test_data/acop/acop.mod"
             ],

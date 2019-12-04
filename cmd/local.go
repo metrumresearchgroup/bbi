@@ -10,6 +10,7 @@ import (
 	"regexp"
 	"strings"
 	"text/template"
+	"time"
 
 	"os"
 
@@ -94,7 +95,7 @@ func newLocalModel(modelname string) localModel {
 	lm.OriginalPath = strings.Replace(lm.ModelPath, "/"+lm.ModelName, "", 1)
 
 	//Process The template from the viper content for output Dir
-	t, err := template.New("output").Parse(viper.GetString("outputDir"))
+	t, err := template.New("output").Parse(outputDir)
 	buf := new(bytes.Buffer)
 
 	if err != nil {
@@ -210,7 +211,8 @@ func (l localModel) Work(channels *turnstile.ChannelMap) {
 
 	fs := afero.NewOsFs()
 	//Execute the script we created
-	scriptLocation := path.Join(l.OutputDir, l.ModelName+".sh")
+	os.Chdir(l.OutputDir)
+	scriptLocation := "./" + l.ModelFileName + ".sh"
 
 	command := exec.Command(scriptLocation)
 	command.Env = os.Environ() //Take in OS Environment
@@ -220,7 +222,7 @@ func (l localModel) Work(channels *turnstile.ChannelMap) {
 	if err != nil {
 		channels.Failed <- 1
 		channels.Errors <- turnstile.ConcurrentError{
-			RunIdentifier: l.ModelName,
+			RunIdentifier: l.ModelFileName,
 			Error:         err,
 			Notes:         "Running the programmatic shell script caused an error",
 		}
@@ -399,14 +401,19 @@ func local(cmd *cobra.Command, args []string) {
 	//Begin Execution
 	m := turnstile.NewManager(scalables, uint64(viper.GetInt("threads")))
 
+	now := time.Now()
+
 	go m.Execute()
 
 	//Now we're doing the work. Is we done?
 
 	for !m.IsComplete() {
 		fmt.Printf("\r%d of %d models completed", m.Completed, m.Iterations)
+		time.Sleep(2 * time.Second)
 	}
 
+	fmt.Printf("\r%d models completed in %s", m.Completed, time.Since(now))
+	println("")
 }
 
 func init() {

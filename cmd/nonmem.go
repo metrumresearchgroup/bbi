@@ -29,8 +29,7 @@ import (
 )
 
 //scriptTemplate is a go template we'll use for generating the script to do the work.
-const scriptTemplate string = `
-#!/bin/bash
+const scriptTemplate string = `#!/bin/bash
 
 #$ -wd {{ .WorkingDirectory }}
 
