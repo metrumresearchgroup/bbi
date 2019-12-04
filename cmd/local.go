@@ -208,7 +208,7 @@ func (l localModel) Prepare(channels *turnstile.ChannelMap) {
 }
 
 func (l localModel) Work(channels *turnstile.ChannelMap) {
-
+	log.Printf("Beginning work phase for %s", l.ModelFileName)
 	fs := afero.NewOsFs()
 	//Execute the script we created
 	os.Chdir(l.OutputDir)
