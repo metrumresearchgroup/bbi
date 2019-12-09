@@ -103,6 +103,7 @@ func clean(cmd *cobra.Command, args []string) error {
 		}
 	}
 
+	//TODO: Have this operate now based on model name?
 	if copiedRuns != "" {
 		copies := strings.Split(copiedRuns, ",")
 		for _, arg := range copies {

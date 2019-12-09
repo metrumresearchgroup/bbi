@@ -5,10 +5,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
+	"io/ioutil"
 	"log"
 	"os/exec"
 	"path"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"text/template"
@@ -52,26 +53,16 @@ type localModel struct {
 func newLocalModel(modelname string) localModel {
 
 	fs := afero.NewOsFs()
-	cwd, err := os.Getwd()
 	lm := localModel{}
 
-	if err != nil {
-		return localModel{
-			Error: errors.New("Unable to locate the current working directory: " + err.Error()),
-		}
-	}
-
-	//Is this path relative? Try combining the provided value with current dir
-	joined := path.Join(cwd, modelname)
-
-	if ok, _ := afero.Exists(fs, joined); ok {
-		//This is a relative path.
-		lm.Path = joined
-	}
-
-	if ok, _ := afero.Exists(fs, modelname); ok {
-		//Arg is an absolut epath
+	if filepath.IsAbs(modelname) {
 		lm.Path = modelname
+	} else {
+		current, err := os.Getwd()
+		if err != nil {
+			lm.Error = err
+		}
+		lm.Path = path.Join(current, modelname)
 	}
 
 	fi, err := fs.Stat(lm.Path)
@@ -251,7 +242,8 @@ func (l localModel) Monitor(channels *turnstile.ChannelMap) {
 }
 
 func (l localModel) Cleanup(channels *turnstile.ChannelMap) {
-
+	//Wait a sec before beginning execution
+	log.Printf("Beginning cleanup phase for model %s\n", l.FileName)
 	fs := afero.NewOsFs()
 
 	//Magical instructions
@@ -260,23 +252,17 @@ func (l localModel) Cleanup(channels *turnstile.ChannelMap) {
 
 	//Copy Up first so that we don't try to move something we remove :)
 	var copied []runner.TargetedFile
+	//log.Printf("Beginning copy-up operations for model %s\n", l.FileName)
 	for _, v := range pwi.FilesToCopy.FilesToCopy {
 
-		source, err := os.Open(path.Join(pwi.FilesToCopy.CopyFrom, v.File))
+		source, err := ioutil.ReadFile(path.Join(pwi.FilesToCopy.CopyFrom, v.File))
 
 		if err != nil {
 			//Just continue. There are potentially files which will not exist based on the values in the list.
 			continue
 		}
 
-		copyTo, err := os.Create(path.Join(pwi.FilesToCopy.CopyTo, l.FileName+"."+v.File))
-
-		if err != nil {
-			log.Printf("An error occurred creating the file handle for the target onto which we are going to copy: %s", path.Join(pwi.FilesToCopy.CopyTo, v.File))
-			continue
-		}
-
-		_, err = io.Copy(source, copyTo)
+		err = ioutil.WriteFile(path.Join(pwi.FilesToCopy.CopyTo, l.FileName+"."+v.File), source, 0755)
 
 		if err != nil {
 			log.Printf("An erorr occurred while attempting to copy the files: File is %s", v.File)
@@ -294,19 +280,24 @@ func (l localModel) Cleanup(channels *turnstile.ChannelMap) {
 	afero.WriteFile(fs, path.Join(l.OriginalPath, "copied.json"), copiedJSON, 0750)
 
 	//Clean Up
+	//log.Printf("Beginning cleanup operations for model %s\n", l.FileName)
 	for _, v := range pwi.FilesToClean.FilesToRemove {
 		var err error
-		//Is it a directory?
-		if ok, _ := afero.IsDir(fs, path.Join(pwi.FilesToClean.Location, v.File)); ok {
-			err = fs.RemoveAll(path.Join(pwi.FilesToClean.Location, v.File))
-			//Nope it's a file!
-		} else {
-			err = fs.Remove(path.Join(pwi.FilesToClean.Location, v.File))
-		}
 
-		if err != nil {
-			//Indicate failure to remove
-			log.Printf("Failure removing file / directory %s", v.File)
+		//Does it even exist?
+		if ok, _ := afero.Exists(fs, path.Join(pwi.FilesToClean.Location, v.File)); ok {
+			//Is it a directory?
+			if ok, _ := afero.IsDir(fs, path.Join(pwi.FilesToClean.Location, v.File)); ok {
+				err = fs.RemoveAll(path.Join(pwi.FilesToClean.Location, v.File))
+				//Nope it's a file!
+			} else {
+				err = fs.Remove(path.Join(pwi.FilesToClean.Location, v.File))
+			}
+
+			if err != nil {
+				//Indicate failure to remove
+				log.Printf("Failure removing file / directory %s. Details : %s", v.File, err.Error())
+			}
 		}
 	}
 }
@@ -331,9 +322,7 @@ func init() {
 	localCmd.Flags().StringVar(&cacheDir, "cacheDir", "", "directory path for cache of nonmem executables for NM7.4+")
 	localCmd.Flags().StringVar(&cacheExe, "cacheExe", "", "name of executable stored in cache")
 	localCmd.Flags().StringVar(&saveExe, "saveExe", "", "what to name the executable when stored in cache")
-	//TODO: Implement Cleanup
 	localCmd.Flags().IntVar(&cleanLvl, "cleanLvl", 0, "clean level used for file output from a given (set of) runs")
-	//TODO: Implement Copy Up
 	localCmd.Flags().IntVar(&copyLvl, "copyLvl", 0, "copy level used for file output from a given (set of) runs")
 	localCmd.Flags().IntVar(&gitignoreLvl, "gitignoreLvl", 0, "gitignore lvl for a given (set of) runs")
 	//TODO: Implement GIT
