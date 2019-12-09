@@ -2,8 +2,10 @@ package cmd
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"os/exec"
 	"path"
@@ -29,14 +31,14 @@ type localOperation struct {
 }
 
 type localModel struct {
-	//ModelName is the name of the model on which we will action: acop.mod
-	ModelName string `json:"model_name"`
-	//ModelPath is the Fully Qualified Path to the original model
-	ModelPath string `json:"model_path"`
-	//ModelFileName is the Filename component (sans extension)
-	ModelFileName string `json:"model_filename"`
-	//ModelExtension is the extension of the file
-	ModelExtension string `json:"model_extension"`
+	//Model is the name of the model on which we will action: acop.mod
+	Model string `json:"model_name"`
+	//Path is the Fully Qualified Path to the original model
+	Path string `json:"model_path"`
+	//FileName is the Filename component (sans extension)
+	FileName string `json:"model_filename"`
+	//Extension is the extension of the file
+	Extension string `json:"model_extension"`
 	//OriginalPath is the path at which the original model was located: /Users/Documents/acop/
 	OriginalPath string `json:"original_path"`
 	//OutputDir is the directory into which the copied models and work will be located
@@ -64,15 +66,15 @@ func newLocalModel(modelname string) localModel {
 
 	if ok, _ := afero.Exists(fs, joined); ok {
 		//This is a relative path.
-		lm.ModelPath = joined
+		lm.Path = joined
 	}
 
 	if ok, _ := afero.Exists(fs, modelname); ok {
 		//Arg is an absolut epath
-		lm.ModelPath = modelname
+		lm.Path = modelname
 	}
 
-	fi, err := fs.Stat(lm.ModelPath)
+	fi, err := fs.Stat(lm.Path)
 
 	if err != nil {
 		return localModel{
@@ -80,19 +82,19 @@ func newLocalModel(modelname string) localModel {
 		}
 	}
 
-	lm.ModelName = fi.Name()
+	lm.Model = fi.Name()
 
-	modelPieces := strings.Split(lm.ModelName, ".")
+	modelPieces := strings.Split(lm.Model, ".")
 
-	lm.ModelFileName = modelPieces[0]
+	lm.FileName = modelPieces[0]
 
 	//Don't assume file will have extension
 	if len(modelPieces) > 1 {
-		lm.ModelExtension = modelPieces[1]
+		lm.Extension = modelPieces[1]
 	}
 
 	//Get the raw path of the original by stripping the actual file from it
-	lm.OriginalPath = strings.Replace(lm.ModelPath, "/"+lm.ModelName, "", 1)
+	lm.OriginalPath = strings.Replace(lm.Path, "/"+lm.Model, "", 1)
 
 	//Process The template from the viper content for output Dir
 	t, err := template.New("output").Parse(outputDir)
@@ -110,7 +112,7 @@ func newLocalModel(modelname string) localModel {
 
 	//Make sure to only use the filename for the output dir
 	err = t.Execute(buf, outputName{
-		Name: lm.ModelFileName,
+		Name: lm.FileName,
 	})
 
 	if err != nil {
@@ -161,7 +163,7 @@ func (l localModel) Prepare(channels *turnstile.ChannelMap) {
 			if err != nil {
 				channels.Failed <- 1
 				channels.Errors <- turnstile.ConcurrentError{
-					RunIdentifier: l.ModelName,
+					RunIdentifier: l.Model,
 					Error:         err,
 					Notes:         "An error occured trying to remove the directory as specified in the overwrite flag",
 				}
@@ -170,7 +172,7 @@ func (l localModel) Prepare(channels *turnstile.ChannelMap) {
 		} else {
 			channels.Failed <- 1
 			channels.Errors <- turnstile.ConcurrentError{
-				RunIdentifier: l.ModelName,
+				RunIdentifier: l.Model,
 				Error:         errors.New("The output directory already exists"),
 				Notes:         fmt.Sprintf("The target directory, %s already, exists, but we are configured to not overwrite. Invalid configuration / run state", l.OutputDir),
 			}
@@ -184,9 +186,9 @@ func (l localModel) Prepare(channels *turnstile.ChannelMap) {
 	if err != nil {
 		channels.Failed <- 1
 		channels.Errors <- turnstile.ConcurrentError{
-			RunIdentifier: l.ModelName,
+			RunIdentifier: l.Model,
 			Error:         err,
-			Notes:         fmt.Sprintf("There appears to have been an issue trying to copy %s to %s", l.ModelName, l.OutputDir),
+			Notes:         fmt.Sprintf("There appears to have been an issue trying to copy %s to %s", l.Model, l.OutputDir),
 		}
 		return
 	}
@@ -197,22 +199,22 @@ func (l localModel) Prepare(channels *turnstile.ChannelMap) {
 	if err != nil {
 		channels.Failed <- 1
 		channels.Errors <- turnstile.ConcurrentError{
-			RunIdentifier: l.ModelName,
+			RunIdentifier: l.Model,
 			Error:         err,
 			Notes:         "An error occurred during the creation of the executable script for this model",
 		}
 	}
 
 	//rwxr-x---
-	afero.WriteFile(fs, path.Join(l.OutputDir, l.ModelFileName+".sh"), scriptContents, 0750)
+	afero.WriteFile(fs, path.Join(l.OutputDir, l.FileName+".sh"), scriptContents, 0750)
 }
 
 func (l localModel) Work(channels *turnstile.ChannelMap) {
-	log.Printf("Beginning work phase for %s", l.ModelFileName)
+	log.Printf("Beginning work phase for %s", l.FileName)
 	fs := afero.NewOsFs()
 	//Execute the script we created
+	scriptLocation := path.Join(l.OutputDir, l.FileName+".sh")
 	os.Chdir(l.OutputDir)
-	scriptLocation := "./" + l.ModelFileName + ".sh"
 
 	command := exec.Command(scriptLocation)
 	command.Env = os.Environ() //Take in OS Environment
@@ -220,16 +222,24 @@ func (l localModel) Work(channels *turnstile.ChannelMap) {
 	output, err := command.CombinedOutput()
 
 	if err != nil {
-		channels.Failed <- 1
-		channels.Errors <- turnstile.ConcurrentError{
-			RunIdentifier: l.ModelFileName,
-			Error:         err,
-			Notes:         "Running the programmatic shell script caused an error",
+		if exitError, ok := err.(*exec.ExitError); ok {
+			channels.Failed <- 1
+			channels.Errors <- turnstile.ConcurrentError{
+				RunIdentifier: l.FileName,
+				Error:         err,
+				Notes:         "Running the programmatic shell script caused an error",
+			}
+			code := exitError.ExitCode()
+			details := exitError.String()
+
+			log.Printf("Exit code was %d, details were %s", code, details)
+			log.Printf("output details were: %s", string(output))
 		}
+
 		return
 	}
 
-	afero.WriteFile(fs, path.Join(l.OutputDir, l.ModelName+".out"), output, 0750)
+	afero.WriteFile(fs, path.Join(l.OutputDir, l.Model+".out"), output, 0750)
 
 	//Mark as completed and move on to cleanup
 	channels.Completed <- 1
@@ -241,9 +251,64 @@ func (l localModel) Monitor(channels *turnstile.ChannelMap) {
 }
 
 func (l localModel) Cleanup(channels *turnstile.ChannelMap) {
-	//Copy Up
+
+	fs := afero.NewOsFs()
+
+	//Magical instructions
+	//TODO: Implement flags for mandatory copy and cleanup exclusions
+	pwi := newPostWorkInstruction(l, []string{}, []string{})
+
+	//Copy Up first so that we don't try to move something we remove :)
+	var copied []runner.TargetedFile
+	for _, v := range pwi.FilesToCopy.FilesToCopy {
+
+		source, err := os.Open(path.Join(pwi.FilesToCopy.CopyFrom, v.File))
+
+		if err != nil {
+			//Just continue. There are potentially files which will not exist based on the values in the list.
+			continue
+		}
+
+		copyTo, err := os.Create(path.Join(pwi.FilesToCopy.CopyTo, l.FileName+"."+v.File))
+
+		if err != nil {
+			log.Printf("An error occurred creating the file handle for the target onto which we are going to copy: %s", path.Join(pwi.FilesToCopy.CopyTo, v.File))
+			continue
+		}
+
+		_, err = io.Copy(source, copyTo)
+
+		if err != nil {
+			log.Printf("An erorr occurred while attempting to copy the files: File is %s", v.File)
+			continue
+		}
+
+		v.File = l.OutputDir + "/" + v.File
+
+		copied = append(copied, v)
+	}
+
+	//Write to File in original path indicating what all was copied
+	copiedJSON, _ := json.Marshal(copied)
+
+	afero.WriteFile(fs, path.Join(l.OriginalPath, "copied.json"), copiedJSON, 0750)
 
 	//Clean Up
+	for _, v := range pwi.FilesToClean.FilesToRemove {
+		var err error
+		//Is it a directory?
+		if ok, _ := afero.IsDir(fs, path.Join(pwi.FilesToClean.Location, v.File)); ok {
+			err = fs.RemoveAll(path.Join(pwi.FilesToClean.Location, v.File))
+			//Nope it's a file!
+		} else {
+			err = fs.Remove(path.Join(pwi.FilesToClean.Location, v.File))
+		}
+
+		if err != nil {
+			//Indicate failure to remove
+			log.Printf("Failure removing file / directory %s", v.File)
+		}
+	}
 }
 
 //End Scalable method definitions
@@ -266,9 +331,12 @@ func init() {
 	localCmd.Flags().StringVar(&cacheDir, "cacheDir", "", "directory path for cache of nonmem executables for NM7.4+")
 	localCmd.Flags().StringVar(&cacheExe, "cacheExe", "", "name of executable stored in cache")
 	localCmd.Flags().StringVar(&saveExe, "saveExe", "", "what to name the executable when stored in cache")
+	//TODO: Implement Cleanup
 	localCmd.Flags().IntVar(&cleanLvl, "cleanLvl", 0, "clean level used for file output from a given (set of) runs")
+	//TODO: Implement Copy Up
 	localCmd.Flags().IntVar(&copyLvl, "copyLvl", 0, "copy level used for file output from a given (set of) runs")
 	localCmd.Flags().IntVar(&gitignoreLvl, "gitignoreLvl", 0, "gitignore lvl for a given (set of) runs")
+	//TODO: Implement GIT
 	localCmd.Flags().BoolVar(&git, "git", false, "whether git is used")
 	localCmd.Flags().StringVar(&outputDir, "outputDir", "{{ .Name }}", "Go template for the output directory to use for storging details of each executed model")
 	localCmd.Flags().BoolVar(&overwrite, "overwrite", true, "Whether or not to remove existing output directories if they are present")
@@ -388,7 +456,7 @@ func local(cmd *cobra.Command, args []string) {
 	if counter > 0 {
 		log.Printf("It appears that %d models generated an error during the initial setup phase", len(errors))
 		for _, v := range errors {
-			log.Printf("Model named %s has errored. Details: %s", v.ModelName, v.Error.Error())
+			log.Printf("Model named %s has errored. Details: %s", v.Model, v.Error.Error())
 		}
 	}
 

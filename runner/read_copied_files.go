@@ -9,12 +9,12 @@ import (
 
 // ReadCopiedFiles reads the _copied.json file for given run
 // eg ReadCopiedFiles(fs, "run001") --> looks to unmarshal run001_copied.json
-func ReadCopiedFiles(fs afero.Fs, run string) ([]CopiedFile, error) {
+func ReadCopiedFiles(fs afero.Fs, run string) ([]TargetedFile, error) {
 	bytes, err := afero.ReadFile(fs, fmt.Sprintf("%s_copied.json", run))
 	if err != nil {
 		return nil, err
 	}
-	var copiedFiles []CopiedFile
+	var copiedFiles []TargetedFile
 	err = json.Unmarshal(bytes, &copiedFiles)
 	if err != nil {
 		return nil, err

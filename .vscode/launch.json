@@ -17,6 +17,10 @@
                 "--overwrite=true",
                 "--threads",
                 "8",
+                "--copyLvl",
+                "1",
+                "--cleanLvl",
+                "1",
                 "/Users/darrellb/Documents/models/test_data/acop/acop[001:006].mod"
             ],
             "showLog": true

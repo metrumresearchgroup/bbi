@@ -18,12 +18,13 @@ import (
 	"bufio"
 	"bytes"
 	"errors"
+	"fmt"
 	"path"
 	"strings"
 	"text/template"
 
 	parser "github.com/metrumresearchgroup/babylon/parsers/nmparser"
-	"github.com/metrumresearchgroup/babylon/utils"
+	"github.com/metrumresearchgroup/babylon/runner"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 )
@@ -77,14 +78,14 @@ func copyFileToDestination(l localModel, modifyPath bool) error {
 	}
 
 	//Get the lines of the file
-	sourceLines, err := getFileLines(l.ModelPath)
+	sourceLines, err := getFileLines(l.Path)
 
 	if err != nil {
-		return errors.New("Unable to read the contents of " + l.ModelPath)
+		return errors.New("Unable to read the contents of " + l.Path)
 	}
 
 	//We'll use stats for setting the mode of the target file to make sure perms are the same
-	stats, err := fs.Stat(l.ModelPath)
+	stats, err := fs.Stat(l.Path)
 
 	if err != nil {
 		return err
@@ -102,7 +103,7 @@ func copyFileToDestination(l localModel, modifyPath bool) error {
 	//Write the file contents
 	fileContents := strings.Join(sourceLines, "\n")
 
-	afero.WriteFile(fs, path.Join(l.OutputDir, l.ModelName), []byte(fileContents), stats.Mode())
+	afero.WriteFile(fs, path.Join(l.OutputDir, l.Model), []byte(fileContents), stats.Mode())
 
 	return nil
 }
@@ -160,12 +161,12 @@ func buildNonMemCommandString(l localModel) string {
 
 	// TODO: Implement cache
 	noBuild := false
-
-	fileName, fileExt := utils.FileAndExt(l.ModelName)
 	nmExecutable := l.Settings.NmExecutableOrPath
 	cmdArgs := []string{
-		strings.Join([]string{fileName, fileExt}, ""),
-		strings.Join([]string{fileName, ".lst"}, ""),
+		l.OutputDir + "/" + l.Model,
+		"",
+		l.OutputDir + "/" + l.FileName + ".lst",
+		"",
 	}
 
 	if noBuild {
@@ -173,4 +174,192 @@ func buildNonMemCommandString(l localModel) string {
 	}
 
 	return nmExecutable + " " + strings.Join(cmdArgs, " ")
+}
+
+//modelName is the full file + ext representation of the model (ie acop.mod)
+//directory is the directory in which we will be performing cleanup
+//exceptions is a variadic input for allowing exceptions / overrides.
+//We're taking a local model because grid engine execution doesn't wait for completion. Nothing to do :)
+func filesToCleanup(model localModel, exceptions ...string) runner.FileCleanInstruction {
+	fci := runner.FileCleanInstruction{
+		Location: model.OutputDir,
+	}
+
+	files := getActionableFileList(model.FileName, model.Settings.CleanLvl)
+
+	for _, v := range files {
+		if !isFilenameInExceptions(exceptions, v) {
+			//Let's add it to the cleanup list if it's not in the exclusions
+			fci.FilesToRemove = append(fci.FilesToRemove, newTargetFile(v, model.Settings.CleanLvl))
+		}
+	}
+
+	return fci
+}
+
+func isFilenameInExceptions(haystack []string, needle string) bool {
+
+	for _, v := range haystack {
+		if v == needle {
+			return true
+		}
+	}
+
+	//No matches
+	return false
+}
+
+func newTargetFile(filename string, level int) runner.TargetedFile {
+	return runner.TargetedFile{
+		File:  filename,
+		Level: level,
+	}
+}
+
+func filesToCopy(model localModel, mandatoryFiles ...string) runner.FileCopyInstruction {
+	fci := runner.FileCopyInstruction{
+		CopyTo:   model.OriginalPath,
+		CopyFrom: model.OutputDir,
+	}
+
+	//Process mandatory files first
+	for _, v := range mandatoryFiles {
+		//Crank it up to 11
+		fci.FilesToCopy = append(fci.FilesToCopy, newTargetFile(v, 11))
+	}
+
+	//Create Target File Entries
+	for _, v := range getActionableFileList(model.FileName, model.Settings.CopyLvl) {
+		fci.FilesToCopy = append(fci.FilesToCopy, newTargetFile(v, model.Settings.CopyLvl))
+	}
+
+	return fci
+}
+
+func getActionableFileList(filename string, level int) []string {
+	var output []string
+	files := make(map[int][]string)
+
+	files[1] = []string{
+		"background.set",
+		"compile.lnk",
+		"FCON",
+		"FDATA",
+		"FMSG",
+		"FREPORT",
+		"FSIZES",
+		"FSTREAM",
+		"FSUBS",
+		"FSUBS.0",
+		"FSUBS.o",
+		"FSUBS_MU.F90",
+		"FSUBS.f90",
+		"fsubs.f90",
+		"FSUBS2",
+		"gfortran.txt",
+		"GFCOMPILE.BAT",
+		"INTER",
+		"licfile.set",
+		"linkc.lnk",
+		"LINK.LNK",
+		"LINKC.LNK",
+		"locfile.set",
+		"maxlim.set",
+		"newline",
+		"nmexec.set",
+		"nmpathlist.txt",
+		"nmprd4p.mod",
+		"nobuild.set",
+		"nonmem",
+		"nonmem.exe",
+		"parafile.set",
+		"parafprint.set",
+		"prcompile.set",
+		"prdefault.set",
+		"prsame.set",
+		"PRSIZES.f90",
+		"rundir.set",
+		"runpdir.set",
+		"simparon.set",
+		"temp_dir",
+		"tprdefault.set",
+		"trskip.set",
+		"worker.set",
+		"xmloff.set",
+		"fort.2001",
+		"fort.2002",
+		"flushtime.set",
+	}
+
+	for i := 0; i <= level; i++ {
+		if val, ok := files[i]; ok {
+			output = append(output, val...)
+		}
+	}
+
+	//Extensions now
+	output = append(output, extrapolateFilesFromExtensions(filename, level)...)
+
+	return output
+}
+
+// Extrapolate extensions into string representations of filenames.
+func extrapolateFilesFromExtensions(filename string, level int) []string {
+	var output []string
+	extensions := make(map[int][]string)
+
+	//TODO: Provide configuration by file of these definitions? Would be nice to be able to include a yaml map of these dynamically
+
+	extensions[1] = []string{
+		"",
+		"_ETAS",
+		"_RMAT",
+		"_SMAT",
+		".msf",
+		"_ETAS.msf",
+		"_RMAT.msf",
+		"_SMAT.msf",
+	}
+
+	extensions[2] = []string{
+		".clt",
+		".coi",
+		".clt",
+		".coi",
+		".cpu",
+		".shm",
+		".phi",
+	}
+
+	// parser now needs all these files + other tooling uses xml files
+	extensions[3] = []string{
+		".xml",
+		".grd",
+		".shk",
+		".cor",
+		".cov",
+		".ext",
+		".lst",
+	}
+
+	//Loop, extrapolate and append to the output slice
+	for i := 0; i <= level; i++ {
+		if val, ok := extensions[i]; ok {
+			for _, ext := range val {
+				//For each filename, let's trim and compose the contents
+				output = append(output, strings.TrimSpace(fmt.Sprintf("%s%s", filename, ext)))
+			}
+		}
+	}
+
+	return output
+}
+
+func newPostWorkInstruction(model localModel, cleanupExclusions []string, mandatoryCopyFiles []string) runner.PostWorkInstructions {
+	pwi := runner.PostWorkInstructions{}
+
+	pwi.FilesToCopy = filesToCopy(model, mandatoryCopyFiles...)
+	pwi.FilesToClean = filesToCleanup(model, cleanupExclusions...)
+
+	return pwi
 }
