@@ -19,6 +19,8 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"path"
 	"strings"
 	"text/template"
@@ -185,7 +187,7 @@ func filesToCleanup(model localModel, exceptions ...string) runner.FileCleanInst
 		Location: model.OutputDir,
 	}
 
-	files := getActionableFileList(model.FileName, model.Settings.CleanLvl)
+	files := getActionableFileList(model.FileName, model.Settings.CleanLvl, model.OutputDir)
 
 	for _, v := range files {
 		if !isFilenameInExceptions(exceptions, v) {
@@ -229,18 +231,19 @@ func filesToCopy(model localModel, mandatoryFiles ...string) runner.FileCopyInst
 	}
 
 	//Create Target File Entries
-	for _, v := range getActionableFileList(model.FileName, model.Settings.CopyLvl) {
+	for _, v := range getActionableFileList(model.FileName, model.Settings.CopyLvl, model.OutputDir) {
 		fci.FilesToCopy = append(fci.FilesToCopy, newTargetFile(v, model.Settings.CopyLvl))
 	}
 
 	return fci
 }
 
-func getActionableFileList(filename string, level int) []string {
+func getActionableFileList(filename string, level int, filepath string) []string {
 	var output []string
 	files := make(map[int][]string)
 
-	files[1] = []string{
+	//These files are files that may be desired above the normal.
+	files[2] = []string{
 		"background.set",
 		"compile.lnk",
 		"FCON",
@@ -270,8 +273,6 @@ func getActionableFileList(filename string, level int) []string {
 		"nmpathlist.txt",
 		"nmprd4p.mod",
 		"nobuild.set",
-		"nonmem",
-		"nonmem.exe",
 		"parafile.set",
 		"parafprint.set",
 		"prcompile.set",
@@ -291,6 +292,21 @@ func getActionableFileList(filename string, level int) []string {
 		"flushtime.set",
 	}
 
+	//Get the files from the model
+	//Look specifically for .mod file
+	fileContents, err := ioutil.ReadFile(path.Join(filepath, filename+".mod"))
+	fileLines := strings.Split(string(fileContents), "\n")
+
+	if err != nil {
+		//Let the user know this is basically a no-op
+		log.Printf("We could not locate or read the mod file (%s) indicated to locate output files. As such none will be included in copy / delete operations", filename+".mod")
+	}
+
+	//Add defined output files to the list at level 1
+	files[1] = append(files[1], parser.FindOutputFiles(fileLines)...)
+
+	//Level two will parse the mod file and return those outputs as Level 1
+
 	for i := 0; i <= level; i++ {
 		if val, ok := files[i]; ok {
 			output = append(output, val...)
@@ -298,27 +314,27 @@ func getActionableFileList(filename string, level int) []string {
 	}
 
 	//Extensions now
-	output = append(output, extrapolateFilesFromExtensions(filename, level)...)
+	output = append(output, extrapolateFilesFromExtensions(filename, level, filepath)...)
 
 	return output
 }
 
 // Extrapolate extensions into string representations of filenames.
-func extrapolateFilesFromExtensions(filename string, level int) []string {
+func extrapolateFilesFromExtensions(filename string, level int, filepath string) []string {
 	var output []string
 	extensions := make(map[int][]string)
 
 	//TODO: Provide configuration by file of these definitions? Would be nice to be able to include a yaml map of these dynamically
 
+	// parser now needs all these files + other tooling uses xml files
 	extensions[1] = []string{
-		"",
-		"_ETAS",
-		"_RMAT",
-		"_SMAT",
-		".msf",
-		"_ETAS.msf",
-		"_RMAT.msf",
-		"_SMAT.msf",
+		".xml",
+		".grd",
+		".shk",
+		".cor",
+		".cov",
+		".ext",
+		".lst",
 	}
 
 	extensions[2] = []string{
@@ -331,15 +347,15 @@ func extrapolateFilesFromExtensions(filename string, level int) []string {
 		".phi",
 	}
 
-	// parser now needs all these files + other tooling uses xml files
 	extensions[3] = []string{
-		".xml",
-		".grd",
-		".shk",
-		".cor",
-		".cov",
-		".ext",
-		".lst",
+		"",
+		"_ETAS",
+		"_RMAT",
+		"_SMAT",
+		".msf",
+		"_ETAS.msf",
+		"_RMAT.msf",
+		"_SMAT.msf",
 	}
 
 	//Loop, extrapolate and append to the output slice
