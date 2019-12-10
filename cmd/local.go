@@ -51,7 +51,7 @@ type NonMemModel struct {
 	Error error `json:"error"`
 }
 
-func newLocalModel(modelname string) NonMemModel {
+func NewNonMemModel(modelname string) NonMemModel {
 
 	fs := afero.NewOsFs()
 	lm := NonMemModel{}
@@ -89,7 +89,7 @@ func newLocalModel(modelname string) NonMemModel {
 	lm.OriginalPath = strings.Replace(lm.Path, "/"+lm.Model, "", 1)
 
 	//Process The template from the viper content for output Dir
-	t, err := template.New("output").Parse(outputDir)
+	t, err := template.New("output").Parse(viper.GetString("outputDir"))
 	buf := new(bytes.Buffer)
 
 	if err != nil {
@@ -124,7 +124,6 @@ func newLocalModel(modelname string) NonMemModel {
 
 	lm.Settings = runner.RunSettings{
 		Git:                viper.GetBool("git"),
-		SaveExe:            saveExe,
 		Verbose:            verbose,
 		Debug:              debug,
 		CleanLvl:           viper.GetInt("cleanLvl"),
@@ -176,7 +175,7 @@ func (l NonMemModel) Prepare(channels *turnstile.ChannelMap) {
 	err := copyFileToDestination(l, true)
 
 	//Now that the directory is created, let's create the gitignore file if specified
-	if git {
+	if viper.GetBool("git") {
 		WriteGitIgnoreFile(l.OutputDir)
 	}
 
@@ -336,46 +335,43 @@ bbi nonmem local . // run all models in directory
 }
 
 func init() {
-	RootCmd.AddCommand(nonmemCmd)
-	localCmd.Flags().StringVar(&cacheDir, "cacheDir", "", "directory path for cache of nonmem executables for NM7.4+")
-	localCmd.Flags().StringVar(&cacheExe, "cacheExe", "", "name of executable stored in cache")
-	localCmd.Flags().StringVar(&saveExe, "saveExe", "", "what to name the executable when stored in cache")
-	localCmd.Flags().IntVar(&cleanLvl, "cleanLvl", 0, "clean level used for file output from a given (set of) runs")
-	localCmd.Flags().IntVar(&copyLvl, "copyLvl", 0, "copy level used for file output from a given (set of) runs")
-	localCmd.Flags().IntVar(&gitignoreLvl, "gitignoreLvl", 0, "gitignore lvl for a given (set of) runs")
-	//TODO: Implement GIT
-	localCmd.Flags().BoolVar(&git, "git", false, "whether git is used")
-	localCmd.Flags().StringVar(&outputDir, "outputDir", "{{ .Name }}", "Go template for the output directory to use for storging details of each executed model")
-	localCmd.Flags().BoolVar(&overwrite, "overwrite", true, "Whether or not to remove existing output directories if they are present")
+	nonmemCmd.AddCommand(localCmd)
+
+	//String Variables
+	localCmd.Flags().String("cacheDir", "", "directory path for cache of nonmem executables for NM7.4+")
+	viper.BindPFlag("cacheDir", localCmd.Flags().Lookup("cacheDir"))
+
+	localCmd.Flags().String("cacheExe", "", "name of executable stored in cache")
+	viper.BindPFlag("cacheExe", localCmd.Flags().Lookup("cacheExe"))
+
+	localCmd.Flags().String("saveExe", "", "what to name the executable when stored in cache")
+	viper.BindPFlag("saveExe", localCmd.Flags().Lookup("saveExe"))
+
+	localCmd.Flags().String("outputDir", "{{ .Name }}", "Go template for the output directory to use for storging details of each executed model")
+	viper.BindPFlag("outputDir", localCmd.Flags().Lookup("outputDir"))
+
+	//Int Variables
+	localCmd.Flags().Int("cleanLvl", 0, "clean level used for file output from a given (set of) runs")
+	viper.BindPFlag("cleanLvl", localCmd.Flags().Lookup("cleanLvl"))
+	viper.SetDefault("cleanLvl", 0)
+
+	localCmd.Flags().Int("copyLvl", 0, "copy level used for file output from a given (set of) runs")
+	viper.BindPFlag("copyLvl", localCmd.Flags().Lookup("copyLvl"))
+	viper.SetDefault("copyLvl", 0)
+
+	localCmd.Flags().Int("gitignoreLvl", 0, "gitignore lvl for a given (set of) runs")
+	viper.BindPFlag("gitignoreLvl", localCmd.Flags().Lookup("gitignoreLvl"))
+
+	//Bool Variables
+	localCmd.Flags().Bool("git", false, "whether git is used")
+	viper.BindPFlag("git", localCmd.Flags().Lookup("git"))
+
+	localCmd.Flags().Bool("overwrite", true, "Whether or not to remove existing output directories if they are present")
+	viper.BindPFlag("overwrite", localCmd.Flags().Lookup("overwrite"))
+
 }
 
 func local(cmd *cobra.Command, args []string) {
-
-	if flagChanged(cmd.Flags(), "cacheDir") {
-		viper.Set("cacheDir", cacheDir)
-	}
-	if flagChanged(cmd.Flags(), "cacheExe") {
-		fmt.Println("setting new cache exe of: ", cacheExe)
-		viper.Set("cacheExe", cacheExe)
-	}
-	if flagChanged(cmd.Flags(), "cleanLvl") {
-		viper.Set("cleanLvl", cleanLvl)
-	}
-	if flagChanged(cmd.Flags(), "copyLvl") {
-		viper.Set("copyLvl", copyLvl)
-	}
-	if flagChanged(cmd.Flags(), "git") {
-		viper.Set("git", git)
-	}
-	if flagChanged(cmd.Flags(), "threads") {
-		viper.Set("threads", threads)
-	}
-	if flagChanged(cmd.Flags(), "outputDir") {
-		viper.Set("outputDir", outputDir)
-	}
-	if flagChanged(cmd.Flags(), "overwrite") {
-		viper.Set("overwrite", overwrite)
-	}
 
 	if debug {
 		viper.Debug()
@@ -415,7 +411,7 @@ func local(cmd *cobra.Command, args []string) {
 			}
 
 			for _, model := range modelsInDir {
-				lo.Models = append(lo.Models, newLocalModel(model))
+				lo.Models = append(lo.Models, NewNonMemModel(model))
 			}
 
 		} else {
@@ -432,10 +428,10 @@ func local(cmd *cobra.Command, args []string) {
 					log.Printf("expanded models: %s \n", pat)
 				}
 				for _, p := range pat {
-					lo.Models = append(lo.Models, newLocalModel(p))
+					lo.Models = append(lo.Models, NewNonMemModel(p))
 				}
 			} else {
-				lo.Models = append(lo.Models, newLocalModel(arg))
+				lo.Models = append(lo.Models, NewNonMemModel(arg))
 			}
 		}
 	}
@@ -493,10 +489,6 @@ func local(cmd *cobra.Command, args []string) {
 
 	fmt.Printf("\r%d models completed in %s", m.Completed, time.Since(now))
 	println("")
-}
-
-func init() {
-	nonmemCmd.AddCommand(localCmd)
 }
 
 //WriteGitIgnoreFile takes a provided path and does best attempt work to write a "Exclude all" gitignore file in the location

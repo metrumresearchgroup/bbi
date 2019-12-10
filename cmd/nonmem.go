@@ -39,19 +39,6 @@ const scriptTemplate string = `#!/bin/bash
 {{ .Command }}
 `
 
-var (
-	cacheDir     string
-	cacheExe     string
-	saveExe      string
-	cleanLvl     int
-	copyLvl      int
-	gitignoreLvl int
-	git          bool
-	//oneEst       bool
-	outputDir string
-	overwrite bool
-)
-
 // RunCmd represents the run command
 var nonmemCmd = &cobra.Command{
 	Use:   "nonmem",
@@ -66,7 +53,11 @@ bbi nonmem <local|sge> .// run all models in directory
 }
 
 func nonmem(cmd *cobra.Command, args []string) {
-	//Just a placeholder
+	//Placeholder
+}
+
+func init() {
+	RootCmd.AddCommand(nonmemCmd)
 }
 
 // "Copies" a file by reading its content (optionally updating the path)

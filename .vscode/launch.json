@@ -12,15 +12,11 @@
             "args": [
                 "nonmem",
                 "local",
-                // "--outputDir",
-                // "{{.Name}}",
                 "--overwrite=true",
                 "--threads",
                 "8",
                 "--copyLvl",
                 "1",
-                "--cleanLvl",
-                "3",
                 "--git=true",
                 "/Users/darrellb/Documents/models/test_data/240/Executable_MTP.mod"
             ],

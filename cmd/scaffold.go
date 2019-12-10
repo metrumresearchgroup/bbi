@@ -46,8 +46,8 @@ func scaffold(cmd *cobra.Command, args []string) error {
 
 	dir, _ := filepath.Abs(".")
 
-	if cacheDir != "" {
-		cache := filepath.Clean(filepath.Join(dir, cacheDir))
+	if viper.GetString("cacheDir") != "" {
+		cache := filepath.Clean(filepath.Join(dir, viper.GetString("cacheDir")))
 		if preview {
 			fmt.Println(fmt.Sprintf("would create cache dir at: %s", cache))
 			return nil
@@ -79,5 +79,6 @@ func scaffold(cmd *cobra.Command, args []string) error {
 }
 func init() {
 	RootCmd.AddCommand(scaffoldCmd)
-	scaffoldCmd.Flags().StringVar(&cacheDir, "cacheDir", "", "create cache directory at path/name")
+	scaffoldCmd.Flags().String("cacheDir", "", "create cache directory at path/name")
+	viper.BindPFlag("cacheDir", scaffoldCmd.Flags().Lookup("cacheDir"))
 }
