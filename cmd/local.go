@@ -174,6 +174,11 @@ func (l localModel) Prepare(channels *turnstile.ChannelMap) {
 	//Copy Model into destination and update Data Path
 	err := copyFileToDestination(l, true)
 
+	//Now that the directory is created, let's create the gitignore file if specified
+	if git {
+		WriteGitIgnoreFile(l.OutputDir)
+	}
+
 	if err != nil {
 		channels.Failed <- 1
 		channels.Errors <- turnstile.ConcurrentError{
@@ -479,4 +484,9 @@ func local(cmd *cobra.Command, args []string) {
 
 func init() {
 	nonmemCmd.AddCommand(localCmd)
+}
+
+//WriteGitIgnoreFile takes a provided path and does best attempt work to write a "Exclude all" gitignore file in the location
+func WriteGitIgnoreFile(filepath string) {
+	ioutil.WriteFile(path.Join(filepath, ".gitignore"), []byte("*"+lineEnding), 0755)
 }

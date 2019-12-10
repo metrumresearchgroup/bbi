@@ -20,8 +20,9 @@
                 "--copyLvl",
                 "1",
                 "--cleanLvl",
-                "1",
-                "/Users/darrellb/Documents/models/test_data/acop/acop[001:006].mod"
+                "3",
+                "--git=true",
+                "/Users/darrellb/Documents/models/test_data/240/Executable_MTP.mod"
             ],
             "showLog": true
             

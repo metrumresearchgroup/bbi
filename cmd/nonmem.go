@@ -324,8 +324,6 @@ func extrapolateFilesFromExtensions(filename string, level int, filepath string)
 	var output []string
 	extensions := make(map[int][]string)
 
-	//TODO: Provide configuration by file of these definitions? Would be nice to be able to include a yaml map of these dynamically
-
 	// parser now needs all these files + other tooling uses xml files
 	extensions[1] = []string{
 		".xml",
