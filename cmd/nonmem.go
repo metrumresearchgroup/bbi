@@ -70,7 +70,7 @@ func nonmem(cmd *cobra.Command, args []string) {
 }
 
 // "Copies" a file by reading its content (optionally updating the path)
-func copyFileToDestination(l localModel, modifyPath bool) error {
+func copyFileToDestination(l NonMemModel, modifyPath bool) error {
 
 	fs := afero.NewOsFs()
 
@@ -134,7 +134,7 @@ func getFileLines(sourceFile string) ([]string, error) {
 }
 
 //processes any template (inlcuding the const one here) to create a byte slice of the entire file
-func generateScript(fileTemplate string, l localModel) ([]byte, error) {
+func generateScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 
 	t, err := template.New("file").Parse(fileTemplate)
 	buf := new(bytes.Buffer)
@@ -159,7 +159,7 @@ func generateScript(fileTemplate string, l localModel) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func buildNonMemCommandString(l localModel) string {
+func buildNonMemCommandString(l NonMemModel) string {
 
 	// TODO: Implement cache
 	noBuild := false
@@ -182,7 +182,7 @@ func buildNonMemCommandString(l localModel) string {
 //directory is the directory in which we will be performing cleanup
 //exceptions is a variadic input for allowing exceptions / overrides.
 //We're taking a local model because grid engine execution doesn't wait for completion. Nothing to do :)
-func filesToCleanup(model localModel, exceptions ...string) runner.FileCleanInstruction {
+func filesToCleanup(model NonMemModel, exceptions ...string) runner.FileCleanInstruction {
 	fci := runner.FileCleanInstruction{
 		Location: model.OutputDir,
 	}
@@ -218,7 +218,7 @@ func newTargetFile(filename string, level int) runner.TargetedFile {
 	}
 }
 
-func filesToCopy(model localModel, mandatoryFiles ...string) runner.FileCopyInstruction {
+func filesToCopy(model NonMemModel, mandatoryFiles ...string) runner.FileCopyInstruction {
 	fci := runner.FileCopyInstruction{
 		CopyTo:   model.OriginalPath,
 		CopyFrom: model.OutputDir,
@@ -369,7 +369,7 @@ func extrapolateFilesFromExtensions(filename string, level int, filepath string)
 	return output
 }
 
-func newPostWorkInstruction(model localModel, cleanupExclusions []string, mandatoryCopyFiles []string) runner.PostWorkInstructions {
+func newPostWorkInstruction(model NonMemModel, cleanupExclusions []string, mandatoryCopyFiles []string) runner.PostWorkInstructions {
 	pwi := runner.PostWorkInstructions{}
 
 	pwi.FilesToCopy = filesToCopy(model, mandatoryCopyFiles...)

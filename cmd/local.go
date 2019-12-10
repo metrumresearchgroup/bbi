@@ -28,10 +28,11 @@ import (
 var arguments []string
 
 type localOperation struct {
-	Models []localModel `json:"models"`
+	Models []NonMemModel `json:"models"`
 }
 
-type localModel struct {
+//NonMemModel is the definition of a model for NonMem including its target directories and settings required for execution
+type NonMemModel struct {
 	//Model is the name of the model on which we will action: acop.mod
 	Model string `json:"model_name"`
 	//Path is the Fully Qualified Path to the original model
@@ -50,10 +51,10 @@ type localModel struct {
 	Error error `json:"error"`
 }
 
-func newLocalModel(modelname string) localModel {
+func newLocalModel(modelname string) NonMemModel {
 
 	fs := afero.NewOsFs()
-	lm := localModel{}
+	lm := NonMemModel{}
 
 	if filepath.IsAbs(modelname) {
 		lm.Path = modelname
@@ -68,7 +69,7 @@ func newLocalModel(modelname string) localModel {
 	fi, err := fs.Stat(lm.Path)
 
 	if err != nil {
-		return localModel{
+		return NonMemModel{
 			Error: err,
 		}
 	}
@@ -92,7 +93,7 @@ func newLocalModel(modelname string) localModel {
 	buf := new(bytes.Buffer)
 
 	if err != nil {
-		return localModel{
+		return NonMemModel{
 			Error: errors.New("There was an issue parsing the template provided: " + err.Error()),
 		}
 	}
@@ -107,7 +108,7 @@ func newLocalModel(modelname string) localModel {
 	})
 
 	if err != nil {
-		return localModel{
+		return NonMemModel{
 			Error: err,
 		}
 	}
@@ -116,7 +117,7 @@ func newLocalModel(modelname string) localModel {
 	lm.OutputDir = path.Join(lm.OriginalPath, buf.String())
 
 	if err != nil {
-		return localModel{
+		return NonMemModel{
 			Error: errors.New("There was an issue executing the provided template: " + err.Error()),
 		}
 	}
@@ -141,7 +142,7 @@ func newLocalModel(modelname string) localModel {
 //Begin Scalable method definitions
 
 //Prepare is basically the old EstimateModel function. Responsible for creating directories and preparation.
-func (l localModel) Prepare(channels *turnstile.ChannelMap) {
+func (l NonMemModel) Prepare(channels *turnstile.ChannelMap) {
 	//Mark the model as started some work
 	channels.Working <- 1
 	fs := afero.NewOsFs()
@@ -205,7 +206,8 @@ func (l localModel) Prepare(channels *turnstile.ChannelMap) {
 	afero.WriteFile(fs, path.Join(l.OutputDir, l.FileName+".sh"), scriptContents, 0750)
 }
 
-func (l localModel) Work(channels *turnstile.ChannelMap) {
+//Work describes the Turnstile execution phase -> IE What heavy lifting should be done
+func (l NonMemModel) Work(channels *turnstile.ChannelMap) {
 	log.Printf("Beginning work phase for %s", l.FileName)
 	fs := afero.NewOsFs()
 	//Execute the script we created
@@ -239,11 +241,13 @@ func (l localModel) Work(channels *turnstile.ChannelMap) {
 
 }
 
-func (l localModel) Monitor(channels *turnstile.ChannelMap) {
+//Monitor is unimplemented here. It's the 3rd phase of Turnstile execution
+func (l NonMemModel) Monitor(channels *turnstile.ChannelMap) {
 	//Do nothing for this implementation
 }
 
-func (l localModel) Cleanup(channels *turnstile.ChannelMap) {
+//Cleanup is the last phase of execution, in which computation / hard work is done and we're cleaning up leftover files, copying results around et all.
+func (l NonMemModel) Cleanup(channels *turnstile.ChannelMap) {
 	time.Sleep(10 * time.Millisecond)
 	log.Printf("Beginning cleanup phase for model %s\n", l.FileName)
 	fs := afero.NewOsFs()
@@ -439,7 +443,7 @@ func local(cmd *cobra.Command, args []string) {
 	//Models in Error
 	//Locate 'em
 	counter := 0
-	var errors []localModel
+	var errors []NonMemModel
 	for _, v := range lo.Models {
 		if v.Error != nil {
 			counter++
