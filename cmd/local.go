@@ -349,6 +349,7 @@ func init() {
 
 	localCmd.Flags().String("outputDir", "{{ .Name }}", "Go template for the output directory to use for storging details of each executed model")
 	viper.BindPFlag("outputDir", localCmd.Flags().Lookup("outputDir"))
+	viper.SetDefault("outputDir", "{{ .Name }}")
 
 	//Int Variables
 	localCmd.Flags().Int("cleanLvl", 0, "clean level used for file output from a given (set of) runs")
@@ -361,13 +362,16 @@ func init() {
 
 	localCmd.Flags().Int("gitignoreLvl", 0, "gitignore lvl for a given (set of) runs")
 	viper.BindPFlag("gitignoreLvl", localCmd.Flags().Lookup("gitignoreLvl"))
+	viper.SetDefault("gitignoreLvl", 1)
 
 	//Bool Variables
 	localCmd.Flags().Bool("git", false, "whether git is used")
 	viper.BindPFlag("git", localCmd.Flags().Lookup("git"))
+	viper.SetDefault("git", true)
 
 	localCmd.Flags().Bool("overwrite", true, "Whether or not to remove existing output directories if they are present")
 	viper.BindPFlag("overwrite", localCmd.Flags().Lookup("overwrite"))
+	viper.SetDefault("overwrite", true)
 
 }
 
