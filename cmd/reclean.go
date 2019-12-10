@@ -50,5 +50,5 @@ func reclean(cmd *cobra.Command, args []string) error {
 }
 func init() {
 	RootCmd.AddCommand(recleanCmd)
-	recleanCmd.Flags().IntVar(&cleanLvl, "cleanLvl", 5, "clean level to apply")
+	recleanCmd.Flags().IntVar(&cleanLvl, "cleanLvl", 0, "clean level to apply")
 }
