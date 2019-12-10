@@ -232,9 +232,6 @@ func (l localModel) Work(channels *turnstile.ChannelMap) {
 
 	afero.WriteFile(fs, path.Join(l.OutputDir, l.Model+".out"), output, 0750)
 
-	//Mark as completed and move on to cleanup
-	channels.Completed <- 1
-
 }
 
 func (l localModel) Monitor(channels *turnstile.ChannelMap) {
@@ -242,7 +239,7 @@ func (l localModel) Monitor(channels *turnstile.ChannelMap) {
 }
 
 func (l localModel) Cleanup(channels *turnstile.ChannelMap) {
-	//Wait a sec before beginning execution
+	time.Sleep(10 * time.Millisecond)
 	log.Printf("Beginning cleanup phase for model %s\n", l.FileName)
 	fs := afero.NewOsFs()
 
@@ -300,6 +297,9 @@ func (l localModel) Cleanup(channels *turnstile.ChannelMap) {
 			}
 		}
 	}
+
+	//Mark as completed and move on to cleanup
+	channels.Completed <- 1
 }
 
 //End Scalable method definitions
