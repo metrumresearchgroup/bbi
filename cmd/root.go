@@ -33,6 +33,7 @@ var (
 	verbose bool
 	debug   bool
 	threads int
+	//Json indicates whether we should have a JSON tree of output
 	Json    bool
 	preview bool
 	noExt   bool

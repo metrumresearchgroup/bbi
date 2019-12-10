@@ -268,7 +268,16 @@ func (l NonMemModel) Cleanup(channels *turnstile.ChannelMap) {
 			continue
 		}
 
-		err = ioutil.WriteFile(path.Join(pwi.FilesToCopy.CopyTo, l.FileName+"."+v.File), source, 0755)
+		//Let's avoid stuttering from extension extrapolation
+		file, _ := utils.FileAndExt(v.File)
+
+		if file == l.FileName {
+			file = v.File
+		} else {
+			file = l.FileName + "." + v.File
+		}
+
+		err = ioutil.WriteFile(path.Join(pwi.FilesToCopy.CopyTo, file), source, 0755)
 
 		if err != nil {
 			log.Printf("An erorr occurred while attempting to copy the files: File is %s", v.File)
@@ -281,7 +290,7 @@ func (l NonMemModel) Cleanup(channels *turnstile.ChannelMap) {
 	}
 
 	//Write to File in original path indicating what all was copied
-	copiedJSON, _ := json.Marshal(copied)
+	copiedJSON, _ := json.MarshalIndent(copied, "", "    ")
 
 	afero.WriteFile(fs, path.Join(l.OriginalPath, "copied.json"), copiedJSON, 0750)
 
