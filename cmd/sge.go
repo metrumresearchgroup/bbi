@@ -2,10 +2,8 @@ package cmd
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os/exec"
 	"path"
@@ -254,75 +252,7 @@ func (l SGEModel) Monitor(channels *turnstile.ChannelMap) {
 
 //Cleanup is the last phase of execution, in which computation / hard work is done and we're cleaning up leftover files, copying results around et all.
 func (l SGEModel) Cleanup(channels *turnstile.ChannelMap) {
-	time.Sleep(10 * time.Millisecond)
-	log.Printf("Beginning cleanup phase for model %s\n", l.Nonmem.FileName)
-	fs := afero.NewOsFs()
-
-	//Magical instructions
-	//TODO: Implement flags for mandatory copy and cleanup exclusions
-	pwi := newPostWorkInstruction(l.Nonmem, []string{}, []string{})
-
-	//Copy Up first so that we don't try to move something we remove :)
-	var copied []runner.TargetedFile
-	//log.Printf("Beginning copy-up operations for model %s\n", l.FileName)
-	for _, v := range pwi.FilesToCopy.FilesToCopy {
-
-		source, err := ioutil.ReadFile(path.Join(pwi.FilesToCopy.CopyFrom, v.File))
-
-		if err != nil {
-			//Just continue. There are potentially files which will not exist based on the values in the list.
-			continue
-		}
-
-		//Let's avoid stuttering from extension extrapolation
-		file, _ := utils.FileAndExt(v.File)
-
-		if file == l.Nonmem.FileName {
-			file = v.File
-		} else {
-			file = l.Nonmem.FileName + "." + v.File
-		}
-
-		err = ioutil.WriteFile(path.Join(pwi.FilesToCopy.CopyTo, file), source, 0755)
-
-		if err != nil {
-			log.Printf("An erorr occurred while attempting to copy the files: File is %s", v.File)
-			continue
-		}
-
-		v.File = l.Nonmem.OutputDir + "/" + v.File
-
-		copied = append(copied, v)
-	}
-
-	//Write to File in original path indicating what all was copied
-	copiedJSON, _ := json.MarshalIndent(copied, "", "    ")
-
-	afero.WriteFile(fs, path.Join(l.Nonmem.OriginalPath, "copied.json"), copiedJSON, 0750)
-
-	//Clean Up
-	//log.Printf("Beginning cleanup operations for model %s\n", l.FileName)
-	for _, v := range pwi.FilesToClean.FilesToRemove {
-		var err error
-
-		//Does it even exist?
-		if ok, _ := afero.Exists(fs, path.Join(pwi.FilesToClean.Location, v.File)); ok {
-			//Is it a directory?
-			if ok, _ := afero.IsDir(fs, path.Join(pwi.FilesToClean.Location, v.File)); ok {
-				err = fs.RemoveAll(path.Join(pwi.FilesToClean.Location, v.File))
-				//Nope it's a file!
-			} else {
-				err = fs.Remove(path.Join(pwi.FilesToClean.Location, v.File))
-			}
-
-			if err != nil {
-				//Indicate failure to remove
-				log.Printf("Failure removing file / directory %s. Details : %s", v.File, err.Error())
-			}
-		}
-	}
-
-	//Mark as completed and move on to cleanup
+	log.Println("There is no cleanup phase in SGE submission. Completing task")
 	channels.Completed <- 1
 }
 
@@ -333,7 +263,7 @@ var sgeCMD = &cobra.Command{
 	Use:   "sge",
 	Short: "sge specifies to run a (set of) models on the Sun Grid Engine",
 	Long:  runLongDescription,
-	Run:   local,
+	Run:   sge,
 }
 
 func init() {
