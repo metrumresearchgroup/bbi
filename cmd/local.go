@@ -325,54 +325,12 @@ func (l NonMemModel) Cleanup(channels *turnstile.ChannelMap) {
 var localCmd = &cobra.Command{
 	Use:   "local",
 	Short: "local specifies to run a (set of) models locally",
-	Long: `run model(s), for example: 
-bbi nonmem local run001.mod
-bbi nonmem --cleanLvl=1 local run001.mod run002.mod 
-bbi nonmem local run[001:006].mod // expand to run001.mod run002.mod ... run006.mod 
-bbi nonmem local . // run all models in directory
- `,
-	Run: local,
+	Long:  runLongDescription,
+	Run:   local,
 }
 
 func init() {
-	nonmemCmd.AddCommand(localCmd)
-
-	//String Variables
-	localCmd.Flags().String("cacheDir", "", "directory path for cache of nonmem executables for NM7.4+")
-	viper.BindPFlag("cacheDir", localCmd.Flags().Lookup("cacheDir"))
-
-	localCmd.Flags().String("cacheExe", "", "name of executable stored in cache")
-	viper.BindPFlag("cacheExe", localCmd.Flags().Lookup("cacheExe"))
-
-	localCmd.Flags().String("saveExe", "", "what to name the executable when stored in cache")
-	viper.BindPFlag("saveExe", localCmd.Flags().Lookup("saveExe"))
-
-	localCmd.Flags().String("outputDir", "{{ .Name }}", "Go template for the output directory to use for storging details of each executed model")
-	viper.BindPFlag("outputDir", localCmd.Flags().Lookup("outputDir"))
-	viper.SetDefault("outputDir", "{{ .Name }}")
-
-	//Int Variables
-	localCmd.Flags().Int("cleanLvl", 0, "clean level used for file output from a given (set of) runs")
-	viper.BindPFlag("cleanLvl", localCmd.Flags().Lookup("cleanLvl"))
-	viper.SetDefault("cleanLvl", 0)
-
-	localCmd.Flags().Int("copyLvl", 0, "copy level used for file output from a given (set of) runs")
-	viper.BindPFlag("copyLvl", localCmd.Flags().Lookup("copyLvl"))
-	viper.SetDefault("copyLvl", 0)
-
-	localCmd.Flags().Int("gitignoreLvl", 0, "gitignore lvl for a given (set of) runs")
-	viper.BindPFlag("gitignoreLvl", localCmd.Flags().Lookup("gitignoreLvl"))
-	viper.SetDefault("gitignoreLvl", 1)
-
-	//Bool Variables
-	localCmd.Flags().Bool("git", false, "whether git is used")
-	viper.BindPFlag("git", localCmd.Flags().Lookup("git"))
-	viper.SetDefault("git", true)
-
-	localCmd.Flags().Bool("overwrite", true, "Whether or not to remove existing output directories if they are present")
-	viper.BindPFlag("overwrite", localCmd.Flags().Lookup("overwrite"))
-	viper.SetDefault("overwrite", true)
-
+	runCmd.AddCommand(localCmd)
 }
 
 func local(cmd *cobra.Command, args []string) {

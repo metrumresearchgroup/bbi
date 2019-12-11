@@ -53,7 +53,7 @@ bbi nonmem <local|sge> .// run all models in directory
 }
 
 func nonmem(cmd *cobra.Command, args []string) {
-	//Placeholder
+	println(runLongDescription)
 }
 
 func init() {
