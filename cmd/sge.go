@@ -24,7 +24,7 @@ import (
 )
 
 type sgeOperation struct {
-	Models []LocalModel `json:"models"`
+	Models []SGEModel `json:"models"`
 }
 
 //SGEModel is the struct used for SGE operations containing the NonMemModel
@@ -199,7 +199,7 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 
 //Work describes the Turnstile execution phase -> IE What heavy lifting should be done
 func (l SGEModel) Work(channels *turnstile.ChannelMap) {
-	log.Printf("Beginning work phase for %s", l.Nonmem.FileName)
+	log.Printf("Beginning SGE work phase for %s", l.Nonmem.FileName)
 	fs := afero.NewOsFs()
 	//Execute the script we created
 	os.Chdir(l.Nonmem.OutputDir)
@@ -277,7 +277,7 @@ func sge(cmd *cobra.Command, args []string) {
 	}
 
 	AppFs := afero.NewOsFs()
-	lo := localOperation{}
+	lo := sgeOperation{}
 
 	if verbose {
 		log.Printf("setting up a work queue with %v workers", viper.GetInt("threads"))
@@ -310,7 +310,7 @@ func sge(cmd *cobra.Command, args []string) {
 			}
 
 			for _, model := range modelsInDir {
-				lo.Models = append(lo.Models, NewLocalNonMemModel(model))
+				lo.Models = append(lo.Models, NewSGENonMemModel(model))
 			}
 
 		} else {
@@ -327,10 +327,10 @@ func sge(cmd *cobra.Command, args []string) {
 					log.Printf("expanded models: %s \n", pat)
 				}
 				for _, p := range pat {
-					lo.Models = append(lo.Models, NewLocalNonMemModel(p))
+					lo.Models = append(lo.Models, NewSGENonMemModel(p))
 				}
 			} else {
-				lo.Models = append(lo.Models, NewLocalNonMemModel(arg))
+				lo.Models = append(lo.Models, NewSGENonMemModel(arg))
 			}
 		}
 	}
