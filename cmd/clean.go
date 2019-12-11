@@ -175,7 +175,7 @@ func getMatches(s []string, expr string, regex bool) ([]string, error) {
 }
 
 func init() {
-	RootCmd.AddCommand(cleanCmd)
+	nonmemCmd.AddCommand(cleanCmd)
 	cleanCmd.Flags().BoolVar(&dirsOnly, "dirsOnly", false, "only match and clean directories")
 	cleanCmd.Flags().BoolVar(&filesOnly, "filesOnly", false, "only match and clean files")
 	cleanCmd.Flags().BoolVar(&inverse, "inverse", false, "inverse selection from the given regex match criteria")

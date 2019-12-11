@@ -39,6 +39,26 @@ const scriptTemplate string = `#!/bin/bash
 {{ .Command }}
 `
 
+//NonMemModel is the definition of a model for NonMem including its target directories and settings required for execution
+type NonMemModel struct {
+	//Model is the name of the model on which we will action: acop.mod
+	Model string `json:"model_name"`
+	//Path is the Fully Qualified Path to the original model
+	Path string `json:"model_path"`
+	//FileName is the Filename component (sans extension)
+	FileName string `json:"model_filename"`
+	//Extension is the extension of the file
+	Extension string `json:"model_extension"`
+	//OriginalPath is the path at which the original model was located: /Users/Documents/acop/
+	OriginalPath string `json:"original_path"`
+	//OutputDir is the directory into which the copied models and work will be located
+	OutputDir string `json:"output_dir"`
+	//Settings are basically the cobra definitions / requirements for the iteration
+	Settings runner.RunSettings `json:"settings"`
+	//Whether or not the model had an error on generation or execution
+	Error error `json:"error"`
+}
+
 // RunCmd represents the run command
 var nonmemCmd = &cobra.Command{
 	Use:   "nonmem",

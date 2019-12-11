@@ -28,30 +28,15 @@ import (
 var arguments []string
 
 type localOperation struct {
-	Models []NonMemModel `json:"models"`
+	Models []LocalModel `json:"models"`
 }
 
-//NonMemModel is the definition of a model for NonMem including its target directories and settings required for execution
-type NonMemModel struct {
-	//Model is the name of the model on which we will action: acop.mod
-	Model string `json:"model_name"`
-	//Path is the Fully Qualified Path to the original model
-	Path string `json:"model_path"`
-	//FileName is the Filename component (sans extension)
-	FileName string `json:"model_filename"`
-	//Extension is the extension of the file
-	Extension string `json:"model_extension"`
-	//OriginalPath is the path at which the original model was located: /Users/Documents/acop/
-	OriginalPath string `json:"original_path"`
-	//OutputDir is the directory into which the copied models and work will be located
-	OutputDir string `json:"output_dir"`
-	//Settings are basically the cobra definitions / requirements for the iteration
-	Settings runner.RunSettings `json:"settings"`
-	//Whether or not the model had an error on generation or execution
-	Error error `json:"error"`
+//LocalModel is the struct used for local operations containing the NonMemModel
+type LocalModel struct {
+	Nonmem NonMemModel
 }
 
-func NewNonMemModel(modelname string) NonMemModel {
+func NewLocalNonMemModel(modelname string) LocalModel {
 
 	fs := afero.NewOsFs()
 	lm := NonMemModel{}
@@ -69,8 +54,10 @@ func NewNonMemModel(modelname string) NonMemModel {
 	fi, err := fs.Stat(lm.Path)
 
 	if err != nil {
-		return NonMemModel{
-			Error: err,
+		return LocalModel{
+			Nonmem: NonMemModel{
+				Error: err,
+			},
 		}
 	}
 
@@ -93,8 +80,10 @@ func NewNonMemModel(modelname string) NonMemModel {
 	buf := new(bytes.Buffer)
 
 	if err != nil {
-		return NonMemModel{
-			Error: errors.New("There was an issue parsing the template provided: " + err.Error()),
+		return LocalModel{
+			Nonmem: NonMemModel{
+				Error: err,
+			},
 		}
 	}
 
@@ -108,8 +97,10 @@ func NewNonMemModel(modelname string) NonMemModel {
 	})
 
 	if err != nil {
-		return NonMemModel{
-			Error: err,
+		return LocalModel{
+			Nonmem: NonMemModel{
+				Error: err,
+			},
 		}
 	}
 
@@ -117,8 +108,10 @@ func NewNonMemModel(modelname string) NonMemModel {
 	lm.OutputDir = path.Join(lm.OriginalPath, buf.String())
 
 	if err != nil {
-		return NonMemModel{
-			Error: errors.New("There was an issue executing the provided template: " + err.Error()),
+		return LocalModel{
+			Nonmem: NonMemModel{
+				Error: err,
+			},
 		}
 	}
 
@@ -135,26 +128,28 @@ func NewNonMemModel(modelname string) NonMemModel {
 		Overwrite:          viper.GetBool("overwrite"),
 	}
 
-	return lm
+	return LocalModel{
+		Nonmem: lm,
+	}
 }
 
 //Begin Scalable method definitions
 
 //Prepare is basically the old EstimateModel function. Responsible for creating directories and preparation.
-func (l NonMemModel) Prepare(channels *turnstile.ChannelMap) {
+func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 	//Mark the model as started some work
 	channels.Working <- 1
 	fs := afero.NewOsFs()
 
 	//Does output directory exist?
-	if ok, _ := afero.Exists(fs, l.OutputDir); ok {
+	if ok, _ := afero.Exists(fs, l.Nonmem.OutputDir); ok {
 		//If so are we configured to overwrite?
-		if l.Settings.Overwrite {
-			err := fs.RemoveAll(l.OutputDir)
+		if l.Nonmem.Settings.Overwrite {
+			err := fs.RemoveAll(l.Nonmem.OutputDir)
 			if err != nil {
 				channels.Failed <- 1
 				channels.Errors <- turnstile.ConcurrentError{
-					RunIdentifier: l.Model,
+					RunIdentifier: l.Nonmem.Model,
 					Error:         err,
 					Notes:         "An error occured trying to remove the directory as specified in the overwrite flag",
 				}
@@ -163,55 +158,55 @@ func (l NonMemModel) Prepare(channels *turnstile.ChannelMap) {
 		} else {
 			channels.Failed <- 1
 			channels.Errors <- turnstile.ConcurrentError{
-				RunIdentifier: l.Model,
+				RunIdentifier: l.Nonmem.Model,
 				Error:         errors.New("The output directory already exists"),
-				Notes:         fmt.Sprintf("The target directory, %s already, exists, but we are configured to not overwrite. Invalid configuration / run state", l.OutputDir),
+				Notes:         fmt.Sprintf("The target directory, %s already, exists, but we are configured to not overwrite. Invalid configuration / run state", l.Nonmem.OutputDir),
 			}
 			return
 		}
 	}
 
 	//Copy Model into destination and update Data Path
-	err := copyFileToDestination(l, true)
+	err := copyFileToDestination(l.Nonmem, true)
 
 	//Now that the directory is created, let's create the gitignore file if specified
 	if viper.GetBool("git") {
-		WriteGitIgnoreFile(l.OutputDir)
+		WriteGitIgnoreFile(l.Nonmem.OutputDir)
 	}
 
 	if err != nil {
 		channels.Failed <- 1
 		channels.Errors <- turnstile.ConcurrentError{
-			RunIdentifier: l.Model,
+			RunIdentifier: l.Nonmem.Model,
 			Error:         err,
-			Notes:         fmt.Sprintf("There appears to have been an issue trying to copy %s to %s", l.Model, l.OutputDir),
+			Notes:         fmt.Sprintf("There appears to have been an issue trying to copy %s to %s", l.Nonmem.Model, l.Nonmem.OutputDir),
 		}
 		return
 	}
 
 	//Create Execution Script
-	scriptContents, err := generateScript(scriptTemplate, l)
+	scriptContents, err := generateScript(scriptTemplate, l.Nonmem)
 
 	if err != nil {
 		channels.Failed <- 1
 		channels.Errors <- turnstile.ConcurrentError{
-			RunIdentifier: l.Model,
+			RunIdentifier: l.Nonmem.Model,
 			Error:         err,
 			Notes:         "An error occurred during the creation of the executable script for this model",
 		}
 	}
 
 	//rwxr-x---
-	afero.WriteFile(fs, path.Join(l.OutputDir, l.FileName+".sh"), scriptContents, 0750)
+	afero.WriteFile(fs, path.Join(l.Nonmem.OutputDir, l.Nonmem.FileName+".sh"), scriptContents, 0750)
 }
 
 //Work describes the Turnstile execution phase -> IE What heavy lifting should be done
-func (l NonMemModel) Work(channels *turnstile.ChannelMap) {
-	log.Printf("Beginning work phase for %s", l.FileName)
+func (l LocalModel) Work(channels *turnstile.ChannelMap) {
+	log.Printf("Beginning work phase for %s", l.Nonmem.FileName)
 	fs := afero.NewOsFs()
 	//Execute the script we created
-	scriptLocation := path.Join(l.OutputDir, l.FileName+".sh")
-	os.Chdir(l.OutputDir)
+	scriptLocation := path.Join(l.Nonmem.OutputDir, l.Nonmem.FileName+".sh")
+	os.Chdir(l.Nonmem.OutputDir)
 
 	command := exec.Command(scriptLocation)
 	command.Env = os.Environ() //Take in OS Environment
@@ -222,7 +217,7 @@ func (l NonMemModel) Work(channels *turnstile.ChannelMap) {
 		if exitError, ok := err.(*exec.ExitError); ok {
 			channels.Failed <- 1
 			channels.Errors <- turnstile.ConcurrentError{
-				RunIdentifier: l.FileName,
+				RunIdentifier: l.Nonmem.FileName,
 				Error:         err,
 				Notes:         "Running the programmatic shell script caused an error",
 			}
@@ -236,24 +231,24 @@ func (l NonMemModel) Work(channels *turnstile.ChannelMap) {
 		return
 	}
 
-	afero.WriteFile(fs, path.Join(l.OutputDir, l.Model+".out"), output, 0750)
+	afero.WriteFile(fs, path.Join(l.Nonmem.OutputDir, l.Nonmem.Model+".out"), output, 0750)
 
 }
 
 //Monitor is unimplemented here. It's the 3rd phase of Turnstile execution
-func (l NonMemModel) Monitor(channels *turnstile.ChannelMap) {
+func (l LocalModel) Monitor(channels *turnstile.ChannelMap) {
 	//Do nothing for this implementation
 }
 
 //Cleanup is the last phase of execution, in which computation / hard work is done and we're cleaning up leftover files, copying results around et all.
-func (l NonMemModel) Cleanup(channels *turnstile.ChannelMap) {
+func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 	time.Sleep(10 * time.Millisecond)
-	log.Printf("Beginning cleanup phase for model %s\n", l.FileName)
+	log.Printf("Beginning cleanup phase for model %s\n", l.Nonmem.FileName)
 	fs := afero.NewOsFs()
 
 	//Magical instructions
 	//TODO: Implement flags for mandatory copy and cleanup exclusions
-	pwi := newPostWorkInstruction(l, []string{}, []string{})
+	pwi := newPostWorkInstruction(l.Nonmem, []string{}, []string{})
 
 	//Copy Up first so that we don't try to move something we remove :)
 	var copied []runner.TargetedFile
@@ -270,10 +265,10 @@ func (l NonMemModel) Cleanup(channels *turnstile.ChannelMap) {
 		//Let's avoid stuttering from extension extrapolation
 		file, _ := utils.FileAndExt(v.File)
 
-		if file == l.FileName {
+		if file == l.Nonmem.FileName {
 			file = v.File
 		} else {
-			file = l.FileName + "." + v.File
+			file = l.Nonmem.FileName + "." + v.File
 		}
 
 		err = ioutil.WriteFile(path.Join(pwi.FilesToCopy.CopyTo, file), source, 0755)
@@ -283,7 +278,7 @@ func (l NonMemModel) Cleanup(channels *turnstile.ChannelMap) {
 			continue
 		}
 
-		v.File = l.OutputDir + "/" + v.File
+		v.File = l.Nonmem.OutputDir + "/" + v.File
 
 		copied = append(copied, v)
 	}
@@ -291,7 +286,7 @@ func (l NonMemModel) Cleanup(channels *turnstile.ChannelMap) {
 	//Write to File in original path indicating what all was copied
 	copiedJSON, _ := json.MarshalIndent(copied, "", "    ")
 
-	afero.WriteFile(fs, path.Join(l.OriginalPath, "copied.json"), copiedJSON, 0750)
+	afero.WriteFile(fs, path.Join(l.Nonmem.OriginalPath, "copied.json"), copiedJSON, 0750)
 
 	//Clean Up
 	//log.Printf("Beginning cleanup operations for model %s\n", l.FileName)
@@ -373,7 +368,7 @@ func local(cmd *cobra.Command, args []string) {
 			}
 
 			for _, model := range modelsInDir {
-				lo.Models = append(lo.Models, NewNonMemModel(model))
+				lo.Models = append(lo.Models, NewLocalNonMemModel(model))
 			}
 
 		} else {
@@ -390,10 +385,10 @@ func local(cmd *cobra.Command, args []string) {
 					log.Printf("expanded models: %s \n", pat)
 				}
 				for _, p := range pat {
-					lo.Models = append(lo.Models, NewNonMemModel(p))
+					lo.Models = append(lo.Models, NewLocalNonMemModel(p))
 				}
 			} else {
-				lo.Models = append(lo.Models, NewNonMemModel(arg))
+				lo.Models = append(lo.Models, NewLocalNonMemModel(arg))
 			}
 		}
 	}
@@ -412,9 +407,9 @@ func local(cmd *cobra.Command, args []string) {
 	counter := 0
 	var errors []NonMemModel
 	for _, v := range lo.Models {
-		if v.Error != nil {
+		if v.Nonmem.Error != nil {
 			counter++
-			errors = append(errors, v)
+			errors = append(errors, v.Nonmem)
 		}
 	}
 

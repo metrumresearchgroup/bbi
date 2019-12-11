@@ -78,7 +78,7 @@ func scaffold(cmd *cobra.Command, args []string) error {
 	return nil
 }
 func init() {
-	RootCmd.AddCommand(scaffoldCmd)
+	nonmemCmd.AddCommand(scaffoldCmd)
 	scaffoldCmd.Flags().String("cacheDir", "", "create cache directory at path/name")
 	viper.BindPFlag("cacheDir", scaffoldCmd.Flags().Lookup("cacheDir"))
 }
