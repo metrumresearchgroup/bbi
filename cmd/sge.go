@@ -1,21 +1,16 @@
 package cmd
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"log"
 	"os/exec"
 	"path"
-	"path/filepath"
 	"regexp"
-	"strings"
-	"text/template"
 	"time"
 
 	"os"
 
-	"github.com/metrumresearchgroup/babylon/runner"
 	"github.com/metrumresearchgroup/babylon/utils"
 	"github.com/metrumresearchgroup/turnstile"
 	"github.com/spf13/afero"
@@ -34,109 +29,8 @@ type SGEModel struct {
 
 //NewSGENonMemModel create the model details from the modelname passed
 func NewSGENonMemModel(modelname string) SGEModel {
-
-	fs := afero.NewOsFs()
-	lm := NonMemModel{}
-
-	if filepath.IsAbs(modelname) {
-		lm.Path = modelname
-	} else {
-		current, err := os.Getwd()
-		if err != nil {
-			lm.Error = err
-		}
-		lm.Path = path.Join(current, modelname)
-	}
-
-	fi, err := fs.Stat(lm.Path)
-
-	if err != nil {
-		return SGEModel{
-			Nonmem: NonMemModel{
-				Error: err,
-			},
-		}
-	}
-
-	lm.Model = fi.Name()
-
-	modelPieces := strings.Split(lm.Model, ".")
-
-	lm.FileName = modelPieces[0]
-
-	//Don't assume file will have extension
-	if len(modelPieces) > 1 {
-		lm.Extension = modelPieces[1]
-	}
-
-	//Get the raw path of the original by stripping the actual file from it
-	lm.OriginalPath = strings.Replace(lm.Path, "/"+lm.Model, "", 1)
-
-	//If no config has been loaded, let's check to see if a config exists with the model and load it
-	if viper.ConfigFileUsed() == "" {
-		//Let's Set the config dir and try to load everything.
-		viper.AddConfigPath(lm.OriginalPath)
-		err := viper.ReadInConfig()
-		if err == nil && viper.ConfigFileUsed() != "" {
-			log.Printf("Config file loaded from %s%s", lm.OriginalPath, ".babylon.yml")
-		}
-	}
-
-	//Process The template from the viper content for output Dir
-	t, err := template.New("output").Parse(viper.GetString("outputDir"))
-	buf := new(bytes.Buffer)
-
-	if err != nil {
-		return SGEModel{
-			Nonmem: NonMemModel{
-				Error: err,
-			},
-		}
-	}
-
-	type outputName struct {
-		Name string
-	}
-
-	//Make sure to only use the filename for the output dir
-	err = t.Execute(buf, outputName{
-		Name: lm.FileName,
-	})
-
-	if err != nil {
-		return SGEModel{
-			Nonmem: NonMemModel{
-				Error: err,
-			},
-		}
-	}
-
-	//Use the template content plus the original path
-	lm.OutputDir = path.Join(lm.OriginalPath, buf.String())
-
-	if err != nil {
-		return SGEModel{
-			Nonmem: NonMemModel{
-				Error: err,
-			},
-		}
-	}
-
-	lm.Settings = runner.RunSettings{
-		Git:                viper.GetBool("git"),
-		Verbose:            verbose,
-		Debug:              debug,
-		CleanLvl:           viper.GetInt("cleanLvl"),
-		CopyLvl:            viper.GetInt("copyLvl"),
-		CacheDir:           viper.GetString("cacheDir"),
-		ExeNameInCache:     viper.GetString("cacheExe"),
-		NmExecutableOrPath: viper.GetString("nmExecutable"),
-		OneEst:             viper.GetBool("oneEst"),
-		Overwrite:          viper.GetBool("overwrite"),
-	}
-
 	return SGEModel{
-		Nonmem: lm,
+		Nonmem: NewNonMemModel(modelname),
 	}
 }
 
@@ -396,6 +290,5 @@ func sge(cmd *cobra.Command, args []string) {
 		time.Sleep(5 * time.Millisecond)
 	}
 
-	fmt.Printf("\r%d models completed in %s", m.Completed, time.Since(now))
-	println("")
+	postWorkNotice(m, now)
 }

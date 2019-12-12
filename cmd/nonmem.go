@@ -21,12 +21,16 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"text/template"
+	"time"
 
 	parser "github.com/metrumresearchgroup/babylon/parsers/nmparser"
 	"github.com/metrumresearchgroup/babylon/runner"
+	"github.com/metrumresearchgroup/turnstile"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -39,6 +43,11 @@ const scriptTemplate string = `#!/bin/bash
 
 {{ .Command }}
 `
+
+var controlStreamExtensions []string = []string{
+	".mod", //PSN Style
+	".ctl", //Metrum Style
+}
 
 //NonMemModel is the definition of a model for NonMem including its target directories and settings required for execution
 type NonMemModel struct {
@@ -181,9 +190,9 @@ func buildNonMemCommandString(l NonMemModel) string {
 	noBuild := false
 	nmExecutable := l.Settings.NmExecutableOrPath
 	cmdArgs := []string{
-		l.OutputDir + "/" + l.Model,
+		path.Join(l.OutputDir, l.Model),
 		"",
-		l.OutputDir + "/" + l.FileName + ".lst",
+		path.Join(l.OutputDir, l.FileName+".lst"),
 		"",
 	}
 
@@ -203,7 +212,7 @@ func filesToCleanup(model NonMemModel, exceptions ...string) runner.FileCleanIns
 		Location: model.OutputDir,
 	}
 
-	files := getActionableFileList(model.FileName, model.Settings.CleanLvl, model.OutputDir)
+	files := getActionableFileList(model.Model, model.Settings.CleanLvl, model.OutputDir)
 
 	for _, v := range files {
 		if !isFilenameInExceptions(exceptions, v) {
@@ -247,14 +256,16 @@ func filesToCopy(model NonMemModel, mandatoryFiles ...string) runner.FileCopyIns
 	}
 
 	//Create Target File Entries
-	for _, v := range getActionableFileList(model.FileName, model.Settings.CopyLvl, model.OutputDir) {
+	for _, v := range getActionableFileList(model.Model, model.Settings.CopyLvl, model.OutputDir) {
 		fci.FilesToCopy = append(fci.FilesToCopy, newTargetFile(v, model.Settings.CopyLvl))
 	}
 
 	return fci
 }
 
-func getActionableFileList(filename string, level int, filepath string) []string {
+//Updating to take the full reference to the file. We'll extract the extension here. Avoids having to curse through potential files when
+//The user has explicitly provided a model to operate on.
+func getActionableFileList(file string, level int, filepath string) []string {
 	var output []string
 	files := make(map[int][]string)
 
@@ -309,8 +320,12 @@ func getActionableFileList(filename string, level int, filepath string) []string
 	}
 
 	//Get the files from the model
-	//Look specifically for .mod file
-	fileContents, err := ioutil.ReadFile(path.Join(filepath, filename+".mod"))
+	modelPieces := strings.Split(file, ".")
+	//Save as even if there's nothing to delimit, the initial value will be the first component
+	filename := modelPieces[0]
+
+	//Explicitly load the file provided by the user
+	fileContents, err := ioutil.ReadFile(path.Join(filepath, file))
 	fileLines := strings.Split(string(fileContents), "\n")
 
 	if err != nil {
@@ -392,4 +407,116 @@ func newPostWorkInstruction(model NonMemModel, cleanupExclusions []string, manda
 	pwi.FilesToClean = filesToCleanup(model, cleanupExclusions...)
 
 	return pwi
+}
+
+func postWorkNotice(m *turnstile.Manager, t time.Time) {
+
+	if m.Errors > 0 {
+		log.Printf("%d errors were experienced during the run", m.Errors)
+
+		for _, v := range m.ErrorList {
+			log.Printf("Errors were experienced while running model %s. Details are %s", v.RunIdentifier, v.Notes)
+		}
+	}
+
+	fmt.Printf("\r%d models completed in %s", m.Completed, time.Since(t))
+	println("")
+}
+
+//NewNonMemModel creates the core nonmem dataset from the passed arguments
+func NewNonMemModel(modelname string) NonMemModel {
+	lm := NonMemModel{}
+	fs := afero.NewOsFs()
+
+	if filepath.IsAbs(modelname) {
+		lm.Path = modelname
+	} else {
+		current, err := os.Getwd()
+		if err != nil {
+			lm.Error = err
+		}
+		lm.Path = path.Join(current, modelname)
+	}
+
+	fi, err := fs.Stat(lm.Path)
+
+	if err != nil {
+		return NonMemModel{
+			Error: err,
+		}
+	}
+
+	lm.Model = fi.Name()
+
+	modelPieces := strings.Split(lm.Model, ".")
+
+	//Don't assume the extension will be there. Prep for invalid
+	if len(modelPieces) > 1 {
+		lm.FileName = modelPieces[0]
+		lm.Extension = modelPieces[1]
+	} else {
+		lm.FileName = lm.Model
+		//Leave Extnsion to default
+	}
+
+	//Get the raw path of the original by stripping the actual file from it
+	lm.OriginalPath = strings.Replace(lm.Path, "/"+lm.Model, "", 1)
+
+	//If no config has been loaded, let's check to see if a config exists with the model and load it
+	if viper.ConfigFileUsed() == "" {
+		//Let's Set the config dir and try to load everything.
+		viper.AddConfigPath(lm.OriginalPath)
+		err := viper.ReadInConfig()
+		if err == nil && viper.ConfigFileUsed() != "" {
+			log.Printf("Config file loaded from %s", path.Join(lm.OriginalPath, "babylon.yml"))
+		}
+	}
+
+	//Process The template from the viper content for output Dir
+	t, err := template.New("output").Parse(viper.GetString("outputDir"))
+	buf := new(bytes.Buffer)
+
+	if err != nil {
+		return NonMemModel{
+			Error: err,
+		}
+	}
+
+	type outputName struct {
+		Name string
+	}
+
+	//Make sure to only use the filename for the output dir
+	err = t.Execute(buf, outputName{
+		Name: lm.FileName,
+	})
+
+	if err != nil {
+		return NonMemModel{
+			Error: err,
+		}
+	}
+
+	//Use the template content plus the original path
+	lm.OutputDir = path.Join(lm.OriginalPath, buf.String())
+
+	if err != nil {
+		return NonMemModel{
+			Error: err,
+		}
+	}
+
+	lm.Settings = runner.RunSettings{
+		Git:                viper.GetBool("git"),
+		Verbose:            verbose,
+		Debug:              debug,
+		CleanLvl:           viper.GetInt("cleanLvl"),
+		CopyLvl:            viper.GetInt("copyLvl"),
+		CacheDir:           viper.GetString("cacheDir"),
+		ExeNameInCache:     viper.GetString("cacheExe"),
+		NmExecutableOrPath: viper.GetString("nmExecutable"),
+		Overwrite:          viper.GetBool("overwrite"),
+	}
+
+	return lm
 }

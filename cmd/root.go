@@ -67,21 +67,15 @@ func Execute(build string) {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	viper.SetConfigName(".babylon")
+	//Removed "." To avoid IDEs not displaying or typical ignore patterns dropping it.
+	viper.SetConfigName("babylon")
 	viper.SetConfigType("yaml")
-	// viper.AddConfigPath(".")
-
-	// err := viper.ReadInConfig()
-
-	// if err != nil {
-	// 	log.Print("No .babylon.yaml file located. Continuing without config file setup")
-	// }
 
 	// Here you will define your flags and configuration settings.
 	// Cobra supports Persistent Flags, which, if defined here,
 	// will be global for your application.
 
-	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.babylon.yml)")
+	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/babylon.yaml)")
 	RootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
 	RootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "debug mode")
 	RootCmd.PersistentFlags().IntVar(&threads, "threads", 4, "number of threads to execute with")
@@ -97,7 +91,7 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	err := configlib.LoadGlobalConfig(".babylon")
+	err := configlib.LoadGlobalConfig("babylon")
 	if err != nil {
 		fmt.Println(fmt.Errorf("err initializing config %s", err))
 	}
