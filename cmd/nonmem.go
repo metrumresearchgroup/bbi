@@ -24,12 +24,14 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"text/template"
 	"time"
 
 	parser "github.com/metrumresearchgroup/babylon/parsers/nmparser"
 	"github.com/metrumresearchgroup/babylon/runner"
+	"github.com/metrumresearchgroup/babylon/utils"
 	"github.com/metrumresearchgroup/turnstile"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
@@ -524,4 +526,66 @@ func NewNonMemModel(modelname string) NonMemModel {
 	}
 
 	return lm
+}
+
+func executeNonMemJob(executor func(model NonMemModel) turnstile.ConcurrentError, model NonMemModel) turnstile.ConcurrentError {
+	return executor(model)
+}
+
+func nonmemModelsFromArguments(args []string) []NonMemModel {
+	// regex for filename expansion check
+	var output []NonMemModel
+	AppFs := afero.NewOsFs()
+	r := regexp.MustCompile("(.*)?\\[(.*)\\](.*)?")
+
+	//Let's process our args into models
+	for _, arg := range args {
+
+		// check if arg is a file or Dir
+		// dirty check for if doesn't have an extension is a folder
+		_, ext := utils.FileAndExt(arg)
+		if ext == "" || arg == "." {
+			// could be directory, will need to be careful about the waitgroup as don't want to
+			// keep waiting forever since it
+			isDir, err := utils.IsDir(arg, AppFs)
+			if err != nil || !isDir {
+				log.Printf("issue handling %s, if this is a run please add the extension. Err: (%s)", arg, err)
+				continue
+			}
+			modelsInDir, err := utils.ListModels(arg, ".mod", AppFs)
+			if err != nil {
+				log.Printf("issue getting models in dir %s, if this is a run please add the extension. Err: (%s)", arg, err)
+				continue
+			}
+			if verbose || debug {
+				log.Printf("adding %v model files in directory %s to queue", len(modelsInDir), arg)
+			}
+
+			for _, model := range modelsInDir {
+				output = append(output, NewNonMemModel(model))
+			}
+
+		} else {
+			// figure out if need to do expansion, or run as-is
+			if len(r.FindAllStringSubmatch(arg, 1)) > 0 {
+				log.Printf("expanding model pattern: %s \n", arg)
+				pat, err := utils.ExpandNameSequence(arg)
+				if err != nil {
+					log.Printf("err expanding name: %v", err)
+					// don't try to run this model
+					continue
+				}
+				if verbose || debug {
+					log.Printf("expanded models: %s \n", pat)
+				}
+				for _, p := range pat {
+					output = append(output, NewNonMemModel(p))
+				}
+			} else {
+				output = append(output, NewNonMemModel(arg))
+			}
+		}
+	}
+
+	return output
 }

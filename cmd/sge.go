@@ -6,12 +6,10 @@ import (
 	"log"
 	"os/exec"
 	"path"
-	"regexp"
 	"time"
 
 	"os"
 
-	"github.com/metrumresearchgroup/babylon/utils"
 	"github.com/metrumresearchgroup/turnstile"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
@@ -48,21 +46,11 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 		if l.Nonmem.Settings.Overwrite {
 			err := fs.RemoveAll(l.Nonmem.OutputDir)
 			if err != nil {
-				channels.Failed <- 1
-				channels.Errors <- turnstile.ConcurrentError{
-					RunIdentifier: l.Nonmem.Model,
-					Error:         err,
-					Notes:         "An error occured trying to remove the directory as specified in the overwrite flag",
-				}
+				recordConcurrentError(l.Nonmem.Model, "An error occured trying to remove the directory as specified in the overwrite flag", err, channels)
 				return
 			}
 		} else {
-			channels.Failed <- 1
-			channels.Errors <- turnstile.ConcurrentError{
-				RunIdentifier: l.Nonmem.Model,
-				Error:         errors.New("The output directory already exists"),
-				Notes:         fmt.Sprintf("The target directory, %s already, exists, but we are configured to not overwrite. Invalid configuration / run state", l.Nonmem.OutputDir),
-			}
+			recordConcurrentError(l.Nonmem.Model, fmt.Sprintf("The target directory, %s already, exists, but we are configured to not overwrite. Invalid configuration / run state", l.Nonmem.OutputDir), errors.New("The output directory already exists"), channels)
 			return
 		}
 	}
@@ -76,12 +64,7 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 	}
 
 	if err != nil {
-		channels.Failed <- 1
-		channels.Errors <- turnstile.ConcurrentError{
-			RunIdentifier: l.Nonmem.Model,
-			Error:         err,
-			Notes:         fmt.Sprintf("There appears to have been an issue trying to copy %s to %s", l.Nonmem.Model, l.Nonmem.OutputDir),
-		}
+		recordConcurrentError(l.Nonmem.Model, fmt.Sprintf("There appears to have been an issue trying to copy %s to %s", l.Nonmem.Model, l.Nonmem.OutputDir), err, channels)
 		return
 	}
 
@@ -89,12 +72,8 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 	scriptContents, err := generateScript(scriptTemplate, l.Nonmem)
 
 	if err != nil {
-		channels.Failed <- 1
-		channels.Errors <- turnstile.ConcurrentError{
-			RunIdentifier: l.Nonmem.Model,
-			Error:         err,
-			Notes:         "An error occurred during the creation of the executable script for this model",
-		}
+		recordConcurrentError(l.Nonmem.Model, "An error occurred during the creation of the executable script for this model", err, channels)
+		return
 	}
 
 	//rwxr-x---
@@ -103,53 +82,14 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 
 //Work describes the Turnstile execution phase -> IE What heavy lifting should be done
 func (l SGEModel) Work(channels *turnstile.ChannelMap) {
-	log.Printf("Beginning SGE work phase for %s", l.Nonmem.FileName)
-	fs := afero.NewOsFs()
-	//Execute the script we created
-	os.Chdir(l.Nonmem.OutputDir)
-	scriptName := l.Nonmem.FileName + ".sh"
+	cerr := executeNonMemJob(executeSGEJob, l.Nonmem)
 
-	//Find Qsub
-	binary, err := exec.LookPath("qsub")
-
-	if err != nil {
-		channels.Failed <- 1
-		channels.Errors <- turnstile.ConcurrentError{
-			RunIdentifier: l.Nonmem.FileName,
-			Error:         err,
-			Notes:         "Couldn't locate qsub in path",
-		}
-		return
+	if cerr.Error != nil {
+		recordConcurrentError(l.Nonmem.Model, cerr.Notes, cerr.Error, channels)
 	}
-
-	command := exec.Command(binary, scriptName)
-	command.Env = os.Environ() //Take in OS Environment
-
-	output, err := command.CombinedOutput()
-
-	if err != nil {
-		if exitError, ok := err.(*exec.ExitError); ok {
-			channels.Failed <- 1
-			channels.Errors <- turnstile.ConcurrentError{
-				RunIdentifier: l.Nonmem.FileName,
-				Error:         err,
-				Notes:         "Running the programmatic shell script caused an error",
-			}
-			code := exitError.ExitCode()
-			details := exitError.String()
-
-			log.Printf("Exit code was %d, details were %s", code, details)
-			log.Printf("output details were: %s", string(output))
-		}
-
-		return
-	}
-
-	afero.WriteFile(fs, path.Join(l.Nonmem.OutputDir, l.Nonmem.Model+".out"), output, 0750)
-
 }
 
-//Monitor is unimplemented here. It's the 3rd phase of Turnstile execution
+//Monitor is the 3rd phase of turnstile (not implemented here)
 func (l SGEModel) Monitor(channels *turnstile.ChannelMap) {
 	//Do nothing for this implementation
 }
@@ -180,64 +120,13 @@ func sge(cmd *cobra.Command, args []string) {
 		viper.Debug()
 	}
 
-	AppFs := afero.NewOsFs()
 	lo := sgeOperation{}
 
 	if verbose {
 		log.Printf("setting up a work queue with %v workers", viper.GetInt("threads"))
 	}
 
-	// regex for filename expansion check
-	r := regexp.MustCompile("(.*)?\\[(.*)\\](.*)?")
-
-	//Let's process our args into models
-	for _, arg := range args {
-
-		// check if arg is a file or Dir
-		// dirty check for if doesn't have an extension is a folder
-		_, ext := utils.FileAndExt(arg)
-		if ext == "" || arg == "." {
-			// could be directory, will need to be careful about the waitgroup as don't want to
-			// keep waiting forever since it
-			isDir, err := utils.IsDir(arg, AppFs)
-			if err != nil || !isDir {
-				log.Printf("issue handling %s, if this is a run please add the extension. Err: (%s)", arg, err)
-				continue
-			}
-			modelsInDir, err := utils.ListModels(arg, ".mod", AppFs)
-			if err != nil {
-				log.Printf("issue getting models in dir %s, if this is a run please add the extension. Err: (%s)", arg, err)
-				continue
-			}
-			if verbose || debug {
-				log.Printf("adding %v model files in directory %s to queue", len(modelsInDir), arg)
-			}
-
-			for _, model := range modelsInDir {
-				lo.Models = append(lo.Models, NewSGENonMemModel(model))
-			}
-
-		} else {
-			// figure out if need to do expansion, or run as-is
-			if len(r.FindAllStringSubmatch(arg, 1)) > 0 {
-				log.Printf("expanding model pattern: %s \n", arg)
-				pat, err := utils.ExpandNameSequence(arg)
-				if err != nil {
-					log.Printf("err expanding name: %v", err)
-					// don't try to run this model
-					continue
-				}
-				if verbose || debug {
-					log.Printf("expanded models: %s \n", pat)
-				}
-				for _, p := range pat {
-					lo.Models = append(lo.Models, NewSGENonMemModel(p))
-				}
-			} else {
-				lo.Models = append(lo.Models, NewSGENonMemModel(arg))
-			}
-		}
-	}
+	lo.Models = sgeModelsFromArguments(args)
 
 	if len(lo.Models) == 0 {
 		log.Fatal("No models were located or loaded. Please verify the arguments provided and try again")
@@ -283,7 +172,15 @@ func sge(cmd *cobra.Command, args []string) {
 
 	go m.Execute()
 
-	//Now we're doing the work. Is we done?
+	//If we're in debug mode, let's periodically print out the details for the manager
+	if debug {
+		go func(m *turnstile.Manager) {
+			for {
+				log.Printf("Manager Details: Working: %d, Errors: %d, Completed: %d, Concurrency: %d, Iterations: %d", m.Working, m.Errors, m.Completed, m.Concurrency, m.Iterations)
+				time.Sleep(500 * time.Millisecond)
+			}
+		}(m)
+	}
 
 	//Basically wait
 	for !m.IsComplete() {
@@ -291,4 +188,67 @@ func sge(cmd *cobra.Command, args []string) {
 	}
 
 	postWorkNotice(m, now)
+}
+
+func newConcurrentError(model string, notes string, err error) turnstile.ConcurrentError {
+	return turnstile.ConcurrentError{
+		RunIdentifier: model,
+		Error:         err,
+		Notes:         notes,
+	}
+}
+
+func recordConcurrentError(model string, notes string, err error, channels *turnstile.ChannelMap) {
+	channels.Failed <- 1
+	channels.Errors <- newConcurrentError(model, notes, err)
+	channels.Completed <- 1
+}
+
+func executeSGEJob(model NonMemModel) turnstile.ConcurrentError {
+	log.Printf("Beginning SGE work phase for %s", model.FileName)
+	fs := afero.NewOsFs()
+	//Execute the script we created
+	os.Chdir(model.OutputDir)
+	scriptName := model.FileName + ".sh"
+
+	//Find Qsub
+	binary, err := exec.LookPath("qsub")
+
+	if err != nil {
+		newConcurrentError(model.Model, "Could not locate qsub binary in path", err)
+	}
+
+	command := exec.Command(binary, scriptName)
+	command.Env = os.Environ() //Take in OS Environment
+
+	output, err := command.CombinedOutput()
+
+	if err != nil {
+		if exitError, ok := err.(*exec.ExitError); ok {
+			code := exitError.ExitCode()
+			details := exitError.String()
+
+			log.Printf("Exit code was %d, details were %s", code, details)
+			log.Printf("output details were: %s", string(output))
+		}
+		return newConcurrentError(model.Model, "Running the programmatic shell script caused an error", err)
+
+	}
+
+	afero.WriteFile(fs, path.Join(model.OutputDir, model.Model+".out"), output, 0750)
+
+	return turnstile.ConcurrentError{}
+}
+
+func sgeModelsFromArguments(args []string) []SGEModel {
+	var output []SGEModel
+	nonmemmodels := nonmemModelsFromArguments(args)
+
+	for _, v := range nonmemmodels {
+		output = append(output, SGEModel{
+			Nonmem: v,
+		})
+	}
+
+	return output
 }

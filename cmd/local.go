@@ -8,7 +8,6 @@ import (
 	"log"
 	"os/exec"
 	"path"
-	"regexp"
 	"time"
 
 	"os"
@@ -108,36 +107,11 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 
 //Work describes the Turnstile execution phase -> IE What heavy lifting should be done
 func (l LocalModel) Work(channels *turnstile.ChannelMap) {
-	log.Printf("Beginning work phase for %s", l.Nonmem.FileName)
-	fs := afero.NewOsFs()
-	//Execute the script we created
-	scriptLocation := path.Join(l.Nonmem.OutputDir, l.Nonmem.FileName+".sh")
-	os.Chdir(l.Nonmem.OutputDir)
+	cerr := executeNonMemJob(executeLocalJob, l.Nonmem)
 
-	command := exec.Command(scriptLocation)
-	command.Env = os.Environ() //Take in OS Environment
-
-	output, err := command.CombinedOutput()
-
-	if err != nil {
-		if exitError, ok := err.(*exec.ExitError); ok {
-			channels.Failed <- 1
-			channels.Errors <- turnstile.ConcurrentError{
-				RunIdentifier: l.Nonmem.FileName,
-				Error:         err,
-				Notes:         "Running the programmatic shell script caused an error",
-			}
-			code := exitError.ExitCode()
-			details := exitError.String()
-
-			log.Printf("Exit code was %d, details were %s", code, details)
-			log.Printf("output details were: %s", string(output))
-		}
-
-		return
+	if cerr.Error != nil {
+		recordConcurrentError(l.Nonmem.Model, cerr.Notes, cerr.Error, channels)
 	}
-
-	afero.WriteFile(fs, path.Join(l.Nonmem.OutputDir, l.Nonmem.Model+".out"), output, 0750)
 
 }
 
@@ -244,64 +218,13 @@ func local(cmd *cobra.Command, args []string) {
 		log.Printf("Config file loaded from %s", viper.ConfigFileUsed())
 	}
 
-	AppFs := afero.NewOsFs()
 	lo := localOperation{}
 
 	if verbose {
 		log.Printf("setting up a work queue with %v workers", viper.GetInt("threads"))
 	}
 
-	// regex for filename expansion check
-	r := regexp.MustCompile("(.*)?\\[(.*)\\](.*)?")
-
-	//Let's process our args into models
-	for _, arg := range args {
-
-		// check if arg is a file or Dir
-		// dirty check for if doesn't have an extension is a folder
-		_, ext := utils.FileAndExt(arg)
-		if ext == "" || arg == "." {
-			// could be directory, will need to be careful about the waitgroup as don't want to
-			// keep waiting forever since it
-			isDir, err := utils.IsDir(arg, AppFs)
-			if err != nil || !isDir {
-				log.Printf("issue handling %s, if this is a run please add the extension. Err: (%s)", arg, err)
-				continue
-			}
-			modelsInDir, err := utils.ListModels(arg, ".mod", AppFs)
-			if err != nil {
-				log.Printf("issue getting models in dir %s, if this is a run please add the extension. Err: (%s)", arg, err)
-				continue
-			}
-			if verbose || debug {
-				log.Printf("adding %v model files in directory %s to queue", len(modelsInDir), arg)
-			}
-
-			for _, model := range modelsInDir {
-				lo.Models = append(lo.Models, NewLocalNonMemModel(model))
-			}
-
-		} else {
-			// figure out if need to do expansion, or run as-is
-			if len(r.FindAllStringSubmatch(arg, 1)) > 0 {
-				log.Printf("expanding model pattern: %s \n", arg)
-				pat, err := utils.ExpandNameSequence(arg)
-				if err != nil {
-					log.Printf("err expanding name: %v", err)
-					// don't try to run this model
-					continue
-				}
-				if verbose || debug {
-					log.Printf("expanded models: %s \n", pat)
-				}
-				for _, p := range pat {
-					lo.Models = append(lo.Models, NewLocalNonMemModel(p))
-				}
-			} else {
-				lo.Models = append(lo.Models, NewLocalNonMemModel(arg))
-			}
-		}
-	}
+	lo.Models = localModelsFromArguments(args)
 
 	if len(lo.Models) == 0 {
 		log.Fatal("No models were located or loaded. Please verify the arguments provided and try again")
@@ -347,7 +270,15 @@ func local(cmd *cobra.Command, args []string) {
 
 	go m.Execute()
 
-	//Now we're doing the work. Is we done?
+	//If we're in debug mode, let's periodically print out the details for the manager
+	if debug {
+		go func(m *turnstile.Manager) {
+			for {
+				log.Printf("Manager Details: Working: %d, Errors: %d, Completed: %d, Concurrency: %d, Iterations: %d", m.Working, m.Errors, m.Completed, m.Concurrency, m.Iterations)
+				time.Sleep(500 * time.Millisecond)
+			}
+		}(m)
+	}
 
 	//Basically wait
 	for !m.IsComplete() {
@@ -359,5 +290,47 @@ func local(cmd *cobra.Command, args []string) {
 
 //WriteGitIgnoreFile takes a provided path and does best attempt work to write a "Exclude all" gitignore file in the location
 func WriteGitIgnoreFile(filepath string) {
-	ioutil.WriteFile(path.Join(filepath, ".gitignore"), []byte("*"+lineEnding), 0755)
+	ioutil.WriteFile(path.Join(filepath, ".gitignore"), []byte("*\n"), 0755)
+}
+
+func executeLocalJob(model NonMemModel) turnstile.ConcurrentError {
+	log.Printf("Beginning local work phase for %s", model.FileName)
+	fs := afero.NewOsFs()
+
+	scriptLocation := path.Join(model.OutputDir, model.FileName+".sh")
+	os.Chdir(model.OutputDir)
+
+	command := exec.Command(scriptLocation)
+	command.Env = os.Environ() //Take in OS Environment
+
+	output, err := command.CombinedOutput()
+
+	if err != nil {
+		if exitError, ok := err.(*exec.ExitError); ok {
+			code := exitError.ExitCode()
+			details := exitError.String()
+
+			log.Printf("Exit code was %d, details were %s", code, details)
+			log.Printf("output details were: %s", string(output))
+		}
+		return newConcurrentError(model.Model, "Running the programmatic shell script caused an error", err)
+
+	}
+
+	afero.WriteFile(fs, path.Join(model.OutputDir, model.Model+".out"), output, 0750)
+
+	return turnstile.ConcurrentError{}
+}
+
+func localModelsFromArguments(args []string) []LocalModel {
+	var output []LocalModel
+	nonmemmodels := nonmemModelsFromArguments(args)
+
+	for _, v := range nonmemmodels {
+		output = append(output, LocalModel{
+			Nonmem: v,
+		})
+	}
+
+	return output
 }
