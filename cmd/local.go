@@ -240,6 +240,10 @@ func local(cmd *cobra.Command, args []string) {
 		viper.Debug()
 	}
 
+	if viper.ConfigFileUsed() != "" {
+		log.Printf("Config file loaded from %s", viper.ConfigFileUsed())
+	}
+
 	AppFs := afero.NewOsFs()
 	lo := localOperation{}
 

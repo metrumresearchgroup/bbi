@@ -425,6 +425,7 @@ func postWorkNotice(m *turnstile.Manager, t time.Time) {
 
 //NewNonMemModel creates the core nonmem dataset from the passed arguments
 func NewNonMemModel(modelname string) NonMemModel {
+
 	lm := NonMemModel{}
 	fs := afero.NewOsFs()
 
@@ -468,7 +469,11 @@ func NewNonMemModel(modelname string) NonMemModel {
 		viper.AddConfigPath(lm.OriginalPath)
 		err := viper.ReadInConfig()
 		if err == nil && viper.ConfigFileUsed() != "" {
-			log.Printf("Config file loaded from %s", path.Join(lm.OriginalPath, "babylon.yml"))
+			log.Printf("Config file loaded from %s", viper.ConfigFileUsed())
+		}
+
+		if err != nil {
+			log.Printf("Attempting to read the located config file at %s has resulted in an error: %s", path.Join(lm.OriginalPath, "babylon.yml"), err.Error())
 		}
 	}
 
