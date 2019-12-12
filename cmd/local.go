@@ -36,6 +36,7 @@ type LocalModel struct {
 	Nonmem NonMemModel
 }
 
+//NewLocalNonMemModel builds the core struct from the model name argument
 func NewLocalNonMemModel(modelname string) LocalModel {
 
 	fs := afero.NewOsFs()
@@ -74,6 +75,16 @@ func NewLocalNonMemModel(modelname string) LocalModel {
 
 	//Get the raw path of the original by stripping the actual file from it
 	lm.OriginalPath = strings.Replace(lm.Path, "/"+lm.Model, "", 1)
+
+	//If no config has been loaded, let's check to see if a config exists with the model and load it
+	if viper.ConfigFileUsed() == "" {
+		//Let's Set the config dir and try to load everything.
+		viper.AddConfigPath(lm.OriginalPath)
+		err := viper.ReadInConfig()
+		if err == nil && viper.ConfigFileUsed() != "" {
+			log.Printf("Config file loaded from %s%s", lm.OriginalPath, ".babylon.yml")
+		}
+	}
 
 	//Process The template from the viper content for output Dir
 	t, err := template.New("output").Parse(viper.GetString("outputDir"))
@@ -124,7 +135,6 @@ func NewLocalNonMemModel(modelname string) LocalModel {
 		CacheDir:           viper.GetString("cacheDir"),
 		ExeNameInCache:     viper.GetString("cacheExe"),
 		NmExecutableOrPath: viper.GetString("nmExecutable"),
-		OneEst:             viper.GetBool("oneEst"),
 		Overwrite:          viper.GetBool("overwrite"),
 	}
 

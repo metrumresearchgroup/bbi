@@ -1,8 +1,6 @@
 package configlib
 
 import (
-	"fmt"
-
 	"runtime"
 
 	"github.com/spf13/viper"
@@ -11,7 +9,7 @@ import (
 // LoadGlobalConfig loads nonmemutils configuration into the global Viper
 func LoadGlobalConfig(configFilename string) error {
 	viper.SetConfigName(configFilename)
-	viper.SetConfigType("toml")
+	viper.SetConfigType("yaml")
 	viper.AutomaticEnv()
 	viper.SetEnvPrefix("babylon")
 	viper.AddConfigPath(".")
@@ -22,7 +20,7 @@ func LoadGlobalConfig(configFilename string) error {
 			return err
 		}
 		loadDefaultSettings() // still load default settings as don't need a config file
-		return fmt.Errorf("unable to locate Config file. (%s)", err)
+		return nil
 	}
 
 	loadDefaultSettings()

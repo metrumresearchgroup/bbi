@@ -29,6 +29,7 @@ import (
 	"github.com/metrumresearchgroup/babylon/runner"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 //scriptTemplate is a go template we'll use for generating the script to do the work.
@@ -78,6 +79,10 @@ func nonmem(cmd *cobra.Command, args []string) {
 
 func init() {
 	RootCmd.AddCommand(nonmemCmd)
+
+	//NM Executable
+	nonmemCmd.PersistentFlags().String("nmExecutable", "nmfe74", "Name of nonmem executable to use. Defaults to nmfe74 (NM7.4)")
+	viper.BindPFlag("nmExecutable", nonmemCmd.PersistentFlags().Lookup("nmExecutable"))
 }
 
 // "Copies" a file by reading its content (optionally updating the path)
