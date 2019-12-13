@@ -6,6 +6,7 @@ import (
 	"log"
 	"os/exec"
 	"path"
+	"strings"
 	"time"
 
 	"os"
@@ -225,16 +226,11 @@ func executeSGEJob(model NonMemModel) turnstile.ConcurrentError {
 
 	if err != nil {
 
-		//
-
-		// if exitError, ok := err.(*exec.ExitError); ok {
-		// 	code := exitError.ExitCode()
-		// 	details := exitError.String()
-
-		// 	log.Printf("Exit code was %d, details were %s", code, details)
-		// 	log.Printf("output details were: %s", string(output))
-		// }
-		return newConcurrentError(model.Model, "Running the programmatic shell script caused an error", err)
+		//Let's look to see if it's just because of the typical "No queues present" error
+		if !strings.Contains(string(output), "job is not allowed to run in any queue") {
+			//If the error doesn't appear to be the above error, we'll generate the concurrent error and move along
+			return newConcurrentError(model.Model, "Running the programmatic shell script caused an error", err)
+		}
 	}
 
 	err = afero.WriteFile(fs, path.Join(model.OutputDir, model.Model+".out"), output, 0750)
