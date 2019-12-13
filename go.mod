@@ -7,6 +7,7 @@ require (
 	github.com/coreos/bbolt v1.3.3
 	github.com/go-chi/chi v4.0.2+incompatible
 	github.com/go-chi/render v1.0.1
+	github.com/go-delve/delve v1.3.2
 	github.com/gobwas/glob v0.2.3
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/protobuf v1.3.2

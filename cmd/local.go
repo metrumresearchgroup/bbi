@@ -11,6 +11,7 @@ import (
 
 	"os"
 
+	"github.com/metrumresearchgroup/babylon/configlib"
 	"github.com/metrumresearchgroup/babylon/runner"
 	"github.com/metrumresearchgroup/babylon/utils"
 	"github.com/metrumresearchgroup/turnstile"
@@ -284,6 +285,10 @@ func local(cmd *cobra.Command, args []string) {
 	//Basically wait
 	for !m.IsComplete() {
 		time.Sleep(5 * time.Millisecond)
+	}
+
+	if len(lo.Models) > 0 {
+		configlib.SaveConfig(lo.Models[0].Nonmem.OriginalPath)
 	}
 
 	postWorkNotice(m, now)

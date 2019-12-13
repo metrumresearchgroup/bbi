@@ -1,6 +1,8 @@
 package configlib
 
 import (
+	"log"
+	"path"
 	"runtime"
 
 	"github.com/spf13/viper"
@@ -12,8 +14,6 @@ func LoadGlobalConfig(configFilename string) error {
 	viper.SetConfigType("yaml")
 	viper.AutomaticEnv()
 	viper.SetEnvPrefix("babylon")
-	viper.AddConfigPath(".")
-	viper.AddConfigPath("$HOME")
 	err := viper.ReadInConfig()
 	if err != nil {
 		if _, ok := err.(viper.ConfigParseError); ok {
@@ -36,4 +36,47 @@ func loadDefaultSettings() {
 	viper.SetDefault("noBuild", false)
 	viper.SetDefault("oneEst", false)
 	viper.SetDefault("threads", runtime.NumCPU())
+}
+
+//LocateAndReadConfigFile will take a priority based approach to loading configs starting with those closest to the model all the way out to the home directory for the users
+func LocateAndReadConfigFile(modelPath string) {
+
+	if viper.ConfigFileUsed() != "" {
+		//We've already read and loaded a config. Nothing to see here. Move along.
+		return
+	}
+
+	locations := []string{
+		modelPath,
+		".",
+		"$HOME",
+	}
+
+	for _, v := range locations {
+		//Add the path and try to load the config
+		viper.AddConfigPath(v)
+		err := viper.ReadInConfig()
+
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			//No config here
+			continue
+		}
+
+		//Handle parse issues
+		if err, ok := err.(viper.ConfigParseError); ok {
+			log.Printf("An error occurred trying to parse the config file located at %s. Error details are %s", v, err.Error())
+			continue
+		}
+
+		//If no errors we return to prevent further processing
+		log.Printf("Configuration file successfully loaded from %s", path.Join(v, "babylon.yml"))
+		return
+	}
+}
+
+//SaveConfig takes the viper settings and writes them to a file in the original path
+func SaveConfig(configpath string) {
+	if viper.GetBool("saveConfig") {
+		viper.WriteConfigAs(path.Join(configpath, "babylon.yaml"))
+	}
 }

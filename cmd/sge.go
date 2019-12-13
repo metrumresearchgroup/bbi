@@ -11,6 +11,7 @@ import (
 
 	"os"
 
+	"github.com/metrumresearchgroup/babylon/configlib"
 	"github.com/metrumresearchgroup/turnstile"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
@@ -103,7 +104,7 @@ func (l SGEModel) Monitor(channels *turnstile.ChannelMap) {
 
 //Cleanup is the last phase of execution, in which computation / hard work is done and we're cleaning up leftover files, copying results around et all.
 func (l SGEModel) Cleanup(channels *turnstile.ChannelMap) {
-	log.Println("There is no cleanup phase in SGE submission")
+	//Do nothing for this implementation
 }
 
 //End Scalable method definitions
@@ -181,6 +182,10 @@ func sge(cmd *cobra.Command, args []string) {
 	//Basically wait
 	for !m.IsComplete() {
 		time.Sleep(5 * time.Millisecond)
+	}
+
+	if len(lo.Models) > 0 {
+		configlib.SaveConfig(lo.Models[0].Nonmem.OriginalPath)
 	}
 
 	postWorkNotice(m, now)
