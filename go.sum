@@ -79,6 +79,10 @@ github.com/metrumresearchgroup/turnstile v0.0.0-20191203195039-25d54c9b2cd6 h1:e
 github.com/metrumresearchgroup/turnstile v0.0.0-20191203195039-25d54c9b2cd6/go.mod h1:Ke/K//x2pSX2Qb8qK7QHJ+I4dBBC9Jmch+DcCEjQJRM=
 github.com/metrumresearchgroup/turnstile v0.0.0-20191203204425-f9edd65a6f6c h1:lNPyYwwzoEKShkF7H4zcTcIT2AXy+DRMRnpYiWlPHUo=
 github.com/metrumresearchgroup/turnstile v0.0.0-20191203204425-f9edd65a6f6c/go.mod h1:Ke/K//x2pSX2Qb8qK7QHJ+I4dBBC9Jmch+DcCEjQJRM=
+github.com/metrumresearchgroup/turnstile v0.0.0-20191213150644-348716185800 h1:LAj+0SrUc4VvGU6jP309uw/hdtMSgifx1AE+KEQWzz4=
+github.com/metrumresearchgroup/turnstile v0.0.0-20191213150644-348716185800/go.mod h1:Ke/K//x2pSX2Qb8qK7QHJ+I4dBBC9Jmch+DcCEjQJRM=
+github.com/metrumresearchgroup/turnstile v0.0.0-20191213153658-5297606be62d h1:ovyYspODzeeNufLfN/siKC1Wo32vnq15HCvtUb0t5Dc=
+github.com/metrumresearchgroup/turnstile v0.0.0-20191213153658-5297606be62d/go.mod h1:Ke/K//x2pSX2Qb8qK7QHJ+I4dBBC9Jmch+DcCEjQJRM=
 github.com/mitchellh/go-homedir v1.1.0/go.mod h1:SfyaCUpYCn1Vlf4IUYiD9fPX4A5wJrkLzIz1N1q0pr0=
 github.com/mitchellh/mapstructure v1.1.2 h1:fmNYVwqnSfB9mZU6OS2O6GsXM+wcskZDuKQzvN1EDeE=
 github.com/mitchellh/mapstructure v1.1.2/go.mod h1:FVVH3fgwuzCH5S8UJGiWEs2h04kUh9fWfEaFds41c1Y=

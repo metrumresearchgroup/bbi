@@ -15,11 +15,9 @@
 package cmd
 
 import (
-	"bufio"
 	"bytes"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path"
@@ -107,7 +105,7 @@ func copyFileToDestination(l NonMemModel, modifyPath bool) error {
 	}
 
 	//Get the lines of the file
-	sourceLines, err := getFileLines(l.Path)
+	sourceLines, err := utils.ReadLines(l.Path)
 
 	if err != nil {
 		return errors.New("Unable to read the contents of " + l.Path)
@@ -135,29 +133,6 @@ func copyFileToDestination(l NonMemModel, modifyPath bool) error {
 	afero.WriteFile(fs, path.Join(l.OutputDir, l.Model), []byte(fileContents), stats.Mode())
 
 	return nil
-}
-
-//Read the contents of a file into a slice of strings
-func getFileLines(sourceFile string) ([]string, error) {
-	fs := afero.NewOsFs()
-	var lines []string
-
-	afero.ReadFile(fs, sourceFile)
-	file, err := fs.Open(sourceFile)
-
-	if err != nil {
-		return []string{}, err
-	}
-
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-
-	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
-	}
-
-	return lines, nil
 }
 
 //processes any template (inlcuding the const one here) to create a byte slice of the entire file
@@ -327,8 +302,7 @@ func getActionableFileList(file string, level int, filepath string) []string {
 	filename := modelPieces[0]
 
 	//Explicitly load the file provided by the user
-	fileContents, err := ioutil.ReadFile(path.Join(filepath, file))
-	fileLines := strings.Split(string(fileContents), "\n")
+	fileLines, err := utils.ReadLines(path.Join(filepath, file))
 
 	if err != nil {
 		//Let the user know this is basically a no-op

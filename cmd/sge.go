@@ -77,7 +77,10 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 	}
 
 	//rwxr-x---
-	afero.WriteFile(fs, path.Join(l.Nonmem.OutputDir, l.Nonmem.FileName+".sh"), scriptContents, 0750)
+	err = afero.WriteFile(fs, path.Join(l.Nonmem.OutputDir, l.Nonmem.FileName+".sh"), scriptContents, 0750)
+	if err != nil {
+		recordConcurrentError(l.Nonmem.Model, "There was an issue writing the executable file", err, channels)
+	}
 }
 
 //Work describes the Turnstile execution phase -> IE What heavy lifting should be done
@@ -86,7 +89,10 @@ func (l SGEModel) Work(channels *turnstile.ChannelMap) {
 
 	if cerr.Error != nil {
 		recordConcurrentError(l.Nonmem.Model, cerr.Notes, cerr.Error, channels)
+		return
 	}
+
+	channels.Completed <- 1
 }
 
 //Monitor is the 3rd phase of turnstile (not implemented here)
@@ -96,8 +102,7 @@ func (l SGEModel) Monitor(channels *turnstile.ChannelMap) {
 
 //Cleanup is the last phase of execution, in which computation / hard work is done and we're cleaning up leftover files, copying results around et all.
 func (l SGEModel) Cleanup(channels *turnstile.ChannelMap) {
-	log.Println("There is no cleanup phase in SGE submission. Completing task")
-	channels.Completed <- 1
+	log.Println("There is no cleanup phase in SGE submission")
 }
 
 //End Scalable method definitions
@@ -116,23 +121,13 @@ func init() {
 
 func sge(cmd *cobra.Command, args []string) {
 
-	if debug {
-		viper.Debug()
-	}
-
 	lo := sgeOperation{}
-
-	if verbose {
-		log.Printf("setting up a work queue with %v workers", viper.GetInt("threads"))
-	}
 
 	lo.Models = sgeModelsFromArguments(args)
 
 	if len(lo.Models) == 0 {
 		log.Fatal("No models were located or loaded. Please verify the arguments provided and try again")
 	}
-
-	//Display Summary
 
 	//Models Added
 	log.Printf("A total of %d models have been located for work", len(lo.Models))
@@ -208,14 +203,19 @@ func executeSGEJob(model NonMemModel) turnstile.ConcurrentError {
 	log.Printf("Beginning SGE work phase for %s", model.FileName)
 	fs := afero.NewOsFs()
 	//Execute the script we created
-	os.Chdir(model.OutputDir)
+	err := os.Chdir(model.OutputDir)
+
+	if err != nil {
+		return newConcurrentError(model.Model, fmt.Sprintf("Unable to change directory to %s", model.OutputDir), err)
+	}
+
 	scriptName := model.FileName + ".sh"
 
 	//Find Qsub
 	binary, err := exec.LookPath("qsub")
 
 	if err != nil {
-		newConcurrentError(model.Model, "Could not locate qsub binary in path", err)
+		return newConcurrentError(model.Model, "Could not locate qsub binary in path", err)
 	}
 
 	command := exec.Command(binary, scriptName)
@@ -224,18 +224,24 @@ func executeSGEJob(model NonMemModel) turnstile.ConcurrentError {
 	output, err := command.CombinedOutput()
 
 	if err != nil {
-		if exitError, ok := err.(*exec.ExitError); ok {
-			code := exitError.ExitCode()
-			details := exitError.String()
 
-			log.Printf("Exit code was %d, details were %s", code, details)
-			log.Printf("output details were: %s", string(output))
-		}
+		//
+
+		// if exitError, ok := err.(*exec.ExitError); ok {
+		// 	code := exitError.ExitCode()
+		// 	details := exitError.String()
+
+		// 	log.Printf("Exit code was %d, details were %s", code, details)
+		// 	log.Printf("output details were: %s", string(output))
+		// }
 		return newConcurrentError(model.Model, "Running the programmatic shell script caused an error", err)
-
 	}
 
-	afero.WriteFile(fs, path.Join(model.OutputDir, model.Model+".out"), output, 0750)
+	err = afero.WriteFile(fs, path.Join(model.OutputDir, model.Model+".out"), output, 0750)
+
+	if err != nil {
+		return newConcurrentError(model.Model, "Having issues writing hte output file from command execution", err)
+	}
 
 	return turnstile.ConcurrentError{}
 }

@@ -11,7 +11,7 @@ require (
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/protobuf v1.3.2
 	github.com/logrusorgru/aurora v0.0.0-20191116043053-66b7ad493a23
-	github.com/metrumresearchgroup/turnstile v0.0.0-20191203204425-f9edd65a6f6c
+	github.com/metrumresearchgroup/turnstile v0.0.0-20191213153658-5297606be62d
 	github.com/olekukonko/tablewriter v0.0.3
 	github.com/spf13/afero v1.2.2
 	github.com/spf13/cobra v0.0.5

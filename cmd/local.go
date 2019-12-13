@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os/exec"
 	"path"
@@ -42,8 +41,10 @@ func NewLocalNonMemModel(modelname string) LocalModel {
 
 //Prepare is basically the old EstimateModel function. Responsible for creating directories and preparation.
 func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
+
 	//Mark the model as started some work
 	channels.Working <- 1
+
 	fs := afero.NewOsFs()
 
 	//Does output directory exist?
@@ -135,7 +136,7 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 	//log.Printf("Beginning copy-up operations for model %s\n", l.FileName)
 	for _, v := range pwi.FilesToCopy.FilesToCopy {
 
-		source, err := ioutil.ReadFile(path.Join(pwi.FilesToCopy.CopyFrom, v.File))
+		source, err := utils.ReadLines(path.Join(pwi.FilesToCopy.CopyFrom, v.File))
 
 		if err != nil {
 			//Just continue. There are potentially files which will not exist based on the values in the list.
@@ -151,7 +152,7 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 			file = l.Nonmem.FileName + "." + v.File
 		}
 
-		err = ioutil.WriteFile(path.Join(pwi.FilesToCopy.CopyTo, file), source, 0755)
+		err = utils.WriteLines(source, path.Join(pwi.FilesToCopy.CopyTo, file))
 
 		if err != nil {
 			log.Printf("An erorr occurred while attempting to copy the files: File is %s", v.File)
@@ -290,7 +291,7 @@ func local(cmd *cobra.Command, args []string) {
 
 //WriteGitIgnoreFile takes a provided path and does best attempt work to write a "Exclude all" gitignore file in the location
 func WriteGitIgnoreFile(filepath string) {
-	ioutil.WriteFile(path.Join(filepath, ".gitignore"), []byte("*\n"), 0755)
+	utils.WriteLines([]string{"*"}, path.Join(filepath, ".gitignore"))
 }
 
 func executeLocalJob(model NonMemModel) turnstile.ConcurrentError {
