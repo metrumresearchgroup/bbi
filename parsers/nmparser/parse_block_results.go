@@ -8,6 +8,9 @@ import (
 
 // ParseBlockResults parses results stored in a block-line structure
 func ParseBlockResults(lines []string) []float64 {
+	if len(lines) == 0 {
+		return []float64{}
+	}
 	var omegaLine string
 	var blockValues []float64
 	r := regexp.MustCompile("E[\\+|\\-]")
