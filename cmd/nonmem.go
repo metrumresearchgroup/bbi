@@ -50,6 +50,55 @@ var controlStreamExtensions []string = []string{
 	".ctl", //Metrum Style
 }
 
+var nonMemTemporaryFiles []string = []string{
+	"background.set",
+	"compile.lnk",
+	"FCON",
+	"FDATA",
+	"FMSG",
+	"FREPORT",
+	"FSIZES",
+	"FSTREAM",
+	"FSUBS",
+	"FSUBS.0",
+	"FSUBS.o",
+	"FSUBS_MU.F90",
+	"FSUBS.f90",
+	"fsubs.f90",
+	"FSUBS2",
+	"gfortran.txt",
+	"GFCOMPILE.BAT",
+	"INTER",
+	"licfile.set",
+	"linkc.lnk",
+	"LINK.LNK",
+	"LINKC.LNK",
+	"locfile.set",
+	"maxlim.set",
+	"newline",
+	"nmexec.set",
+	"nmpathlist.txt",
+	"nmprd4p.mod",
+	"nobuild.set",
+	"parafile.set",
+	"parafprint.set",
+	"prcompile.set",
+	"prdefault.set",
+	"prsame.set",
+	"PRSIZES.f90",
+	"rundir.set",
+	"runpdir.set",
+	"simparon.set",
+	"temp_dir",
+	"tprdefault.set",
+	"trskip.set",
+	"worker.set",
+	"xmloff.set",
+	"fort.2001",
+	"fort.2002",
+	"flushtime.set",
+}
+
 //NonMemModel is the definition of a model for NonMem including its target directories and settings required for execution
 type NonMemModel struct {
 	//Model is the name of the model on which we will action: acop.mod
@@ -190,7 +239,7 @@ func filesToCleanup(model NonMemModel, exceptions ...string) runner.FileCleanIns
 		Location: model.OutputDir,
 	}
 
-	files := getActionableFileList(model.Model, model.Settings.CleanLvl, model.OutputDir)
+	files := getCleanableFileList(model.Model, model.Settings.CleanLvl, model.OutputDir)
 
 	for _, v := range files {
 		if !isFilenameInExceptions(exceptions, v) {
@@ -234,20 +283,21 @@ func filesToCopy(model NonMemModel, mandatoryFiles ...string) runner.FileCopyIns
 	}
 
 	//Create Target File Entries
-	for _, v := range getActionableFileList(model.Model, model.Settings.CopyLvl, model.OutputDir) {
+	for _, v := range getCopiableFileList(model.Model, model.Settings.CopyLvl, model.OutputDir) {
 		fci.FilesToCopy = append(fci.FilesToCopy, newTargetFile(v, model.Settings.CopyLvl))
 	}
 
 	return fci
 }
 
-//Updating to take the full reference to the file. We'll extract the extension here. Avoids having to curse through potential files when
-//The user has explicitly provided a model to operate on.
-func getActionableFileList(file string, level int, filepath string) []string {
+//Get only te list of files to clean. Separated because of logic requirements
+func getCleanableFileList(file string, level int, filepath string) []string {
 	var output []string
 	files := make(map[int][]string)
 
-	//These files are files that may be desired above the normal.
+	//So what does clean level 1 actually do here?
+
+	//These files are files that may be desired above the normal. Classified as "Temp" files. Default removed
 	files[2] = []string{
 		"background.set",
 		"compile.lnk",
@@ -297,6 +347,19 @@ func getActionableFileList(file string, level int, filepath string) []string {
 		"flushtime.set",
 	}
 
+	for i := 0; i <= level; i++ {
+		if val, ok := files[i]; ok {
+			output = append(output, val...)
+		}
+	}
+
+	return output
+}
+
+func getCopiableFileList(file string, level int, filepath string) []string {
+	var output []string
+	files := make(map[int][]string)
+
 	//Get the files from the model
 	modelPieces := strings.Split(file, ".")
 	//Save as even if there's nothing to delimit, the initial value will be the first component
@@ -313,8 +376,7 @@ func getActionableFileList(file string, level int, filepath string) []string {
 	//Add defined output files to the list at level 1
 	files[1] = append(files[1], parser.FindOutputFiles(fileLines)...)
 
-	//Level two will parse the mod file and return those outputs as Level 1
-
+	//Still necessary at th is point to make sure we're adding the level based data (such as the raw output files) to the output slice
 	for i := 0; i <= level; i++ {
 		if val, ok := files[i]; ok {
 			output = append(output, val...)
@@ -322,13 +384,13 @@ func getActionableFileList(file string, level int, filepath string) []string {
 	}
 
 	//Extensions now
-	output = append(output, extrapolateFilesFromExtensions(filename, level, filepath)...)
+	output = append(output, extrapolateCopyFilesFromExtensions(filename, level, filepath)...)
 
 	return output
 }
 
 // Extrapolate extensions into string representations of filenames.
-func extrapolateFilesFromExtensions(filename string, level int, filepath string) []string {
+func extrapolateCopyFilesFromExtensions(filename string, level int, filepath string) []string {
 	var output []string
 	extensions := make(map[int][]string)
 

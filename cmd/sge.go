@@ -71,6 +71,7 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 	}
 
 	//Create Execution Script
+	//TODO: This should basically call babylon the same as normal against the targeted mod file
 	scriptContents, err := generateScript(scriptTemplate, l.Nonmem)
 
 	if err != nil {
