@@ -38,10 +38,14 @@ import (
 )
 
 //scriptTemplate is a go template we'll use for generating the script to do the work.
-const scriptTemplate string = `#!/bin/bash
+const nonMemExecutionTemplate string = `#!/bin/bash
 
 #$ -wd {{ .WorkingDirectory }}
 
+{{ .Command }}
+`
+
+const sgeExecutionTemplate string = `#!/bin/bash
 {{ .Command }}
 `
 
@@ -206,6 +210,10 @@ func generateScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 
 	if err != nil {
 		return []byte{}, errors.New("An error occured during the execution of the provided script template")
+	}
+
+	if debug {
+		log.Println(buf.String())
 	}
 
 	return buf.Bytes(), nil

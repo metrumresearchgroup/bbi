@@ -1,12 +1,14 @@
 package cmd
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"log"
 	"os/exec"
 	"path"
 	"strings"
+	"text/template"
 	"time"
 
 	"os"
@@ -72,7 +74,7 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 
 	//Create Execution Script
 	//TODO: This should basically call babylon the same as normal against the targeted mod file
-	scriptContents, err := generateScript(scriptTemplate, l.Nonmem)
+	scriptContents, err := generateBabylonScript(sgeExecutionTemplate, l.Nonmem)
 
 	if err != nil {
 		recordConcurrentError(l.Nonmem.Model, "An error occurred during the creation of the executable script for this model", err, channels)
@@ -259,4 +261,30 @@ func sgeModelsFromArguments(args []string) []SGEModel {
 	}
 
 	return output
+}
+
+//Generate the command line script to execute babylon on the grid.
+func generateBabylonScript(fileTemplate string, l NonMemModel) ([]byte, error) {
+
+	t, err := template.New("file").Parse(fileTemplate)
+	buf := new(bytes.Buffer)
+	if err != nil {
+		return []byte{}, errors.New("There was an error processing the provided script template")
+	}
+
+	type content struct {
+		Command string
+	}
+
+	//The assumption is that at this point, the config will have been written to the original path directory.
+
+	err = t.Execute(buf, content{
+		Command: "/data/bbi" + " nonmem run local " + l.Path,
+	})
+
+	if err != nil {
+		return []byte{}, errors.New("An error occured during the execution of the provided script template")
+	}
+
+	return buf.Bytes(), nil
 }

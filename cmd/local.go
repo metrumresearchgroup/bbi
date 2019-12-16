@@ -92,7 +92,7 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 	}
 
 	//Create Execution Script
-	scriptContents, err := generateScript(scriptTemplate, l.Nonmem)
+	scriptContents, err := generateScript(nonMemExecutionTemplate, l.Nonmem)
 
 	if err != nil {
 		channels.Failed <- 1
@@ -288,7 +288,9 @@ func local(cmd *cobra.Command, args []string) {
 	}
 
 	if len(lo.Models) > 0 {
-		configlib.SaveConfig(lo.Models[0].Nonmem.OriginalPath)
+		if viper.GetBool("saveConfig") {
+			configlib.SaveConfig(lo.Models[0].Nonmem.OriginalPath)
+		}
 	}
 
 	postWorkNotice(m, now)
