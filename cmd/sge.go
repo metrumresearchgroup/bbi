@@ -122,6 +122,10 @@ var sgeCMD = &cobra.Command{
 
 func init() {
 	runCmd.AddCommand(sgeCMD)
+
+	//String Variables
+	sgeCMD.PersistentFlags().String("babylonBinary", "/data/bbi", "directory path for babylon to be called in goroutines (SGE Execution)")
+	viper.BindPFlag("babylonBinary", sgeCMD.PersistentFlags().Lookup("babylonBinary"))
 }
 
 func sge(cmd *cobra.Command, args []string) {
@@ -133,6 +137,11 @@ func sge(cmd *cobra.Command, args []string) {
 	if len(lo.Models) == 0 {
 		log.Fatal("No models were located or loaded. Please verify the arguments provided and try again")
 	}
+
+	//Save the config file to the directory to facilitate further execution
+	configlib.SaveConfig(lo.Models[0].Nonmem.OriginalPath)
+	//Read it in to make sure we're not trying to save it again later
+	configlib.LocateAndReadConfigFile(lo.Models[0].Nonmem.OriginalPath)
 
 	//Models Added
 	log.Printf("A total of %d models have been located for work", len(lo.Models))
@@ -187,7 +196,8 @@ func sge(cmd *cobra.Command, args []string) {
 		time.Sleep(5 * time.Millisecond)
 	}
 
-	if len(lo.Models) > 0 {
+	//Double check to make sure nothing has been read in before trying to write to a file
+	if len(lo.Models) > 0 && viper.ConfigFileUsed() != "" {
 		configlib.SaveConfig(lo.Models[0].Nonmem.OriginalPath)
 	}
 
@@ -279,7 +289,7 @@ func generateBabylonScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 	//The assumption is that at this point, the config will have been written to the original path directory.
 
 	err = t.Execute(buf, content{
-		Command: "/data/bbi" + " nonmem run local " + l.Path,
+		Command: viper.GetString("babylonBinary") + " nonmem run local " + l.Path,
 	})
 
 	if err != nil {

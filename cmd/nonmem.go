@@ -101,6 +101,7 @@ var nonMemTemporaryFiles []string = []string{
 	"fort.2001",
 	"fort.2002",
 	"flushtime.set",
+	"nonmem",
 }
 
 //NonMemModel is the definition of a model for NonMem including its target directories and settings required for execution
@@ -303,57 +304,8 @@ func getCleanableFileList(file string, level int, filepath string) []string {
 	var output []string
 	files := make(map[int][]string)
 
-	//So what does clean level 1 actually do here?
-
 	//These files are files that may be desired above the normal. Classified as "Temp" files. Default removed
-	files[2] = []string{
-		"background.set",
-		"compile.lnk",
-		"FCON",
-		"FDATA",
-		"FMSG",
-		"FREPORT",
-		"FSIZES",
-		"FSTREAM",
-		"FSUBS",
-		"FSUBS.0",
-		"FSUBS.o",
-		"FSUBS_MU.F90",
-		"FSUBS.f90",
-		"fsubs.f90",
-		"FSUBS2",
-		"gfortran.txt",
-		"GFCOMPILE.BAT",
-		"INTER",
-		"licfile.set",
-		"linkc.lnk",
-		"LINK.LNK",
-		"LINKC.LNK",
-		"locfile.set",
-		"maxlim.set",
-		"newline",
-		"nmexec.set",
-		"nmpathlist.txt",
-		"nmprd4p.mod",
-		"nobuild.set",
-		"parafile.set",
-		"parafprint.set",
-		"prcompile.set",
-		"prdefault.set",
-		"prsame.set",
-		"PRSIZES.f90",
-		"rundir.set",
-		"runpdir.set",
-		"simparon.set",
-		"temp_dir",
-		"tprdefault.set",
-		"trskip.set",
-		"worker.set",
-		"xmloff.set",
-		"fort.2001",
-		"fort.2002",
-		"flushtime.set",
-	}
+	files[2] = nonMemTemporaryFiles
 
 	for i := 0; i <= level; i++ {
 		if val, ok := files[i]; ok {
