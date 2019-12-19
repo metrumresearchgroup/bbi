@@ -192,6 +192,9 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 		}
 	}
 
+	//Gitignore operations
+	createNewGitIgnoreFile(l.Nonmem)
+
 	//Mark as completed and move on to cleanup
 	channels.Completed <- 1
 }
@@ -341,4 +344,24 @@ func localModelsFromArguments(args []string) []LocalModel {
 	}
 
 	return output
+}
+
+func createNewGitIgnoreFile(m NonMemModel) error {
+	//First let's remove the gitignore in the output dir.
+	fs := afero.NewOsFs()
+	if ok, _ := afero.Exists(fs, path.Join(m.OutputDir, ".gitignore")); ok {
+		//If the gitignore file exists let's remove it
+		fs.Remove(path.Join(m.OutputDir, ".gitignore"))
+	}
+
+	//Force level one per initial discussions
+	linesToAddToGitignore := getCleanableFileList(m.FileName, 1)
+
+	err := utils.WriteLines(linesToAddToGitignore, path.Join(m.OutputDir, ".gitignore"))
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

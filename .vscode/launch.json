@@ -14,7 +14,7 @@
                 "run",
                 "--saveConfig=true",
                 "local",
-                "/Users/darrellb/Documents/models/test_data/240/Executable_MTP.mod"
+                "/Users/dbreeden/Documents/models/test_data/240/Executable_MTP.mod"
             ],
             "showLog": true
             

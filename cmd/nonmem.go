@@ -248,7 +248,7 @@ func filesToCleanup(model NonMemModel, exceptions ...string) runner.FileCleanIns
 		Location: model.OutputDir,
 	}
 
-	files := getCleanableFileList(model.Model, model.Settings.CleanLvl, model.OutputDir)
+	files := getCleanableFileList(model.Model, model.Settings.CleanLvl)
 
 	for _, v := range files {
 		if !isFilenameInExceptions(exceptions, v) {
@@ -300,7 +300,7 @@ func filesToCopy(model NonMemModel, mandatoryFiles ...string) runner.FileCopyIns
 }
 
 //Get only te list of files to clean. Separated because of logic requirements
-func getCleanableFileList(file string, level int, filepath string) []string {
+func getCleanableFileList(file string, level int) []string {
 	var output []string
 	files := make(map[int][]string)
 
@@ -415,12 +415,11 @@ func extrapolateCopyFilesFromExtensions(filename string, level int, filepath str
 }
 
 func newPostWorkInstruction(model NonMemModel, cleanupExclusions []string, mandatoryCopyFiles []string) runner.PostWorkInstructions {
-	pwi := runner.PostWorkInstructions{}
 
-	pwi.FilesToCopy = filesToCopy(model, mandatoryCopyFiles...)
-	pwi.FilesToClean = filesToCleanup(model, cleanupExclusions...)
-
-	return pwi
+	return runner.PostWorkInstructions{
+		FilesToCopy:  filesToCopy(model, mandatoryCopyFiles...),
+		FilesToClean: filesToCleanup(model, cleanupExclusions...),
+	}
 }
 
 func postWorkNotice(m *turnstile.Manager, t time.Time) {
