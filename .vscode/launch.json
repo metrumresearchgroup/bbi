@@ -1,6 +1,7 @@
 {
     "version": "0.2.0",
     "configurations": [
+
         {
             "name": "bbi",
             "type": "go",
@@ -19,11 +20,17 @@
             "type": "go",
             "request": "launch",
             "mode": "debug",
-            "program": "${workspaceRoot}",
+            "program": "${workspaceRoot}/cmd/bbi",
             "env": {},
-            "args": [],
-            "showLog": true,
-            "trace": "verbose"
+            "args": [
+                "nonmem",
+                "run",
+                "--saveConfig=true",
+                "local",
+                "/Users/dbreeden/Documents/models/test_data/240/Executable_MTP.mod"
+            ],
+            "showLog": true
+            
         }
     ]
 }

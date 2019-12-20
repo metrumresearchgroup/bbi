@@ -103,6 +103,7 @@ func clean(cmd *cobra.Command, args []string) error {
 		}
 	}
 
+	//TODO: Have this operate now based on model name?
 	if copiedRuns != "" {
 		copies := strings.Split(copiedRuns, ",")
 		for _, arg := range copies {
@@ -174,7 +175,7 @@ func getMatches(s []string, expr string, regex bool) ([]string, error) {
 }
 
 func init() {
-	RootCmd.AddCommand(cleanCmd)
+	nonmemCmd.AddCommand(cleanCmd)
 	cleanCmd.Flags().BoolVar(&dirsOnly, "dirsOnly", false, "only match and clean directories")
 	cleanCmd.Flags().BoolVar(&filesOnly, "filesOnly", false, "only match and clean files")
 	cleanCmd.Flags().BoolVar(&inverse, "inverse", false, "inverse selection from the given regex match criteria")

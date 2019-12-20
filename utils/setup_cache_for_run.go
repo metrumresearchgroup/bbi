@@ -42,14 +42,12 @@ func SetupCacheForRun(
 	// there may be other uses, to be safe will also check again.
 	ok, err := DirExists(fullCacheDirPath, fs)
 	if !ok || err != nil {
-		//TODO: change these exits to instead just return an error probably
 		log.Printf("issue with cache directory at: %s, no precompiled model will be used. ERR: %s, ok: %v", cacheDir, err, ok)
 		return err
 	}
 	//check that modelDir exists to copy nonmem executable into
 	ok, err = DirExists(fullModelDirPath, fs)
 	if !ok || err != nil {
-		//TODO: change these exits to instead just return an error probably
 		log.Printf("issue with model directory at: %s, no precompiled model will be used. ERR: %s, ok: %v", cacheDir, err, ok)
 		return err
 	}
