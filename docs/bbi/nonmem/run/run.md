@@ -26,11 +26,6 @@ The run command collects a series of flags necessary to define the behavior for:
 * `--cleanLvl <1|2|3>` : Based on a list of extensions and files (See below), will remove any matching files from the output directory after the work is done. Default is 2
 * `--copyLvl <1|2|3>` : Based on a list of extension and files (See below), will remove copy any of the matched files back into the original model directory prepended with the model name. Mirrors PSN functionality, although the default is 0 (or off)
 
-### Subcommands
-
-* `local` : Indicates to run the model on the local machine
-* `sge` : Indicates to run the model on the Sun Grid Engine
-
 ### Options
 
 ```
