@@ -27,8 +27,8 @@ For Example:
 
 `bbi nonmem run sge /abs/path/to/file.mod`
 
- * nonmem : The modeling software we should be targeting for this run
- * sge : The mode of execution. For nonmem this can either be local or sge, with sge indicating submission of jobs to the grid
+ * `nonmem` : The modeling software we should be targeting for this run
+ * `sge` : The mode of execution. For nonmem this can either be local or sge, with sge indicating submission of jobs to the grid
  * `/abs/path/to/file.mod` : The location of the file to submit for execution. Can be relative or absolute. 
 
  #### Viper Configuration
