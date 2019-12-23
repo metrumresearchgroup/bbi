@@ -562,7 +562,7 @@ func nonmemModelsFromArguments(args []string) []NonMemModel {
 			}
 
 			for _, model := range modelsInDir {
-				output = append(output, NewNonMemModel(model))
+				output = append(output, NewNonMemModel(path.Join(arg, model)))
 			}
 
 		} else {
