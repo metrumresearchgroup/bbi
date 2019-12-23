@@ -56,7 +56,7 @@ The run command and its variants all implement the [turnstile](https://github.co
 Currently there is really only one level of clean files, which is level 1. Its contents are the temporary files (including the nonmem executable) created during nonmem execution:
 
 ```
-        "background.set",
+    "background.set",
 	"compile.lnk",
 	"FCON",
 	"FDATA",
