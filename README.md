@@ -42,6 +42,13 @@ For Example:
  * The `--saveConfig` flag will take all the flags you have passed and write it to `babylon.yaml` in the same directory as the model file you provide as an argument
  * You may also manually curate a `babylon.yaml` into the directory of the model file you will be submitting. The keys for the config will match any flag you can provide during execution.
 
+ Configurations for execution are located (in order of priority)
+
+ * In the Model Directory
+ * In the directory from which Babylon is executed
+ * In the executing user's home (`~`) directory
+
+
  #### Viper and SGE
  You may notice that if you issue a job with nonmen targeting SGE that a babylon.yaml file is created for you automatically. This is because SGE execution wraps the Babylon CLI into an executable for the grid to execute. This ensures the following:
 
