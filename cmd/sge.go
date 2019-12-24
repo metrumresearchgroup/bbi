@@ -7,6 +7,7 @@ import (
 	"log"
 	"os/exec"
 	"path"
+	"regexp"
 	"strings"
 	"text/template"
 	"time"
@@ -82,7 +83,7 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 	}
 
 	//rwxr-x---
-	err = afero.WriteFile(fs, path.Join(l.Nonmem.OutputDir, l.Nonmem.FileName+".sh"), scriptContents, 0750)
+	err = afero.WriteFile(fs, path.Join(l.Nonmem.OutputDir, getSGEScriptName(l.Nonmem.FileName)+".sh"), scriptContents, 0750)
 	if err != nil {
 		recordConcurrentError(l.Nonmem.Model, "There was an issue writing the executable file", err, channels)
 	}
@@ -228,7 +229,7 @@ func executeSGEJob(model NonMemModel) turnstile.ConcurrentError {
 		return newConcurrentError(model.Model, fmt.Sprintf("Unable to change directory to %s", model.OutputDir), err)
 	}
 
-	scriptName := model.FileName + ".sh"
+	scriptName := getSGEScriptName(model.FileName) + ".sh"
 
 	//Find Qsub
 	binary, err := exec.LookPath("qsub")
@@ -297,4 +298,15 @@ func generateBabylonScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 	}
 
 	return buf.Bytes(), nil
+}
+
+//Specifically used to return the name of a SGE script, modified if it begins with an integer a SGE doesn't care for that.
+func getSGEScriptName(modelFileName string) string {
+	r := regexp.MustCompile(`^[0-9]{1,}.*$`)
+
+	if r.MatchString(modelFileName) {
+		return "run_" + modelFileName
+	}
+
+	return modelFileName
 }

@@ -1,17 +1,18 @@
-## bbi
+## bbi nonmem
 
-manage and execute models
+Run (and other actions) against nonmem model(s)
 
 ### Synopsis
 
-babylon cli version 1.0.0
+Nonmem and its subcommands are all based around the execution and interpretation of nonmem models and more. 
 
 ### Options
 
 ```
+  -h, --help                  help for nonmem
+      --nmExecutable string   Name of nonmem executable to use. Defaults to nmfe74 (NM7.4) (default "nmfe74")
       --config string   config file (default is $HOME/babylon.yaml)
   -d, --debug           debug mode
-  -h, --help            help for bbi
       --json            json tree of output, if possible
       --no-cor-file     do not use cor file
       --no-cov-file     do not use cov file
@@ -24,7 +25,9 @@ babylon cli version 1.0.0
 ```
 
 ### Subcommands
-* [nonmem](nonmem/nonmem.md) - Nonmem model execution
-* [version](bbi_version.md) - check version
-
-
+* [clean](clean/clean.md)
+* [probs](probs/probs.md)
+* [reclean](reclean/reclean.md)
+* [run](run/run.md)
+* [scaffold](scaffold/scaffold.md)
+* [summary](summary/summary.md)
