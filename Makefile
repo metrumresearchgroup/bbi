@@ -5,3 +5,6 @@ MAKE_HOME=${PWD}
 
 install:
 	cd cmd/bbi; go install ${LDFLAGS}
+release:
+	cd cmd/bbi; goreleaser --rm-dist
+
