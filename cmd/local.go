@@ -7,6 +7,7 @@ import (
 	"log"
 	"os/exec"
 	"path"
+	"strings"
 	"time"
 
 	"os"
@@ -18,6 +19,7 @@ import (
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"gopkg.in/yaml.v2"
 )
 
 var arguments []string
@@ -168,7 +170,7 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 	//Write to File in original path indicating what all was copied
 	copiedJSON, _ := json.MarshalIndent(copied, "", "    ")
 
-	afero.WriteFile(fs, path.Join(l.Nonmem.OriginalPath, "copied.json"), copiedJSON, 0750)
+	afero.WriteFile(fs, path.Join(l.Nonmem.OriginalPath, l.Nonmem.FileName+"_copied.json"), copiedJSON, 0750)
 
 	//Clean Up
 	//log.Printf("Beginning cleanup operations for model %s\n", l.FileName)
@@ -194,6 +196,19 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 
 	//Gitignore operations
 	createNewGitIgnoreFile(l.Nonmem)
+
+	//Serialize and Write the Config down to a file
+	err := writeNonmemConfig(l.Nonmem)
+
+	if err != nil {
+		channels.Failed <- 1
+		channels.Errors <- turnstile.ConcurrentError{
+			RunIdentifier: l.Nonmem.FileName,
+			Notes:         "An error occurred trying to write the config file to the output directory",
+			Error:         err,
+		}
+		return
+	}
 
 	//Mark as completed and move on to cleanup
 	channels.Completed <- 1
@@ -364,4 +379,16 @@ func createNewGitIgnoreFile(m NonMemModel) error {
 	}
 
 	return nil
+}
+
+func writeNonmemConfig(model NonMemModel) error {
+	outBytes, err := yaml.Marshal(model.Configuration)
+
+	if err != nil {
+		return err
+	}
+
+	outString := strings.Split(string(outBytes), "\n")
+
+	return utils.WriteLines(outString, path.Join(model.OutputDir, "config.yaml"))
 }
