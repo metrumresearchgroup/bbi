@@ -8,6 +8,19 @@ import (
 	"github.com/spf13/viper"
 )
 
+type Config struct {
+	NMExecutable  string `yaml:"nmExecutable"`
+	Overwrite     bool   `yaml:"overwrite"`
+	CleanLevel    int    `yaml:"cleanLvl"`
+	CopyLevel     int    `yaml:"copyLvl"`
+	Git           bool   `yaml:"git"`
+	BabylonBinary string `yaml:"babylonbinary"`
+	SaveConfig    bool   `yaml:"saveConfig"`
+	OutputDir     string `yaml:"outputDir"`
+	Threads       int    `yaml:"threads"`
+	Debug         bool   `yaml:"debug"`
+}
+
 // LoadGlobalConfig loads nonmemutils configuration into the global Viper
 func LoadGlobalConfig(configFilename string) error {
 	viper.SetConfigName(configFilename)
@@ -79,4 +92,12 @@ func SaveConfig(configpath string) {
 	if viper.GetBool("saveConfig") {
 		viper.WriteConfigAs(path.Join(configpath, "babylon.yaml"))
 	}
+}
+
+//UnmarshalViper collects the viper details and inserts them into the class struct
+func UnmarshalViper() Config {
+	c := Config{}
+	viper.Unmarshal(&c)
+
+	return c
 }

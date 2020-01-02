@@ -119,7 +119,7 @@ type NonMemModel struct {
 	//OutputDir is the directory into which the copied models and work will be located
 	OutputDir string `json:"output_dir"`
 	//Settings are basically the cobra definitions / requirements for the iteration
-	Settings runner.RunSettings `json:"settings"`
+	Configuration configlib.Config `json:"configuration"`
 	//Whether or not the model had an error on generation or execution
 	Error error `json:"error"`
 }
@@ -224,7 +224,7 @@ func buildNonMemCommandString(l NonMemModel) string {
 
 	// TODO: Implement cache
 	noBuild := false
-	nmExecutable := l.Settings.NmExecutableOrPath
+	nmExecutable := l.Configuration.NMExecutable
 	cmdArgs := []string{
 		path.Join(l.OutputDir, l.Model),
 		"",
@@ -248,12 +248,12 @@ func filesToCleanup(model NonMemModel, exceptions ...string) runner.FileCleanIns
 		Location: model.OutputDir,
 	}
 
-	files := getCleanableFileList(model.Model, model.Settings.CleanLvl)
+	files := getCleanableFileList(model.Model, model.Configuration.CleanLevel)
 
 	for _, v := range files {
 		if !isFilenameInExceptions(exceptions, v) {
 			//Let's add it to the cleanup list if it's not in the exclusions
-			fci.FilesToRemove = append(fci.FilesToRemove, newTargetFile(v, model.Settings.CleanLvl))
+			fci.FilesToRemove = append(fci.FilesToRemove, newTargetFile(v, model.Configuration.CopyLevel))
 		}
 	}
 
@@ -292,8 +292,8 @@ func filesToCopy(model NonMemModel, mandatoryFiles ...string) runner.FileCopyIns
 	}
 
 	//Create Target File Entries
-	for _, v := range getCopiableFileList(model.Model, model.Settings.CopyLvl, model.OutputDir) {
-		fci.FilesToCopy = append(fci.FilesToCopy, newTargetFile(v, model.Settings.CopyLvl))
+	for _, v := range getCopiableFileList(model.Model, model.Configuration.CopyLevel, model.OutputDir) {
+		fci.FilesToCopy = append(fci.FilesToCopy, newTargetFile(v, model.Configuration.CopyLevel))
 	}
 
 	return fci
@@ -513,17 +513,7 @@ func NewNonMemModel(modelname string) NonMemModel {
 		}
 	}
 
-	lm.Settings = runner.RunSettings{
-		Git:                viper.GetBool("git"),
-		Verbose:            verbose,
-		Debug:              debug,
-		CleanLvl:           viper.GetInt("cleanLvl"),
-		CopyLvl:            viper.GetInt("copyLvl"),
-		CacheDir:           viper.GetString("cacheDir"),
-		ExeNameInCache:     viper.GetString("cacheExe"),
-		NmExecutableOrPath: viper.GetString("nmExecutable"),
-		Overwrite:          viper.GetBool("overwrite"),
-	}
+	lm.Configuration = configlib.UnmarshalViper()
 
 	return lm
 }
