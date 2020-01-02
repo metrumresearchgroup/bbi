@@ -13,6 +13,8 @@
                 "nonmem",
                 "run",
                 "--saveConfig=true",
+                "--copyLvl",
+                "1",
                 "local",
                 "/Users/dbreeden/Documents/models/test_data/240/Executable_MTP.mod"
             ],

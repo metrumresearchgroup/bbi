@@ -248,12 +248,12 @@ func filesToCleanup(model NonMemModel, exceptions ...string) runner.FileCleanIns
 		Location: model.OutputDir,
 	}
 
-	files := getCleanableFileList(model.Model, model.Configuration.CleanLevel)
+	files := getCleanableFileList(model.Model, model.Configuration.CleanLvl)
 
 	for _, v := range files {
 		if !isFilenameInExceptions(exceptions, v) {
 			//Let's add it to the cleanup list if it's not in the exclusions
-			fci.FilesToRemove = append(fci.FilesToRemove, newTargetFile(v, model.Configuration.CopyLevel))
+			fci.FilesToRemove = append(fci.FilesToRemove, newTargetFile(v, model.Configuration.CleanLvl))
 		}
 	}
 
@@ -292,8 +292,8 @@ func filesToCopy(model NonMemModel, mandatoryFiles ...string) runner.FileCopyIns
 	}
 
 	//Create Target File Entries
-	for _, v := range getCopiableFileList(model.Model, model.Configuration.CopyLevel, model.OutputDir) {
-		fci.FilesToCopy = append(fci.FilesToCopy, newTargetFile(v, model.Configuration.CopyLevel))
+	for _, v := range getCopiableFileList(model.Model, model.Configuration.CopyLvl, model.OutputDir) {
+		fci.FilesToCopy = append(fci.FilesToCopy, newTargetFile(v, model.Configuration.CopyLvl))
 	}
 
 	return fci

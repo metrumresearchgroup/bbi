@@ -11,8 +11,8 @@ import (
 type Config struct {
 	NMExecutable  string `yaml:"nmExecutable"`
 	Overwrite     bool   `yaml:"overwrite"`
-	CleanLevel    int    `yaml:"cleanLvl"`
-	CopyLevel     int    `yaml:"copyLvl"`
+	CleanLvl      int    `yaml:"cleanLvl"`
+	CopyLvl       int    `yaml:"copyLvl"`
 	Git           bool   `yaml:"git"`
 	BabylonBinary string `yaml:"babylonbinary"`
 	SaveConfig    bool   `yaml:"saveConfig"`
