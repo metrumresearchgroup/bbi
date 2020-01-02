@@ -48,7 +48,7 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 	//Does output directory exist?
 	if ok, _ := afero.Exists(fs, l.Nonmem.OutputDir); ok {
 		//If so are we configured to overwrite?
-		if l.Nonmem.Settings.Overwrite {
+		if l.Nonmem.Configuration.Overwrite {
 			err := fs.RemoveAll(l.Nonmem.OutputDir)
 			if err != nil {
 				recordConcurrentError(l.Nonmem.Model, "An error occured trying to remove the directory as specified in the overwrite flag", err, channels)
