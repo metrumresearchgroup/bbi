@@ -52,5 +52,5 @@ func summary(cmd *cobra.Command, args []string) {
 
 }
 func init() {
-	RootCmd.AddCommand(summaryCmd)
+	nonmemCmd.AddCommand(summaryCmd)
 }

@@ -70,6 +70,10 @@ func EstOutputFileCleanLevels(r string) map[string]int {
 		"_SMAT.msf",
 	}
 
+	//Examples
+	//For RUN001 as the identifier:
+	//run001_ETAS -> msfb001_etas
+	//run001_RMAT.msf -> msfb001_RMAT.mfs
 	for _, f := range msfFileSuffixes {
 		EstOutputFiles[strings.Replace(fmt.Sprintf("%s%s", r, f), "run", "msfb", 1)] = 1
 	}

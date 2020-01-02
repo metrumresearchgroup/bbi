@@ -1,10 +1,12 @@
 package runner
 
 import (
+	"bytes"
 	"log"
 	"path/filepath"
+	"text/template"
 
-	"fmt"
+	"errors"
 
 	"github.com/metrumresearchgroup/babylon/utils"
 	"github.com/spf13/afero"
@@ -22,46 +24,32 @@ func EstimateModel(
 ) ReturnStatus {
 
 	modelFile := filepath.Base(modelPath)
-	runNum, _ := utils.FileAndExt(modelPath)
+	//Renaming to fileName to be a bit more explicit
+	fileName, _ := utils.FileAndExt(modelPath)
 	dir, _ := filepath.Abs(filepath.Dir(modelPath))
-	dirInfo, _ := afero.ReadDir(fs, dir)
-	dirs := utils.ListDirNames(dirInfo)
-	newDirSuggestion := NextDirSuggestion{}
-	var modelDir string
-	if runSettings.ProposedRunDir == "" {
-		newDirSuggestion = FindNextEstDirNum(runNum, dirs, 2)
-		// to normalize with a potentially passed proposedRunDir, will
-		// use absolute paths to run models
-		modelDir = filepath.Join(dir, newDirSuggestion.NextDirName)
-	} else {
-		// if user proposes a new directory, will consider it a 'first' run, as they are customizing the output
-		// directory. As we have less control over this directory, will need to more aggressively check it
-		// the default behavior can be considered that it will _not_ overwrite an existing directory,
-		// perhaps could add a force/overwrite setting, but for now, will just make the user cleanup if they
-		// want a specific directory
-		proposedRunDir := runSettings.ProposedRunDir
-		if !filepath.IsAbs(proposedRunDir) {
-			proposedRunDir = filepath.Join(dir, proposedRunDir)
-		}
-		modelDir = proposedRunDir
-		exists, err := utils.DirExists(modelDir, fs)
-		if exists || err != nil {
-			return ReturnStatus{
-				RunDir: modelDir,
-				DidRun: false,
-				Error:  fmt.Errorf("run directory %s already exists! will not overwrite", proposedRunDir),
-			}
-		}
-	}
 
-	if !newDirSuggestion.FirstRun && runSettings.OneEst {
-		if runSettings.Verbose {
-			log.Printf("run directory for model %s exists, not re-running", runNum)
-		}
-		return ReturnStatus{
-			RunDir: modelDir,
-			DidRun: false,
-			Error:  fmt.Errorf("run directory %s already exists! will not overwrite", newDirSuggestion.NextDirName),
+	outputDirectoryName, err := processDirectoryTemplate(fileName, runSettings)
+
+	//Need to get the absolute path for the directory
+	outputDirectoryPath := filepath.Join(dir, outputDirectoryName)
+
+	isDirectory, _ := afero.IsDir(fs, outputDirectoryPath)
+	isEmpty, _ := afero.IsEmpty(fs, outputDirectoryPath)
+
+	//The desired directory is present, but not empty.
+	if isDirectory && !isEmpty {
+
+		if runSettings.Overwrite {
+			//Let's remove the entire friggin dir and its contents
+			log.Print("Settings are configured to over write. Removing existing directory")
+			fs.RemoveAll(outputDirectoryPath)
+		} else {
+			//Generate an error and bubble it up to the user
+			return ReturnStatus{
+				RunDir: outputDirectoryPath,
+				DidRun: false,
+				Error:  errors.New("Run settings indicate that we should not overwrite output directories, but the targeted directory," + outputDirectoryPath + " already exists"),
+			}
 		}
 	}
 
@@ -75,17 +63,17 @@ func EstimateModel(
 	nmExecutableOrPath := runSettings.NmExecutableOrPath
 
 	if verbose {
-		log.Printf("setting up run infrastructure for run %s", runNum)
+		log.Printf("setting up run infrastructure for run %s", fileName)
 		log.Printf("base dir: %s", dir)
-		log.Printf("new run directory to be prepared: %s", modelDir)
+		log.Printf("new run directory to be prepared: %s", outputDirectoryPath)
 	}
 
 	// copy files with any changes
-	extraFiles, err := PrepareEstRun(fs, dir, modelFile, modelDir)
+	extraFiles, err := PrepareEstRun(fs, dir, modelFile, outputDirectoryPath)
 	if err != nil {
 		log.Printf("error preparing estimation run: %s", err)
 		return ReturnStatus{
-			RunDir: modelDir,
+			RunDir: outputDirectoryPath,
 			DidRun: false,
 			Error:  err,
 		}
@@ -93,12 +81,12 @@ func EstimateModel(
 
 	if runSettings.Git {
 		// for now just add a gitignore to add everything in run output by default
-		utils.WriteLinesFS(fs, []string{"*"}, filepath.Join(dir, modelDir, ".gitignore"))
+		utils.WriteLinesFS(fs, []string{"*"}, filepath.Join(dir, outputDirectoryPath, ".gitignore"))
 	}
 	// deal with cache maybe
 	noBuild := false
 	if exeNameInCache != "" {
-		err := utils.SetupCacheForRun(fs, dir, modelDir, cacheDir, exeNameInCache, debug)
+		err := utils.SetupCacheForRun(fs, dir, outputDirectoryPath, cacheDir, exeNameInCache, debug)
 		if err != nil {
 			log.Printf("error setting up cache: %v \n unable to precompile model", err)
 		} else {
@@ -108,36 +96,36 @@ func EstimateModel(
 
 	// run model
 	if verbose {
-		log.Printf("running model %s ...\n", runNum)
+		log.Printf("running model %s ...\n", fileName)
 	}
-	err = RunEstModel(fs, modelDir, modelFile, noBuild, nmExecutableOrPath)
+	err = RunEstModel(fs, outputDirectoryPath, modelFile, noBuild, nmExecutableOrPath)
 
 	if err != nil {
 		log.Printf("error during estimation run: %s", err)
 		return ReturnStatus{
-			RunDir: modelDir,
+			RunDir: outputDirectoryPath,
 			DidRun: true,
 			Error:  err,
 		}
 	}
 
 	if verbose {
-		log.Printf("completed execution of %s, cleaning up...", runNum)
+		log.Printf("completed execution of %s, cleaning up...", fileName)
 	}
 
 	if runSettings.SaveExe != "" {
-		err := utils.CopyExeToCache(fs, modelDir, cacheDir, runSettings.SaveExe)
+		err := utils.CopyExeToCache(fs, outputDirectoryPath, cacheDir, runSettings.SaveExe)
 		if err != nil {
 			log.Printf("error during estimation run: %s", err)
 		}
 	}
 
-	estDirInfo, _ := afero.ReadDir(fs, modelDir)
+	estDirInfo, _ := afero.ReadDir(fs, outputDirectoryPath)
 	fileList := utils.ListFiles(estDirInfo)
 	err = CleanEstFolderAndCopyToParent(fs,
 		dir,
-		runNum,
-		modelDir,
+		fileName,
+		outputDirectoryPath,
 		fileList,
 		extraFiles.Files,
 		extraFiles.Files,
@@ -149,7 +137,7 @@ func EstimateModel(
 	if err != nil {
 		log.Printf("error cleaning estimation run: %s", err)
 		return ReturnStatus{
-			RunDir: modelDir,
+			RunDir: outputDirectoryPath,
 			DidRun: true,
 			Error:  err,
 		}
@@ -158,8 +146,38 @@ func EstimateModel(
 		log.Println("done cleaning up!")
 	}
 	return ReturnStatus{
-		RunDir: modelDir,
+		RunDir: outputDirectoryPath,
 		DidRun: true,
 		Error:  nil,
 	}
+}
+
+//Processes the go template for the output directory and returns the processed string and any relative errors
+// name: The name of the model from which the template will be derived.
+// r: The RunSettings struct containing the configurations from the run.
+func processDirectoryTemplate(name string, r RunSettings) (string, error) {
+	var generated []byte
+	buf := bytes.NewBuffer(generated)
+
+	type templateContent struct {
+		Name string
+	}
+
+	tc := templateContent{
+		Name: name,
+	}
+
+	t, err := template.New("outputfile").Parse(r.OutputDir)
+
+	if err != nil {
+		return "", errors.New("There was an issue parsing the output directory template as provided by the run settings: " + err.Error())
+	}
+
+	err = t.Execute(buf, tc)
+
+	if err != nil {
+		return "", errors.New("There was an issue processing the output directory template as provided by the run settings: " + err.Error())
+	}
+
+	return buf.String(), nil
 }

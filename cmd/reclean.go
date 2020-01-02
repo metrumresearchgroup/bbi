@@ -34,10 +34,6 @@ var recleanCmd = &cobra.Command{
 }
 
 func reclean(cmd *cobra.Command, args []string) error {
-	if flagChanged(cmd.Flags(), "cleanLvl") {
-		viper.Set("cleanLvl", cleanLvl)
-	}
-
 	if debug {
 		viper.Debug()
 	}
@@ -49,6 +45,9 @@ func reclean(cmd *cobra.Command, args []string) error {
 	return nil
 }
 func init() {
-	RootCmd.AddCommand(recleanCmd)
-	recleanCmd.Flags().IntVar(&cleanLvl, "cleanLvl", 5, "clean level to apply")
+	nonmemCmd.AddCommand(recleanCmd)
+
+	recleanCmd.Flags().Int("recleanLvl", 0, "clean level to apply")
+	viper.BindPFlag("recleanLvl", recleanCmd.Flags().Lookup("recleanLvl"))
+
 }
