@@ -27,7 +27,6 @@ func RunEstModel(fs afero.Fs,
 ) error {
 	ok, err := utils.DirExists(modelDir, fs)
 	if !ok || err != nil {
-		//TODO: change these exits to instead just return an error probably
 		log.Printf("could not find directory to run model %s, ERR: %s, ok: %v", modelDir, err, ok)
 		return err
 	}

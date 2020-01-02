@@ -10,11 +10,11 @@
             "program": "${workspaceRoot}/cmd/bbi",
             "env": {},
             "args": [
+                "nonmem",
                 "run",
-                "--outputDir",
-                "{{.Name}}__Meow",
-                "--overwrite=true",
-                "/Users/darrellb/Documents/models/test_data/acop/acop.mod"
+                "--saveConfig=true",
+                "local",
+                "/Users/dbreeden/Documents/models/test_data/240/Executable_MTP.mod"
             ],
             "showLog": true
             
