@@ -33,8 +33,17 @@ func ParseFinalParameterEstimatesFromLst(lines []string) ParametersResult {
 
 	var sigmaParsed []float64
 	thetaParsed := ParseThetaResults(lines[thetaStart:omegaStart])
-	omegaParsed := ParseBlockResults(lines[omegaStart:sigmaStart])
-	if sigmaEnd > sigmaStart {
+	omegaEnd := sigmaStart
+	// if sigmaStart is 0 then there are no sigmas, which can happen
+	// for certain types of models
+	if omegaEnd == 0 {
+		omegaEnd = len(lines) - 1
+	}
+
+	omegaParsed := ParseBlockResults(lines[omegaStart:omegaEnd])
+	if sigmaStart == 0 {
+		// just use default
+	} else if sigmaEnd > sigmaStart {
 		sigmaParsed = ParseBlockResults(lines[sigmaStart:sigmaEnd])
 	} else {
 		sigmaParsed = ParseBlockResults(lines[sigmaStart:])

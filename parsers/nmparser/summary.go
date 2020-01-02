@@ -8,7 +8,6 @@ import (
 
 	"github.com/logrusorgru/aurora"
 	"github.com/olekukonko/tablewriter"
-	"github.com/thoas/go-funk"
 )
 
 // Summary prints all results from the parsed LstData
@@ -19,7 +18,7 @@ func (results ModelOutput) Summary() bool {
 	thetaTable.SetHeader([]string{"Theta", "Name", "Estimate", "StdErr (RSE)"})
 	// required for color, prevents newline in row
 	thetaTable.SetAutoWrapText(false)
-
+	isBayesian := results.RunDetails.EstimationMethods[0] == "MCMC Bayesian Analysis"
 	finalEstimationMethodIndex := len(results.ParametersData) - 1
 	for i := range results.ParametersData[finalEstimationMethodIndex].Estimates.Theta {
 		numResult := results.ParametersData[finalEstimationMethodIndex].Estimates.Theta[i]
@@ -52,40 +51,44 @@ func (results ModelOutput) Summary() bool {
 	omegaTable.SetAlignment(tablewriter.ALIGN_LEFT)
 	omegaTable.SetColWidth(100)
 	omegaHeaders := []string{"Omega", "Eta", "Estimate"}
-	nSubPopsForMixtureModels := len(results.ShrinkageDetails[len(results.RunDetails.EstimationMethod)-1])
-	if nSubPopsForMixtureModels > 1 {
-		for i := 0; i < nSubPopsForMixtureModels; i++ {
-			omegaHeaders = append(omegaHeaders, fmt.Sprintf("Pop%v Shrinkage (%%)", i+1))
+	if !isBayesian {
+		// bayesian methods have no concept of shrinkage
+		nSubPopsForMixtureModels := len(results.ShrinkageDetails[len(results.RunDetails.EstimationMethods)-1])
+		if nSubPopsForMixtureModels > 1 {
+			for i := 0; i < nSubPopsForMixtureModels; i++ {
+				omegaHeaders = append(omegaHeaders, fmt.Sprintf("Pop%v Shrinkage (%%)", i+1))
+			}
+		} else {
+			// single population
+			omegaHeaders = append(omegaHeaders, "Shrinkage (%)")
 		}
-	} else {
-		// single population
-		omegaHeaders = append(omegaHeaders, "Shrinkage (%)")
 	}
 	omegaTable.SetHeader(omegaHeaders)
 	// required for color, prevents newline in row
 	thetaTable.SetAutoWrapText(false)
 
-	diagIndices := GetDiagonalIndices(results.ParameterStructures.Omega)
-	methodIndex := len(results.RunDetails.EstimationMethod) - 1
+	methodIndex := len(results.RunDetails.EstimationMethods) - 1
 	for n := range results.ParametersData[finalEstimationMethodIndex].Estimates.Omega {
-		if results.ParameterStructures.Omega[n] == 0 {
+		diagIndex, isDiag := diagonalIndices[n]
+		if !isDiag {
 			continue
 		}
-		diagIndex := funk.IndexOfInt(diagIndices, n)
 		var shrinkageValues []string
 		etaName := "-"
 		val := results.ParametersData[finalEstimationMethodIndex].Estimates.Omega[n]
-		if diagIndex > -1 {
-			etaName = fmt.Sprintf("ETA%v", diagIndex+1)
-			for sp := range results.ShrinkageDetails[methodIndex] {
-				if len(results.ShrinkageDetails[methodIndex]) > 0 {
-					// get the data for the last method
-					shrinkageDetails := results.ShrinkageDetails[len(results.ShrinkageDetails)-1]
-					shrinkage := shrinkageDetails[sp].EtaSD[diagIndex]
-					if shrinkage > 30.0 {
-						shrinkageValues = append(shrinkageValues, aurora.Sprintf(aurora.Red("%s"), fmt.Sprintf("%f", shrinkage)))
-					} else {
-						shrinkageValues = append(shrinkageValues, fmt.Sprintf("%f", shrinkage))
+		if isDiag {
+			etaName = fmt.Sprintf("ETA%v", diagIndex)
+			if !isBayesian {
+				for sp := range results.ShrinkageDetails[methodIndex] {
+					if len(results.ShrinkageDetails[methodIndex]) > 0 {
+						// get the data for the last method
+						shrinkageDetails := results.ShrinkageDetails[len(results.ShrinkageDetails)-1]
+						shrinkage := shrinkageDetails[sp].EtaSD[diagIndex-1]
+						if shrinkage > 30.0 {
+							shrinkageValues = append(shrinkageValues, aurora.Sprintf(aurora.Red("%s"), fmt.Sprintf("%f", shrinkage)))
+						} else {
+							shrinkageValues = append(shrinkageValues, fmt.Sprintf("%f", shrinkage))
+						}
 					}
 				}
 			}
@@ -101,8 +104,17 @@ func (results ModelOutput) Summary() bool {
 		results.RunDetails.NumberOfPatients,
 	))
 	fmt.Println("Estimation Method(s):")
-	for _, em := range results.RunDetails.EstimationMethod {
+	for _, em := range results.RunDetails.EstimationMethods {
 		fmt.Println(" - " + em)
+	}
+	if results.RunHeuristics.AnyTrue() {
+		fmt.Println(aurora.Bold(aurora.Red("Heuristic Problems Detected: ")))
+		issues := results.RunHeuristics.ErrorStrings()
+		for _, issue := range issues {
+			fmt.Println(aurora.Red(" - " + issue))
+		}
+	} else {
+		fmt.Println("No Heuristic Problems Detected")
 	}
 
 	thetaTable.Render()

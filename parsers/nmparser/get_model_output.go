@@ -1,11 +1,12 @@
 package parser
 
 import (
-	"log"
+	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/metrumresearchgroup/babylon/utils"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 )
 
@@ -26,6 +27,7 @@ func GetModelOutput(filePath string, verbose, noExt, noGrd, noCov, noCor, noShk 
 	fileLines, _ := utils.ReadLinesFS(AppFs, outputFilePath)
 	results := ParseLstEstimationFile(fileLines)
 	results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, filepath.Base(outputFilePath))
+	isBayesian := results.RunDetails.EstimationMethods[0] == "MCMC Bayesian Analysis"
 
 	if !noExt {
 		extFilePath := strings.Join([]string{filepath.Join(dir, runNum), ".ext"}, "")
@@ -41,11 +43,15 @@ func GetModelOutput(filePath string, verbose, noExt, noGrd, noCov, noCor, noShk 
 		results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, filepath.Base(extFilePath))
 	}
 
-	if !noGrd {
+	if !noGrd && !isBayesian {
 		grdFilePath := strings.Join([]string{filepath.Join(dir, runNum), ".grd"}, "")
 		grdLines, err := utils.ReadLinesFS(AppFs, grdFilePath)
 		if err != nil {
-			panic(err)
+			if os.IsNotExist(err) {
+				log.Error("no gradient file exists at: " + grdFilePath)
+			} else {
+				panic(err)
+			}
 		}
 		parametersData, _ := ParseGrdData(ParseGrdLines(grdLines))
 		results.RunHeuristics.HasFinalZeroGradient = HasZeroGradient(parametersData[len(parametersData)-1].Fixed.Theta)
@@ -69,29 +75,20 @@ func GetModelOutput(filePath string, verbose, noExt, noGrd, noCov, noCor, noShk 
 			results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, filepath.Base(corFilePath))
 		}
 	}
-
-	epsCount := 0
-	for i := range results.ParameterStructures.Sigma {
-		if results.ParameterStructures.Sigma[i] > 0 {
-			epsCount++
-		}
-	}
-	etaCount := 0
-	for i := range results.ParameterStructures.Omega {
-		if results.ParameterStructures.Omega[i] > 0 {
-			etaCount++
-		}
-	}
-
-	if !noShk {
+	etaCount := lowerDiagonalLengthToDimension[len(results.ParametersData[len(results.ParametersData)-1].Estimates.Omega)]
+	epsCount := lowerDiagonalLengthToDimension[len(results.ParametersData[len(results.ParametersData)-1].Estimates.Sigma)]
+	// bayesian model runs will never have shrinkage files
+	if !noShk && !isBayesian {
 		shkFilePath := strings.Join([]string{filepath.Join(dir, runNum), ".shk"}, "")
 		shkLines, err := utils.ReadLines(shkFilePath)
 		if err != nil {
-			panic(err)
+			if os.IsNotExist(err) {
+				log.Error("no shrinkage file exists at: " + shkFilePath)
+			} else {
+				panic(err)
+			}
 		}
 		results.ShrinkageDetails = ParseShkData(ParseShkLines(shkLines), etaCount, epsCount)
-	} else {
-		log.Printf("Shrinkage file not used. Mixture-model shrinkage data may not be accurate.")
 	}
 
 	setMissingValuesToDefault(&results, etaCount, epsCount)

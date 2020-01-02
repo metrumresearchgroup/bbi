@@ -69,7 +69,7 @@ func parseOFV(line string, ofvDetails OfvDetails) OfvDetails {
 	return ofvDetails
 }
 
-func getLargeConditionNumberStatus(lines []string, start int, largeNumberLimit float64) HeuristicStatus {
+func getLargeConditionNumberStatus(lines []string, start int, largeNumberLimit float64) bool {
 
 	// go until line of ints
 	for i, line := range lines[start:] {
@@ -110,11 +110,11 @@ func getLargeConditionNumberStatus(lines []string, start int, largeNumberLimit f
 		sort.Float64s(eigenvalues)
 		ratio := eigenvalues[len(eigenvalues)-1] / eigenvalues[0]
 		if ratio > largeNumberLimit {
-			return HeuristicTrue
+			return true
 		}
 	}
 
-	return HeuristicFalse
+	return false
 }
 
 func getMatrixData(lines []string, start int) MatrixData {
@@ -234,7 +234,7 @@ func getMatrixData(lines []string, start int) MatrixData {
 	}
 }
 
-func getCorrelationStatus(lines []string, start int, correlationLimit float64) HeuristicStatus {
+func getCorrelationStatus(lines []string, start int, correlationLimit float64) bool {
 
 	matrix := getMatrixData(lines, start).Values
 
@@ -246,15 +246,15 @@ func getCorrelationStatus(lines []string, start int, correlationLimit float64) H
 					continue
 				}
 				if math.Abs(cell) >= correlationLimit {
-					return HeuristicFalse
+					return false
 				}
 			}
 		}
 	} else {
-		return HeuristicUndefined
+		return false
 	}
 
-	return HeuristicTrue
+	return true
 }
 
 func getThetaValues(lines []string, start int) FlatArray {
@@ -287,10 +287,9 @@ func contains(a []string, value string) bool {
 	return false
 }
 
-func parseGradient(lines []string) (hasFinalZero HeuristicStatus) {
-
+func parseGradient(lines []string) bool {
 	if len(lines) == 0 {
-		return HeuristicUndefined
+		return false
 	}
 
 	fields := strings.Fields(strings.TrimSpace(strings.Replace(lines[len(lines)-1], "GRADIENT:", "", -1)))
@@ -305,7 +304,7 @@ func parseGradient(lines []string) (hasFinalZero HeuristicStatus) {
 		}
 		return HasZeroGradient(result)
 	}
-	return HeuristicFalse
+	return false
 }
 
 // get gradient lines until a blank line is reached
@@ -324,14 +323,10 @@ func getGradientLine(lines []string, start int) string {
 // ParseLstEstimationFile parses the lst file
 func ParseLstEstimationFile(lines []string) ModelOutput {
 	ofvDetails := NewOfvDetails()
-	shrinkageDetails := make([]ShrinkageDetails, 1)
 	runHeuristics := NewRunHeuristics()
-	var startParameterStructuresIndex int
-	var endParameterStucturesIndex int
 	var finalParameterEstimatesIndex int
 	var standardErrorEstimateIndex int
 	var covarianceMatrixEstimateIndex int
-	var correlationMatrixEstimateIndex int
 	var startThetaIndex int
 	var endSigmaIndex int
 	var gradientLines []string
@@ -348,10 +343,6 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 			}
 		case strings.Contains(line, "$EST") && endSigmaIndex == 0:
 			endSigmaIndex = i
-		case strings.Contains(line, "0LENGTH OF THETA"):
-			startParameterStructuresIndex = i
-		case strings.Contains(line, "0DEFAULT SIGMA BOUNDARY"):
-			endParameterStucturesIndex = i
 		case strings.Contains(line, "#OBJV"):
 			ofvDetails = parseOFV(line, ofvDetails)
 		case strings.Contains(line, "CONSTANT TO OBJECTIVE FUNCTION"):
@@ -371,37 +362,20 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 			if !strings.Contains(line, "INVERSE") {
 				covarianceMatrixEstimateIndex = i + 3
 			}
-		case strings.Contains(line, "ETASHRINK"):
-			shrinkageDetails[0] = parseShrinkage(line, shrinkageDetails[0])
-		case strings.Contains(line, "EBVSHRINK"):
-			shrinkageDetails[0] = parseShrinkage(line, shrinkageDetails[0])
-		case strings.Contains(line, "EPSSHRINK"):
-			shrinkageDetails[0] = parseShrinkage(line, shrinkageDetails[0])
-		case strings.Contains(line, "ETAshrink"):
-			shrinkageDetails[0] = parseShrinkage(line, shrinkageDetails[0])
-		case strings.Contains(line, "EBVshrink"):
-			shrinkageDetails[0] = parseShrinkage(line, shrinkageDetails[0])
-		case strings.Contains(line, "EPSshrink"):
-			shrinkageDetails[0] = parseShrinkage(line, shrinkageDetails[0])
-		case strings.Contains(line, "0MINIMIZATION SUCCESSFUL"):
-			runHeuristics.MinimizationSuccessful = HeuristicTrue
+		case strings.Contains(line, "0MINIMIZATION TERMINATED"):
+			runHeuristics.MinimizationTerminated = true
 		case strings.Contains(line, "GRADIENT:"):
 			gradientLines = append(gradientLines, getGradientLine(lines, i))
 		case strings.Contains(line, "RESET HESSIAN"):
-			runHeuristics.HessianReset = HeuristicTrue
+			runHeuristics.HessianReset = true
 		case strings.Contains(line, "PARAMETER ESTIMATE IS NEAR ITS BOUNDARY"):
-			runHeuristics.ParameterNearBoundary = HeuristicTrue
-		case strings.Contains(line, "COVARIANCE STEP OMITTED: NO"):
-			runHeuristics.CovarianceStepOmitted = HeuristicTrue
+			runHeuristics.ParameterNearBoundary = true
+		case strings.Contains(line, "COVARIANCE STEP ABORTED"):
+			runHeuristics.CovarianceStepAborted = true
 		case strings.Contains(line, "EIGENVALUES OF COR MATRIX OF ESTIMATE"):
 			// TODO: get largeNumberLimit from config
 			// or derive. something like (number of parameters) * 10
 			runHeuristics.LargeConditionNumber = getLargeConditionNumberStatus(lines, i, 1000.0)
-		case strings.Contains(line, "CORRELATION MATRIX OF ESTIMATE"):
-			correlationMatrixEstimateIndex = i
-			// TODO: get correlationLimit from config
-			runHeuristics.CorrelationsOk = getCorrelationStatus(lines, i, 0.90)
-
 		default:
 			continue
 		}
@@ -411,33 +385,28 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 
 	var finalParameterEst ParametersResult
 	var finalParameterStdErr ParametersResult
-	var parameterStructures ParameterStructures
-	var parameterNames ParameterNames
-	var covTheta, corTheta FlatArray
+	//var parameterNames ParameterNames
 
 	if standardErrorEstimateIndex > finalParameterEstimatesIndex {
 		finalParameterEst = ParseFinalParameterEstimatesFromLst(lines[finalParameterEstimatesIndex:standardErrorEstimateIndex])
 	}
 
-	if covarianceMatrixEstimateIndex > 0 {
-		covTheta = getThetaValues(lines, covarianceMatrixEstimateIndex)
-	}
+	// if covarianceMatrixEstimateIndex > 0 {
+	// 	covTheta = getThetaValues(lines, covarianceMatrixEstimateIndex)
+	// }
 
-	if correlationMatrixEstimateIndex > 0 {
-		corTheta = getThetaValues(lines, correlationMatrixEstimateIndex)
-	}
+	// if correlationMatrixEstimateIndex > 0 {
+	// 	corTheta = getThetaValues(lines, correlationMatrixEstimateIndex)
+	// }
 
 	if covarianceMatrixEstimateIndex > standardErrorEstimateIndex {
 		finalParameterStdErr = ParseFinalParameterEstimatesFromLst(lines[standardErrorEstimateIndex:covarianceMatrixEstimateIndex])
 	}
 
-	if (endParameterStucturesIndex) > startParameterStructuresIndex {
-		parameterStructures = ParseParameterStructures(lines[startParameterStructuresIndex : endParameterStucturesIndex+1])
-	}
-
-	if endSigmaIndex > startThetaIndex {
-		parameterNames = ParseParameterNames(lines[startThetaIndex:endSigmaIndex])
-	}
+	// TODO: replace parsing parameter names
+	// if endSigmaIndex > startThetaIndex {
+	// 	parameterNames = ParseParameterNames(lines[startThetaIndex:endSigmaIndex])
+	// }
 	// TODO re-replace parameter data from lst
 	result := ModelOutput{
 		RunHeuristics: runHeuristics,
@@ -448,12 +417,9 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 				StdErr:    finalParameterStdErr,
 			},
 		},
-		ParameterStructures: parameterStructures,
-		ParameterNames:      parameterNames,
-		OFV:                 ofvDetails,
-		ShrinkageDetails:    [][]ShrinkageDetails{shrinkageDetails},
-		CovarianceTheta:     []FlatArray{covTheta},
-		CorrelationTheta:    []FlatArray{corTheta},
+		ParameterNames: NewDefaultParameterNames(len(finalParameterEst.Theta), len(finalParameterEst.Omega), len(finalParameterEst.Sigma)),
+
+		OFV: ofvDetails,
 	}
 	return result
 }

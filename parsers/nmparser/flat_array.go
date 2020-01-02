@@ -1,12 +1,7 @@
 package parser
 
-// FlatArray ... to be consumed by R as matrix(Values, nrow=Dim)
-type FlatArray struct {
-	Values []float64
-	Dim    int
-}
-
-// MakeFlatArray ...
+// MakeFlatArray creates a flat array from a matrix-style
+// input of rows and columns
 func MakeFlatArray(matrix [][]float64, length int) FlatArray {
 	if length > len(matrix) {
 		panic("error making FlatArray")

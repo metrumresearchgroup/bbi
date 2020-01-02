@@ -1,5 +1,14 @@
 package parser
 
+// FlatArray provides a slice of values meant to be coerced to a matrix
+// of the dimensions Dim
+// This allows easy coercion to matrices in languages like R
+// using matrix(Values, nrow = Dim)
+type FlatArray struct {
+	Values []float64 `json:"values,omitempty"`
+	Dim    int       `json:"dim,omitempty"`
+}
+
 // ParameterNames containst the names of model parameters
 type ParameterNames struct {
 	Theta []string `json:"theta,omitempty"`
@@ -37,13 +46,13 @@ type ParametersData struct {
 // RunHeuristics ...
 // some values are defined as pointers to support tri-state: true, false, nil
 type RunHeuristics struct {
-	CovarianceStepOmitted  HeuristicStatus `json:"covariance_step_omitted,omitempty"`
-	LargeConditionNumber   HeuristicStatus `json:"large_condition_number,omitempty"`
-	CorrelationsOk         HeuristicStatus `json:"correlations_ok,omitempty"`
-	ParameterNearBoundary  HeuristicStatus `json:"parameter_near_boundary,omitempty"`
-	HessianReset           HeuristicStatus `json:"hessian_reset,omitempty"`
-	HasFinalZeroGradient   HeuristicStatus `json:"has_final_zero_gradient,omitempty"`
-	MinimizationSuccessful HeuristicStatus `json:"minimization_successful,omitempty"`
+	CovarianceStepAborted  bool `json:"covariance_step_aborted"`
+	LargeConditionNumber   bool `json:"large_condition_number"`
+	CorrelationsNotOK      bool `json:"correlations_not_ok"`
+	ParameterNearBoundary  bool `json:"parameter_near_boundary"`
+	HessianReset           bool `json:"hessian_reset"`
+	HasFinalZeroGradient   bool `json:"has_final_zero_gradient"`
+	MinimizationTerminated bool `json:"minimization_terminated"`
 }
 
 // RunDetails contains key information about logistics of the model run
@@ -57,7 +66,7 @@ type RunDetails struct {
 	SignificantDigits   float64  `json:"significant_digits,omitempty"`
 	ProblemText         string   `json:"problem_text,omitempty"`
 	ModFile             string   `json:"mod_file,omitempty"`
-	EstimationMethod    []string `json:"estimation_method,omitempty"`
+	EstimationMethods   []string `json:"estimation_method,omitempty"`
 	DataSet             string   `json:"data_set,omitempty"`
 	NumberOfPatients    int64    `json:"number_of_patients,omitempty"`
 	NumberOfObs         int64    `json:"number_of_obs,omitempty"`
@@ -83,7 +92,7 @@ type RunDetails struct {
 
 // ShrinkageDetails ...
 type ShrinkageDetails struct {
-	SubPop      int64    `json:"sub_pop,omitempty"`
+	SubPop      int64     `json:"sub_pop,omitempty"`
 	EtaBar      []float64 `json:"eta_bar,omitempty"`
 	EtaBarSE    []float64 `json:"ebv_bar_se,omitempty"`
 	Pval        []float64 `json:"pval,omitempty"`
@@ -120,15 +129,14 @@ type OfvDetails struct {
 
 // ModelOutput is the output struct from a lst file
 type ModelOutput struct {
-	RunDetails          RunDetails           `json:"run_details,omitempty"`
-	RunHeuristics       RunHeuristics        `json:"run_heuristics,omitempty"`
-	ParametersData      []ParametersData     `json:"parameters_data,omitempty"`
-	ParameterStructures ParameterStructures  `json:"parameter_structures,omitempty"`
-	ParameterNames      ParameterNames       `json:"parameter_names,omitempty"`
-	OFV                 OfvDetails           `json:"ofv,omitempty"`
-	ShrinkageDetails    [][]ShrinkageDetails `json:"shrinkage_details,omitempty"`
-	CovarianceTheta     []FlatArray          `json:"covariance_theta,omitempty"`
-	CorrelationTheta    []FlatArray          `json:"correlation_theta,omitempty"`
+	RunDetails       RunDetails           `json:"run_details,omitempty"`
+	RunHeuristics    RunHeuristics        `json:"run_heuristics,omitempty"`
+	ParametersData   []ParametersData     `json:"parameters_data,omitempty"`
+	ParameterNames   ParameterNames       `json:"parameter_names,omitempty"`
+	OFV              OfvDetails           `json:"ofv,omitempty"`
+	ShrinkageDetails [][]ShrinkageDetails `json:"shrinkage_details,omitempty"`
+	CovarianceTheta  []FlatArray          `json:"covariance_theta,omitempty"`
+	CorrelationTheta []FlatArray          `json:"correlation_theta,omitempty"`
 }
 
 // ExtData provides an intermediate representation of the ExtData after iterations have been stripped out
@@ -174,7 +182,7 @@ func NewRunDetails() RunDetails {
 		SignificantDigits:   DefaultFloat64,
 		ProblemText:         DefaultString,
 		ModFile:             DefaultString,
-		EstimationMethod:    []string{},
+		EstimationMethods:   []string{},
 		DataSet:             DefaultString,
 		NumberOfPatients:    DefaultInt64,
 		NumberOfObs:         DefaultInt64,
@@ -195,18 +203,18 @@ func NewOfvDetails() OfvDetails {
 	return ofvDetails
 }
 
-// NewRunHeuristics ...
+// NewRunHeuristics provides a new run heuristics struct
+// at the moment it just returns all defaults, however
+// this abstraction will allow more flexible refactoring
+// to control additional default logic if needed.
+// For now, the idea is to define the heuristic such that
+// given a true result, it is a negative outcome.
+// For example, rather than using a Heuristic CorrelationOK
+// in which a default false would cause significant logic
+// to test to make sure they were OK, where the implication
+// is that unless otherwise warned, they are.
+// Hence, using the Heuristic CorrelationNotOK allows
+// a reasonable default false, that can be detected true
 func NewRunHeuristics() RunHeuristics {
-	runHeuristics := RunHeuristics{
-		CovarianceStepOmitted: HeuristicUndefined, 
-		LargeConditionNumber : HeuristicUndefined, 
-		CorrelationsOk : HeuristicUndefined,       
-		ParameterNearBoundary : HeuristicUndefined,
-		HessianReset : HeuristicUndefined,         
-		HasFinalZeroGradient : HeuristicUndefined, 
-		MinimizationSuccessful: HeuristicUndefined,
-	}
-	return runHeuristics
+	return RunHeuristics{}
 }
-
-

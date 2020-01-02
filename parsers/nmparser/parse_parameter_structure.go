@@ -5,7 +5,20 @@ import (
 	"strings"
 )
 
-// ParameterStructures contains the final parameter estimate values
+// ParameterStructures contains the final parameter estimate values such
+// that for Omega and Sigma, the int slices represent which portion of
+// the model definition corresponds to the parameter values. For example
+// given mutiple $OMEGA statements, the values will correspond to different
+// blocks,
+// $OMEGA 0.04
+// $OMEGA BLOCK(2)
+// 0.04
+// 0.01 0.04
+//
+// would correspond to a lower triangular structure
+// 1
+// 0 2
+// 0 2 2
 type ParameterStructures struct {
 	Theta int
 	Omega []int

@@ -117,7 +117,7 @@ func TestParseGradient(t *testing.T) {
 
 	var tests = []struct {
 		lines                []string
-		hasZeroFinalGradient HeuristicStatus
+		hasZeroFinalGradient bool
 		context              string
 	}{
 		{
@@ -127,7 +127,7 @@ func TestParseGradient(t *testing.T) {
 				"GRADIENT:   4.8447E+01  5.7713E+01 -3.7520E+01 -9.4538E+00 -3.7976E+00  6.1177E+00 -3.1052E+00  3.6826E+00 -2.0215E+01",
 				"GRADIENT:   1.0154E-02  1.2524E-03  1.9361E-02 -6.2542E-02  4.4554E-02 -1.4700E-02 -2.3183E-02 -5.9024E-03 -5.8699E-03",
 			},
-			hasZeroFinalGradient: HeuristicFalse,
+			hasZeroFinalGradient: false,
 			context:              "no zero gradient",
 		},
 		{
@@ -137,7 +137,7 @@ func TestParseGradient(t *testing.T) {
 				"GRADIENT:   4.8447E+01  5.7713E+01 -3.7520E+01 -9.4538E+00 -3.7976E+00  6.1177E+00 -3.1052E+00  3.6826E+00 -2.0215E+01",
 				"GRADIENT:   1.0154E-02  1.2524E-03  1.9361E-02 -6.2542E-02  4.4554E-02 -1.4700E-02 -2.3183E-02 -5.9024E-03 -5.8699E-03",
 			},
-			hasZeroFinalGradient: HeuristicFalse,
+			hasZeroFinalGradient: false,
 			context:              "zero gradient",
 		},
 		{
@@ -147,7 +147,7 @@ func TestParseGradient(t *testing.T) {
 				"GRADIENT:   4.8447E+01  5.7713E+01 -3.7520E+01 -9.4538E+00 -3.7976E+00  6.1177E+00 -3.1052E+00  3.6826E+00 -2.0215E+01",
 				"GRADIENT:   0           1.2524E-03  1.9361E-02 -6.2542E-02  4.4554E-02 -1.4700E-02 -2.3183E-02 -5.9024E-03 -5.8699E-03",
 			},
-			hasZeroFinalGradient: HeuristicTrue,
+			hasZeroFinalGradient: true,
 			context:              "zero final gradient",
 		},
 		{
@@ -157,7 +157,7 @@ func TestParseGradient(t *testing.T) {
 				"GRADIENT:   0  5.7713E+01 -3.7520E+01 -9.4538E+00 -3.7976E+00  6.1177E+00 -3.1052E+00  3.6826E+00 -2.0215E+01",
 				"GRADIENT:   0  1.2524E-03  1.9361E-02 -6.2542E-02  4.4554E-02 -1.4700E-02 -2.3183E-02 -5.9024E-03 -5.8699E-03",
 			},
-			hasZeroFinalGradient: HeuristicTrue,
+			hasZeroFinalGradient: true,
 			context:              "zero gradients and zero final gradient",
 		},
 		// {
@@ -177,7 +177,7 @@ func TestSetLargeConditionNumber(t *testing.T) {
 	var tests = []struct {
 		lines                []string
 		n                    int
-		largeConditionNumber HeuristicStatus
+		largeConditionNumber bool
 		context              string
 	}{
 		{
@@ -197,7 +197,7 @@ func TestSetLargeConditionNumber(t *testing.T) {
 				" Elapsed finaloutput time in seconds:     0.16                                                                           ",
 			},
 			n:                    3,
-			largeConditionNumber: HeuristicFalse,
+			largeConditionNumber: false,
 			context:              "not large",
 		},
 		{
@@ -217,7 +217,7 @@ func TestSetLargeConditionNumber(t *testing.T) {
 				" Elapsed finaloutput time in seconds:     0.16                                                                           ",
 			},
 			n:                    3,
-			largeConditionNumber: HeuristicTrue,
+			largeConditionNumber: true,
 			context:              "large",
 		},
 		// {
@@ -239,13 +239,13 @@ func TestSetCorrelationsOk(t *testing.T) {
 	var tests = []struct {
 		lines          []string
 		n              int
-		correlationsOk HeuristicStatus
+		correlationsOk bool
 		context        string
 	}{
 		{
 			lines:          []string{"", ""},
 			n:              0,
-			correlationsOk: HeuristicUndefined,
+			correlationsOk: false,
 			context:        "empty lines, not OK",
 		},
 		{
@@ -317,7 +317,7 @@ func TestSetCorrelationsOk(t *testing.T) {
 				"1",
 			},
 			n:              3,
-			correlationsOk: HeuristicTrue,
+			correlationsOk: true,
 			context:        "OK",
 		},
 		{
@@ -387,7 +387,7 @@ func TestSetCorrelationsOk(t *testing.T) {
 				"",
 			},
 			n:              3,
-			correlationsOk: HeuristicFalse,
+			correlationsOk: false,
 			context:        "Not Ok, 2nd row",
 		},
 
@@ -458,7 +458,7 @@ func TestSetCorrelationsOk(t *testing.T) {
 				"",
 			},
 			n:              3,
-			correlationsOk: HeuristicFalse,
+			correlationsOk: false,
 			context:        "Not OK, last row",
 		},
 	}
@@ -682,6 +682,6 @@ func TestGetGradientLine(t *testing.T) {
 		line := getGradientLine(tt.lines, tt.n)
 		assert.Equal(t, tt.expected, line, "Fail :"+tt.expected)
 		hasZero := parseGradient([]string{line})
-		assert.Equal(t, HeuristicTrue, hasZero, "Fail :"+tt.expected)
+		assert.Equal(t, true, hasZero, "Fail :"+tt.expected)
 	}
 }
