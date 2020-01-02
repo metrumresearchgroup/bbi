@@ -84,7 +84,7 @@ func probs(cmd *cobra.Command, args []string) error {
 	return nil
 }
 func init() {
-	RootCmd.AddCommand(probsCmd)
+	nonmemCmd.AddCommand(probsCmd)
 }
 
 type runSummary struct {

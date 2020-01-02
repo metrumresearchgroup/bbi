@@ -12,10 +12,34 @@ import (
 	"github.com/spf13/afero"
 )
 
-// CopiedFile represents metadata about files copied after run to parent directory
-type CopiedFile struct {
+// TargetedFile represents metadata about files copied or cleaned after run
+type TargetedFile struct {
 	File  string `json:"file,omitempty"`
 	Level int    `json:"level,omitempty"`
+}
+
+//PostWorkInstructions contains all hte details for whether any cleanup or copy actions should occur during the post work phase of the operation
+type PostWorkInstructions struct {
+	FilesToCopy  FileCopyInstruction
+	FilesToClean FileCleanInstruction
+}
+
+//FileCopyInstruction includes everything necessary to copy files back to the source directory
+type FileCopyInstruction struct {
+	//The target directory where files will be copied into
+	CopyTo string
+	//The source directory from which files will be copied
+	CopyFrom string
+	//Slice of strings identifying files to be copied. Should be processed from clean level + any overrides
+	FilesToCopy []TargetedFile
+}
+
+//FileCleanInstruction includes everything necessary to remove files for a designated model run
+type FileCleanInstruction struct {
+	//Directory in which the files we will remove exist. Should correlate to template output for outputDir
+	Location string
+	//Slice of strings representing filenames to be purged. Should correlate to clean level contents
+	FilesToRemove []TargetedFile
 }
 
 // CleanEstFolderAndCopyToParent cleans the estimation folder and then copies relevant files back to parent dir
@@ -27,7 +51,7 @@ type CopiedFile struct {
 // cleanLvl := 2
 // copyLvl := 2
 // dirInfo, _ := afero.ReadDir(AppFs, filepath.Join(dir, dirToClean))
-// fileList := utils.ListFiles(dirInfo)
+// fileList := utils.ListFiles(dirInfo) - Wait if this can be executed, why pass it down stream?
 // runner.CleanEstFolderAndCopyToParent(AppFs, dir, runNum, dirToClean, fileList, cleanLvl, copyLvl, true, true)
 func CleanEstFolderAndCopyToParent(
 	fs afero.Fs,
@@ -44,10 +68,12 @@ func CleanEstFolderAndCopyToParent(
 ) error {
 	outputFiles := EstOutputFileCleanLevels(runNum)
 	keyOutputFiles := EstOutputFilesByRun(runNum)
-	var copiedFiles []CopiedFile
+	var copiedFiles []TargetedFile
 	if !filepath.IsAbs(dirToClean) {
 		dirToClean = filepath.Join(parentDir, dirToClean)
 	}
+
+	//We're literally forcably incrementing the cleanlvl / keep level to make sure they're not operated on?
 	for _, f := range keepFiles {
 		// make sure will be kept
 		outputFiles[f] = cleanLvl + 1
@@ -97,7 +123,7 @@ func CleanEstFolderAndCopyToParent(
 			}
 			fileToCopy.Close()
 			newFile.Close()
-			copiedFiles = append(copiedFiles, CopiedFile{File: file, Level: lvl})
+			copiedFiles = append(copiedFiles, TargetedFile{File: file, Level: lvl})
 		}
 
 		if len(copiedFiles) > 0 {
