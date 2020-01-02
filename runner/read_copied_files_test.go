@@ -10,13 +10,13 @@ import (
 func TestReadCopiedFiles(t *testing.T) {
 	results := []struct {
 		input  string
-		output []CopiedFile
+		output []TargetedFile
 	}{
 		{
 			"testdata/run100",
-			[]CopiedFile{
-				CopiedFile{"catab100", 1},
-				CopiedFile{"run100.lst", 3},
+			[]TargetedFile{
+				TargetedFile{"catab100", 1},
+				TargetedFile{"run100.lst", 3},
 			},
 		},
 	}

@@ -21,6 +21,7 @@ import (
 	"github.com/metrumresearchgroup/babylon/configlib"
 	"github.com/spf13/cobra"
 	flag "github.com/spf13/pflag"
+	"github.com/spf13/viper"
 )
 
 // VERSION is the current bbi version
@@ -33,6 +34,7 @@ var (
 	verbose bool
 	debug   bool
 	threads int
+	//Json indicates whether we should have a JSON tree of output
 	Json    bool
 	preview bool
 	noExt   bool
@@ -65,33 +67,31 @@ func Execute(build string) {
 func init() {
 	cobra.OnInitialize(initConfig)
 
+	//Removed "." To avoid IDEs not displaying or typical ignore patterns dropping it.
+	viper.SetConfigName("babylon")
+	viper.SetConfigType("yaml")
+
 	// Here you will define your flags and configuration settings.
 	// Cobra supports Persistent Flags, which, if defined here,
 	// will be global for your application.
 
-	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/babylonconfig.toml)")
+	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/babylon.yaml)")
 	RootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
 	RootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "debug mode")
-	RootCmd.PersistentFlags().IntVar(&threads, "threads", 0, "number of threads to execute with")
-	RootCmd.PersistentFlags().BoolVar(&Json, "json", false, "json tree of output, if possible")
-	RootCmd.PersistentFlags().BoolVarP(&preview, "preview", "p", false, "preview action, but don't actually run command")
+	RootCmd.PersistentFlags().IntVar(&threads, "threads", 4, "number of threads to execute with")
+	RootCmd.PersistentFlags().BoolVar(&Json, "json", false, "json tree of output, if possible")                           //TODO: Implement
+	RootCmd.PersistentFlags().BoolVarP(&preview, "preview", "p", false, "preview action, but don't actually run command") //TODO: Implement
+	//Used for Summary
 	RootCmd.PersistentFlags().BoolVarP(&noExt, "no-ext-file", "", false, "do not use ext file")
 	RootCmd.PersistentFlags().BoolVarP(&noGrd, "no-grd-file", "", false, "do not use grd file")
 	RootCmd.PersistentFlags().BoolVarP(&noCov, "no-cov-file", "", false, "do not use cov file")
 	RootCmd.PersistentFlags().BoolVarP(&noCor, "no-cor-file", "", false, "do not use cor file")
 	RootCmd.PersistentFlags().BoolVarP(&noShk, "no-shk-file", "", false, "do not use shk file")
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
 }
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	// if cfgFile != "" { // enable ability to specify config file via flag
-	// 	viper.SetConfigFile(cfgFile)
-	// }
-	// TODO: set config a little more flexibly
-	err := configlib.LoadGlobalConfig("babylonconfig")
+	err := configlib.LoadGlobalConfig("babylon")
 	if err != nil {
 		fmt.Println(fmt.Errorf("err initializing config %s", err))
 	}

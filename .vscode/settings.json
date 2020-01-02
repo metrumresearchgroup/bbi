@@ -1,5 +1,5 @@
 {
-"window.zoomLevel": 2,
+"window.zoomLevel": 1,
 "go.lintOnSave": "package",
 "editor.fontFamily": "'Fira Code', Menlo, Monaco, 'Courier New', monospace",
 "editor.fontLigatures": true,
@@ -8,6 +8,17 @@
     "options": "json=omitempty",
     "promptForTags": true,
     "transform": "snakecase"
+},
+"go.delveConfig": {
+    "dlvLoadConfig": {
+        "followPointers": true,
+        "maxVariableRecurse": 1,
+        "maxStringLen": 1024,
+        "maxArrayValues": 128,
+        "maxStructFields": -1
+    },
+    "apiVersion": 2,
+    "showGlobalVariables": true
 },
 "go.editorContextMenuCommands": {
     "toggleTestFile": true,

@@ -13,7 +13,8 @@ type RunSettings struct {
 	ExeNameInCache     string `json:"exe_name_in_cache,omitempty"`
 	NmExecutableOrPath string `json:"nm_executable_or_path,omitempty"`
 	OneEst             bool   `json:"one_est,omitempty"`
-	ProposedRunDir     string `json:"proposed_run_dir,omitempty"`
+	OutputDir          string `json:"output_dir,omitempty"`
+	Overwrite          bool   `json:"overwrite,omitempty"`
 }
 
 // ReturnStatus gives information about the result of a model run
