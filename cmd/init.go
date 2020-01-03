@@ -8,8 +8,8 @@ import (
 // RunCmd represents the run command
 var initCmd = &cobra.Command{
 	Use:   "init",
-	Short: "Setups up configuration file with defaults",
-	Long: `run bbi init to create a babylon.yaml configuration file in the current directory.
+	Short: "Create configuration file with defaults",
+	Long: `Run bbi init to create a babylon.yaml configuration file in the current directory.
  `,
 	Run: initializer,
 }
