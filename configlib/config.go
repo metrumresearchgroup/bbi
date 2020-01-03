@@ -9,16 +9,24 @@ import (
 )
 
 type Config struct {
-	NMExecutable  string `yaml:"nmExecutable"`
-	Overwrite     bool   `yaml:"overwrite"`
-	CleanLvl      int    `yaml:"cleanLvl"`
-	CopyLvl       int    `yaml:"copyLvl"`
-	Git           bool   `yaml:"git"`
-	BabylonBinary string `yaml:"babylonbinary"`
-	SaveConfig    bool   `yaml:"saveConfig"`
-	OutputDir     string `yaml:"outputDir"`
-	Threads       int    `yaml:"threads"`
-	Debug         bool   `yaml:"debug"`
+	NMVersion     string                  `yaml:"nmVersion"`
+	Overwrite     bool                    `yaml:"overwrite"`
+	CleanLvl      int                     `yaml:"cleanLvl"`
+	CopyLvl       int                     `yaml:"copyLvl"`
+	Git           bool                    `yaml:"git"`
+	BabylonBinary string                  `yaml:"babylonbinary"`
+	SaveConfig    bool                    `yaml:"saveConfig"`
+	OutputDir     string                  `yaml:"outputDir"`
+	Threads       int                     `yaml:"threads"`
+	Debug         bool                    `yaml:"debug"`
+	Nonmem        map[string]NonMemDetail `mapstructure:"nonmem"`
+}
+
+type NonMemDetail struct {
+	Home       string `yaml:"home"`
+	Executable string `yaml:"executable"`
+	Nmqual     bool   `yaml:"nmqual"`
+	Default    bool   `yaml:"default"`
 }
 
 // LoadGlobalConfig loads nonmemutils configuration into the global Viper
@@ -98,6 +106,5 @@ func SaveConfig(configpath string) {
 func UnmarshalViper() Config {
 	c := Config{}
 	viper.Unmarshal(&c)
-
 	return c
 }

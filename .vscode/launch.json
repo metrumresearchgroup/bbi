@@ -24,6 +24,8 @@
             "env": {},
             "args": [
                 "nonmem",
+                "--nmVersion",
+                "nm74",
                 "run",
                 "--saveConfig=true",
                 "--copyLvl",

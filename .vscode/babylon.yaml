@@ -1,0 +1,38 @@
+babylonbinary: /data/bbi
+cachedir: mdlcache
+cacheexe: ""
+cleanlvl: 0
+copylvl: 1
+git: true
+gitignorelvl: 1
+nmexecutable: nmfe74
+nmversion: ""
+nobuild: false
+nonmem:
+  nm73_gf:
+    default: false
+    executable: nmfe73
+    home: /opt/NONMEM/nm73gf
+    nmqual: true
+  nm73_nmfe:
+    default: false
+    executable: nmfe73
+    home: /opt/NONMEM/nm73gf_nmfe
+    nmqual: false
+  nm74:
+    default: true
+    executable: nmfe74
+    home: /opt/NONMEM/nm74
+    nmqual: true
+  nm74_nmfe:
+    default: false
+    executable: nmfe74
+    home: /opt/NONMEM/nm74gf_nmfe
+    nmqual: false
+oneest: false
+outputdir: '{{ .Name }}'
+overwrite: true
+recleanlvl: 0
+saveconfig: true
+saveexe: ""
+threads: 16

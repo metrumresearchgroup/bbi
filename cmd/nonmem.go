@@ -144,9 +144,9 @@ func nonmem(cmd *cobra.Command, args []string) {
 func init() {
 	RootCmd.AddCommand(nonmemCmd)
 
-	//NM Executable
-	nonmemCmd.PersistentFlags().String("nmExecutable", "nmfe74", "Name of nonmem executable to use. Defaults to nmfe74 (NM7.4)")
-	viper.BindPFlag("nmExecutable", nonmemCmd.PersistentFlags().Lookup("nmExecutable"))
+	//NM Selector
+	nonmemCmd.PersistentFlags().String("nmVersion", "", "Version of nonmem from the configuration list to use")
+	viper.BindPFlag("nmVersion", nonmemCmd.PersistentFlags().Lookup("nmVersion"))
 }
 
 // "Copies" a file by reading its content (optionally updating the path)
@@ -222,9 +222,31 @@ func generateScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 
 func buildNonMemCommandString(l NonMemModel) string {
 
+	var nmHome string
+	var nmBinary string
+
+	if viper.GetString("nmVersion") == "" {
+		//Find the default location
+		for _, v := range l.Configuration.Nonmem {
+			if v.Default {
+				nmHome = v.Home
+				nmBinary = v.Executable
+			}
+		}
+	} else {
+		//Try to access the Provided value
+		if val, ok := l.Configuration.Nonmem[viper.GetString("nmVersion")]; ok {
+			nmHome = val.Home
+			nmBinary = val.Executable
+		} else {
+			//Not a valid option!
+			log.Fatalf("nmVersion of %s was provided but has no configurations in babylon.yaml!", viper.GetString("nmVersion"))
+		}
+	}
+
 	// TODO: Implement cache
 	noBuild := false
-	nmExecutable := l.Configuration.NMExecutable
+	nmExecutable := path.Join(nmHome, "run", nmBinary)
 	cmdArgs := []string{
 		path.Join(l.OutputDir, l.Model),
 		"",
@@ -514,6 +536,11 @@ func NewNonMemModel(modelname string) NonMemModel {
 	}
 
 	lm.Configuration = configlib.UnmarshalViper()
+
+	//Check to see if We for some reason have no nonmem contents
+	if len(lm.Configuration.Nonmem) == 0 {
+		log.Fatal("No nonmem configurations were loaded in from file. Please make sure the nonmem key and its children are present in babylon.yaml")
+	}
 
 	return lm
 }
