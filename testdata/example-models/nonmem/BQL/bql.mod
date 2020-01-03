@@ -1,6 +1,6 @@
 $PROBLEM RUN# 2 - 2cmpt model - no BQLs 
 $INPUT C ID TIME DV AMT EVID AGE WT MDV  
-$DATA ./nobqldata.csv IGNORE=C
+$DATA nobqldata.csv IGNORE=C
 $SUBROUTINES ADVAN4 TRANS4 
 $PK
  TVCL = THETA(1)*(WT/70)**THETA(6)

@@ -2,7 +2,7 @@ $PROB RUN# 1 FULL TMDD MODEL EXAMPLE
 $INPUT C ID AMT TIME DV EVID CMT L2
 ;DV is in molar concentration (pM)
 ;AMT is in molar amount (pmoles)
-$DATA ./TMDD.csv IGNORE=C
+$DATA TMDD.csv IGNORE=C
 
 $SUBROUTINE ADVAN6 TRANS1 TOL=4
 
