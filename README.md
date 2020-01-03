@@ -40,7 +40,7 @@ For Example:
  For automation and reproducability purposes, that can be painful, leading to scripting purely for the purpose of re-executing the job the same was it was originally run. This can be remedied via a `yaml` config file in one of two ways:
 
  * The `--saveConfig` flag will take all the flags you have passed and write it to `babylon.yaml` in the same directory as the model file you provide as an argument
- * You may also manually curate a `babylon.yaml` into the directory of the model file you will be submitting. The keys for the config will match any flag you can provide during execution.
+ * You may also use the `bbi init` command in the directory with your models to create a default configuration file. you may alter this as necessary to meet your needs.
 
  Configurations for execution are located (in order of priority)
 
