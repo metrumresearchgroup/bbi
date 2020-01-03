@@ -33,13 +33,13 @@ func initializer(cmd *cobra.Command, args []string) {
 	viper.Set("nonmem.nm73_nmfe.default", false)
 	viper.Set("nonmem.nm73_nmfe.executable", "nmfe73")
 	viper.Set("nonmem.nm73_nmfe.home", "/opt/NONMEM/nm73gf_nmfe")
-	viper.Set("nonmem.nm73_nmfe.nmqual", false)
+	viper.Set("nonmem.nm73_nmfe.nmqual", true)
 
 	//nm74_nmfe
 	viper.Set("nonmem.nm74_nmfe.default", false)
 	viper.Set("nonmem.nm74_nmfe.executable", "nmfe74")
 	viper.Set("nonmem.nm74_nmfe.home", "/opt/NONMEM/nm74gf_nmfe")
-	viper.Set("nonmem.nm74_nmfe.nmqual", false)
+	viper.Set("nonmem.nm74_nmfe.nmqual", true)
 
 	viper.WriteConfigAs("./babylon.yaml")
 
