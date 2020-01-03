@@ -167,10 +167,12 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 		copied = append(copied, v)
 	}
 
-	//Write to File in original path indicating what all was copied
-	copiedJSON, _ := json.MarshalIndent(copied, "", "    ")
+	if len(copied) > 0 {
+		//Write to File in original path indicating what all was copied
+		copiedJSON, _ := json.MarshalIndent(copied, "", "    ")
 
-	afero.WriteFile(fs, path.Join(l.Nonmem.OriginalPath, l.Nonmem.FileName+"_copied.json"), copiedJSON, 0750)
+		afero.WriteFile(fs, path.Join(l.Nonmem.OriginalPath, l.Nonmem.FileName+"_copied.json"), copiedJSON, 0750)
+	}
 
 	//Clean Up
 	//log.Printf("Beginning cleanup operations for model %s\n", l.FileName)
