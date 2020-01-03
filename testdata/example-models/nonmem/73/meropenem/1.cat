@@ -1,7 +1,0 @@
-Thu Oct 24 15:52:49 2019
-cannot locate *.tab in control stream for run 
-cannot locate *par.tab in control stream for run 
-cannot locate *.msf in control stream for run 
-perl -S /opt/NONMEM/nm73gf/nmqual/autolog.pl /opt/NONMEM/nm73gf/nmqual/log.xml run ce ../model/nonmem/73/meropenem/1 1
-Run 1 has exit code 0
-cannot locate *.tab in control stream for run 1
