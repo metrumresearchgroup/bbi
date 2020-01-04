@@ -63,10 +63,12 @@ func initializer(cmd *cobra.Command, args []string) {
 				continue
 			}
 
-			viper.Set("nonmem."+v+".default", false)
-			viper.Set("nonmem."+v+".executable", nm)
-			viper.Set("nonmem."+v+".home", filepath.Join(l, v))
-			viper.Set("nonmem."+v+".nmqual", hasNMQual(filepath.Join(l, v)))
+			identifier := filepath.Base(v)
+
+			viper.Set("nonmem."+identifier+".default", false)
+			viper.Set("nonmem."+identifier+".executable", nm)
+			viper.Set("nonmem."+identifier+".home", v)
+			viper.Set("nonmem."+identifier+".nmqual", hasNMQual(filepath.Join(l, v)))
 
 		}
 	}
