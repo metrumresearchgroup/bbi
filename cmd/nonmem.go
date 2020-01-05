@@ -110,6 +110,10 @@ type NonMemModel struct {
 	Model string `json:"model_name"`
 	//Path is the Fully Qualified Path to the original model
 	Path string `json:"model_path"`
+	// DataPath is the path to the data when executing the model
+	DataPath string `json:"data_path"`
+	// DataMD5 is the md5hash of the data
+	DataMD5 string `json:"data_md5"`
 	//FileName is the Filename component (sans extension)
 	FileName string `json:"model_filename"`
 	//Extension is the extension of the file
