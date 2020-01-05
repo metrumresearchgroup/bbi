@@ -426,5 +426,5 @@ func writeNonmemConfig(model NonMemModel) error {
 		return err
 	}
 
-	return afero.WriteFile(afero.NewOsFs(), path.Join(model.OutputDir, "config.json"), outBytes, 0750)
+	return afero.WriteFile(afero.NewOsFs(), path.Join(model.OutputDir, "bbi_config.json"), outBytes, 0750)
 }
