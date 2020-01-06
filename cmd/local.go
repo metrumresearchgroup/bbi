@@ -7,6 +7,7 @@ import (
 	"log"
 	"os/exec"
 	"path"
+	"runtime"
 	"strings"
 	"time"
 
@@ -242,6 +243,11 @@ func local(cmd *cobra.Command, args []string) {
 
 	if debug {
 		viper.Debug()
+	}
+
+	//Check for parallel mode provided with more nodes than CPU Cores
+	if viper.GetInt("parallel.nodes") > runtime.NumCPU() {
+		log.Fatalf("%d nodes were requested for parallel operation, but this system only has %d CPUs", viper.GetInt("parallel.nodes"), runtime.NumCPU())
 	}
 
 	if viper.ConfigFileUsed() != "" {
