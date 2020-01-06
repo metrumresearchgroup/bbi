@@ -341,7 +341,6 @@ func buildNonMemCommandString(l NonMemModel) string {
 	}
 
 	//Section for Appending the parafile command
-	println(viper.GetInt("parallel.nodes"))
 	if l.Configuration.Parallel.Parallel {
 		cmdArgs = append(cmdArgs, "-parafile="+path.Join(l.OutputDir, paraFileName))
 	}
