@@ -107,6 +107,14 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 
 	//rwxr-x---
 	afero.WriteFile(fs, path.Join(l.Nonmem.OutputDir, l.Nonmem.FileName+".sh"), scriptContents, 0750)
+
+	if l.Nonmem.Configuration.Parallel.Parallel {
+		err = writeParaFile(l.Nonmem)
+		if err != nil {
+			log.Fatalf("Configuration requires parallel operation, but generation or writing of the parafile has failed: %s", err)
+		}
+	}
+
 }
 
 //Work describes the Turnstile execution phase -> IE What heavy lifting should be done

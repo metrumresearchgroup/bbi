@@ -49,6 +49,29 @@ const sgeExecutionTemplate string = `#!/bin/bash
 {{ .Command }}
 `
 
+//Parse type 2 refers to evenly load balanced work
+//Transfer Type 1 refers to MPI
+//TIMEOUTI 100 means wait 100 seconds for node to become available
+//TIMEOUT 10 means wait 10 seconds for work to complete -> Should default to 10
+const nonmemParaFiletemplate string = `$GENERAL
+NODES={{ .TotalNodes }} PARSE_TYPE=2 TIMEOUTI=100 TIMEOUT={{ .CompletionTimeout }} PARAPRINT=0 TRANSFER_TYPE=1
+$COMMANDS
+1: {{ .MpiExecPath }} -wdir "$PWD" -n {{ .HeadNodes }} ./nonmem $*
+2:-wdir "$PWD" -n {{ .WorkerNodes }} ./nonmem -wnf
+$DIRECTORIES
+1:NONE
+2-[nodes]:worker{#-1}`
+
+const paraFileName string = "para.pnm"
+
+type nonmemParallelDirective struct {
+	TotalNodes        int
+	CompletionTimeout int
+	MpiExecPath       string
+	HeadNodes         int
+	WorkerNodes       int
+}
+
 var controlStreamExtensions []string = []string{
 	".mod", //PSN Style
 	".ctl", //Metrum Style
@@ -145,8 +168,26 @@ func init() {
 	RootCmd.AddCommand(nonmemCmd)
 
 	//NM Selector
-	nonmemCmd.PersistentFlags().String("nmVersion", "", "Version of nonmem from the configuration list to use")
-	viper.BindPFlag("nmVersion", nonmemCmd.PersistentFlags().Lookup("nmVersion"))
+	const nmVersionIdentifier string = "nmVersion"
+	nonmemCmd.PersistentFlags().String(nmVersionIdentifier, "", "Version of nonmem from the configuration list to use")
+	viper.BindPFlag(nmVersionIdentifier, nonmemCmd.PersistentFlags().Lookup(nmVersionIdentifier))
+
+	//Parallelization Components
+	const parallelIdentifier string = "parallel"
+	nonmemCmd.PersistentFlags().Bool(parallelIdentifier, false, "Whether or not to run nonmem in parallel mode")
+	viper.BindPFlag("parallel."+parallelIdentifier, nonmemCmd.PersistentFlags().Lookup(parallelIdentifier))
+
+	const parallelNodesIdentifier string = "nodes"
+	nonmemCmd.PersistentFlags().Int(parallelNodesIdentifier, 8, "The number of nodes on which to perform parallel operations")
+	viper.BindPFlag("parallel."+parallelNodesIdentifier, nonmemCmd.PersistentFlags().Lookup(parallelNodesIdentifier))
+
+	const parallelCompletionTimeoutIdentifier string = "timeout"
+	nonmemCmd.PersistentFlags().Int(parallelCompletionTimeoutIdentifier, 30, "The amount of time to wait for parallel operations in nonmem before timing out")
+	viper.BindPFlag("parallel."+parallelCompletionTimeoutIdentifier, nonmemCmd.PersistentFlags().Lookup(parallelCompletionTimeoutIdentifier))
+
+	const mpiExecPathIdentifier string = "mpiExecPath"
+	nonmemCmd.PersistentFlags().String(mpiExecPathIdentifier, "/usr/local/mpich3/bin/mpiexec", "The fully qualified path to mpiexec. Used for nonmem parallel operations")
+	viper.BindPFlag("parallel."+mpiExecPathIdentifier, nonmemCmd.PersistentFlags().Lookup(mpiExecPathIdentifier))
 }
 
 // "Copies" a file by reading its content (optionally updating the path)
@@ -220,6 +261,47 @@ func generateScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
+func writeParaFile(l NonMemModel) error {
+	contentBytes, err := generateParaFile(l)
+
+	//Something failed during generation
+	if err != nil {
+		return err
+	}
+
+	contentLines := strings.Split(string(contentBytes), "\n")
+
+	return utils.WriteLines(contentLines, path.Join(l.OutputDir, paraFileName))
+
+}
+
+func generateParaFile(l NonMemModel) ([]byte, error) {
+	nmp := nonmemParallelDirective{
+		TotalNodes:        l.Configuration.Parallel.Nodes,
+		HeadNodes:         l.Configuration.Parallel.Nodes - (l.Configuration.Parallel.Nodes - 1),
+		WorkerNodes:       l.Configuration.Parallel.Nodes - 1,
+		CompletionTimeout: l.Configuration.Parallel.Timeout,
+		MpiExecPath:       l.Configuration.Parallel.MPIExecPath,
+	}
+
+	buf := new(bytes.Buffer)
+
+	t := template.New("parafile")
+	parsed, err := t.Parse(nonmemParaFiletemplate)
+
+	if err != nil {
+		return []byte{}, err
+	}
+
+	err = parsed.Execute(buf, nmp)
+
+	if err != nil {
+		return []byte{}, err
+	}
+
+	return buf.Bytes(), nil
+}
+
 func buildNonMemCommandString(l NonMemModel) string {
 
 	var nmHome string
@@ -256,6 +338,12 @@ func buildNonMemCommandString(l NonMemModel) string {
 
 	if noBuild {
 		cmdArgs = append(cmdArgs, "--nobuild")
+	}
+
+	//Section for Appending the parafile command
+	println(viper.GetInt("parallel.nodes"))
+	if l.Configuration.Parallel.Parallel {
+		cmdArgs = append(cmdArgs, "-parafile="+path.Join(l.OutputDir, paraFileName))
 	}
 
 	return nmExecutable + " " + strings.Join(cmdArgs, " ")
