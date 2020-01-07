@@ -34,7 +34,7 @@ type ParallelConfig struct {
 	Parallel    bool   `yaml:"parallel" json:"parallel,omitempty"`
 	Nodes       int    `yaml:"nodes" json:"nodes,omitempty"`
 	MPIExecPath string `yaml:"mpiExecPath" json:"mpiExecPath,omitempty"`
-	Timeout     int    `yaml:"timeout" jason:"timeout,omitempty"`
+	Timeout     int    `yaml:"timeout" json:"timeout,omitempty"`
 }
 
 // LoadGlobalConfig loads nonmemutils configuration into the global Viper
