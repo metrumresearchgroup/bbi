@@ -1,12 +1,15 @@
 package cmd
 
 import (
+	"crypto/md5"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"os/exec"
 	"path"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -19,7 +22,6 @@ import (
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"gopkg.in/yaml.v2"
 )
 
 var arguments []string
@@ -137,6 +139,37 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 	time.Sleep(10 * time.Millisecond)
 	log.Printf("Beginning cleanup phase for model %s\n", l.Nonmem.FileName)
 	fs := afero.NewOsFs()
+	// while the rest of the cleanup is happening, lets also hash the data in the background
+	// so don't have to wait extra time if its on the larger end
+	//Get the lines of the file
+	modelPath := filepath.Join(l.Nonmem.OutputDir, l.Nonmem.Model)
+	sourceLines, err := utils.ReadLines(modelPath)
+
+	if err != nil {
+		log.Printf("error reading model at path: %s, to extract data path: %s\n", modelPath, err)
+	}
+	for _, line := range sourceLines {
+		if strings.Contains(line, "$DATA") {
+			// extract out data path
+			l.Nonmem.DataPath = filepath.Clean(strings.Fields(line)[1])
+		}
+	}
+	hashChan := make(chan string)
+	go func() {
+		f, err := os.Open(l.Nonmem.DataPath)
+		if err != nil {
+			log.Printf("error reading data to hash: %s\n", err)
+			hashChan <- ""
+		}
+		defer f.Close()
+
+		h := md5.New()
+		if _, err := io.Copy(h, f); err != nil {
+			log.Printf("error hashing data: %s\n", err)
+			hashChan <- ""
+		}
+		hashChan <- fmt.Sprintf("%x", h.Sum(nil))
+	}()
 
 	//Magical instructions
 	//TODO: Implement flags for mandatory copy and cleanup exclusions
@@ -166,11 +199,11 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 		err = utils.WriteLines(source, path.Join(pwi.FilesToCopy.CopyTo, file))
 
 		if err != nil {
-			log.Printf("An erorr occurred while attempting to copy the files: File is %s", v.File)
+			log.Printf("An error occurred while attempting to copy the files: File is %s", v.File)
 			continue
 		}
 
-		v.File = l.Nonmem.OutputDir + "/" + v.File
+		v.File = filepath.Join(l.Nonmem.OutputDir, v.File)
 
 		copied = append(copied, v)
 	}
@@ -207,8 +240,11 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 	//Gitignore operations
 	createNewGitIgnoreFile(l.Nonmem)
 
+	// this should have been either completed well before, or must at least wait now to complete the hash
+	// before writing out the config
+	l.Nonmem.DataMD5 = <-hashChan
 	//Serialize and Write the Config down to a file
-	err := writeNonmemConfig(l.Nonmem)
+	err = writeNonmemConfig(l.Nonmem)
 
 	if err != nil {
 		channels.Failed <- 1
@@ -392,13 +428,11 @@ func createNewGitIgnoreFile(m NonMemModel) error {
 }
 
 func writeNonmemConfig(model NonMemModel) error {
-	outBytes, err := yaml.Marshal(model.Configuration)
+	outBytes, err := json.MarshalIndent(model, "", "    ")
 
 	if err != nil {
 		return err
 	}
 
-	outString := strings.Split(string(outBytes), "\n")
-
-	return utils.WriteLines(outString, path.Join(model.OutputDir, "config.yaml"))
+	return afero.WriteFile(afero.NewOsFs(), path.Join(model.OutputDir, "bbi_config.json"), outBytes, 0750)
 }
