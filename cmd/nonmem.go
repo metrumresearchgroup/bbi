@@ -182,7 +182,7 @@ func init() {
 	viper.BindPFlag("parallel."+parallelNodesIdentifier, nonmemCmd.PersistentFlags().Lookup(parallelNodesIdentifier))
 
 	const parallelCompletionTimeoutIdentifier string = "timeout"
-	nonmemCmd.PersistentFlags().Int(parallelCompletionTimeoutIdentifier, 30, "The amount of time to wait for parallel operations in nonmem before timing out")
+	nonmemCmd.PersistentFlags().Int(parallelCompletionTimeoutIdentifier, 2147483647, "The amount of time to wait for parallel operations in nonmem before timing out")
 	viper.BindPFlag("parallel."+parallelCompletionTimeoutIdentifier, nonmemCmd.PersistentFlags().Lookup(parallelCompletionTimeoutIdentifier))
 
 	const mpiExecPathIdentifier string = "mpiExecPath"
