@@ -125,6 +125,19 @@ var nonMemTemporaryFiles []string = []string{
 	"fort.2002",
 	"flushtime.set",
 	"nonmem",
+	"FPWARN",
+	"condorarguments.set",
+	"condoropenmpiscript.set",
+	"condor.set",
+	"mpiloc",
+	"nmmpi.sh",
+	"temp.out",
+	"trashfile.xxx",
+}
+
+var parallelRegexesToRemove []string = []string{
+	"worker[0-9]{1,}",
+	"fort.[0-9]{1,}",
 }
 
 //NonMemModel is the definition of a model for NonMem including its target directories and settings required for execution
@@ -367,6 +380,26 @@ func filesToCleanup(model NonMemModel, exceptions ...string) runner.FileCleanIns
 		if !isFilenameInExceptions(exceptions, v) {
 			//Let's add it to the cleanup list if it's not in the exclusions
 			fci.FilesToRemove = append(fci.FilesToRemove, newTargetFile(v, model.Configuration.CleanLvl))
+		}
+	}
+
+	if model.Configuration.Parallel.Parallel {
+		fs := afero.NewOsFs()
+		for _, variant := range parallelRegexesToRemove {
+
+			r := regexp.MustCompile(variant)
+
+			files, err := afero.ReadDir(fs, model.OutputDir)
+
+			if err != nil {
+				log.Printf("Error trying to read directory %s for parallel files to cleanup", model.OutputDir)
+			}
+
+			for _, f := range files {
+				if r.MatchString(f.Name()) {
+					fci.FilesToRemove = append(fci.FilesToRemove, newTargetFile(f.Name(), model.Configuration.CleanLvl))
+				}
+			}
 		}
 	}
 
