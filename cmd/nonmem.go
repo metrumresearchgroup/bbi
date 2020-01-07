@@ -326,6 +326,10 @@ func buildNonMemCommandString(l NonMemModel) string {
 		}
 	}
 
+	if nmHome == "" {
+		log.Fatal("No version was supplied and no default value exists in the configset")
+	}
+
 	// TODO: Implement cache
 	noBuild := false
 	nmExecutable := path.Join(nmHome, "run", nmBinary)

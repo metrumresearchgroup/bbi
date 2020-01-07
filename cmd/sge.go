@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path"
 	"regexp"
+	"strconv"
 	"strings"
 	"text/template"
 	"time"
@@ -234,11 +235,27 @@ func executeSGEJob(model NonMemModel) turnstile.ConcurrentError {
 	//Find Qsub
 	binary, err := exec.LookPath("qsub")
 
+	qsubArguments := []string{}
+
+	if model.Configuration.Parallel.Parallel {
+		qsubArguments = []string{
+			"-V",
+			"-j",
+			"y",
+			"-pe",
+			"orte",
+			strconv.Itoa(model.Configuration.Parallel.Nodes),
+		}
+	}
+
+	qsubArguments = append(qsubArguments, scriptName)
+
 	if err != nil {
 		return newConcurrentError(model.Model, "Could not locate qsub binary in path", err)
 	}
 
-	command := exec.Command(binary, scriptName)
+	command := exec.Command(binary, qsubArguments...)
+
 	command.Env = os.Environ() //Take in OS Environment
 
 	output, err := command.CombinedOutput()
