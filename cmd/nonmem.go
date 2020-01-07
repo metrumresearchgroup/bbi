@@ -142,10 +142,16 @@ var parallelRegexesToRemove []string = []string{
 
 //NonMemModel is the definition of a model for NonMem including its target directories and settings required for execution
 type NonMemModel struct {
+	// BBIVersion is the bbi version used to execute the model
+	BBIVersion string `json:"bbi_version"`
 	//Model is the name of the model on which we will action: acop.mod
 	Model string `json:"model_name"`
 	//Path is the Fully Qualified Path to the original model
 	Path string `json:"model_path"`
+	// DataPath is the path to the data when executing the model
+	DataPath string `json:"data_path"`
+	// DataMD5 is the md5hash of the data
+	DataMD5 string `json:"data_md5"`
 	//FileName is the Filename component (sans extension)
 	FileName string `json:"model_filename"`
 	//Extension is the extension of the file
@@ -585,7 +591,9 @@ func postWorkNotice(m *turnstile.Manager, t time.Time) {
 //NewNonMemModel creates the core nonmem dataset from the passed arguments
 func NewNonMemModel(modelname string) NonMemModel {
 
-	lm := NonMemModel{}
+	lm := NonMemModel{
+		BBIVersion: VERSION,
+	}
 	fs := afero.NewOsFs()
 
 	if filepath.IsAbs(modelname) {
