@@ -278,7 +278,7 @@ func writeParaFile(l NonMemModel) error {
 func generateParaFile(l NonMemModel) ([]byte, error) {
 	nmp := nonmemParallelDirective{
 		TotalNodes:        l.Configuration.Parallel.Nodes,
-		HeadNodes:         l.Configuration.Parallel.Nodes - (l.Configuration.Parallel.Nodes - 1),
+		HeadNodes:         1,
 		WorkerNodes:       l.Configuration.Parallel.Nodes - 1,
 		CompletionTimeout: l.Configuration.Parallel.Timeout,
 		MpiExecPath:       l.Configuration.Parallel.MPIExecPath,
