@@ -41,9 +41,9 @@ func init() {
 	viper.SetDefault("outputDir", "{{ .Name }}")
 
 	//Int Variables
-	runCmd.PersistentFlags().Int("cleanLvl", 0, "clean level used for file output from a given (set of) runs")
+	runCmd.PersistentFlags().Int("cleanLvl", 1, "clean level used for file output from a given (set of) runs")
 	viper.BindPFlag("cleanLvl", runCmd.PersistentFlags().Lookup("cleanLvl"))
-	viper.SetDefault("cleanLvl", 0)
+	viper.SetDefault("cleanLvl", 1)
 
 	runCmd.PersistentFlags().Int("copyLvl", 0, "copy level used for file output from a given (set of) runs")
 	viper.BindPFlag("copyLvl", runCmd.PersistentFlags().Lookup("copyLvl"))
