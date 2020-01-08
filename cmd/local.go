@@ -31,16 +31,15 @@ type localOperation struct {
 //LocalModel is the struct used for local operations containing the NonMemModel
 type LocalModel struct {
 	Nonmem NonMemModel
+	Cancel chan bool
 }
 
-//NewLocalNonMemModel builds the core struct from the model name argument
-func NewLocalNonMemModel(modelname string) LocalModel {
-	return LocalModel{
-		Nonmem: NewNonMemModel(modelname),
-	}
-}
 
 //Begin Scalable method definitions
+
+func (l LocalModel) CancellationChannel() chan bool {
+	return l.Cancel
+}
 
 //Prepare is basically the old EstimateModel function. Responsible for creating directories and preparation.
 func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
@@ -56,7 +55,7 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 		if l.Nonmem.Configuration.Overwrite {
 			err := fs.RemoveAll(l.Nonmem.OutputDir)
 			if err != nil {
-				channels.Failed <- 1
+				l.Cancel <- true
 				channels.Errors <- turnstile.ConcurrentError{
 					RunIdentifier: l.Nonmem.Model,
 					Error:         err,
@@ -65,7 +64,7 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 				return
 			}
 		} else {
-			channels.Failed <- 1
+			l.Cancel <- true
 			channels.Errors <- turnstile.ConcurrentError{
 				RunIdentifier: l.Nonmem.Model,
 				Error:         errors.New("The output directory already exists"),
@@ -83,13 +82,9 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 		WriteGitIgnoreFile(l.Nonmem.OutputDir)
 	}
 
+
 	if err != nil {
-		channels.Failed <- 1
-		channels.Errors <- turnstile.ConcurrentError{
-			RunIdentifier: l.Nonmem.Model,
-			Error:         err,
-			Notes:         fmt.Sprintf("There appears to have been an issue trying to copy %s to %s", l.Nonmem.Model, l.Nonmem.OutputDir),
-		}
+		RecordConcurrentError(l.Nonmem.Model,fmt.Sprintf("There appears to have been an issue trying to copy %s to %s", l.Nonmem.Model, l.Nonmem.OutputDir),err,channels,l.Cancel)
 		return
 	}
 
@@ -97,12 +92,13 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 	scriptContents, err := generateScript(nonMemExecutionTemplate, l.Nonmem)
 
 	if err != nil {
-		channels.Failed <- 1
+		l.Cancel <- true
 		channels.Errors <- turnstile.ConcurrentError{
 			RunIdentifier: l.Nonmem.Model,
 			Error:         err,
 			Notes:         "An error occurred during the creation of the executable script for this model",
 		}
+		return
 	}
 
 	//rwxr-x---
@@ -114,7 +110,7 @@ func (l LocalModel) Work(channels *turnstile.ChannelMap) {
 	cerr := executeNonMemJob(executeLocalJob, l.Nonmem)
 
 	if cerr.Error != nil {
-		recordConcurrentError(l.Nonmem.Model, cerr.Notes, cerr.Error, channels)
+		RecordConcurrentError(l.Nonmem.Model, cerr.Notes, cerr.Error, channels,l.Cancel)
 	}
 
 }
@@ -201,12 +197,7 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 	err := writeNonmemConfig(l.Nonmem)
 
 	if err != nil {
-		channels.Failed <- 1
-		channels.Errors <- turnstile.ConcurrentError{
-			RunIdentifier: l.Nonmem.FileName,
-			Notes:         "An error occurred trying to write the config file to the output directory",
-			Error:         err,
-		}
+		RecordConcurrentError(l.Nonmem.FileName,"An error occurred trying to write the config file to the directory",err,channels,l.Cancel)
 		return
 	}
 
@@ -355,6 +346,7 @@ func localModelsFromArguments(args []string) []LocalModel {
 	for _, v := range nonmemmodels {
 		output = append(output, LocalModel{
 			Nonmem: v,
+			Cancel:turnstile.CancellationChannel(),
 		})
 	}
 
