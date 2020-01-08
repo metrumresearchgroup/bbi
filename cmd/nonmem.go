@@ -207,6 +207,10 @@ func init() {
 	const mpiExecPathIdentifier string = "mpiExecPath"
 	nonmemCmd.PersistentFlags().String(mpiExecPathIdentifier, "/usr/local/mpich3/bin/mpiexec", "The fully qualified path to mpiexec. Used for nonmem parallel operations")
 	viper.BindPFlag("parallel."+mpiExecPathIdentifier, nonmemCmd.PersistentFlags().Lookup(mpiExecPathIdentifier))
+
+	const parafileIdentifier string = "parafile"
+	nonmemCmd.PersistentFlags().String(parafileIdentifier, "", "Location of a user-provided parafile to use for parallel execution")
+	viper.BindPFlag("parallel."+parafileIdentifier, nonmemCmd.PersistentFlags().Lookup(parafileIdentifier))
 }
 
 // "Copies" a file by reading its content (optionally updating the path)
@@ -281,6 +285,7 @@ func generateScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 }
 
 func writeParaFile(l NonMemModel) error {
+
 	contentBytes, err := generateParaFile(l)
 
 	//Something failed during generation
@@ -288,7 +293,17 @@ func writeParaFile(l NonMemModel) error {
 		return err
 	}
 
-	contentLines := strings.Split(string(contentBytes), "\n")
+	var contentLines []string
+
+	//If no parafile is provided, generate one
+	if l.Configuration.Parallel.Parafile == "" {
+		contentLines = strings.Split(string(contentBytes), "\n")
+	} else {
+		contentLines, err = utils.ReadLines(l.Configuration.Parallel.Parafile)
+		if err != nil {
+			log.Fatalf("Unable to read the contents of the parafile provided: %s, Error is %s ", l.Configuration.Parallel.Parafile, err)
+		}
+	}
 
 	return utils.WriteLines(contentLines, path.Join(l.OutputDir, paraFileName))
 
