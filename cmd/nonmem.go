@@ -222,7 +222,6 @@ func generateScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 
 func buildNonMemCommandString(l NonMemModel) string {
 
-	// TODO: Implement cache
 	noBuild := false
 	nmExecutable := l.Configuration.NMExecutable
 	cmdArgs := []string{
