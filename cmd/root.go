@@ -25,7 +25,7 @@ import (
 )
 
 // VERSION is the current bbi version
-var VERSION string = "2.1.0-alpha.1"
+var VERSION string = "2.1.0-alpha.5"
 
 var (
 	// name of config file
@@ -79,6 +79,7 @@ func init() {
 	RootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
 	RootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "debug mode")
 	RootCmd.PersistentFlags().IntVar(&threads, "threads", 4, "number of threads to execute with")
+	viper.BindPFlag("threads", RootCmd.PersistentFlags().Lookup("threads"))                                               //Update to make sure viper binds to the flag
 	RootCmd.PersistentFlags().BoolVar(&Json, "json", false, "json tree of output, if possible")                           //TODO: Implement
 	RootCmd.PersistentFlags().BoolVarP(&preview, "preview", "p", false, "preview action, but don't actually run command") //TODO: Implement
 	//Used for Summary

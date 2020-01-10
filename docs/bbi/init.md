@@ -1,17 +1,14 @@
-## bbi
-
-manage and execute models
+## bbi init
 
 ### Synopsis
-
-babylon cli version 1.0.0
+Run bbi init to create a babylon.yaml configuration file in the current directory. This will create a `babylon.yaml` file in the current directory containing all the defaults necessary to get started. 
 
 ### Options
 
 ```
+  -h, --help   help for init
       --config string   config file (default is $HOME/babylon.yaml)
   -d, --debug           debug mode
-  -h, --help            help for bbi
       --json            json tree of output, if possible
       --no-cor-file     do not use cor file
       --no-cov-file     do not use cov file
@@ -22,10 +19,3 @@ babylon cli version 1.0.0
       --threads int     number of threads to execute with (default 4)
   -v, --verbose         verbose output
 ```
-
-### Subcommands
-* [nonmem](nonmem/nonmem.md) - Nonmem model execution
-* [version](bbi_version.md) - Check version
-* [init](init.md) - Initialize configuration in current directory
-
-

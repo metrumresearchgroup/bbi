@@ -14,6 +14,7 @@ require (
 	github.com/logrusorgru/aurora v0.0.0-20191116043053-66b7ad493a23
 	github.com/metrumresearchgroup/turnstile v0.0.0-20200108202800-0f59ec7f4d90
 	github.com/mitchellh/go-homedir v1.1.0
+	github.com/mitchellh/mapstructure v1.1.2
 	github.com/olekukonko/tablewriter v0.0.3
 	github.com/pelletier/go-toml v1.4.0 // indirect
 	github.com/sirupsen/logrus v1.2.0
