@@ -89,7 +89,7 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 	}
 
 	//rwxr-x---
-	err = afero.WriteFile(fs, path.Join(l.Nonmem.OutputDir, getSGEScriptName(l.Nonmem.FileName)+".sh"), scriptContents, 0750)
+	err = afero.WriteFile(fs, path.Join(l.Nonmem.OutputDir, "grid.sh"), scriptContents, 0750)
 	if err != nil {
 		RecordConcurrentError(l.Nonmem.Model, "There was an issue writing the executable file", err, channels, l.Cancel)
 	}
@@ -235,7 +235,7 @@ func executeSGEJob(model NonMemModel) turnstile.ConcurrentError {
 		return newConcurrentError(model.Model, fmt.Sprintf("Unable to change directory to %s", model.OutputDir), err)
 	}
 
-	scriptName := getSGEScriptName(model.FileName) + ".sh"
+	scriptName := "grid.sh"
 
 	//Find Qsub
 	binary, err := exec.LookPath("qsub")

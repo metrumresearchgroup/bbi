@@ -64,15 +64,25 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 				}
 				return
 			}
-		} else {
-			l.Cancel <- true
-			channels.Errors <- turnstile.ConcurrentError{
-				RunIdentifier: l.Nonmem.Model,
-				Error:         errors.New("The output directory already exists"),
-				Notes:         fmt.Sprintf("The target directory, %s already, exists, but we are configured to not overwrite. Invalid configuration / run state", l.Nonmem.OutputDir),
-			}
-			return
 		}
+
+		if !l.Nonmem.Configuration.Overwrite {
+			//If not, we only want to panic if there are nonmem output files in the directory
+			if !doesDirectoryContainOutputFiles(l.Nonmem.OutputDir, l.Nonmem.FileName) {
+				//Continue along if we find no relevant content
+				log.Printf("No Nonmem output files detected in %s. Good to continue", l.Nonmem.OutputDir)
+			} else {
+				//Or panic because we're in a scenario where we shouldn't purge, but there's content in the directory from previous runs
+				l.Cancel <- true
+				channels.Errors <- turnstile.ConcurrentError{
+					RunIdentifier: l.Nonmem.Model,
+					Error:         errors.New("The output directory already exists"),
+					Notes:         fmt.Sprintf("The target directory, %s already, exists, but we are configured to not overwrite. Invalid configuration / run state", l.Nonmem.OutputDir),
+				}
+				return
+			}
+		}
+
 	}
 
 	//Copy Model into destination and update Data Path

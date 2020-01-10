@@ -753,3 +753,26 @@ func nonmemModelsFromArguments(args []string) []NonMemModel {
 
 	return output
 }
+
+func doesDirectoryContainOutputFiles(path string, modelname string) bool {
+	fs := afero.NewOsFs()
+
+	contents, err := afero.ReadDir(fs, path)
+
+	if err != nil {
+		//If we can't read the output, let's indicate that files did exist to trigger an overwrite.
+		return true
+	}
+
+	contentFiles := getCopiableFileList(modelname, 3, path)
+
+	for _, v := range contents {
+		for _, f := range contentFiles {
+			if v.Name() == f {
+				return true
+			}
+		}
+	}
+
+	return false
+}
