@@ -133,6 +133,9 @@ func sge(cmd *cobra.Command, args []string) {
 
 	lo := sgeOperation{}
 
+	//Let's try to immediately load any specified configuration files
+	configlib.ProcessSpecifiedConfigFile()
+
 	lo.Models = sgeModelsFromArguments(args)
 
 	if len(lo.Models) == 0 {
@@ -173,6 +176,10 @@ func sge(cmd *cobra.Command, args []string) {
 
 	for _, v := range lo.Models {
 		scalables = append(scalables, v)
+	}
+
+	if viper.ConfigFileUsed() != "" {
+		log.Printf("Config file loaded from %s", viper.ConfigFileUsed())
 	}
 
 	//Begin Execution

@@ -272,9 +272,8 @@ func local(cmd *cobra.Command, args []string) {
 		viper.Debug()
 	}
 
-	if viper.ConfigFileUsed() != "" {
-		log.Printf("Config file loaded from %s", viper.ConfigFileUsed())
-	}
+	//Let's try to immediately load any specified configuration files
+	configlib.ProcessSpecifiedConfigFile()
 
 	lo := localOperation{}
 
@@ -319,6 +318,10 @@ func local(cmd *cobra.Command, args []string) {
 
 	for _, v := range lo.Models {
 		scalables = append(scalables, v)
+	}
+
+	if viper.ConfigFileUsed() != "" {
+		log.Printf("Config file loaded from %s", viper.ConfigFileUsed())
 	}
 
 	//Begin Execution

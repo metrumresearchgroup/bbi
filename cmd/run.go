@@ -62,6 +62,10 @@ func init() {
 	viper.BindPFlag("overwrite", runCmd.PersistentFlags().Lookup("overwrite"))
 	viper.SetDefault("overwrite", true)
 
+	const configIdentifier string = "config"
+	runCmd.PersistentFlags().String(configIdentifier, "", "Statically define which config file you would like to use for the execution of the jobs")
+	viper.BindPFlag(configIdentifier, runCmd.PersistentFlags().Lookup(configIdentifier))
+
 	const saveconfig string = "saveConfig"
 	runCmd.PersistentFlags().Bool(saveconfig, true, "Whether or not to save the existing configuration to a file with the model")
 	viper.BindPFlag(saveconfig, runCmd.PersistentFlags().Lookup(saveconfig))
