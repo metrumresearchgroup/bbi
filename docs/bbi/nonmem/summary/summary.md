@@ -22,13 +22,27 @@ bbi summary [flags]
 ### Options inherited from parent commands
 
 ```
-      --config string   config file (default is $HOME/babylonconfig.toml)
+  -h, --help                 help for nonmem
+      --mpiExecPath string   The fully qualified path to mpiexec. Used for nonmem parallel operations (default "/usr/local/mpich3/bin/mpiexec")
+      --nmVersion string     Version of nonmem from the configuration list to use
+      --nodes int            The number of nodes on which to perform parallel operations (default 8)
+      --parallel             Whether or not to run nonmem in parallel mode
+      --timeout int          The amount of time to wait for parallel operations in nonmem before timing out (default 30)
+      --config string   config file (default is $HOME/babylon.yaml)
   -d, --debug           debug mode
+      --json            json tree of output, if possible
+      --no-cor-file     do not use cor file
+      --no-cov-file     do not use cov file
+      --no-ext-file     do not use ext file
+      --no-grd-file     do not use grd file
+      --no-shk-file     do not use shk file
   -p, --preview         preview action, but don't actually run command
-      --threads int     number of threads to execute with
-  -t, --tree            json tree of output, if possible
+      --threads int     number of threads to execute with (default 4)
   -v, --verbose         verbose output
 ```
+
+### Nonmem Parallel
+If you want to run nonmem in Parallel, you will need to set the `--parallel` flag to true. You can then use the `--nodes` flag to indicate how many parallel operations to make, `--timeout` to indicate how long to wait for parallel operations to finish, and `--mpiExecPath` to specify where `mpiexec` is located on the system
 
 ### SEE ALSO
 * [bbi](bbi.md)	 - manage and execute models

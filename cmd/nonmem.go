@@ -49,6 +49,29 @@ const sgeExecutionTemplate string = `#!/bin/bash
 {{ .Command }}
 `
 
+//Parse type 2 refers to evenly load balanced work
+//Transfer Type 1 refers to MPI
+//TIMEOUTI 100 means wait 100 seconds for node to become available
+//TIMEOUT 10 means wait 10 seconds for work to complete -> Should default to 10
+const nonmemParaFiletemplate string = `$GENERAL
+NODES={{ .TotalNodes }} PARSE_TYPE=2 TIMEOUTI=100 TIMEOUT={{ .CompletionTimeout }} PARAPRINT=0 TRANSFER_TYPE=1
+$COMMANDS
+1: {{ .MpiExecPath }} -wdir "$PWD" -n {{ .HeadNodes }} ./nonmem $*
+2:-wdir "$PWD" -n {{ .WorkerNodes }} ./nonmem -wnf
+$DIRECTORIES
+1:NONE
+2-[nodes]:worker{#-1}`
+
+const paraFileName string = "para.pnm"
+
+type nonmemParallelDirective struct {
+	TotalNodes        int
+	CompletionTimeout int
+	MpiExecPath       string
+	HeadNodes         int
+	WorkerNodes       int
+}
+
 var controlStreamExtensions []string = []string{
 	".mod", //PSN Style
 	".ctl", //Metrum Style
@@ -102,6 +125,19 @@ var nonMemTemporaryFiles []string = []string{
 	"fort.2002",
 	"flushtime.set",
 	"nonmem",
+	"FPWARN",
+	"condorarguments.set",
+	"condoropenmpiscript.set",
+	"condor.set",
+	"mpiloc",
+	"nmmpi.sh",
+	"temp.out",
+	"trashfile.xxx",
+}
+
+var parallelRegexesToRemove []string = []string{
+	"worker[0-9]{1,}",
+	"fort.[0-9]{1,}",
 }
 
 //NonMemModel is the definition of a model for NonMem including its target directories and settings required for execution
@@ -151,8 +187,30 @@ func init() {
 	RootCmd.AddCommand(nonmemCmd)
 
 	//NM Selector
-	nonmemCmd.PersistentFlags().String("nmVersion", "", "Version of nonmem from the configuration list to use")
-	viper.BindPFlag("nmVersion", nonmemCmd.PersistentFlags().Lookup("nmVersion"))
+	const nmVersionIdentifier string = "nmVersion"
+	nonmemCmd.PersistentFlags().String(nmVersionIdentifier, "", "Version of nonmem from the configuration list to use")
+	viper.BindPFlag(nmVersionIdentifier, nonmemCmd.PersistentFlags().Lookup(nmVersionIdentifier))
+
+	//Parallelization Components
+	const parallelIdentifier string = "parallel"
+	nonmemCmd.PersistentFlags().Bool(parallelIdentifier, false, "Whether or not to run nonmem in parallel mode")
+	viper.BindPFlag("parallel."+parallelIdentifier, nonmemCmd.PersistentFlags().Lookup(parallelIdentifier))
+
+	const parallelNodesIdentifier string = "nodes"
+	nonmemCmd.PersistentFlags().Int(parallelNodesIdentifier, 8, "The number of nodes on which to perform parallel operations")
+	viper.BindPFlag("parallel."+parallelNodesIdentifier, nonmemCmd.PersistentFlags().Lookup(parallelNodesIdentifier))
+
+	const parallelCompletionTimeoutIdentifier string = "timeout"
+	nonmemCmd.PersistentFlags().Int(parallelCompletionTimeoutIdentifier, 2147483647, "The amount of time to wait for parallel operations in nonmem before timing out")
+	viper.BindPFlag("parallel."+parallelCompletionTimeoutIdentifier, nonmemCmd.PersistentFlags().Lookup(parallelCompletionTimeoutIdentifier))
+
+	const mpiExecPathIdentifier string = "mpiExecPath"
+	nonmemCmd.PersistentFlags().String(mpiExecPathIdentifier, "/usr/local/mpich3/bin/mpiexec", "The fully qualified path to mpiexec. Used for nonmem parallel operations")
+	viper.BindPFlag("parallel."+mpiExecPathIdentifier, nonmemCmd.PersistentFlags().Lookup(mpiExecPathIdentifier))
+
+	const parafileIdentifier string = "parafile"
+	nonmemCmd.PersistentFlags().String(parafileIdentifier, "", "Location of a user-provided parafile to use for parallel execution")
+	viper.BindPFlag("parallel."+parafileIdentifier, nonmemCmd.PersistentFlags().Lookup(parafileIdentifier))
 }
 
 // "Copies" a file by reading its content (optionally updating the path)
@@ -226,6 +284,58 @@ func generateScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
+func writeParaFile(l NonMemModel) error {
+
+	contentBytes, err := generateParaFile(l)
+
+	//Something failed during generation
+	if err != nil {
+		return err
+	}
+
+	var contentLines []string
+
+	//If no parafile is provided, generate one
+	if l.Configuration.Parallel.Parafile == "" {
+		contentLines = strings.Split(string(contentBytes), "\n")
+	} else {
+		contentLines, err = utils.ReadLines(l.Configuration.Parallel.Parafile)
+		if err != nil {
+			log.Fatalf("Unable to read the contents of the parafile provided: %s, Error is %s ", l.Configuration.Parallel.Parafile, err)
+		}
+	}
+
+	return utils.WriteLines(contentLines, path.Join(l.OutputDir, paraFileName))
+
+}
+
+func generateParaFile(l NonMemModel) ([]byte, error) {
+	nmp := nonmemParallelDirective{
+		TotalNodes:        l.Configuration.Parallel.Nodes,
+		HeadNodes:         1,
+		WorkerNodes:       l.Configuration.Parallel.Nodes - 1,
+		CompletionTimeout: l.Configuration.Parallel.Timeout,
+		MpiExecPath:       l.Configuration.Parallel.MPIExecPath,
+	}
+
+	buf := new(bytes.Buffer)
+
+	t := template.New("parafile")
+	parsed, err := t.Parse(nonmemParaFiletemplate)
+
+	if err != nil {
+		return []byte{}, err
+	}
+
+	err = parsed.Execute(buf, nmp)
+
+	if err != nil {
+		return []byte{}, err
+	}
+
+	return buf.Bytes(), nil
+}
+
 func buildNonMemCommandString(l NonMemModel) string {
 
 	var nmHome string
@@ -250,6 +360,10 @@ func buildNonMemCommandString(l NonMemModel) string {
 		}
 	}
 
+	if nmHome == "" {
+		log.Fatal("No version was supplied and no default value exists in the configset")
+	}
+
 	// TODO: Implement cache
 	noBuild := false
 	nmExecutable := path.Join(nmHome, "run", nmBinary)
@@ -262,6 +376,11 @@ func buildNonMemCommandString(l NonMemModel) string {
 
 	if noBuild {
 		cmdArgs = append(cmdArgs, "--nobuild")
+	}
+
+	//Section for Appending the parafile command
+	if l.Configuration.Parallel.Parallel {
+		cmdArgs = append(cmdArgs, "-parafile="+path.Join(l.OutputDir, paraFileName))
 	}
 
 	return nmExecutable + " " + strings.Join(cmdArgs, " ")
@@ -282,6 +401,26 @@ func filesToCleanup(model NonMemModel, exceptions ...string) runner.FileCleanIns
 		if !isFilenameInExceptions(exceptions, v) {
 			//Let's add it to the cleanup list if it's not in the exclusions
 			fci.FilesToRemove = append(fci.FilesToRemove, newTargetFile(v, model.Configuration.CleanLvl))
+		}
+	}
+
+	if model.Configuration.Parallel.Parallel {
+		fs := afero.NewOsFs()
+		for _, variant := range parallelRegexesToRemove {
+
+			r := regexp.MustCompile(variant)
+
+			files, err := afero.ReadDir(fs, model.OutputDir)
+
+			if err != nil {
+				log.Printf("Error trying to read directory %s for parallel files to cleanup", model.OutputDir)
+			}
+
+			for _, f := range files {
+				if r.MatchString(f.Name()) {
+					fci.FilesToRemove = append(fci.FilesToRemove, newTargetFile(f.Name(), model.Configuration.CleanLvl))
+				}
+			}
 		}
 	}
 
@@ -613,4 +752,27 @@ func nonmemModelsFromArguments(args []string) []NonMemModel {
 	}
 
 	return output
+}
+
+func doesDirectoryContainOutputFiles(path string, modelname string) bool {
+	fs := afero.NewOsFs()
+
+	contents, err := afero.ReadDir(fs, path)
+
+	if err != nil {
+		//If we can't read the output, let's indicate that files did exist to trigger an overwrite.
+		return true
+	}
+
+	contentFiles := getCopiableFileList(modelname, 3, path)
+
+	for _, v := range contents {
+		for _, f := range contentFiles {
+			if v.Name() == f {
+				return true
+			}
+		}
+	}
+
+	return false
 }

@@ -20,6 +20,7 @@ type Config struct {
 	Threads       int                     `yaml:"threads" json:"threads,omitempty"`
 	Debug         bool                    `yaml:"debug" json:"debug,omitempty"`
 	Nonmem        map[string]NonMemDetail `mapstructure:"nonmem" json:"nonmem,omitempty"`
+	Parallel      ParallelConfig          `mapstructure:"parallel" json:"parallel"`
 }
 
 type NonMemDetail struct {
@@ -27,6 +28,14 @@ type NonMemDetail struct {
 	Executable string `yaml:"executable" json:"executable,omitempty"`
 	Nmqual     bool   `yaml:"nmqual" json:"nmqual,omitempty"`
 	Default    bool   `yaml:"default" json:"default,omitempty"`
+}
+
+type ParallelConfig struct {
+	Parallel    bool   `yaml:"parallel" json:"parallel,omitempty"`
+	Nodes       int    `yaml:"nodes" json:"nodes,omitempty"`
+	MPIExecPath string `yaml:"mpiExecPath" json:"mpiExecPath,omitempty"`
+	Timeout     int    `yaml:"timeout" json:"timeout,omitempty"`
+	Parafile    string `yaml:"parafile" json:"parafile,omitempty"`
 }
 
 // LoadGlobalConfig loads nonmemutils configuration into the global Viper

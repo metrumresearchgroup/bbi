@@ -30,6 +30,13 @@
                 "--saveConfig=true",
                 "--copyLvl",
                 "1",
+                "--parallel=true",
+                "--nodes",
+                "2",
+                "--timeout",
+                "45",
+                "--mpiExecPath",
+                "/usr/local/bin/mpiexec",
                 "local",
                 "/Users/dbreeden/Documents/models/test_data/240/Executable_MTP.mod"
             ],

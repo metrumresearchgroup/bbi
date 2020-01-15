@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path"
 	"regexp"
+	"strconv"
 	"strings"
 	"text/template"
 	"time"
@@ -28,16 +29,22 @@ type sgeOperation struct {
 //SGEModel is the struct used for SGE operations containing the NonMemModel
 type SGEModel struct {
 	Nonmem NonMemModel
+	Cancel chan bool
 }
 
 //NewSGENonMemModel create the model details from the modelname passed
 func NewSGENonMemModel(modelname string) SGEModel {
 	return SGEModel{
 		Nonmem: NewNonMemModel(modelname),
+		Cancel: turnstile.CancellationChannel(),
 	}
 }
 
 //Begin Scalable method definitions
+
+func (l SGEModel) CancellationChannel() chan bool {
+	return l.Cancel
+}
 
 //Prepare is basically the old EstimateModel function. Responsible for creating directories and preparation.
 func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
@@ -51,11 +58,11 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 		if l.Nonmem.Configuration.Overwrite {
 			err := fs.RemoveAll(l.Nonmem.OutputDir)
 			if err != nil {
-				recordConcurrentError(l.Nonmem.Model, "An error occured trying to remove the directory as specified in the overwrite flag", err, channels)
+				RecordConcurrentError(l.Nonmem.Model, "An error occured trying to remove the directory as specified in the overwrite flag", err, channels, l.Cancel)
 				return
 			}
 		} else {
-			recordConcurrentError(l.Nonmem.Model, fmt.Sprintf("The target directory, %s already, exists, but we are configured to not overwrite. Invalid configuration / run state", l.Nonmem.OutputDir), errors.New("The output directory already exists"), channels)
+			RecordConcurrentError(l.Nonmem.Model, fmt.Sprintf("The target directory, %s already, exists, but we are configured to not overwrite. Invalid configuration / run state", l.Nonmem.OutputDir), errors.New("The output directory already exists"), channels, l.Cancel)
 			return
 		}
 	}
@@ -69,23 +76,22 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 	}
 
 	if err != nil {
-		recordConcurrentError(l.Nonmem.Model, fmt.Sprintf("There appears to have been an issue trying to copy %s to %s", l.Nonmem.Model, l.Nonmem.OutputDir), err, channels)
+		RecordConcurrentError(l.Nonmem.Model, fmt.Sprintf("There appears to have been an issue trying to copy %s to %s", l.Nonmem.Model, l.Nonmem.OutputDir), err, channels, l.Cancel)
 		return
 	}
 
 	//Create Execution Script
-	//TODO: This should basically call babylon the same as normal against the targeted mod file
 	scriptContents, err := generateBabylonScript(sgeExecutionTemplate, l.Nonmem)
 
 	if err != nil {
-		recordConcurrentError(l.Nonmem.Model, "An error occurred during the creation of the executable script for this model", err, channels)
+		RecordConcurrentError(l.Nonmem.Model, "An error occurred during the creation of the executable script for this model", err, channels, l.Cancel)
 		return
 	}
 
 	//rwxr-x---
-	err = afero.WriteFile(fs, path.Join(l.Nonmem.OutputDir, getSGEScriptName(l.Nonmem.FileName)+".sh"), scriptContents, 0750)
+	err = afero.WriteFile(fs, path.Join(l.Nonmem.OutputDir, "grid.sh"), scriptContents, 0750)
 	if err != nil {
-		recordConcurrentError(l.Nonmem.Model, "There was an issue writing the executable file", err, channels)
+		RecordConcurrentError(l.Nonmem.Model, "There was an issue writing the executable file", err, channels, l.Cancel)
 	}
 }
 
@@ -94,7 +100,7 @@ func (l SGEModel) Work(channels *turnstile.ChannelMap) {
 	cerr := executeNonMemJob(executeSGEJob, l.Nonmem)
 
 	if cerr.Error != nil {
-		recordConcurrentError(l.Nonmem.Model, cerr.Notes, cerr.Error, channels)
+		RecordConcurrentError(l.Nonmem.Model, cerr.Notes, cerr.Error, channels, l.Cancel)
 		return
 	}
 
@@ -213,10 +219,10 @@ func newConcurrentError(model string, notes string, err error) turnstile.Concurr
 	}
 }
 
-func recordConcurrentError(model string, notes string, err error, channels *turnstile.ChannelMap) {
-	channels.Failed <- 1
+//RecordConcurrentError handles the processing of cancellation messages as well placing concurrent errors onto the statck
+func RecordConcurrentError(model string, notes string, err error, channels *turnstile.ChannelMap, cancel chan bool) {
+	cancel <- true
 	channels.Errors <- newConcurrentError(model, notes, err)
-	channels.Completed <- 1
 }
 
 func executeSGEJob(model NonMemModel) turnstile.ConcurrentError {
@@ -229,16 +235,32 @@ func executeSGEJob(model NonMemModel) turnstile.ConcurrentError {
 		return newConcurrentError(model.Model, fmt.Sprintf("Unable to change directory to %s", model.OutputDir), err)
 	}
 
-	scriptName := getSGEScriptName(model.FileName) + ".sh"
+	scriptName := "grid.sh"
 
 	//Find Qsub
 	binary, err := exec.LookPath("qsub")
+
+	qsubArguments := []string{}
+
+	if model.Configuration.Parallel.Parallel {
+		qsubArguments = []string{
+			"-V",   //Pass the environment to the context for the SGE job
+			"-j",   // Merge output streams
+			"y",    // Yes to the above
+			"-pe",  // Parallel execution
+			"orte", // Parallel environment name for the grid (Namespace for mpi messages)
+			strconv.Itoa(model.Configuration.Parallel.Nodes),
+		}
+	}
+
+	qsubArguments = append(qsubArguments, scriptName)
 
 	if err != nil {
 		return newConcurrentError(model.Model, "Could not locate qsub binary in path", err)
 	}
 
-	command := exec.Command(binary, scriptName)
+	command := exec.Command(binary, qsubArguments...)
+
 	command.Env = os.Environ() //Take in OS Environment
 
 	output, err := command.CombinedOutput()
@@ -268,6 +290,7 @@ func sgeModelsFromArguments(args []string) []SGEModel {
 	for _, v := range nonmemmodels {
 		output = append(output, SGEModel{
 			Nonmem: v,
+			Cancel: turnstile.CancellationChannel(),
 		})
 	}
 
