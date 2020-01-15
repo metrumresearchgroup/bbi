@@ -58,9 +58,9 @@ func init() {
 	viper.BindPFlag("git", runCmd.PersistentFlags().Lookup("git"))
 	viper.SetDefault("git", true)
 
-	runCmd.PersistentFlags().Bool("overwrite", true, "Whether or not to remove existing output directories if they are present")
+	runCmd.PersistentFlags().Bool("overwrite", false, "Whether or not to remove existing output directories if they are present")
 	viper.BindPFlag("overwrite", runCmd.PersistentFlags().Lookup("overwrite"))
-	viper.SetDefault("overwrite", true)
+	viper.SetDefault("overwrite", false)
 
 	const saveconfig string = "saveConfig"
 	runCmd.PersistentFlags().Bool(saveconfig, true, "Whether or not to save the existing configuration to a file with the model")

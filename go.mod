@@ -10,9 +10,10 @@ require (
 	github.com/gobwas/glob v0.2.3
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/protobuf v1.3.2
+	github.com/google/uuid v1.1.1
 	github.com/kr/pretty v0.1.0
 	github.com/logrusorgru/aurora v0.0.0-20191116043053-66b7ad493a23
-	github.com/metrumresearchgroup/turnstile v0.0.0-20191213153658-5297606be62d
+	github.com/metrumresearchgroup/turnstile v0.0.0-20200108202800-0f59ec7f4d90
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/olekukonko/tablewriter v0.0.3
