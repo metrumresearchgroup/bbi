@@ -9,16 +9,33 @@ import (
 )
 
 type Config struct {
-	NMExecutable  string `yaml:"nmExecutable"`
-	Overwrite     bool   `yaml:"overwrite"`
-	CleanLvl      int    `yaml:"cleanLvl"`
-	CopyLvl       int    `yaml:"copyLvl"`
-	Git           bool   `yaml:"git"`
-	BabylonBinary string `yaml:"babylonbinary"`
-	SaveConfig    bool   `yaml:"saveConfig"`
-	OutputDir     string `yaml:"outputDir"`
-	Threads       int    `yaml:"threads"`
-	Debug         bool   `yaml:"debug"`
+	NMVersion     string                  `yaml:"nmVersion" json:"nm_version,omitempty"`
+	Overwrite     bool                    `yaml:"overwrite" json:"overwrite,omitempty"`
+	CleanLvl      int                     `yaml:"cleanLvl" json:"clean_lvl,omitempty"`
+	CopyLvl       int                     `yaml:"copyLvl" json:"copy_lvl,omitempty"`
+	Git           bool                    `yaml:"git" json:"git,omitempty"`
+	BabylonBinary string                  `yaml:"babylonbinary" json:"babylon_binary,omitempty"`
+	SaveConfig    bool                    `yaml:"saveConfig" json:"save_config,omitempty"`
+	OutputDir     string                  `yaml:"outputDir" json:"output_dir,omitempty"`
+	Threads       int                     `yaml:"threads" json:"threads,omitempty"`
+	Debug         bool                    `yaml:"debug" json:"debug,omitempty"`
+	Nonmem        map[string]NonMemDetail `mapstructure:"nonmem" json:"nonmem,omitempty"`
+	Parallel      ParallelConfig          `mapstructure:"parallel" json:"parallel"`
+}
+
+type NonMemDetail struct {
+	Home       string `yaml:"home" json:"home,omitempty"`
+	Executable string `yaml:"executable" json:"executable,omitempty"`
+	Nmqual     bool   `yaml:"nmqual" json:"nmqual,omitempty"`
+	Default    bool   `yaml:"default" json:"default,omitempty"`
+}
+
+type ParallelConfig struct {
+	Parallel    bool   `yaml:"parallel" json:"parallel,omitempty"`
+	Nodes       int    `yaml:"nodes" json:"nodes,omitempty"`
+	MPIExecPath string `yaml:"mpiExecPath" json:"mpiExecPath,omitempty"`
+	Timeout     int    `yaml:"timeout" json:"timeout,omitempty"`
+	Parafile    string `yaml:"parafile" json:"parafile,omitempty"`
 }
 
 // LoadGlobalConfig loads nonmemutils configuration into the global Viper
@@ -44,8 +61,9 @@ func loadDefaultSettings() {
 	viper.SetDefault("cacheDir", "mdlcache")
 	viper.SetDefault("cacheExe", "")
 	viper.SetDefault("gitignoreLvl", 1)
+	viper.SetDefault("cleanLvl", 1)
 	viper.SetDefault("git", true)
-	viper.SetDefault("nmExecutable", "nmfe74")
+	viper.SetDefault("nmExecutable", "")
 	viper.SetDefault("noBuild", false)
 	viper.SetDefault("oneEst", false)
 	viper.SetDefault("threads", runtime.NumCPU())
@@ -98,6 +116,5 @@ func SaveConfig(configpath string) {
 func UnmarshalViper() Config {
 	c := Config{}
 	viper.Unmarshal(&c)
-
 	return c
 }

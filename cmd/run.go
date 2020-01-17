@@ -41,9 +41,9 @@ func init() {
 	viper.SetDefault("outputDir", "{{ .Name }}")
 
 	//Int Variables
-	runCmd.PersistentFlags().Int("cleanLvl", 0, "clean level used for file output from a given (set of) runs")
+	runCmd.PersistentFlags().Int("cleanLvl", 1, "clean level used for file output from a given (set of) runs")
 	viper.BindPFlag("cleanLvl", runCmd.PersistentFlags().Lookup("cleanLvl"))
-	viper.SetDefault("cleanLvl", 0)
+	viper.SetDefault("cleanLvl", 1)
 
 	runCmd.PersistentFlags().Int("copyLvl", 0, "copy level used for file output from a given (set of) runs")
 	viper.BindPFlag("copyLvl", runCmd.PersistentFlags().Lookup("copyLvl"))
@@ -58,9 +58,9 @@ func init() {
 	viper.BindPFlag("git", runCmd.PersistentFlags().Lookup("git"))
 	viper.SetDefault("git", true)
 
-	runCmd.PersistentFlags().Bool("overwrite", true, "Whether or not to remove existing output directories if they are present")
+	runCmd.PersistentFlags().Bool("overwrite", false, "Whether or not to remove existing output directories if they are present")
 	viper.BindPFlag("overwrite", runCmd.PersistentFlags().Lookup("overwrite"))
-	viper.SetDefault("overwrite", true)
+	viper.SetDefault("overwrite", false)
 
 	const saveconfig string = "saveConfig"
 	runCmd.PersistentFlags().Bool(saveconfig, true, "Whether or not to save the existing configuration to a file with the model")

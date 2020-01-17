@@ -21,7 +21,7 @@ func main() {
 		expandedNames, err := utils.ExpandNameSequence(t)
 		fmt.Println("err:", err)
 		fmt.Println(expandedNames)
-		fmt.Println("------------") 
+		fmt.Println("------------")
 	}
-	
+
 }

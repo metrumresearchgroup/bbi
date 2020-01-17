@@ -1,12 +1,15 @@
 package cmd
 
 import (
+	"crypto/md5"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"os/exec"
 	"path"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -19,7 +22,6 @@ import (
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"gopkg.in/yaml.v2"
 )
 
 var arguments []string
@@ -31,16 +33,14 @@ type localOperation struct {
 //LocalModel is the struct used for local operations containing the NonMemModel
 type LocalModel struct {
 	Nonmem NonMemModel
-}
-
-//NewLocalNonMemModel builds the core struct from the model name argument
-func NewLocalNonMemModel(modelname string) LocalModel {
-	return LocalModel{
-		Nonmem: NewNonMemModel(modelname),
-	}
+	Cancel chan bool
 }
 
 //Begin Scalable method definitions
+
+func (l LocalModel) CancellationChannel() chan bool {
+	return l.Cancel
+}
 
 //Prepare is basically the old EstimateModel function. Responsible for creating directories and preparation.
 func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
@@ -56,7 +56,7 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 		if l.Nonmem.Configuration.Overwrite {
 			err := fs.RemoveAll(l.Nonmem.OutputDir)
 			if err != nil {
-				channels.Failed <- 1
+				l.Cancel <- true
 				channels.Errors <- turnstile.ConcurrentError{
 					RunIdentifier: l.Nonmem.Model,
 					Error:         err,
@@ -64,15 +64,25 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 				}
 				return
 			}
-		} else {
-			channels.Failed <- 1
-			channels.Errors <- turnstile.ConcurrentError{
-				RunIdentifier: l.Nonmem.Model,
-				Error:         errors.New("The output directory already exists"),
-				Notes:         fmt.Sprintf("The target directory, %s already, exists, but we are configured to not overwrite. Invalid configuration / run state", l.Nonmem.OutputDir),
-			}
-			return
 		}
+
+		if !l.Nonmem.Configuration.Overwrite {
+			//If not, we only want to panic if there are nonmem output files in the directory
+			if !doesDirectoryContainOutputFiles(l.Nonmem.OutputDir, l.Nonmem.FileName) {
+				//Continue along if we find no relevant content
+				log.Printf("No Nonmem output files detected in %s. Good to continue", l.Nonmem.OutputDir)
+			} else {
+				//Or panic because we're in a scenario where we shouldn't purge, but there's content in the directory from previous runs
+				l.Cancel <- true
+				channels.Errors <- turnstile.ConcurrentError{
+					RunIdentifier: l.Nonmem.Model,
+					Error:         errors.New("The output directory already exists"),
+					Notes:         fmt.Sprintf("The target directory, %s already, exists, but we are configured to not overwrite. Invalid configuration / run state", l.Nonmem.OutputDir),
+				}
+				return
+			}
+		}
+
 	}
 
 	//Copy Model into destination and update Data Path
@@ -84,12 +94,7 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 	}
 
 	if err != nil {
-		channels.Failed <- 1
-		channels.Errors <- turnstile.ConcurrentError{
-			RunIdentifier: l.Nonmem.Model,
-			Error:         err,
-			Notes:         fmt.Sprintf("There appears to have been an issue trying to copy %s to %s", l.Nonmem.Model, l.Nonmem.OutputDir),
-		}
+		RecordConcurrentError(l.Nonmem.Model, fmt.Sprintf("There appears to have been an issue trying to copy %s to %s", l.Nonmem.Model, l.Nonmem.OutputDir), err, channels, l.Cancel)
 		return
 	}
 
@@ -97,16 +102,25 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 	scriptContents, err := generateScript(nonMemExecutionTemplate, l.Nonmem)
 
 	if err != nil {
-		channels.Failed <- 1
+		l.Cancel <- true
 		channels.Errors <- turnstile.ConcurrentError{
 			RunIdentifier: l.Nonmem.Model,
 			Error:         err,
 			Notes:         "An error occurred during the creation of the executable script for this model",
 		}
+		return
 	}
 
 	//rwxr-x---
 	afero.WriteFile(fs, path.Join(l.Nonmem.OutputDir, l.Nonmem.FileName+".sh"), scriptContents, 0750)
+
+	if l.Nonmem.Configuration.Parallel.Parallel {
+		err = writeParaFile(l.Nonmem)
+		if err != nil {
+			log.Fatalf("Configuration requires parallel operation, but generation or writing of the parafile has failed: %s", err)
+		}
+	}
+
 }
 
 //Work describes the Turnstile execution phase -> IE What heavy lifting should be done
@@ -114,7 +128,7 @@ func (l LocalModel) Work(channels *turnstile.ChannelMap) {
 	cerr := executeNonMemJob(executeLocalJob, l.Nonmem)
 
 	if cerr.Error != nil {
-		recordConcurrentError(l.Nonmem.Model, cerr.Notes, cerr.Error, channels)
+		RecordConcurrentError(l.Nonmem.Model, cerr.Notes, cerr.Error, channels, l.Cancel)
 	}
 
 }
@@ -129,6 +143,37 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 	time.Sleep(10 * time.Millisecond)
 	log.Printf("Beginning cleanup phase for model %s\n", l.Nonmem.FileName)
 	fs := afero.NewOsFs()
+	// while the rest of the cleanup is happening, lets also hash the data in the background
+	// so don't have to wait extra time if its on the larger end
+	//Get the lines of the file
+	modelPath := filepath.Join(l.Nonmem.OutputDir, l.Nonmem.Model)
+	sourceLines, err := utils.ReadLines(modelPath)
+
+	if err != nil {
+		log.Printf("error reading model at path: %s, to extract data path: %s\n", modelPath, err)
+	}
+	for _, line := range sourceLines {
+		if strings.Contains(line, "$DATA") {
+			// extract out data path
+			l.Nonmem.DataPath = filepath.Clean(strings.Fields(line)[1])
+		}
+	}
+	hashChan := make(chan string)
+	go func() {
+		f, err := os.Open(l.Nonmem.DataPath)
+		if err != nil {
+			log.Printf("error reading data to hash: %s\n", err)
+			hashChan <- ""
+		}
+		defer f.Close()
+
+		h := md5.New()
+		if _, err := io.Copy(h, f); err != nil {
+			log.Printf("error hashing data: %s\n", err)
+			hashChan <- ""
+		}
+		hashChan <- fmt.Sprintf("%x", h.Sum(nil))
+	}()
 
 	//Magical instructions
 	//TODO: Implement flags for mandatory copy and cleanup exclusions
@@ -158,19 +203,21 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 		err = utils.WriteLines(source, path.Join(pwi.FilesToCopy.CopyTo, file))
 
 		if err != nil {
-			log.Printf("An erorr occurred while attempting to copy the files: File is %s", v.File)
+			log.Printf("An error occurred while attempting to copy the files: File is %s", v.File)
 			continue
 		}
 
-		v.File = l.Nonmem.OutputDir + "/" + v.File
+		v.File = filepath.Join(l.Nonmem.OutputDir, v.File)
 
 		copied = append(copied, v)
 	}
 
-	//Write to File in original path indicating what all was copied
-	copiedJSON, _ := json.MarshalIndent(copied, "", "    ")
+	if len(copied) > 0 {
+		//Write to File in original path indicating what all was copied
+		copiedJSON, _ := json.MarshalIndent(copied, "", "    ")
 
-	afero.WriteFile(fs, path.Join(l.Nonmem.OriginalPath, l.Nonmem.FileName+"_copied.json"), copiedJSON, 0750)
+		afero.WriteFile(fs, path.Join(l.Nonmem.OriginalPath, l.Nonmem.FileName+"_copied.json"), copiedJSON, 0750)
+	}
 
 	//Clean Up
 	//log.Printf("Beginning cleanup operations for model %s\n", l.FileName)
@@ -197,16 +244,14 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 	//Gitignore operations
 	createNewGitIgnoreFile(l.Nonmem)
 
+	// this should have been either completed well before, or must at least wait now to complete the hash
+	// before writing out the config
+	l.Nonmem.DataMD5 = <-hashChan
 	//Serialize and Write the Config down to a file
-	err := writeNonmemConfig(l.Nonmem)
+	err = writeNonmemConfig(l.Nonmem)
 
 	if err != nil {
-		channels.Failed <- 1
-		channels.Errors <- turnstile.ConcurrentError{
-			RunIdentifier: l.Nonmem.FileName,
-			Notes:         "An error occurred trying to write the config file to the output directory",
-			Error:         err,
-		}
+		RecordConcurrentError(l.Nonmem.FileName, "An error occurred trying to write the config file to the directory", err, channels, l.Cancel)
 		return
 	}
 
@@ -355,6 +400,7 @@ func localModelsFromArguments(args []string) []LocalModel {
 	for _, v := range nonmemmodels {
 		output = append(output, LocalModel{
 			Nonmem: v,
+			Cancel: turnstile.CancellationChannel(),
 		})
 	}
 
@@ -382,13 +428,11 @@ func createNewGitIgnoreFile(m NonMemModel) error {
 }
 
 func writeNonmemConfig(model NonMemModel) error {
-	outBytes, err := yaml.Marshal(model.Configuration)
+	outBytes, err := json.MarshalIndent(model, "", "    ")
 
 	if err != nil {
 		return err
 	}
 
-	outString := strings.Split(string(outBytes), "\n")
-
-	return utils.WriteLines(outString, path.Join(model.OutputDir, "config.yaml"))
+	return afero.WriteFile(afero.NewOsFs(), path.Join(model.OutputDir, "bbi_config.json"), outBytes, 0750)
 }
