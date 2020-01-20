@@ -7,6 +7,7 @@ import (
 	"log"
 	"os/exec"
 	"path"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -229,13 +230,8 @@ func executeSGEJob(model NonMemModel) turnstile.ConcurrentError {
 	log.Printf("Beginning SGE work phase for %s", model.FileName)
 	fs := afero.NewOsFs()
 	//Execute the script we created
-	err := os.Chdir(model.OutputDir)
 
-	if err != nil {
-		return newConcurrentError(model.Model, fmt.Sprintf("Unable to change directory to %s", model.OutputDir), err)
-	}
-
-	scriptName := "grid.sh"
+	scriptName := filepath.Join(model.OutputDir, "grid.sh")
 
 	//Find Qsub
 	binary, err := exec.LookPath("qsub")
@@ -243,15 +239,20 @@ func executeSGEJob(model NonMemModel) turnstile.ConcurrentError {
 	qsubArguments := []string{}
 
 	if model.Configuration.Parallel.Parallel {
-		qsubArguments = []string{
+		qsubArguments = append(qsubArguments, []string{
 			"-V",   //Pass the environment to the context for the SGE job
-			"-j",   // Merge output streams
-			"y",    // Yes to the above
 			"-pe",  // Parallel execution
 			"orte", // Parallel environment name for the grid (Namespace for mpi messages)
 			strconv.Itoa(model.Configuration.Parallel.Nodes),
-		}
+		}...)
 	}
+
+	qsubArguments = append(qsubArguments, []string{
+		"-j",
+		"y",
+		"-o",
+		filepath.Join(model.OutputDir, "sge.output"),
+	}...)
 
 	qsubArguments = append(qsubArguments, scriptName)
 
