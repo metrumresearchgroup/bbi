@@ -51,7 +51,7 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 		randomizedTimer := randomInteger(1, l.Nonmem.Configuration.Delay)
 
 		if l.Nonmem.Configuration.Debug {
-			log.Printf("Random delay of %d seconds introduced", randomizedTimer)
+			log.Printf("Random delay of %d seconds introduced for model %s", randomizedTimer, l.Nonmem.FileName)
 		}
 
 		time.Sleep(time.Duration(randomizedTimer) * time.Second)
