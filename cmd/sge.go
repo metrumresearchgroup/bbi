@@ -251,7 +251,7 @@ func executeSGEJob(model NonMemModel) turnstile.ConcurrentError {
 		"-j",
 		"y",
 		"-o",
-		filepath.Join(model.OutputDir, "sge.output"),
+		filepath.Join(model.OutputDir, "sge.output.$JOB_ID"),
 	}...)
 
 	qsubArguments = append(qsubArguments, scriptName)
