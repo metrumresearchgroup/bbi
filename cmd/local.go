@@ -45,6 +45,18 @@ func (l LocalModel) CancellationChannel() chan bool {
 //Prepare is basically the old EstimateModel function. Responsible for creating directories and preparation.
 func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 
+	//Jitter / Delay
+	if l.Nonmem.Configuration.Delay > 0 {
+		//Add a random Timer
+		randomizedTimer := randomInteger(1, l.Nonmem.Configuration.Delay)
+
+		if l.Nonmem.Configuration.Debug {
+			log.Printf("Random delay of %d seconds introduced", randomizedTimer)
+		}
+
+		time.Sleep(time.Duration(randomizedTimer) * time.Second)
+	}
+
 	//Mark the model as started some work
 	channels.Working <- 1
 

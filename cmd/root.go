@@ -16,7 +16,9 @@ package cmd
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
+	"time"
 
 	"github.com/metrumresearchgroup/babylon/configlib"
 	"github.com/spf13/cobra"
@@ -65,6 +67,10 @@ func Execute(build string) {
 }
 
 func init() {
+
+	//Set random for application
+	rand.Seed(time.Now().UnixNano())
+
 	cobra.OnInitialize(initConfig)
 
 	//Removed "." To avoid IDEs not displaying or typical ignore patterns dropping it.
@@ -78,10 +84,11 @@ func init() {
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/babylon.yaml)")
 	RootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
 	RootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "debug mode")
+	viper.BindPFlag("debug", RootCmd.PersistentFlags().Lookup("debug")) //Bind Debug to viper
 	RootCmd.PersistentFlags().IntVar(&threads, "threads", 4, "number of threads to execute with")
-	viper.BindPFlag("threads", RootCmd.PersistentFlags().Lookup("threads"))                                               //Update to make sure viper binds to the flag
-	RootCmd.PersistentFlags().BoolVar(&Json, "json", false, "json tree of output, if possible")                           //TODO: Implement
-	RootCmd.PersistentFlags().BoolVarP(&preview, "preview", "p", false, "preview action, but don't actually run command") //TODO: Implement
+	viper.BindPFlag("threads", RootCmd.PersistentFlags().Lookup("threads")) //Update to make sure viper binds to the flag
+	RootCmd.PersistentFlags().BoolVar(&Json, "json", false, "json tree of output, if possible")
+	RootCmd.PersistentFlags().BoolVarP(&preview, "preview", "p", false, "preview action, but don't actually run command")
 	//Used for Summary
 	RootCmd.PersistentFlags().BoolVarP(&noExt, "no-ext-file", "", false, "do not use ext file")
 	RootCmd.PersistentFlags().BoolVarP(&noGrd, "no-grd-file", "", false, "do not use grd file")
@@ -104,4 +111,10 @@ func flagChanged(flags *flag.FlagSet, key string) bool {
 		return false
 	}
 	return flag.Changed
+}
+
+//Assumes random has been set previously and seeded to avoid reproducible data sets
+//Here random is set during root.go setup
+func randomInteger(min int, max int) int {
+	return rand.Intn(max-min) + min
 }
