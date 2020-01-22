@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"path"
 	"path/filepath"
@@ -32,6 +31,7 @@ import (
 	"github.com/metrumresearchgroup/babylon/runner"
 	"github.com/metrumresearchgroup/babylon/utils"
 	"github.com/metrumresearchgroup/turnstile"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -45,9 +45,28 @@ const nonMemExecutionTemplate string = `#!/bin/bash
 {{ .Command }}
 `
 
-const sgeExecutionTemplate string = `#!/bin/bash
-{{ .Command }}
-`
+//Parse type 2 refers to evenly load balanced work
+//Transfer Type 1 refers to MPI
+//TIMEOUTI 100 means wait 100 seconds for node to become available
+//TIMEOUT 10 means wait 10 seconds for work to complete -> Should default to 10
+const nonmemParaFiletemplate string = `$GENERAL
+NODES={{ .TotalNodes }} PARSE_TYPE=2 TIMEOUTI=100 TIMEOUT={{ .CompletionTimeout }} PARAPRINT=0 TRANSFER_TYPE=1
+$COMMANDS
+1: {{ .MpiExecPath }} -wdir "$PWD" -n {{ .HeadNodes }} ./nonmem $*
+2:-wdir "$PWD" -n {{ .WorkerNodes }} ./nonmem -wnf
+$DIRECTORIES
+1:NONE
+2-[nodes]:worker{#-1}`
+
+const paraFileName string = "para.pnm"
+
+type nonmemParallelDirective struct {
+	TotalNodes        int
+	CompletionTimeout int
+	MpiExecPath       string
+	HeadNodes         int
+	WorkerNodes       int
+}
 
 var controlStreamExtensions []string = []string{
 	".mod", //PSN Style
@@ -102,6 +121,19 @@ var nonMemTemporaryFiles []string = []string{
 	"fort.2002",
 	"flushtime.set",
 	"nonmem",
+	"FPWARN",
+	"condorarguments.set",
+	"condoropenmpiscript.set",
+	"condor.set",
+	"mpiloc",
+	"nmmpi.sh",
+	"temp.out",
+	"trashfile.xxx",
+}
+
+var parallelRegexesToRemove []string = []string{
+	"worker[0-9]{1,}",
+	"fort.[0-9]{1,}",
 }
 
 //NonMemModel is the definition of a model for NonMem including its target directories and settings required for execution
@@ -151,8 +183,30 @@ func init() {
 	RootCmd.AddCommand(nonmemCmd)
 
 	//NM Selector
-	nonmemCmd.PersistentFlags().String("nmVersion", "", "Version of nonmem from the configuration list to use")
-	viper.BindPFlag("nmVersion", nonmemCmd.PersistentFlags().Lookup("nmVersion"))
+	const nmVersionIdentifier string = "nmVersion"
+	nonmemCmd.PersistentFlags().String(nmVersionIdentifier, "", "Version of nonmem from the configuration list to use")
+	viper.BindPFlag(nmVersionIdentifier, nonmemCmd.PersistentFlags().Lookup(nmVersionIdentifier))
+
+	//Parallelization Components
+	const parallelIdentifier string = "parallel"
+	nonmemCmd.PersistentFlags().Bool(parallelIdentifier, false, "Whether or not to run nonmem in parallel mode")
+	viper.BindPFlag("parallel."+parallelIdentifier, nonmemCmd.PersistentFlags().Lookup(parallelIdentifier))
+
+	const parallelNodesIdentifier string = "nodes"
+	nonmemCmd.PersistentFlags().Int(parallelNodesIdentifier, 8, "The number of nodes on which to perform parallel operations")
+	viper.BindPFlag("parallel."+parallelNodesIdentifier, nonmemCmd.PersistentFlags().Lookup(parallelNodesIdentifier))
+
+	const parallelCompletionTimeoutIdentifier string = "timeout"
+	nonmemCmd.PersistentFlags().Int(parallelCompletionTimeoutIdentifier, 2147483647, "The amount of time to wait for parallel operations in nonmem before timing out")
+	viper.BindPFlag("parallel."+parallelCompletionTimeoutIdentifier, nonmemCmd.PersistentFlags().Lookup(parallelCompletionTimeoutIdentifier))
+
+	const mpiExecPathIdentifier string = "mpiExecPath"
+	nonmemCmd.PersistentFlags().String(mpiExecPathIdentifier, "/usr/local/mpich3/bin/mpiexec", "The fully qualified path to mpiexec. Used for nonmem parallel operations")
+	viper.BindPFlag("parallel."+mpiExecPathIdentifier, nonmemCmd.PersistentFlags().Lookup(mpiExecPathIdentifier))
+
+	const parafileIdentifier string = "parafile"
+	nonmemCmd.PersistentFlags().String(parafileIdentifier, "", "Location of a user-provided parafile to use for parallel execution")
+	viper.BindPFlag("parallel."+parafileIdentifier, nonmemCmd.PersistentFlags().Lookup(parafileIdentifier))
 }
 
 // "Copies" a file by reading its content (optionally updating the path)
@@ -219,8 +273,62 @@ func generateScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 		return []byte{}, errors.New("An error occured during the execution of the provided script template")
 	}
 
-	if debug {
-		log.Println(buf.String())
+	if viper.GetBool("debug") {
+		log.Debugf("Generated command template for local execution is: %s", buf.String())
+	}
+
+	return buf.Bytes(), nil
+}
+
+func writeParaFile(l NonMemModel) error {
+
+	contentBytes, err := generateParaFile(l)
+
+	log.Debugf("Parafile used has contents of : %s", string(contentBytes))
+
+	//Something failed during generation
+	if err != nil {
+		return err
+	}
+
+	var contentLines []string
+
+	//If no parafile is provided, generate one
+	if l.Configuration.Parallel.Parafile == "" {
+		contentLines = strings.Split(string(contentBytes), "\n")
+	} else {
+		contentLines, err = utils.ReadLines(l.Configuration.Parallel.Parafile)
+		if err != nil {
+			log.Fatalf("Unable to read the contents of the parafile provided: %s, Error is %s ", l.Configuration.Parallel.Parafile, err)
+		}
+	}
+
+	return utils.WriteLines(contentLines, path.Join(l.OutputDir, paraFileName))
+
+}
+
+func generateParaFile(l NonMemModel) ([]byte, error) {
+	nmp := nonmemParallelDirective{
+		TotalNodes:        l.Configuration.Parallel.Nodes,
+		HeadNodes:         1,
+		WorkerNodes:       l.Configuration.Parallel.Nodes - 1,
+		CompletionTimeout: l.Configuration.Parallel.Timeout,
+		MpiExecPath:       l.Configuration.Parallel.MPIExecPath,
+	}
+
+	buf := new(bytes.Buffer)
+
+	t := template.New("parafile")
+	parsed, err := t.Parse(nonmemParaFiletemplate)
+
+	if err != nil {
+		return []byte{}, err
+	}
+
+	err = parsed.Execute(buf, nmp)
+
+	if err != nil {
+		return []byte{}, err
 	}
 
 	return buf.Bytes(), nil
@@ -250,6 +358,10 @@ func buildNonMemCommandString(l NonMemModel) string {
 		}
 	}
 
+	if nmHome == "" {
+		log.Fatal("No version was supplied and no default value exists in the configset")
+	}
+
 	// TODO: Implement cache
 	noBuild := false
 	nmExecutable := path.Join(nmHome, "run", nmBinary)
@@ -262,6 +374,11 @@ func buildNonMemCommandString(l NonMemModel) string {
 
 	if noBuild {
 		cmdArgs = append(cmdArgs, "--nobuild")
+	}
+
+	//Section for Appending the parafile command
+	if l.Configuration.Parallel.Parallel {
+		cmdArgs = append(cmdArgs, "-parafile="+path.Join(l.OutputDir, paraFileName))
 	}
 
 	return nmExecutable + " " + strings.Join(cmdArgs, " ")
@@ -282,6 +399,26 @@ func filesToCleanup(model NonMemModel, exceptions ...string) runner.FileCleanIns
 		if !isFilenameInExceptions(exceptions, v) {
 			//Let's add it to the cleanup list if it's not in the exclusions
 			fci.FilesToRemove = append(fci.FilesToRemove, newTargetFile(v, model.Configuration.CleanLvl))
+		}
+	}
+
+	if model.Configuration.Parallel.Parallel {
+		fs := afero.NewOsFs()
+		for _, variant := range parallelRegexesToRemove {
+
+			r := regexp.MustCompile(variant)
+
+			files, err := afero.ReadDir(fs, model.OutputDir)
+
+			if err != nil {
+				log.Printf("Error trying to read directory %s for parallel files to cleanup", model.OutputDir)
+			}
+
+			for _, f := range files {
+				if r.MatchString(f.Name()) {
+					fci.FilesToRemove = append(fci.FilesToRemove, newTargetFile(f.Name(), model.Configuration.CleanLvl))
+				}
+			}
 		}
 	}
 
@@ -367,13 +504,17 @@ func getCopiableFileList(file string, level int, filepath string) []string {
 	modelPieces := strings.Split(file, ".")
 	//Save as even if there's nothing to delimit, the initial value will be the first component
 	filename := modelPieces[0]
+	if viper.GetBool("debug") {
+		log.Infof("%s Attempting to locate copiable files. Provided path is %s", "["+filename+"]", filepath)
+	}
 
 	//Explicitly load the file provided by the user
 	fileLines, err := utils.ReadLines(path.Join(filepath, file))
 
 	if err != nil {
 		//Let the user know this is basically a no-op
-		log.Printf("We could not locate or read the mod file (%s) indicated to locate output files. As such none will be included in copy / delete operations", filename+".mod")
+		log.Errorf("%s We could not locate or read the mod file (%s) indicated to locate output files. As such, no table or output files will be included in copy / delete operations", "["+filename+"]", filename+".mod")
+		log.Errorf("%s Error was specifically : %s", "["+filename+"]", err)
 	}
 
 	//Add defined output files to the list at level 1
@@ -451,16 +592,16 @@ func newPostWorkInstruction(model NonMemModel, cleanupExclusions []string, manda
 }
 
 func postWorkNotice(m *turnstile.Manager, t time.Time) {
-
+	log.Debug("Work has completed. Beginning detail display via console")
 	if m.Errors > 0 {
-		log.Printf("%d errors were experienced during the run", m.Errors)
+		log.Errorf("%d errors were experienced during the run", m.Errors)
 
 		for _, v := range m.ErrorList {
-			log.Printf("Errors were experienced while running model %s. Details are %s", v.RunIdentifier, v.Notes)
+			log.Errorf("Errors were experienced while running model %s. Details are %s", v.RunIdentifier, v.Notes)
 		}
 	}
 
-	fmt.Printf("\r%d models completed in %s", m.Completed, time.Since(t))
+	log.Infof("\r%d models completed in %s", m.Completed, time.Since(t))
 	println("")
 }
 
@@ -574,16 +715,16 @@ func nonmemModelsFromArguments(args []string) []NonMemModel {
 			// keep waiting forever since it
 			isDir, err := utils.IsDir(arg, AppFs)
 			if err != nil || !isDir {
-				log.Printf("issue handling %s, if this is a run please add the extension. Err: (%s)", arg, err)
+				log.Errorf("issue handling %s, if this is a run please add the extension. Err: (%s)", arg, err)
 				continue
 			}
 			modelsInDir, err := utils.ListModels(arg, ".mod", AppFs)
 			if err != nil {
-				log.Printf("issue getting models in dir %s, if this is a run please add the extension. Err: (%s)", arg, err)
+				log.Errorf("issue getting models in dir %s, if this is a run please add the extension. Err: (%s)", arg, err)
 				continue
 			}
-			if verbose || debug {
-				log.Printf("adding %v model files in directory %s to queue", len(modelsInDir), arg)
+			if viper.GetBool("verbose") || viper.GetBool("debug") {
+				log.Debug("adding %v model files in directory %s to queue", len(modelsInDir), arg)
 			}
 
 			for _, model := range modelsInDir {
@@ -593,15 +734,15 @@ func nonmemModelsFromArguments(args []string) []NonMemModel {
 		} else {
 			// figure out if need to do expansion, or run as-is
 			if len(r.FindAllStringSubmatch(arg, 1)) > 0 {
-				log.Printf("expanding model pattern: %s \n", arg)
+				log.Infof("expanding model pattern: %s \n", arg)
 				pat, err := utils.ExpandNameSequence(arg)
 				if err != nil {
-					log.Printf("err expanding name: %v", err)
+					log.Errorf("err expanding name: %v", err)
 					// don't try to run this model
 					continue
 				}
-				if verbose || debug {
-					log.Printf("expanded models: %s \n", pat)
+				if viper.GetBool("verbose") || viper.GetBool("debug") {
+					log.Debugf("expanded models: %s \n", pat)
 				}
 				for _, p := range pat {
 					output = append(output, NewNonMemModel(p))
@@ -613,4 +754,31 @@ func nonmemModelsFromArguments(args []string) []NonMemModel {
 	}
 
 	return output
+}
+
+func doesDirectoryContainOutputFiles(path string, modelname string) bool {
+	fs := afero.NewOsFs()
+
+	contents, err := afero.ReadDir(fs, path)
+
+	if err != nil {
+		//If we can't read the output, let's indicate that files did exist to trigger an overwrite.
+		return true
+	}
+
+	contentFiles := getCopiableFileList(modelname, 3, path)
+
+	for _, v := range contents {
+		for _, f := range contentFiles {
+			if v.Name() == f {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+func (n NonMemModel) LogIdentifier() string {
+	return fmt.Sprintf("[%s]", n.FileName)
 }

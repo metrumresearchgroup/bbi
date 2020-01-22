@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"io"
-	"log"
 	"os/exec"
 	"path"
 	"path/filepath"
@@ -33,48 +33,60 @@ type localOperation struct {
 //LocalModel is the struct used for local operations containing the NonMemModel
 type LocalModel struct {
 	Nonmem NonMemModel
-}
-
-//NewLocalNonMemModel builds the core struct from the model name argument
-func NewLocalNonMemModel(modelname string) LocalModel {
-	return LocalModel{
-		Nonmem: NewNonMemModel(modelname),
-	}
+	Cancel chan bool
 }
 
 //Begin Scalable method definitions
 
+func (l LocalModel) CancellationChannel() chan bool {
+	return l.Cancel
+}
+
 //Prepare is basically the old EstimateModel function. Responsible for creating directories and preparation.
 func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
-
+	log.Debugf("%s Beginning local preparation phase", l.Nonmem.LogIdentifier())
 	//Mark the model as started some work
 	channels.Working <- 1
 
 	fs := afero.NewOsFs()
 
+	log.Debugf("%s Overwrite is currently set to %t", l.Nonmem.LogIdentifier(), viper.GetBool("debug"))
 	//Does output directory exist?
-	if ok, _ := afero.Exists(fs, l.Nonmem.OutputDir); ok {
+	if ok, _ := afero.DirExists(fs, l.Nonmem.OutputDir); ok {
 		//If so are we configured to overwrite?
 		if l.Nonmem.Configuration.Overwrite {
-			err := fs.RemoveAll(l.Nonmem.OutputDir)
+			log.Debugf("%s Removing directory %s", l.Nonmem.LogIdentifier(), l.Nonmem.OutputDir)
+			err := RemoveContentsAndDir(l.Nonmem.OutputDir)
+			log.Error(err)
 			if err != nil {
-				channels.Failed <- 1
+				l.Cancel <- true
 				channels.Errors <- turnstile.ConcurrentError{
 					RunIdentifier: l.Nonmem.Model,
 					Error:         err,
-					Notes:         "An error occured trying to remove the directory as specified in the overwrite flag",
+					Notes:         "An error occurred trying to remove the directory as specified in the overwrite flag",
 				}
 				return
 			}
-		} else {
-			channels.Failed <- 1
-			channels.Errors <- turnstile.ConcurrentError{
-				RunIdentifier: l.Nonmem.Model,
-				Error:         errors.New("The output directory already exists"),
-				Notes:         fmt.Sprintf("The target directory, %s already, exists, but we are configured to not overwrite. Invalid configuration / run state", l.Nonmem.OutputDir),
-			}
-			return
 		}
+
+		if !l.Nonmem.Configuration.Overwrite {
+			//If not, we only want to panic if there are nonmem output files in the directory
+			if !doesDirectoryContainOutputFiles(l.Nonmem.OutputDir, l.Nonmem.Model) {
+				//Continue along if we find no relevant content
+				log.Infof("%s No Nonmem output files detected in %s. Good to continue", l.Nonmem.LogIdentifier(), l.Nonmem.OutputDir)
+			} else {
+				//Or panic because we're in a scenario where we shouldn't purge, but there's content in the directory from previous runs
+				log.Debugf("%s Configuration for overwrite was %t, but %s had Nonmem outputs. As such, we will hault operations", l.Nonmem.LogIdentifier(), viper.GetBool("debug"), l.Nonmem.OutputDir)
+				l.Cancel <- true
+				channels.Errors <- turnstile.ConcurrentError{
+					RunIdentifier: l.Nonmem.Model,
+					Error:         errors.New("The output directory already exists"),
+					Notes:         fmt.Sprintf("The target directory, %s already, exists, but we are configured to not overwrite. Invalid configuration / run state", l.Nonmem.OutputDir),
+				}
+				return
+			}
+		}
+
 	}
 
 	//Copy Model into destination and update Data Path
@@ -82,33 +94,41 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 
 	//Now that the directory is created, let's create the gitignore file if specified
 	if viper.GetBool("git") {
+		log.Debugf("%s Writing initial gitignore file", l.Nonmem.LogIdentifier())
 		WriteGitIgnoreFile(l.Nonmem.OutputDir)
 	}
 
 	if err != nil {
-		channels.Failed <- 1
-		channels.Errors <- turnstile.ConcurrentError{
-			RunIdentifier: l.Nonmem.Model,
-			Error:         err,
-			Notes:         fmt.Sprintf("There appears to have been an issue trying to copy %s to %s", l.Nonmem.Model, l.Nonmem.OutputDir),
-		}
+		RecordConcurrentError(l.Nonmem.Model, fmt.Sprintf("There appears to have been an issue trying to copy %s to %s", l.Nonmem.Model, l.Nonmem.OutputDir), err, channels, l.Cancel)
 		return
 	}
 
 	//Create Execution Script
+	log.Debugf("%s Creating local execution script", l.Nonmem.LogIdentifier())
 	scriptContents, err := generateScript(nonMemExecutionTemplate, l.Nonmem)
 
 	if err != nil {
-		channels.Failed <- 1
+		l.Cancel <- true
 		channels.Errors <- turnstile.ConcurrentError{
 			RunIdentifier: l.Nonmem.Model,
 			Error:         err,
 			Notes:         "An error occurred during the creation of the executable script for this model",
 		}
+		return
 	}
+
+	log.Debugf("%s Writing script to file", l.Nonmem.LogIdentifier())
 
 	//rwxr-x---
 	afero.WriteFile(fs, path.Join(l.Nonmem.OutputDir, l.Nonmem.FileName+".sh"), scriptContents, 0750)
+
+	if l.Nonmem.Configuration.Parallel.Parallel {
+		err = writeParaFile(l.Nonmem)
+		if err != nil {
+			log.Fatalf("%s Configuration requires parallel operation, but generation or writing of the parafile has failed: %s", l.Nonmem.LogIdentifier(), err)
+		}
+	}
+
 }
 
 //Work describes the Turnstile execution phase -> IE What heavy lifting should be done
@@ -116,7 +136,7 @@ func (l LocalModel) Work(channels *turnstile.ChannelMap) {
 	cerr := executeNonMemJob(executeLocalJob, l.Nonmem)
 
 	if cerr.Error != nil {
-		recordConcurrentError(l.Nonmem.Model, cerr.Notes, cerr.Error, channels)
+		RecordConcurrentError(l.Nonmem.Model, cerr.Notes, cerr.Error, channels, l.Cancel)
 	}
 
 }
@@ -129,7 +149,7 @@ func (l LocalModel) Monitor(channels *turnstile.ChannelMap) {
 //Cleanup is the last phase of execution, in which computation / hard work is done and we're cleaning up leftover files, copying results around et all.
 func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 	time.Sleep(10 * time.Millisecond)
-	log.Printf("Beginning cleanup phase for model %s\n", l.Nonmem.FileName)
+	log.Printf("%s Beginning cleanup phase", l.Nonmem.LogIdentifier())
 	fs := afero.NewOsFs()
 	// while the rest of the cleanup is happening, lets also hash the data in the background
 	// so don't have to wait extra time if its on the larger end
@@ -138,43 +158,50 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 	sourceLines, err := utils.ReadLines(modelPath)
 
 	if err != nil {
-		log.Printf("error reading model at path: %s, to extract data path: %s\n", modelPath, err)
+		log.Errorf("%s error reading model at path: %s, to extract data path: %s\n", l.Nonmem.LogIdentifier(), modelPath, err)
 	}
+
+	log.Debugf("%s Beginning hash calculation operations for data file", l.Nonmem.LogIdentifier())
+
 	for _, line := range sourceLines {
 		if strings.Contains(line, "$DATA") {
 			// extract out data path
 			l.Nonmem.DataPath = filepath.Clean(strings.Fields(line)[1])
 		}
 	}
+
 	hashChan := make(chan string)
 	go func() {
 		f, err := os.Open(l.Nonmem.DataPath)
 		if err != nil {
-			log.Printf("error reading data to hash: %s\n", err)
+			log.Errorf("%s error reading data to hash: %s", l.Nonmem.LogIdentifier(), err)
 			hashChan <- ""
 		}
 		defer f.Close()
 
 		h := md5.New()
 		if _, err := io.Copy(h, f); err != nil {
-			log.Printf("error hashing data: %s\n", err)
+			log.Errorf("%s error hashing data: %s", l.Nonmem.LogIdentifier(), err)
 			hashChan <- ""
 		}
 		hashChan <- fmt.Sprintf("%x", h.Sum(nil))
 	}()
 
+	log.Debugf("%s Beginning selection of cleanable / copiable files", l.Nonmem.LogIdentifier())
 	//Magical instructions
 	//TODO: Implement flags for mandatory copy and cleanup exclusions
 	pwi := newPostWorkInstruction(l.Nonmem, []string{}, []string{})
 
 	//Copy Up first so that we don't try to move something we remove :)
 	var copied []runner.TargetedFile
-	//log.Printf("Beginning copy-up operations for model %s\n", l.FileName)
+
+	log.Debugf("%s Beginning selection of copiable files ", l.Nonmem.LogIdentifier())
 	for _, v := range pwi.FilesToCopy.FilesToCopy {
 
 		source, err := utils.ReadLines(path.Join(pwi.FilesToCopy.CopyFrom, v.File))
 
 		if err != nil {
+			log.Debugf("%s Unable to read file at %s. Continuing anyway", l.Nonmem.LogIdentifier(), path.Join(pwi.FilesToCopy.CopyFrom, v.File))
 			//Just continue. There are potentially files which will not exist based on the values in the list.
 			continue
 		}
@@ -191,7 +218,7 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 		err = utils.WriteLines(source, path.Join(pwi.FilesToCopy.CopyTo, file))
 
 		if err != nil {
-			log.Printf("An error occurred while attempting to copy the files: File is %s", v.File)
+			log.Errorf("%s An error occurred while attempting to copy the files: File is %s", l.Nonmem.LogIdentifier(), v.File)
 			continue
 		}
 
@@ -201,6 +228,7 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 	}
 
 	if len(copied) > 0 {
+		log.Debugf("%s Writing out copied json file for", l.Nonmem.LogIdentifier())
 		//Write to File in original path indicating what all was copied
 		copiedJSON, _ := json.MarshalIndent(copied, "", "    ")
 
@@ -208,7 +236,7 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 	}
 
 	//Clean Up
-	//log.Printf("Beginning cleanup operations for model %s\n", l.FileName)
+	log.Debugf("%s Beginning local cleanup operations", l.Nonmem.LogIdentifier())
 	for _, v := range pwi.FilesToClean.FilesToRemove {
 		var err error
 
@@ -224,7 +252,7 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 
 			if err != nil {
 				//Indicate failure to remove
-				log.Printf("Failure removing file / directory %s. Details : %s", v.File, err.Error())
+				log.Errorf("%s Failure removing file / directory %s. Details : %s", l.Nonmem.LogIdentifier(), v.File, err.Error())
 			}
 		}
 	}
@@ -236,15 +264,11 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 	// before writing out the config
 	l.Nonmem.DataMD5 = <-hashChan
 	//Serialize and Write the Config down to a file
+	log.Debugf("%s Writing out configuration as json into %s", l.Nonmem.LogIdentifier(), l.Nonmem.OutputDir)
 	err = writeNonmemConfig(l.Nonmem)
 
 	if err != nil {
-		channels.Failed <- 1
-		channels.Errors <- turnstile.ConcurrentError{
-			RunIdentifier: l.Nonmem.FileName,
-			Notes:         "An error occurred trying to write the config file to the output directory",
-			Error:         err,
-		}
+		RecordConcurrentError(l.Nonmem.FileName, "An error occurred trying to write the config file to the directory", err, channels, l.Cancel)
 		return
 	}
 
@@ -268,19 +292,23 @@ func init() {
 
 func local(cmd *cobra.Command, args []string) {
 
-	if debug {
-		viper.Debug()
+	log.Info("Beginning Local Path")
+
+	//Set Logrus level if we're debug
+	if viper.GetBool("debug") {
+		log.SetLevel(log.DebugLevel)
 	}
 
 	//Let's try to immediately load any specified configuration files
 	configlib.ProcessSpecifiedConfigFile()
 
-	lo := localOperation{}
-
-	if verbose {
-		log.Printf("setting up a work queue with %v workers", viper.GetInt("threads"))
+	if viper.ConfigFileUsed() != "" {
+		log.Infof("Config file loaded from %s", viper.ConfigFileUsed())
 	}
 
+	lo := localOperation{}
+
+	log.Debug("Locating models from arguments")
 	lo.Models = localModelsFromArguments(args)
 
 	if len(lo.Models) == 0 {
@@ -290,7 +318,7 @@ func local(cmd *cobra.Command, args []string) {
 	//Display Summary
 
 	//Models Added
-	log.Printf("A total of %d models have been located for work", len(lo.Models))
+	log.Infof("A total of %d models have been located for work", len(lo.Models))
 
 	//Models in Error
 	//Locate 'em
@@ -304,14 +332,14 @@ func local(cmd *cobra.Command, args []string) {
 	}
 
 	if counter > 0 {
-		log.Printf("It appears that %d models generated an error during the initial setup phase", len(errors))
+		log.Infof("It appears that %d models generated an error during the initial setup phase", len(errors))
 		for _, v := range errors {
-			log.Printf("Model named %s has errored. Details: %s", v.Model, v.Error.Error())
+			log.Errorf("Model named %s has errored. Details: %s", v.Model, v.Error.Error())
 		}
 	}
 
 	//Models in OK state
-	log.Printf("%d models successfully completed initial setup phase.", len(lo.Models)-len(errors))
+	log.Infof("%d models successfully completed initial setup phase.", len(lo.Models)-len(errors))
 
 	//Create signature safe slice for manager
 	var scalables []turnstile.Scalable
@@ -320,23 +348,21 @@ func local(cmd *cobra.Command, args []string) {
 		scalables = append(scalables, v)
 	}
 
-	if viper.ConfigFileUsed() != "" {
-		log.Printf("Config file loaded from %s", viper.ConfigFileUsed())
-	}
-
 	//Begin Execution
+	log.Debug("Building turnstile manager")
 	m := turnstile.NewManager(scalables, uint64(viper.GetInt("threads")))
 
 	now := time.Now()
 
+	log.Debug("Beginning turnstile execution")
 	go m.Execute()
 
 	//If we're in debug mode, let's periodically print out the details for the manager
-	if debug {
+	if viper.GetBool("debug") {
 		go func(m *turnstile.Manager) {
 			for {
-				log.Printf("Manager Details: Working: %d, Errors: %d, Completed: %d, Concurrency: %d, Iterations: %d", m.Working, m.Errors, m.Completed, m.Concurrency, m.Iterations)
-				time.Sleep(500 * time.Millisecond)
+				log.Infof("Manager Details: Working: %d, Errors: %d, Completed: %d, Concurrency: %d, Iterations: %d", m.Working, m.Errors, m.Completed, m.Concurrency, m.Iterations)
+				time.Sleep(3 * time.Second)
 			}
 		}(m)
 	}
@@ -361,7 +387,7 @@ func WriteGitIgnoreFile(filepath string) {
 }
 
 func executeLocalJob(model NonMemModel) turnstile.ConcurrentError {
-	log.Printf("Beginning local work phase for %s", model.FileName)
+	log.Infof("%s Beginning local work phase", model.LogIdentifier())
 	fs := afero.NewOsFs()
 
 	scriptLocation := path.Join(model.OutputDir, model.FileName+".sh")
@@ -370,6 +396,8 @@ func executeLocalJob(model NonMemModel) turnstile.ConcurrentError {
 	command := exec.Command(scriptLocation)
 	command.Env = os.Environ() //Take in OS Environment
 
+	log.Debugf("%s Generated command was: %s", model.LogIdentifier(), command.String())
+
 	output, err := command.CombinedOutput()
 
 	if err != nil {
@@ -377,8 +405,8 @@ func executeLocalJob(model NonMemModel) turnstile.ConcurrentError {
 			code := exitError.ExitCode()
 			details := exitError.String()
 
-			log.Printf("Exit code was %d, details were %s", code, details)
-			log.Printf("output details were: %s", string(output))
+			log.Errorf("%s Exit code was %d, details were %s", model.LogIdentifier(), code, details)
+			log.Errorf("%s output details were: %s", model.LogIdentifier(), string(output))
 		}
 		return newConcurrentError(model.Model, "Running the programmatic shell script caused an error", err)
 
@@ -396,6 +424,7 @@ func localModelsFromArguments(args []string) []LocalModel {
 	for _, v := range nonmemmodels {
 		output = append(output, LocalModel{
 			Nonmem: v,
+			Cancel: turnstile.CancellationChannel(),
 		})
 	}
 
@@ -403,6 +432,7 @@ func localModelsFromArguments(args []string) []LocalModel {
 }
 
 func createNewGitIgnoreFile(m NonMemModel) error {
+	log.Debugf("%s Writing finalized gitignore file", m.LogIdentifier())
 	//First let's remove the gitignore in the output dir.
 	fs := afero.NewOsFs()
 	if ok, _ := afero.Exists(fs, path.Join(m.OutputDir, ".gitignore")); ok {

@@ -2,10 +2,13 @@ package configlib
 
 import (
 	"fmt"
-	"log"
+	"github.com/metrumresearchgroup/babylon/utils"
 	"path"
+	"path/filepath"
 	"runtime"
+	"strings"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -21,6 +24,7 @@ type Config struct {
 	Threads       int                     `yaml:"threads" json:"threads,omitempty"`
 	Debug         bool                    `yaml:"debug" json:"debug,omitempty"`
 	Nonmem        map[string]NonMemDetail `mapstructure:"nonmem" json:"nonmem,omitempty"`
+	Parallel      ParallelConfig          `mapstructure:"parallel" json:"parallel"`
 }
 
 type NonMemDetail struct {
@@ -28,6 +32,14 @@ type NonMemDetail struct {
 	Executable string `yaml:"executable" json:"executable,omitempty"`
 	Nmqual     bool   `yaml:"nmqual" json:"nmqual,omitempty"`
 	Default    bool   `yaml:"default" json:"default,omitempty"`
+}
+
+type ParallelConfig struct {
+	Parallel    bool   `yaml:"parallel" json:"parallel,omitempty"`
+	Nodes       int    `yaml:"nodes" json:"nodes,omitempty"`
+	MPIExecPath string `yaml:"mpiExecPath" json:"mpiExecPath,omitempty"`
+	Timeout     int    `yaml:"timeout" json:"timeout,omitempty"`
+	Parafile    string `yaml:"parafile" json:"parafile,omitempty"`
 }
 
 // LoadGlobalConfig loads nonmemutils configuration into the global Viper
@@ -69,16 +81,34 @@ func LocateAndReadConfigFile(modelPath string) {
 		return
 	}
 
-	//To avoid spooky action, only looking in model directory or any manually provided configuration
 	locations := []string{
 		modelPath,
 	}
 
 	for _, v := range locations {
-		err := LoadFileToViper(v)
-		if err != nil {
-			log.Fatalf("Unable to load config file from %s", v)
+		//Add the path and try to load the config
+		viper.AddConfigPath(v)
+		err := viper.ReadInConfig()
+
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			//No config here
+			continue
 		}
+
+		//Handle parse issues
+		if err, ok := err.(viper.ConfigParseError); ok {
+			log.Errorf("An error occurred trying to parse the config file located at %s. Error details are %s", v, err.Error())
+			continue
+		}
+
+		//Let's print out the config we loaded
+		if viper.GetBool("debug") {
+			lines, _ := utils.ReadLines(filepath.Join(v, "babylon.yaml"))
+			log.Debugf("Contents of loaded config file are: \n%s", strings.Join(lines, "\n"))
+		}
+
+		//If no errors we return to prevent further processing
+		log.Infof("Configuration file successfully loaded from %s", path.Join(v, "babylon.yml"))
 		return
 	}
 }
