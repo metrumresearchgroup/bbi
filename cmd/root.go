@@ -16,7 +16,10 @@ package cmd
 
 import (
 	"fmt"
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/afero"
 	"os"
+	"path/filepath"
 
 	"github.com/metrumresearchgroup/babylon/configlib"
 	"github.com/spf13/cobra"
@@ -78,6 +81,7 @@ func init() {
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/babylon.yaml)")
 	RootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
 	RootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "debug mode")
+	viper.BindPFlag("debug", RootCmd.PersistentFlags().Lookup("debug"))
 	RootCmd.PersistentFlags().IntVar(&threads, "threads", 4, "number of threads to execute with")
 	viper.BindPFlag("threads", RootCmd.PersistentFlags().Lookup("threads"))                                               //Update to make sure viper binds to the flag
 	RootCmd.PersistentFlags().BoolVar(&Json, "json", false, "json tree of output, if possible")                           //TODO: Implement
@@ -104,4 +108,31 @@ func flagChanged(flags *flag.FlagSet, key string) bool {
 		return false
 	}
 	return flag.Changed
+}
+
+func RemoveContentsAndDir(path string) error {
+	fs := afero.NewOsFs()
+	contents, err := afero.ReadDir(fs, path)
+
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+
+	for _, v := range contents {
+		err := fs.Remove(filepath.Join(path, v.Name()))
+		if err != nil {
+			log.Error(err)
+			return err
+		}
+	}
+
+	//Now that the contents are gone
+	err = fs.RemoveAll(path)
+
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	return nil
 }
