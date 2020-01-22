@@ -299,6 +299,9 @@ func local(cmd *cobra.Command, args []string) {
 		log.SetLevel(log.DebugLevel)
 	}
 
+	//Let's try to immediately load any specified configuration files
+	configlib.ProcessSpecifiedConfigFile()
+
 	if viper.ConfigFileUsed() != "" {
 		log.Infof("Config file loaded from %s", viper.ConfigFileUsed())
 	}

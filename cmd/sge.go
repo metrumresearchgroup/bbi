@@ -189,6 +189,9 @@ func sge(cmd *cobra.Command, args []string) {
 
 	lo := sgeOperation{}
 
+	//Let's try to immediately load any specified configuration files
+	configlib.ProcessSpecifiedConfigFile()
+
 	//If we're in debug mode, let's set the logger to debug
 	if viper.GetBool("debug") {
 		log.SetLevel(log.DebugLevel)

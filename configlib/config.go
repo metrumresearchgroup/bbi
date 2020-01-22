@@ -1,6 +1,7 @@
 package configlib
 
 import (
+	"fmt"
 	"github.com/metrumresearchgroup/babylon/utils"
 	"path"
 	"path/filepath"
@@ -110,6 +111,44 @@ func LocateAndReadConfigFile(modelPath string) {
 		log.Infof("Configuration file successfully loaded from %s", path.Join(v, "babylon.yml"))
 		return
 	}
+}
+
+func ProcessSpecifiedConfigFile() {
+	//Check to see if a config was provided.
+	if len(viper.GetString("config")) > 0 {
+		err := LoadFileToViper(viper.GetString("config"))
+		if err != nil {
+			//If we specified a config and we can't load it, stop processing to allow the user to decide
+			//how best to proceed.
+			log.Fatalf("User specified %s as the configuration to load, but an error "+
+				"happened attempting to do so : %s", viper.GetString("config"), err)
+		}
+	}
+}
+
+func LoadFileToViper(filepath string) error {
+
+	//Does the path contain babylon.yaml? If so we only need the directory
+	if path.Base(filepath) == "babylon.yaml" {
+		filepath = path.Dir(filepath)
+	}
+	//Or we could provide an IO reader for reading the config
+
+	viper.AddConfigPath(filepath)
+	err := viper.ReadInConfig()
+
+	if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+		//No config here
+		return fmt.Errorf("path %s was provided for a configuration file, but no configurations were "+
+			"located here", filepath)
+	}
+
+	//Handle parse issues
+	if err, ok := err.(viper.ConfigParseError); ok {
+		return fmt.Errorf("an error occurred trying to parse the config file located at %s. Error details are %s", filepath, err.Error())
+	}
+
+	return nil
 }
 
 //SaveConfig takes the viper settings and writes them to a file in the original path
