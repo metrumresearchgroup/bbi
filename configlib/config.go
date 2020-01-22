@@ -1,10 +1,13 @@
 package configlib
 
 import (
-	"log"
+	"github.com/metrumresearchgroup/babylon/utils"
 	"path"
+	"path/filepath"
 	"runtime"
+	"strings"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -79,8 +82,6 @@ func LocateAndReadConfigFile(modelPath string) {
 
 	locations := []string{
 		modelPath,
-		".",
-		"$HOME",
 	}
 
 	for _, v := range locations {
@@ -95,12 +96,18 @@ func LocateAndReadConfigFile(modelPath string) {
 
 		//Handle parse issues
 		if err, ok := err.(viper.ConfigParseError); ok {
-			log.Printf("An error occurred trying to parse the config file located at %s. Error details are %s", v, err.Error())
+			log.Errorf("An error occurred trying to parse the config file located at %s. Error details are %s", v, err.Error())
 			continue
 		}
 
+		//Let's print out the config we loaded
+		if viper.GetBool("debug") {
+			lines, _ := utils.ReadLines(filepath.Join(v, "babylon.yaml"))
+			log.Debugf("Contents of loaded config file are: \n%s", strings.Join(lines, "\n"))
+		}
+
 		//If no errors we return to prevent further processing
-		log.Printf("Configuration file successfully loaded from %s", path.Join(v, "babylon.yml"))
+		log.Infof("Configuration file successfully loaded from %s", path.Join(v, "babylon.yml"))
 		return
 	}
 }
