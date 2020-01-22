@@ -504,13 +504,17 @@ func getCopiableFileList(file string, level int, filepath string) []string {
 	modelPieces := strings.Split(file, ".")
 	//Save as even if there's nothing to delimit, the initial value will be the first component
 	filename := modelPieces[0]
+	if viper.GetBool("debug") {
+		log.Infof("%s Attempting to locate copiable files. Provided path is %s", "["+filename+"]", filepath)
+	}
 
 	//Explicitly load the file provided by the user
 	fileLines, err := utils.ReadLines(path.Join(filepath, file))
 
 	if err != nil {
 		//Let the user know this is basically a no-op
-		log.Printf("We could not locate or read the mod file (%s) indicated to locate output files. As such none will be included in copy / delete operations", filename+".mod")
+		log.Errorf("%s We could not locate or read the mod file (%s) indicated to locate output files. As such, no table or output files will be included in copy / delete operations", "["+filename+"]", filename+".mod")
+		log.Errorf("%s Error was specifically : %s", "["+filename+"]", err)
 	}
 
 	//Add defined output files to the list at level 1

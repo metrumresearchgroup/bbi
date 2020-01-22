@@ -71,7 +71,7 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 
 		if !l.Nonmem.Configuration.Overwrite {
 			//If not, we only want to panic if there are nonmem output files in the directory
-			if !doesDirectoryContainOutputFiles(l.Nonmem.OutputDir, l.Nonmem.FileName) {
+			if !doesDirectoryContainOutputFiles(l.Nonmem.OutputDir, l.Nonmem.Model) {
 				//Continue along if we find no relevant content
 				log.Infof("%s No Nonmem output files detected in %s. Good to continue", l.Nonmem.LogIdentifier(), l.Nonmem.OutputDir)
 			} else {
