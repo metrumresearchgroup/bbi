@@ -115,6 +115,6 @@ func flagChanged(flags *flag.FlagSet, key string) bool {
 
 //Assumes random has been set previously and seeded to avoid reproducible data sets
 //Here random is set during root.go setup
-func randomInteger(min int, max int) int {
-	return rand.Intn(max-min) + min
+func randomFloat(min int, max int) float64 {
+	return float64(float64(min) + rand.Float64()*(float64(max)-float64(min)))
 }
