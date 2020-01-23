@@ -16,11 +16,8 @@ package cmd
 
 import (
 	"fmt"
-	log "github.com/sirupsen/logrus"
-	"github.com/spf13/afero"
 	"math/rand"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/metrumresearchgroup/babylon/configlib"
