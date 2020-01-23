@@ -25,6 +25,7 @@ type Config struct {
 	Debug         bool                    `yaml:"debug" json:"debug,omitempty"`
 	Nonmem        map[string]NonMemDetail `mapstructure:"nonmem" json:"nonmem,omitempty"`
 	Parallel      ParallelConfig          `mapstructure:"parallel" json:"parallel"`
+	Delay         int                     `yaml:"delay" json:"delay,omitempty"`
 }
 
 type NonMemDetail struct {

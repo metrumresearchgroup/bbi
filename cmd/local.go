@@ -45,6 +45,19 @@ func (l LocalModel) CancellationChannel() chan bool {
 //Prepare is basically the old EstimateModel function. Responsible for creating directories and preparation.
 func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 	log.Debugf("%s Beginning local preparation phase", l.Nonmem.LogIdentifier())
+
+	//Jitter / Delay
+	if l.Nonmem.Configuration.Delay > 0 {
+		//Add a random Timer
+		randomizedTimer := randomFloat(1, l.Nonmem.Configuration.Delay)
+
+		if l.Nonmem.Configuration.Debug {
+			log.Infof("Random delay of %f seconds introduced for model %s", randomizedTimer, l.Nonmem.FileName)
+		}
+
+		time.Sleep(time.Duration(randomizedTimer) * time.Second)
+	}
+
 	//Mark the model as started some work
 	channels.Working <- 1
 
@@ -56,7 +69,7 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 		//If so are we configured to overwrite?
 		if l.Nonmem.Configuration.Overwrite {
 			log.Debugf("%s Removing directory %s", l.Nonmem.LogIdentifier(), l.Nonmem.OutputDir)
-			err := RemoveContentsAndDir(l.Nonmem.OutputDir)
+			err := fs.RemoveAll(l.Nonmem.OutputDir)
 			log.Error(err)
 			if err != nil {
 				l.Cancel <- true

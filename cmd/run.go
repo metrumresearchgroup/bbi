@@ -70,6 +70,10 @@ func init() {
 	runCmd.PersistentFlags().Bool(saveconfig, true, "Whether or not to save the existing configuration to a file with the model")
 	viper.BindPFlag(saveconfig, runCmd.PersistentFlags().Lookup(saveconfig))
 
+	const delayIdentifier string = "delay"
+	runCmd.PersistentFlags().Int(delayIdentifier, 0, "Selects a random number of seconds between 1 and this value to stagger / jitter job execution. Assists in dealing with large volumes of work dealing with the same data set. May avoid NMTRAN issues about not being able read / close files")
+	viper.BindPFlag(delayIdentifier, runCmd.PersistentFlags().Lookup(delayIdentifier))
+
 	nonmemCmd.AddCommand(runCmd)
 
 }
