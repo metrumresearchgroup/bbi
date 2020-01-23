@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"path"
 	"path/filepath"
@@ -32,6 +31,7 @@ import (
 	"github.com/metrumresearchgroup/babylon/runner"
 	"github.com/metrumresearchgroup/babylon/utils"
 	"github.com/metrumresearchgroup/turnstile"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -42,10 +42,6 @@ const nonMemExecutionTemplate string = `#!/bin/bash
 
 #$ -wd {{ .WorkingDirectory }}
 
-{{ .Command }}
-`
-
-const sgeExecutionTemplate string = `#!/bin/bash
 {{ .Command }}
 `
 
@@ -277,8 +273,8 @@ func generateScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 		return []byte{}, errors.New("An error occured during the execution of the provided script template")
 	}
 
-	if debug {
-		log.Println(buf.String())
+	if viper.GetBool("debug") {
+		log.Debugf("Generated command template for local execution is: %s", buf.String())
 	}
 
 	return buf.Bytes(), nil
@@ -287,6 +283,8 @@ func generateScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 func writeParaFile(l NonMemModel) error {
 
 	contentBytes, err := generateParaFile(l)
+
+	log.Debugf("Parafile used has contents of : %s", string(contentBytes))
 
 	//Something failed during generation
 	if err != nil {
@@ -506,13 +504,17 @@ func getCopiableFileList(file string, level int, filepath string) []string {
 	modelPieces := strings.Split(file, ".")
 	//Save as even if there's nothing to delimit, the initial value will be the first component
 	filename := modelPieces[0]
+	if viper.GetBool("debug") {
+		log.Infof("%s Attempting to locate copiable files. Provided path is %s", "["+filename+"]", filepath)
+	}
 
 	//Explicitly load the file provided by the user
 	fileLines, err := utils.ReadLines(path.Join(filepath, file))
 
 	if err != nil {
 		//Let the user know this is basically a no-op
-		log.Printf("We could not locate or read the mod file (%s) indicated to locate output files. As such none will be included in copy / delete operations", filename+".mod")
+		log.Errorf("%s We could not locate or read the mod file (%s) indicated to locate output files. As such, no table or output files will be included in copy / delete operations", "["+filename+"]", filename+".mod")
+		log.Errorf("%s Error was specifically : %s", "["+filename+"]", err)
 	}
 
 	//Add defined output files to the list at level 1
@@ -590,16 +592,16 @@ func newPostWorkInstruction(model NonMemModel, cleanupExclusions []string, manda
 }
 
 func postWorkNotice(m *turnstile.Manager, t time.Time) {
-
+	log.Debug("Work has completed. Beginning detail display via console")
 	if m.Errors > 0 {
-		log.Printf("%d errors were experienced during the run", m.Errors)
+		log.Errorf("%d errors were experienced during the run", m.Errors)
 
 		for _, v := range m.ErrorList {
-			log.Printf("Errors were experienced while running model %s. Details are %s", v.RunIdentifier, v.Notes)
+			log.Errorf("Errors were experienced while running model %s. Details are %s", v.RunIdentifier, v.Notes)
 		}
 	}
 
-	fmt.Printf("\r%d models completed in %s", m.Completed, time.Since(t))
+	log.Infof("\r%d models completed in %s", m.Completed, time.Since(t))
 	println("")
 }
 
@@ -713,16 +715,16 @@ func nonmemModelsFromArguments(args []string) []NonMemModel {
 			// keep waiting forever since it
 			isDir, err := utils.IsDir(arg, AppFs)
 			if err != nil || !isDir {
-				log.Printf("issue handling %s, if this is a run please add the extension. Err: (%s)", arg, err)
+				log.Errorf("issue handling %s, if this is a run please add the extension. Err: (%s)", arg, err)
 				continue
 			}
 			modelsInDir, err := utils.ListModels(arg, ".mod", AppFs)
 			if err != nil {
-				log.Printf("issue getting models in dir %s, if this is a run please add the extension. Err: (%s)", arg, err)
+				log.Errorf("issue getting models in dir %s, if this is a run please add the extension. Err: (%s)", arg, err)
 				continue
 			}
-			if verbose || debug {
-				log.Printf("adding %v model files in directory %s to queue", len(modelsInDir), arg)
+			if viper.GetBool("verbose") || viper.GetBool("debug") {
+				log.Debug("adding %v model files in directory %s to queue", len(modelsInDir), arg)
 			}
 
 			for _, model := range modelsInDir {
@@ -732,15 +734,15 @@ func nonmemModelsFromArguments(args []string) []NonMemModel {
 		} else {
 			// figure out if need to do expansion, or run as-is
 			if len(r.FindAllStringSubmatch(arg, 1)) > 0 {
-				log.Printf("expanding model pattern: %s \n", arg)
+				log.Infof("expanding model pattern: %s \n", arg)
 				pat, err := utils.ExpandNameSequence(arg)
 				if err != nil {
-					log.Printf("err expanding name: %v", err)
+					log.Errorf("err expanding name: %v", err)
 					// don't try to run this model
 					continue
 				}
-				if verbose || debug {
-					log.Printf("expanded models: %s \n", pat)
+				if viper.GetBool("verbose") || viper.GetBool("debug") {
+					log.Debugf("expanded models: %s \n", pat)
 				}
 				for _, p := range pat {
 					output = append(output, NewNonMemModel(p))
@@ -775,4 +777,8 @@ func doesDirectoryContainOutputFiles(path string, modelname string) bool {
 	}
 
 	return false
+}
+
+func (n NonMemModel) LogIdentifier() string {
+	return fmt.Sprintf("[%s]", n.FileName)
 }

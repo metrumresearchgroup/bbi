@@ -65,7 +65,7 @@ func initializer(cmd *cobra.Command, args []string) {
 
 			identifier := filepath.Base(v)
 
-			viper.Set("nonmem."+identifier+".default", false)
+			viper.Set("nonmem."+identifier+".default", len(locations) == 1) //If there's only one location, true
 			viper.Set("nonmem."+identifier+".executable", nm)
 			viper.Set("nonmem."+identifier+".home", v)
 			viper.Set("nonmem."+identifier+".nmqual", hasNMQual(filepath.Join(l, v)))

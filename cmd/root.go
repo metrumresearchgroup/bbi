@@ -16,8 +16,11 @@ package cmd
 
 import (
 	"fmt"
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/afero"
 	"math/rand"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/metrumresearchgroup/babylon/configlib"
@@ -27,7 +30,7 @@ import (
 )
 
 // VERSION is the current bbi version
-var VERSION string = "2.1.0-alpha.6"
+var VERSION string = "2.1.0-alpha.7"
 
 var (
 	// name of config file
