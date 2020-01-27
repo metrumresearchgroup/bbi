@@ -335,20 +335,19 @@ func local(cmd *cobra.Command, args []string) {
 
 	//Models in Error
 	//Locate 'em
-	counter := 0
 	var errors []NonMemModel
 	for _, v := range lo.Models {
 		if v.Nonmem.Error != nil {
-			counter++
 			errors = append(errors, v.Nonmem)
 		}
 	}
 
-	if counter > 0 {
-		log.Infof("It appears that %d models generated an error during the initial setup phase", len(errors))
+	if len(errors) > 0 {
+		log.Errorf("It appears that %d models generated an error during the initial setup phase", len(errors))
 		for _, v := range errors {
-			log.Errorf("Model named %s has errored. Details: %s", v.Model, v.Error.Error())
+			log.Errorf("Model load has errored. Details: %s", v.Error.Error())
 		}
+		return
 	}
 
 	//Models in OK state
