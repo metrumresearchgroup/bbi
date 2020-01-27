@@ -63,7 +63,7 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 
 	fs := afero.NewOsFs()
 
-	log.Debugf("%s Overwrite is currently set to %t", l.Nonmem.LogIdentifier(), viper.GetBool("debug"))
+	log.Debugf("%s Overwrite is currently set to %t", l.Nonmem.LogIdentifier(), l.Nonmem.Configuration.Overwrite)
 	//Does output directory exist?
 	if ok, _ := afero.DirExists(fs, l.Nonmem.OutputDir); ok {
 		//If so are we configured to overwrite?
@@ -89,11 +89,11 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 				log.Infof("%s No Nonmem output files detected in %s. Good to continue", l.Nonmem.LogIdentifier(), l.Nonmem.OutputDir)
 			} else {
 				//Or panic because we're in a scenario where we shouldn't purge, but there's content in the directory from previous runs
-				log.Debugf("%s Configuration for overwrite was %t, but %s had Nonmem outputs. As such, we will hault operations", l.Nonmem.LogIdentifier(), viper.GetBool("debug"), l.Nonmem.OutputDir)
+				log.Debugf("%s Configuration for overwrite was %t, but %s had Nonmem outputs. As such, we will hault operations", l.Nonmem.LogIdentifier(), l.Nonmem.Configuration.Overwrite, l.Nonmem.OutputDir)
 				l.Cancel <- true
 				channels.Errors <- turnstile.ConcurrentError{
 					RunIdentifier: l.Nonmem.Model,
-					Error:         errors.New("The output directory already exists"),
+					Error:         errors.New("the output directory already exists"),
 					Notes:         fmt.Sprintf("The target directory, %s already, exists, but we are configured to not overwrite. Invalid configuration / run state", l.Nonmem.OutputDir),
 				}
 				return
@@ -385,10 +385,9 @@ func local(cmd *cobra.Command, args []string) {
 		time.Sleep(5 * time.Millisecond)
 	}
 
-	if len(lo.Models) > 0 {
-		if viper.GetBool("saveConfig") {
-			configlib.SaveConfig(lo.Models[0].Nonmem.OriginalPath)
-		}
+	//If set to save config and the config value is not populated
+	if viper.GetBool("saveConfig") && len(viper.GetString("config")) == 0 {
+		configlib.SaveConfig(lo.Models[0].Nonmem.OriginalPath)
 	}
 
 	postWorkNotice(m, now)

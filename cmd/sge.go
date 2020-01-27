@@ -80,7 +80,7 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 				log.Infof("%s No Nonmem output files detected in %s. Good to continue", l.Nonmem.LogIdentifier(), l.Nonmem.OutputDir)
 			} else {
 				//Or panic because we're in a scenario where we shouldn't purge, but there's content in the directory from previous runs
-				log.Debugf("%s Configuration for overwrite was %t, but %s had Nonmem outputs. As such, we will hault operations", l.Nonmem.LogIdentifier(), viper.GetBool("debug"), l.Nonmem.OutputDir)
+				log.Debugf("%s Configuration for overwrite was %t, but %s had Nonmem outputs. As such, we will hault operations", l.Nonmem.LogIdentifier(), l.Nonmem.Configuration.Overwrite, l.Nonmem.OutputDir)
 				l.Cancel <- true
 				channels.Errors <- turnstile.ConcurrentError{
 					RunIdentifier: l.Nonmem.Model,
@@ -375,10 +375,24 @@ func generateBabylonScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 		Command          string
 	}
 
+	commandComponents := []string{
+		l.Configuration.BabylonBinary,
+		"nonmem",
+		"run",
+	}
+
+	commandComponents = append(commandComponents, []string{
+		"local",
+		l.Path,
+	}...)
+
+	generatedCommand := strings.TrimSpace(strings.Join(commandComponents, " "))
+	log.Debugf("Generated command is %s", generatedCommand)
+
 	//The assumption is that at this point, the config will have been written to the original path directory.
 
 	err = t.Execute(buf, content{
-		Command:          viper.GetString("babylonBinary") + " nonmem run local " + l.Path,
+		Command:          generatedCommand,
 		WorkingDirectory: l.OutputDir,
 	})
 
