@@ -63,8 +63,9 @@ func init() {
 	viper.SetDefault("overwrite", false)
 
 	const configIdentifier string = "config"
-	runCmd.PersistentFlags().String(configIdentifier, "", "Statically define which config file you would like to use for the execution of the jobs")
+	runCmd.PersistentFlags().String(configIdentifier, "babylon.yaml", "Filename (relative to the model) that will be loaded")
 	viper.BindPFlag(configIdentifier, runCmd.PersistentFlags().Lookup(configIdentifier))
+	viper.SetDefault(configIdentifier, "babylon.yaml")
 
 	const saveconfig string = "saveConfig"
 	runCmd.PersistentFlags().Bool(saveconfig, true, "Whether or not to save the existing configuration to a file with the model")

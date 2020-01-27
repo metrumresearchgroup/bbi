@@ -157,7 +157,7 @@ type NonMemModel struct {
 	//OutputDir is the directory into which the copied models and work will be located
 	OutputDir string `json:"output_dir"`
 	//Settings are basically the cobra definitions / requirements for the iteration
-	Configuration configlib.Config `json:"configuration"`
+	Configuration *configlib.Config `json:"configuration"`
 	//Whether or not the model had an error on generation or execution
 	Error error `json:"error"`
 }
@@ -647,8 +647,17 @@ func NewNonMemModel(modelname string) NonMemModel {
 	//Get the raw path of the original by stripping the actual file from it
 	lm.OriginalPath = strings.Replace(lm.Path, "/"+lm.Model, "", 1)
 
-	//If no config has been loaded, let's check to see if a config exists with the model and load it
-	configlib.LocateAndReadConfigFile(lm.OriginalPath)
+	config, err := os.Open(filepath.Join(lm.OriginalPath, "babylon.yaml"))
+
+	if err != nil {
+		log.Fatalf("A failure occurred accessing the initial configuration at %s", filepath.Join(lm.OriginalPath, "babylon.yaml"))
+	}
+
+	err = viper.ReadConfig(config)
+
+	if err != nil {
+		log.Fatalf("Viper had issues parsing the configuration file provided. Details are: %s", err)
+	}
 
 	//Process The template from the viper content for output Dir
 	t, err := template.New("output").Parse(viper.GetString("outputDir"))
@@ -685,6 +694,8 @@ func NewNonMemModel(modelname string) NonMemModel {
 	}
 
 	lm.Configuration = configlib.UnmarshalViper()
+
+	log.Debug("Contents of configuration are ", lm.Configuration)
 
 	//Check to see if We for some reason have no nonmem contents
 	if len(lm.Configuration.Nonmem) == 0 {
@@ -781,4 +792,59 @@ func doesDirectoryContainOutputFiles(path string, modelname string) bool {
 
 func (n NonMemModel) LogIdentifier() string {
 	return fmt.Sprintf("[%s]", n.FileName)
+}
+
+func createChildDirectories(l NonMemModel, cancel chan bool, channels *turnstile.ChannelMap, sge bool) error {
+	fs := afero.NewOsFs()
+	log.Debugf("%s Overwrite is currently set to %t", l.LogIdentifier(), viper.GetBool("debug"))
+	//Does output directory exist?
+	if ok, _ := afero.DirExists(fs, l.OutputDir); ok {
+		//If so are we configured to overwrite?
+		if l.Configuration.Overwrite {
+			log.Debugf("%s Removing directory %s", l.LogIdentifier(), l.OutputDir)
+			err := fs.RemoveAll(l.OutputDir)
+			if err != nil {
+				return err
+			}
+		}
+
+		if !l.Configuration.Overwrite {
+			//If not, we only want to panic if there are nonmem output files in the directory
+			if !doesDirectoryContainOutputFiles(l.OutputDir, l.Model) {
+				//Continue along if we find no relevant content
+				log.Infof("%s No Nonmem output files detected in %s. Good to continue", l.LogIdentifier(), l.OutputDir)
+			} else {
+				//Or panic because we're in a scenario where we shouldn't purge, but there's content in the directory from previous runs
+				log.Debugf("%s Configuration for overwrite was %t, but %s had Nonmem outputs. As such, we will hault operations", l.LogIdentifier(), viper.GetBool("debug"), l.OutputDir)
+				return fmt.Errorf("The target directory, %s already exist, but we are configured not to overwrite. Invalid configuration / run state", l.OutputDir)
+			}
+		}
+	}
+
+	//Copy Model into destination and update Data Path
+	err := copyFileToDestination(l, true)
+
+	if err != nil {
+		return err
+	}
+
+	//Now that the directory is created, let's create the gitignore file if specified
+	if viper.GetBool("git") {
+		log.Debugf("%s Writing initial gitignore file", l.LogIdentifier())
+		WriteGitIgnoreFile(l.OutputDir)
+	}
+
+	if err != nil {
+		RecordConcurrentError(l.Model, fmt.Sprintf("There appears to have been an issue trying to copy %s to %s", l.Model, l.OutputDir), err, channels, cancel)
+		return err
+	}
+
+	err = configlib.WriteViperConfig(l.OutputDir, sge, l.Configuration)
+
+	if err != nil {
+		RecordConcurrentError(l.Model, "Error writing updated viper config", err, channels, cancel)
+		return err
+	}
+
+	return nil
 }

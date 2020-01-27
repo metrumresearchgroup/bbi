@@ -3,7 +3,6 @@ package cmd
 import (
 	"crypto/md5"
 	"encoding/json"
-	"errors"
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"io"
@@ -44,7 +43,25 @@ func (l LocalModel) CancellationChannel() chan bool {
 
 //Prepare is basically the old EstimateModel function. Responsible for creating directories and preparation.
 func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
+	//Mark the model as started some work
+	channels.Working <- 1
+
 	log.Debugf("%s Beginning local preparation phase", l.Nonmem.LogIdentifier())
+
+	//Try loading the original config
+	log.Debug("Attempting to load config file")
+	err := configlib.LoadViperFromPath(l.Nonmem.OriginalPath)
+
+	//If we can't load the configuration, let's basically stop
+	if err != nil {
+		RecordConcurrentError(l.Nonmem.FileName, err.Error(), err, channels, l.Cancel)
+		return
+	}
+
+	//Load it discretely into the model
+	l.Nonmem.Configuration = configlib.UnmarshalViper()
+
+	log.Infof("Successfully loaded configuration from %s", filepath.Join(l.Nonmem.OutputDir, viper.GetString("config")))
 
 	//Jitter / Delay
 	if l.Nonmem.Configuration.Delay > 0 {
@@ -58,62 +75,22 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 		time.Sleep(time.Duration(randomizedTimer) * time.Second)
 	}
 
-	//Mark the model as started some work
-	channels.Working <- 1
-
 	fs := afero.NewOsFs()
 
-	log.Debugf("%s Overwrite is currently set to %t", l.Nonmem.LogIdentifier(), viper.GetBool("debug"))
-	//Does output directory exist?
-	if ok, _ := afero.DirExists(fs, l.Nonmem.OutputDir); ok {
-		//If so are we configured to overwrite?
-		if l.Nonmem.Configuration.Overwrite {
-			log.Debugf("%s Removing directory %s", l.Nonmem.LogIdentifier(), l.Nonmem.OutputDir)
-			err := fs.RemoveAll(l.Nonmem.OutputDir)
-			log.Error(err)
-			if err != nil {
-				l.Cancel <- true
-				channels.Errors <- turnstile.ConcurrentError{
-					RunIdentifier: l.Nonmem.Model,
-					Error:         err,
-					Notes:         "An error occurred trying to remove the directory as specified in the overwrite flag",
-				}
-				return
-			}
-		}
-
-		if !l.Nonmem.Configuration.Overwrite {
-			//If not, we only want to panic if there are nonmem output files in the directory
-			if !doesDirectoryContainOutputFiles(l.Nonmem.OutputDir, l.Nonmem.Model) {
-				//Continue along if we find no relevant content
-				log.Infof("%s No Nonmem output files detected in %s. Good to continue", l.Nonmem.LogIdentifier(), l.Nonmem.OutputDir)
-			} else {
-				//Or panic because we're in a scenario where we shouldn't purge, but there's content in the directory from previous runs
-				log.Debugf("%s Configuration for overwrite was %t, but %s had Nonmem outputs. As such, we will hault operations", l.Nonmem.LogIdentifier(), viper.GetBool("debug"), l.Nonmem.OutputDir)
-				l.Cancel <- true
-				channels.Errors <- turnstile.ConcurrentError{
-					RunIdentifier: l.Nonmem.Model,
-					Error:         errors.New("The output directory already exists"),
-					Notes:         fmt.Sprintf("The target directory, %s already, exists, but we are configured to not overwrite. Invalid configuration / run state", l.Nonmem.OutputDir),
-				}
-				return
-			}
-		}
-
+	if !l.Nonmem.Configuration.Local.CreateChildDirs {
+		log.Debugf("Create Child Dir directive is %t. Setting Model output dir = %s", l.Nonmem.Configuration.Local.CreateChildDirs, l.Nonmem.OriginalPath)
+		//Set output dir to Original Path for execution sake
+		l.Nonmem.OutputDir = l.Nonmem.OriginalPath
 	}
 
-	//Copy Model into destination and update Data Path
-	err := copyFileToDestination(l.Nonmem, true)
+	if l.Nonmem.Configuration.Local.CreateChildDirs {
+		err := createChildDirectories(l.Nonmem, l.Cancel, channels, false)
 
-	//Now that the directory is created, let's create the gitignore file if specified
-	if viper.GetBool("git") {
-		log.Debugf("%s Writing initial gitignore file", l.Nonmem.LogIdentifier())
-		WriteGitIgnoreFile(l.Nonmem.OutputDir)
-	}
-
-	if err != nil {
-		RecordConcurrentError(l.Nonmem.Model, fmt.Sprintf("There appears to have been an issue trying to copy %s to %s", l.Nonmem.Model, l.Nonmem.OutputDir), err, channels, l.Cancel)
-		return
+		if err != nil {
+			//Handles the cancel operation
+			RecordConcurrentError(l.Nonmem.FileName, err.Error(), err, channels, l.Cancel)
+			return
+		}
 	}
 
 	//Create Execution Script
@@ -133,7 +110,7 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 	log.Debugf("%s Writing script to file", l.Nonmem.LogIdentifier())
 
 	//rwxr-x---
-	afero.WriteFile(fs, path.Join(l.Nonmem.OutputDir, l.Nonmem.FileName+".sh"), scriptContents, 0750)
+	afero.WriteFile(fs, path.Join(l.Nonmem.OutputDir, l.Nonmem.FileName+".sh"), scriptContents, 0750) //TODO: Handle this error
 
 	if l.Nonmem.Configuration.Parallel.Parallel {
 		err = writeParaFile(l.Nonmem)
@@ -301,6 +278,11 @@ var localCmd = &cobra.Command{
 
 func init() {
 	runCmd.AddCommand(localCmd)
+
+	childDirIdentifier := "createChildDirs"
+	localCmd.PersistentFlags().Bool(childDirIdentifier, true, "Indicates whether or not local branch execution"+
+		"should create a new subdirectory with the outputDir variable as its name and execute in that directory")
+	viper.BindPFlag("local."+childDirIdentifier, localCmd.PersistentFlags().Lookup(childDirIdentifier))
 }
 
 func local(cmd *cobra.Command, args []string) {
@@ -311,9 +293,6 @@ func local(cmd *cobra.Command, args []string) {
 	if viper.GetBool("debug") {
 		log.SetLevel(log.DebugLevel)
 	}
-
-	//Let's try to immediately load any specified configuration files
-	configlib.ProcessSpecifiedConfigFile()
 
 	if viper.ConfigFileUsed() != "" {
 		log.Infof("Config file loaded from %s", viper.ConfigFileUsed())
@@ -385,11 +364,7 @@ func local(cmd *cobra.Command, args []string) {
 		time.Sleep(5 * time.Millisecond)
 	}
 
-	if len(lo.Models) > 0 {
-		if viper.GetBool("saveConfig") {
-			configlib.SaveConfig(lo.Models[0].Nonmem.OriginalPath)
-		}
-	}
+	//TODO: Move saveconfig operations to cleanup for both paths
 
 	postWorkNotice(m, now)
 }
@@ -403,8 +378,12 @@ func executeLocalJob(model NonMemModel) turnstile.ConcurrentError {
 	log.Infof("%s Beginning local work phase", model.LogIdentifier())
 	fs := afero.NewOsFs()
 
+	log.Debugf("Output directory is currently set to %s", model.OutputDir)
+
 	scriptLocation := path.Join(model.OutputDir, model.FileName+".sh")
 	os.Chdir(model.OutputDir)
+
+	log.Debugf("Script location is pegged at %s", scriptLocation)
 
 	command := exec.Command(scriptLocation)
 	command.Env = os.Environ() //Take in OS Environment
@@ -414,6 +393,7 @@ func executeLocalJob(model NonMemModel) turnstile.ConcurrentError {
 	output, err := command.CombinedOutput()
 
 	if err != nil {
+		log.Debug(err)
 		if exitError, ok := err.(*exec.ExitError); ok {
 			code := exitError.ExitCode()
 			details := exitError.String()
