@@ -210,7 +210,7 @@ func init() {
 }
 
 // "Copies" a file by reading its content (optionally updating the path)
-func copyFileToDestination(l NonMemModel, modifyPath bool) error {
+func copyFileToDestination(l *NonMemModel, modifyPath bool) error {
 
 	fs := afero.NewOsFs()
 
@@ -251,7 +251,7 @@ func copyFileToDestination(l NonMemModel, modifyPath bool) error {
 }
 
 //processes any template (inlcuding the const one here) to create a byte slice of the entire file
-func generateScript(fileTemplate string, l NonMemModel) ([]byte, error) {
+func generateScript(fileTemplate string, l *NonMemModel) ([]byte, error) {
 
 	t, err := template.New("file").Parse(fileTemplate)
 	buf := new(bytes.Buffer)
@@ -280,7 +280,7 @@ func generateScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func writeParaFile(l NonMemModel) error {
+func writeParaFile(l *NonMemModel) error {
 
 	contentBytes, err := generateParaFile(l)
 
@@ -307,7 +307,7 @@ func writeParaFile(l NonMemModel) error {
 
 }
 
-func generateParaFile(l NonMemModel) ([]byte, error) {
+func generateParaFile(l *NonMemModel) ([]byte, error) {
 	nmp := nonmemParallelDirective{
 		TotalNodes:        l.Configuration.Parallel.Nodes,
 		HeadNodes:         1,
@@ -334,7 +334,7 @@ func generateParaFile(l NonMemModel) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func buildNonMemCommandString(l NonMemModel) string {
+func buildNonMemCommandString(l *NonMemModel) string {
 
 	var nmHome string
 	var nmBinary string
@@ -388,7 +388,7 @@ func buildNonMemCommandString(l NonMemModel) string {
 //directory is the directory in which we will be performing cleanup
 //exceptions is a variadic input for allowing exceptions / overrides.
 //We're taking a local model because grid engine execution doesn't wait for completion. Nothing to do :)
-func filesToCleanup(model NonMemModel, exceptions ...string) runner.FileCleanInstruction {
+func filesToCleanup(model *NonMemModel, exceptions ...string) runner.FileCleanInstruction {
 	fci := runner.FileCleanInstruction{
 		Location: model.OutputDir,
 	}
@@ -444,7 +444,7 @@ func newTargetFile(filename string, level int) runner.TargetedFile {
 	}
 }
 
-func filesToCopy(model NonMemModel, mandatoryFiles ...string) runner.FileCopyInstruction {
+func filesToCopy(model *NonMemModel, mandatoryFiles ...string) runner.FileCopyInstruction {
 	fci := runner.FileCopyInstruction{
 		CopyTo:   model.OriginalPath,
 		CopyFrom: model.OutputDir,
@@ -583,7 +583,7 @@ func extrapolateCopyFilesFromExtensions(filename string, level int, filepath str
 	return output
 }
 
-func newPostWorkInstruction(model NonMemModel, cleanupExclusions []string, mandatoryCopyFiles []string) runner.PostWorkInstructions {
+func newPostWorkInstruction(model *NonMemModel, cleanupExclusions []string, mandatoryCopyFiles []string) runner.PostWorkInstructions {
 
 	return runner.PostWorkInstructions{
 		FilesToCopy:  filesToCopy(model, mandatoryCopyFiles...),
@@ -705,7 +705,7 @@ func NewNonMemModel(modelname string) NonMemModel {
 	return lm
 }
 
-func executeNonMemJob(executor func(model NonMemModel) turnstile.ConcurrentError, model NonMemModel) turnstile.ConcurrentError {
+func executeNonMemJob(executor func(model *NonMemModel) turnstile.ConcurrentError, model *NonMemModel) turnstile.ConcurrentError {
 	return executor(model)
 }
 
@@ -794,7 +794,7 @@ func (n NonMemModel) LogIdentifier() string {
 	return fmt.Sprintf("[%s]", n.FileName)
 }
 
-func createChildDirectories(l NonMemModel, cancel chan bool, channels *turnstile.ChannelMap, sge bool) error {
+func createChildDirectories(l *NonMemModel, cancel chan bool, channels *turnstile.ChannelMap, sge bool) error {
 	fs := afero.NewOsFs()
 	log.Debugf("%s Overwrite is currently set to %t", l.LogIdentifier(), viper.GetBool("debug"))
 	//Does output directory exist?

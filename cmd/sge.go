@@ -28,16 +28,8 @@ type sgeOperation struct {
 
 //SGEModel is the struct used for SGE operations containing the NonMemModel
 type SGEModel struct {
-	Nonmem NonMemModel
+	Nonmem *NonMemModel
 	Cancel chan bool
-}
-
-//NewSGENonMemModel create the model details from the modelname passed
-func NewSGENonMemModel(modelname string) SGEModel {
-	return SGEModel{
-		Nonmem: NewNonMemModel(modelname),
-		Cancel: turnstile.CancellationChannel(),
-	}
 }
 
 //Begin Scalable method definitions
@@ -85,7 +77,7 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 	}
 
 	//Create Execution Script
-	scriptContents, err := generateBabylonScript(nonMemExecutionTemplate, l.Nonmem)
+	scriptContents, err := generateBabylonScript(nonMemExecutionTemplate, *l.Nonmem)
 
 	if err != nil {
 		RecordConcurrentError(l.Nonmem.Model, "An error occurred during the creation of the executable script for this model", err, channels, l.Cancel)
@@ -187,7 +179,7 @@ func sge(cmd *cobra.Command, args []string) {
 	//Models in Error
 	//Locate 'em
 	counter := 0
-	var errors []NonMemModel
+	var errors []*NonMemModel
 	for _, v := range lo.Models {
 		if v.Nonmem.Error != nil {
 			counter++
@@ -258,7 +250,7 @@ func RecordConcurrentError(model string, notes string, err error, channels *turn
 	channels.Errors <- newConcurrentError(model, notes, err)
 }
 
-func executeSGEJob(model NonMemModel) turnstile.ConcurrentError {
+func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 	log.Printf("%s Beginning SGE work phase", model.LogIdentifier())
 	fs := afero.NewOsFs()
 	//Execute the script we created
@@ -323,7 +315,7 @@ func sgeModelsFromArguments(args []string) []SGEModel {
 
 	for _, v := range nonmemmodels {
 		output = append(output, SGEModel{
-			Nonmem: v,
+			Nonmem: &v,
 			Cancel: turnstile.CancellationChannel(),
 		})
 	}

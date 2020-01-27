@@ -31,7 +31,7 @@ type localOperation struct {
 
 //LocalModel is the struct used for local operations containing the NonMemModel
 type LocalModel struct {
-	Nonmem NonMemModel
+	Nonmem *NonMemModel
 	Cancel chan bool
 }
 
@@ -315,7 +315,7 @@ func local(cmd *cobra.Command, args []string) {
 	//Models in Error
 	//Locate 'em
 	counter := 0
-	var errors []NonMemModel
+	var errors []*NonMemModel
 	for _, v := range lo.Models {
 		if v.Nonmem.Error != nil {
 			counter++
@@ -374,7 +374,7 @@ func WriteGitIgnoreFile(filepath string) {
 	utils.WriteLines([]string{"*"}, path.Join(filepath, ".gitignore"))
 }
 
-func executeLocalJob(model NonMemModel) turnstile.ConcurrentError {
+func executeLocalJob(model *NonMemModel) turnstile.ConcurrentError {
 	log.Infof("%s Beginning local work phase", model.LogIdentifier())
 	fs := afero.NewOsFs()
 
@@ -415,8 +415,12 @@ func localModelsFromArguments(args []string) []LocalModel {
 	nonmemmodels := nonmemModelsFromArguments(args)
 
 	for _, v := range nonmemmodels {
+		log.Info(v.FileName)
+		//Creating a copy of it here to avoid duplicate memory references
+		n := v
+
 		output = append(output, LocalModel{
-			Nonmem: v,
+			Nonmem: &n,
 			Cancel: turnstile.CancellationChannel(),
 		})
 	}
@@ -424,7 +428,7 @@ func localModelsFromArguments(args []string) []LocalModel {
 	return output
 }
 
-func createNewGitIgnoreFile(m NonMemModel) error {
+func createNewGitIgnoreFile(m *NonMemModel) error {
 	log.Debugf("%s Writing finalized gitignore file", m.LogIdentifier())
 	//First let's remove the gitignore in the output dir.
 	fs := afero.NewOsFs()
@@ -445,7 +449,7 @@ func createNewGitIgnoreFile(m NonMemModel) error {
 	return nil
 }
 
-func writeNonmemConfig(model NonMemModel) error {
+func writeNonmemConfig(model *NonMemModel) error {
 	outBytes, err := json.MarshalIndent(model, "", "    ")
 
 	if err != nil {
