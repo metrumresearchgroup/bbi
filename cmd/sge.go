@@ -314,8 +314,9 @@ func sgeModelsFromArguments(args []string) []SGEModel {
 	nonmemmodels := nonmemModelsFromArguments(args)
 
 	for _, v := range nonmemmodels {
+		n := v
 		output = append(output, SGEModel{
-			Nonmem: &v,
+			Nonmem: &n,
 			Cancel: turnstile.CancellationChannel(),
 		})
 	}
