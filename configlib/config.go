@@ -34,6 +34,7 @@ type Config struct {
 	Nonmem        map[string]NonMemDetail `mapstructure:"nonmem" json:"nonmem,omitempty" yaml:"nonmem"`
 	Parallel      ParallelConfig          `mapstructure:"parallel" json:"parallel" yaml:"parallel"`
 	Delay         int                     `yaml:"delay" json:"delay,omitempty" yaml:"delay"`
+	NMQual        bool                    `yaml:"nmqual" json:"nmqual,omitempty"`
 }
 
 type NonMemDetail struct {

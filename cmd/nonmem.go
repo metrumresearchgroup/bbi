@@ -205,6 +205,10 @@ func init() {
 	const parafileIdentifier string = "parafile"
 	nonmemCmd.PersistentFlags().String(parafileIdentifier, "", "Location of a user-provided parafile to use for parallel execution")
 	viper.BindPFlag("parallel."+parafileIdentifier, nonmemCmd.PersistentFlags().Lookup(parafileIdentifier))
+
+	const nmQualIdentifier string = "nmqual"
+	nonmemCmd.PersistentFlags().Bool(nmQualIdentifier, false, "Whether or not to execute with nmqual (autolog.pl")
+	viper.BindPFlag(nmQualIdentifier, nonmemCmd.PersistentFlags().Lookup(nmQualIdentifier))
 }
 
 // "Copies" a file by reading its content (optionally updating the path)
