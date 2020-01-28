@@ -46,12 +46,7 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 	channels.Working <- 1
 
 	//Load the original config if specified, otherwise pull locally relative.
-	var err error
-	if len(viper.GetString("config")) > 0 {
-		err = configlib.LoadViperFromPath(viper.GetString("config"))
-	} else {
-		err = configlib.LoadViperFromPath(l.Nonmem.OriginalPath)
-	}
+	err := configlib.LoadViperFromPath(l.Nonmem.OriginalPath)
 
 	//If we can't load the configuration, let's basically stop
 	if err != nil {
