@@ -216,6 +216,13 @@ func copyFileToDestination(l *NonMemModel, modifyPath bool) error {
 
 	fs := afero.NewOsFs()
 
+	filename := l.Model
+
+	//Set it to a ctl file if we're in NMQual mode
+	if l.Configuration.NMQual {
+		filename = l.FileName + ".ctl"
+	}
+
 	if exists, _ := afero.DirExists(fs, l.OutputDir); !exists {
 		//Create the directory
 		fs.MkdirAll(l.OutputDir, 0750)
@@ -247,14 +254,14 @@ func copyFileToDestination(l *NonMemModel, modifyPath bool) error {
 	//Write the file contents
 	fileContents := strings.Join(sourceLines, "\n")
 
-	afero.WriteFile(fs, path.Join(l.OutputDir, l.Model), []byte(fileContents), stats.Mode())
+	afero.WriteFile(fs, path.Join(l.OutputDir, filename), []byte(fileContents), stats.Mode())
 
 	return nil
 }
 
 //processes any template (inlcuding the const one here) to create a byte slice of the entire file
 func generateScript(fileTemplate string, l *NonMemModel) ([]byte, error) {
-
+	log.Debugf("%s beginning script command generation. NMQual is set to %t", l.LogIdentifier(), l.Configuration.NMQual)
 	t, err := template.New("file").Parse(fileTemplate)
 	buf := new(bytes.Buffer)
 	if err != nil {
@@ -266,10 +273,17 @@ func generateScript(fileTemplate string, l *NonMemModel) ([]byte, error) {
 		Command          string
 	}
 
-	err = t.Execute(buf, content{
+	cont := content{
 		WorkingDirectory: l.OutputDir,
 		Command:          buildNonMemCommandString(l),
-	})
+	}
+
+	//Set the command to autolog contents if we're set to nmqual
+	if l.Configuration.NMQual {
+		cont.Command = buildAutologCommandString(l)
+	}
+
+	err = t.Execute(buf, cont)
 
 	if err != nil {
 		return []byte{}, errors.New("An error occured during the execution of the provided script template")
@@ -384,6 +398,23 @@ func buildNonMemCommandString(l *NonMemModel) string {
 	}
 
 	return nmExecutable + " " + strings.Join(cmdArgs, " ")
+}
+
+func buildAutologCommandString(l *NonMemModel) string {
+	//`perl  -S /opt/NONMEM/nm74gf/nmqual/autolog.pl /opt/NONMEM/nm74gf/nmqual/log.xml para ce /data/tmp/001 001`
+	nm := l.Configuration.Nonmem[l.Configuration.NMVersion]
+	commandComponents := []string{
+		"perl",
+		"-S",
+		filepath.Join(nm.Home, "nmqual", "autolog.pl"),
+		filepath.Join(nm.Home, "nmqual", "log.xml"),
+		"para",
+		"ce",
+		l.OutputDir,
+		l.FileName,
+	}
+
+	return strings.TrimSpace(strings.Join(commandComponents, " "))
 }
 
 //modelName is the full file + ext representation of the model (ie acop.mod)
