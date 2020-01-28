@@ -393,7 +393,7 @@ func filesToCleanup(model *NonMemModel, exceptions ...string) runner.FileCleanIn
 		Location: model.OutputDir,
 	}
 
-	files := getCleanableFileList(model.Model, model.Configuration.CleanLvl)
+	files := getCleanableFileList(model.FileName, model.Configuration.CleanLvl)
 
 	for _, v := range files {
 		if !isFilenameInExceptions(exceptions, v) {
