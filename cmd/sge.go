@@ -346,7 +346,7 @@ func generateBabylonScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 
 	commandComponents = append(commandComponents, []string{
 		"local",
-		l.Path,
+		filepath.Join(l.OutputDir, l.Model),
 	}...)
 
 	if !l.Configuration.Local.CreateChildDirs {

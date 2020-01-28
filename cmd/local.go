@@ -61,7 +61,7 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 	//Load it discretely into the model
 	l.Nonmem.Configuration = configlib.UnmarshalViper()
 
-	log.Infof("Successfully loaded configuration from %s", filepath.Join(l.Nonmem.OutputDir, viper.GetString("config")))
+	log.Infof("Successfully inserted configuration from %s into model structs", filepath.Join(l.Nonmem.OutputDir, viper.GetString("config")))
 
 	//Jitter / Delay
 	if l.Nonmem.Configuration.Delay > 0 {
