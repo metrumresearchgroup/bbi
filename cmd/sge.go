@@ -41,6 +41,7 @@ func (l SGEModel) CancellationChannel() chan bool {
 //Prepare is basically the old EstimateModel function. Responsible for creating directories and preparation.
 func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 	log.Debugf("%s Beginning Prepare phase of SGE Work", l.Nonmem.LogIdentifier())
+
 	//Mark the model as started some work
 	channels.Working <- 1
 
@@ -56,24 +57,17 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 
 	l.Nonmem.Configuration = configlib.UnmarshalViper()
 
-	if !l.Nonmem.Configuration.Local.CreateChildDirs {
-		//Set output dir to Original Path for execution sake
-		l.Nonmem.OutputDir = l.Nonmem.OriginalPath
-	}
-
 	fs := afero.NewOsFs()
 
 	log.Debugf("%s Overwrite is currrently set to %t", l.Nonmem.LogIdentifier(), l.Nonmem.Configuration.Overwrite)
 	log.Debugf("%s Beginning evaluation of whether or not %s exists", l.Nonmem.LogIdentifier(), l.Nonmem.OutputDir)
 
-	if l.Nonmem.Configuration.Local.CreateChildDirs {
-		err := createChildDirectories(l.Nonmem, l.Cancel, channels, true)
+	err = createChildDirectories(l.Nonmem, l.Cancel, channels, true)
 
-		if err != nil {
-			//Handles the cancel operation
-			RecordConcurrentError(l.Nonmem.FileName, err.Error(), err, channels, l.Cancel)
-			return
-		}
+	if err != nil {
+		//Handles the cancel operation
+		RecordConcurrentError(l.Nonmem.FileName, err.Error(), err, channels, l.Cancel)
+		return
 	}
 
 	//Create Execution Script
