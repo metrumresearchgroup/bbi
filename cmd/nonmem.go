@@ -58,8 +58,6 @@ $DIRECTORIES
 1:NONE
 2-[nodes]:worker{#-1}`
 
-const paraFileName string = "para.pnm"
-
 type nonmemParallelDirective struct {
 	TotalNodes        int
 	CompletionTimeout int
@@ -303,7 +301,7 @@ func writeParaFile(l *NonMemModel) error {
 		}
 	}
 
-	return utils.WriteLines(contentLines, path.Join(l.OutputDir, paraFileName))
+	return utils.WriteLines(contentLines, path.Join(l.OutputDir, l.FileName+".pnm"))
 
 }
 
@@ -378,7 +376,7 @@ func buildNonMemCommandString(l *NonMemModel) string {
 
 	//Section for Appending the parafile command
 	if l.Configuration.Parallel.Parallel {
-		cmdArgs = append(cmdArgs, "-parafile="+path.Join(l.OutputDir, paraFileName))
+		cmdArgs = append(cmdArgs, "-parafile="+path.Join(l.OutputDir, l.FileName+".pnm"))
 	}
 
 	return nmExecutable + " " + strings.Join(cmdArgs, " ")
