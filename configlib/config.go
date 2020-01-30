@@ -149,19 +149,6 @@ func LocateAndReadConfigFile(modelPath string) {
 	}
 }
 
-func ProcessSpecifiedConfigFile() {
-	//Check to see if a config was provided.
-	if len(viper.GetString("config")) > 0 {
-		err := LoadViperFromPath(viper.GetString("config"))
-		if err != nil {
-			//If we specified a config and we can't load it, stop processing to allow the user to decide
-			//how best to proceed.
-			log.Fatalf("User specified %s as the configuration to load, but an error "+
-				"happened attempting to do so : %s", viper.GetString("config"), err)
-		}
-	}
-}
-
 //SaveConfig takes the viper settings and writes them to a file in the original path
 func SaveConfig(configpath string) {
 	if viper.GetBool("saveConfig") {
@@ -184,24 +171,16 @@ func UnmarshalViper() *Config {
 	}
 }
 
-//LoadViperFromPath allows the read of viper from file reader
-func LoadViperFromPath(path string) error {
+//LoadViperFromFile allows the read of viper from file reader
+func LoadViperFromFile(path string) error {
 	log.Debugf("Attempting to load configuration from %s", path)
 	viper.SetConfigType("yaml")
-	filename := viper.GetString("config")
-	log.Debugf("Pulled %s as the filename value from viper", viper.GetString("config"))
-	if len(filename) == 0 {
-		log.Debug("Config value not accurately set. Using default")
-		filename = "babylon.yaml"
-	}
 
-	log.Debugf("Designated filename is %s", filename)
-
-	config, err := os.Open(filepath.Join(path, filename))
+	config, err := os.Open(path)
 
 	if err != nil {
 		log.Error(err)
-		return fmt.Errorf("unable to load or access the configuration file (%s) located at %s", filename, path)
+		return fmt.Errorf("unable to load or access the configuration file (%s) located at %s", "babylon.yaml", path)
 	}
 
 	err = viper.ReadConfig(config)
@@ -211,7 +190,8 @@ func LoadViperFromPath(path string) error {
 		return fmt.Errorf("viper had issues parsing the configuration file provided. Details are: %s", err)
 	}
 
-	log.Infof("Configuration successfully loaded from %s", filepath.Join(path, filename))
+	log.Infof("Configuration successfully loaded from %s", path)
+	log.Infof("Read viper values. Threads are %d", viper.GetInt("threads"))
 	return nil
 }
 

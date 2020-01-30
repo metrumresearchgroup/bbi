@@ -726,15 +726,6 @@ func NewNonMemModel(modelname string) NonMemModel {
 		}
 	}
 
-	lm.Configuration = configlib.UnmarshalViper()
-
-	log.Debug("Contents of configuration are ", lm.Configuration)
-
-	//Check to see if We for some reason have no nonmem contents
-	if len(lm.Configuration.Nonmem) == 0 {
-		log.Fatal("No nonmem configurations were loaded in from file. Please make sure the nonmem key and its children are present in babylon.yaml")
-	}
-
 	return lm
 }
 
