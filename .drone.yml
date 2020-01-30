@@ -4,7 +4,7 @@
   steps:
     - name: build image
       environment:
-        BBI_BRANCH: $$BRANCH
+        BBI_BRANCH: ${DRONE_COMMIT_BRANCH}
       image: plugins/docker
       settings:
         username:
@@ -13,11 +13,11 @@
           from_secret: DOCKERHUB_PASSWORD
         repo: dukeofubuntu/babylon
         tags:
-          - $$BRANCH
+          - ${DRONE_COMMIT_BRANCH}
         build_args_from_env:
-          - DRONE_BRANCH
+          - BBI_BRANCH
     - name: test
-      image: dukeofubuntu/babylon:$$BRANCH
+      image: dukeofubuntu/babylon:${DRONE_COMMIT_BRANCH}
       environment:
         MPIEXEC_PATH: /usr/bin/mpiexec
         NONMEMROOT: /opt
