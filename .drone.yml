@@ -3,7 +3,12 @@
   type: docker
   steps:
     - name: Clone Tests Repo
-      image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/nonmem
+      image: agur/drone-ecr-puller
+      access_key:
+      secret_access_key:
+      region: us-east-1
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
       environment:
         MPICH_PATH:  /usr/local/mpich3/bin/mpiexec
         NMVERSION: nm74gf
@@ -12,14 +17,8 @@
         GITHUB_TOKEN:
             from_secret: GITHUB_TOKEN
       commands:
+        - docker run [your image @ ecr]
         - git clone https://github.com/metrumresearchgroup/babylontest.git
-    - name: Populate nonmem license
-      image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/nonmem
-      commands:
-        - echo ${LICENSE} | base64 -d > nonmem.lic
-    - name: Test
-      image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/nonmem
-      commands:
-        - cp nonmem.lic /opt/NONMEM/nm74gf/license/nonmem.lic
+        - cd babylontest
         - go mod download
-        - go test -v ./...
+        - docker run --rm -it -v $(pwd)/nonmem.lic:/opt/NONMEM/nm74gf/license/nonmem.lic 906087756158.dkr.ecr.us-east-1.amazonaws.com/nonmem go test -v ./...
