@@ -16,3 +16,6 @@ go test -run TestBabylonCompletesLocalExecution
 
 #Sge basic tests
 #go test -run TestBabylonCompletesSGEExecution
+
+
+#Install and setup Babylon
