@@ -1,12 +1,9 @@
   name: BabylonTesting
-  kind: pipeline
   type: docker
+  kind: pipeline
   steps:
-    - name: Clone Tests Repo
+    - name: Clone and Test
       image: agur/drone-ecr-puller
-      access_key:
-      secret_access_key:
-      region: us-east-1
       volumes:
         - /var/run/docker.sock:/var/run/docker.sock
       environment:
