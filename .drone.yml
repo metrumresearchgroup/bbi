@@ -23,7 +23,7 @@
       commands:
         - $(aws ecr get-login --no-include-email --region us-east-1)
         - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/nonmem
-        - docker run --rm -t -v $(pwd):/app -e LICENSE="${LICENSE}" -e GITHUB_TOKEN="${GITHUB_TOKEN}" 906087756158.dkr.ecr.us-east-1.amazonaws.com/nonmem sh /app/test.sh
+        - docker run --rm -t -v $(pwd):/app -e LICENSE="$LICENSE" -e GITHUB_TOKEN="$GITHUB_TOKEN" 906087756158.dkr.ecr.us-east-1.amazonaws.com/nonmem sh /app/test.sh
   volumes:
     - name: dockersock
       host:
