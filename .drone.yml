@@ -8,6 +8,8 @@
         MPIEXEC_PATH: /usr/bin/mpiexec
         NONMEMROOT: /opt
         NMVERSION: nm
+        NONMEM_LICENSE:
+          from_secret: NONMEM_LICENSE
       commands:
         - echo "$NONMEM_LICENSE" > /opt/nm/license/nonmem.lic
         - cat /opt/nm/license/nonmem.lic
