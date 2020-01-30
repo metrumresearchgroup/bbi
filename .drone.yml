@@ -1,0 +1,25 @@
+  name: BabylonTesting
+  kind: pipeline
+  type: docker
+  steps:
+    - name: Clone Tests Repo
+      image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/nonmem
+      environment:
+        MPICH_PATH:  /usr/local/mpich3/bin/mpiexec
+        NMVERSION: nm74gf
+        LICENSE:
+            from_secret: NONMEM_LICENSE
+        GITHUB_TOKEN:
+            from_secret: GITHUB_TOKEN
+      commands:
+        - git clone https://github.com/metrumresearchgroup/babylontest.git
+    - name: Populate nonmem license
+      image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/nonmem
+      commands:
+        - echo ${LICENSE} | base64 -d > nonmem.lic
+    - name: Test
+      image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/nonmem
+      commands:
+        - cp nonmem.lic /opt/NONMEM/nm74gf/license/nonmem.lic
+        - go mod download
+        - go test -v ./...
