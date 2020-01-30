@@ -63,7 +63,7 @@ func init() {
 	viper.SetDefault("overwrite", false)
 
 	const configIdentifier string = "config"
-	runCmd.PersistentFlags().String(configIdentifier, "", "Statically define which config file you would like to use for the execution of the jobs")
+	runCmd.PersistentFlags().String(configIdentifier, "", "Path (relative or absolute) to another babylon.yaml to load")
 	viper.BindPFlag(configIdentifier, runCmd.PersistentFlags().Lookup(configIdentifier))
 
 	const saveconfig string = "saveConfig"

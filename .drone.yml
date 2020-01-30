@@ -1,0 +1,38 @@
+  name: BabylonTesting
+  type: docker
+  kind: pipeline
+  steps:
+    - name: build image
+      environment:
+        BBI_BRANCH: ${DRONE_COMMIT_BRANCH}
+      image: plugins/docker
+      settings:
+        username:
+          from_secret: DOCKERHUB_USERNAME
+        password:
+          from_secret: DOCKERHUB_PASSWORD
+        repo: dukeofubuntu/babylon
+        tags:
+          - BBI-${DRONE_BUILD_NUMBER}
+        build_args_from_env:
+          - BBI_BRANCH
+    - name: test
+      image: dukeofubuntu/babylon:BBI-${DRONE_BUILD_NUMBER}
+      environment:
+        MPIEXEC_PATH: /usr/bin/mpiexec
+        NONMEMROOT: /opt
+        NMVERSION: nm
+        NONMEM_LICENSE:
+          from_secret: NONMEM_LICENSE
+      commands:
+        - echo "$NONMEM_LICENSE" > /opt/nm/license/nonmem.lic
+        - mkdir /test
+        - cd /test
+        - git clone https://github.com/metrumresearchgroup/babylontest.git
+        - cd babylontest
+        - go mod download
+        - go test ./... -v
+
+  trigger:
+    event:
+      - push

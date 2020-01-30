@@ -80,9 +80,6 @@ func init() {
 	// Here you will define your flags and configuration settings.
 	// Cobra supports Persistent Flags, which, if defined here,
 	// will be global for your application.
-
-	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/babylon.yaml)")
-	viper.BindPFlag("config", RootCmd.PersistentFlags().Lookup("config")) //Bind config to viper to make sure it'll parse
 	RootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
 	RootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "debug mode")
 	viper.BindPFlag("debug", RootCmd.PersistentFlags().Lookup("debug")) //Bind Debug to viper

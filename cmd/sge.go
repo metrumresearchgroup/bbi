@@ -3,13 +3,11 @@ package cmd
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"github.com/metrumresearchgroup/babylon/utils"
 	log "github.com/sirupsen/logrus"
 	"os/exec"
 	"path"
 	"path/filepath"
-	"regexp"
 	"strconv"
 	"strings"
 	"text/template"
@@ -30,16 +28,8 @@ type sgeOperation struct {
 
 //SGEModel is the struct used for SGE operations containing the NonMemModel
 type SGEModel struct {
-	Nonmem NonMemModel
+	Nonmem *NonMemModel
 	Cancel chan bool
-}
-
-//NewSGENonMemModel create the model details from the modelname passed
-func NewSGENonMemModel(modelname string) SGEModel {
-	return SGEModel{
-		Nonmem: NewNonMemModel(modelname),
-		Cancel: turnstile.CancellationChannel(),
-	}
 }
 
 //Begin Scalable method definitions
@@ -51,64 +41,44 @@ func (l SGEModel) CancellationChannel() chan bool {
 //Prepare is basically the old EstimateModel function. Responsible for creating directories and preparation.
 func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 	log.Debugf("%s Beginning Prepare phase of SGE Work", l.Nonmem.LogIdentifier())
+
 	//Mark the model as started some work
 	channels.Working <- 1
+
+	//Load the original config if specified, otherwise pull locally relative.
+	var config string
+	if len(viper.GetString("config")) > 0 {
+		config = viper.GetString("config")
+	} else {
+		config = filepath.Join(l.Nonmem.OriginalPath, "babylon.yaml")
+	}
+
+	err := configlib.LoadViperFromFile(config)
+
+	//If we can't load the configuration, let's basically stop
+	if err != nil {
+		RecordConcurrentError(l.Nonmem.FileName, "An error occurred trying to"+
+			" load the configuration file", err, channels, l.Cancel)
+		return
+	}
+
+	l.Nonmem.Configuration = configlib.UnmarshalViper()
+
 	fs := afero.NewOsFs()
 
 	log.Debugf("%s Overwrite is currrently set to %t", l.Nonmem.LogIdentifier(), l.Nonmem.Configuration.Overwrite)
 	log.Debugf("%s Beginning evaluation of whether or not %s exists", l.Nonmem.LogIdentifier(), l.Nonmem.OutputDir)
 
-	//Does output directory exist?
-	if ok, _ := afero.DirExists(fs, l.Nonmem.OutputDir); ok {
-		//If so are we configured to overwrite?
-		log.Debugf("%s Directory %s exists.", l.Nonmem.LogIdentifier(), l.Nonmem.OutputDir)
-
-		if l.Nonmem.Configuration.Overwrite {
-			log.Debugf("%s Beginning removal of %s", l.Nonmem.LogIdentifier(), l.Nonmem.OutputDir)
-			err := fs.RemoveAll(l.Nonmem.OutputDir)
-			if err != nil {
-				RecordConcurrentError(l.Nonmem.Model, "An error occured trying to remove the directory as specified in the overwrite flag", err, channels, l.Cancel)
-				return
-			}
-		}
-
-		if !l.Nonmem.Configuration.Overwrite {
-			log.Debugf("%s checking to see if %s contains nonmem outputs", l.Nonmem.LogIdentifier(), l.Nonmem.OutputDir)
-			//If not, we only want to panic if there are nonmem output files in the directory
-			if !doesDirectoryContainOutputFiles(l.Nonmem.OutputDir, l.Nonmem.FileName) {
-				//Continue along if we find no relevant content
-				log.Infof("%s No Nonmem output files detected in %s. Good to continue", l.Nonmem.LogIdentifier(), l.Nonmem.OutputDir)
-			} else {
-				//Or panic because we're in a scenario where we shouldn't purge, but there's content in the directory from previous runs
-				log.Debugf("%s Configuration for overwrite was %t, but %s had Nonmem outputs. As such, we will hault operations", l.Nonmem.LogIdentifier(), viper.GetBool("debug"), l.Nonmem.OutputDir)
-				l.Cancel <- true
-				channels.Errors <- turnstile.ConcurrentError{
-					RunIdentifier: l.Nonmem.Model,
-					Error:         errors.New("The output directory already exists"),
-					Notes:         fmt.Sprintf("The target directory, %s already, exists, but we are configured to not overwrite. Invalid configuration / run state", l.Nonmem.OutputDir),
-				}
-				return
-			}
-		}
-
-	}
-
-	//Copy Model into destination and update Data Path
-	log.Debugf("%s Beginning copy operations for original model file", l.Nonmem.LogIdentifier())
-	err := copyFileToDestination(l.Nonmem, true)
-
-	//Now that the directory is created, let's create the gitignore file if specified
-	if viper.GetBool("git") {
-		WriteGitIgnoreFile(l.Nonmem.OutputDir)
-	}
+	err = createChildDirectories(l.Nonmem, l.Cancel, channels, true)
 
 	if err != nil {
-		RecordConcurrentError(l.Nonmem.Model, fmt.Sprintf("There appears to have been an issue trying to copy %s to %s", l.Nonmem.Model, l.Nonmem.OutputDir), err, channels, l.Cancel)
+		//Handles the cancel operation
+		RecordConcurrentError(l.Nonmem.FileName, err.Error(), err, channels, l.Cancel)
 		return
 	}
 
 	//Create Execution Script
-	scriptContents, err := generateBabylonScript(nonMemExecutionTemplate, l.Nonmem)
+	scriptContents, err := generateBabylonScript(nonMemExecutionTemplate, *l.Nonmem)
 
 	if err != nil {
 		RecordConcurrentError(l.Nonmem.Model, "An error occurred during the creation of the executable script for this model", err, channels, l.Cancel)
@@ -149,16 +119,11 @@ func (l SGEModel) Monitor(channels *turnstile.ChannelMap) {
 
 //Cleanup is the last phase of execution, in which computation / hard work is done and we're cleaning up leftover files, copying results around et all.
 func (l SGEModel) Cleanup(channels *turnstile.ChannelMap) {
-	//Set the config to overwrite false and re-write config. This ensures that the local phase will not deal with io contention
-	//around the SGE output streams
-	log.Debug("Updating babylon config to overwrite=false. This avoids IO contention with the grid engine for the next execution round")
-	viper.Set("overwrite", false)
-	viper.Set("saveConfig", false) //We also set saveconfig to false to avoid all of the children trying to re-save their configurations en-masse
-	err := viper.WriteConfigAs(filepath.Join(l.Nonmem.OriginalPath, "babylon.yaml"))
-
-	if err != nil {
-		log.Errorf("Errors were experienced while trying to update the config at %s. Error is: %s", filepath.Join(l.Nonmem.OriginalPath, "babylon.yaml"), err)
-	}
+	//err := configlib.WriteViperConfig(l.Nonmem.OutputDir, true)
+	//
+	//if err != nil {
+	//	log.Errorf("Errors were experienced while trying to update the config at %s. Error is: %s", filepath.Join(l.Nonmem.OriginalPath, "babylon.yaml"), err)
+	//}
 }
 
 //End Scalable method definitions
@@ -189,9 +154,6 @@ func sge(cmd *cobra.Command, args []string) {
 
 	lo := sgeOperation{}
 
-	//Let's try to immediately load any specified configuration files
-	configlib.ProcessSpecifiedConfigFile()
-
 	//If we're in debug mode, let's set the logger to debug
 	if viper.GetBool("debug") {
 		log.SetLevel(log.DebugLevel)
@@ -205,6 +167,7 @@ func sge(cmd *cobra.Command, args []string) {
 		log.Fatal("No models were located or loaded. Please verify the arguments provided and try again")
 	}
 
+	//TODO: Change this logic
 	log.Debug("Beginning config save / load operations for SGE Path")
 	//Save the config file to the directory to facilitate further execution
 	configlib.SaveConfig(lo.Models[0].Nonmem.OriginalPath)
@@ -217,7 +180,7 @@ func sge(cmd *cobra.Command, args []string) {
 	//Models in Error
 	//Locate 'em
 	counter := 0
-	var errors []NonMemModel
+	var errors []*NonMemModel
 	for _, v := range lo.Models {
 		if v.Nonmem.Error != nil {
 			counter++
@@ -288,7 +251,7 @@ func RecordConcurrentError(model string, notes string, err error, channels *turn
 	channels.Errors <- newConcurrentError(model, notes, err)
 }
 
-func executeSGEJob(model NonMemModel) turnstile.ConcurrentError {
+func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 	log.Printf("%s Beginning SGE work phase", model.LogIdentifier())
 	fs := afero.NewOsFs()
 	//Execute the script we created
@@ -352,8 +315,9 @@ func sgeModelsFromArguments(args []string) []SGEModel {
 	nonmemmodels := nonmemModelsFromArguments(args)
 
 	for _, v := range nonmemmodels {
+		n := v
 		output = append(output, SGEModel{
-			Nonmem: v,
+			Nonmem: &n,
 			Cancel: turnstile.CancellationChannel(),
 		})
 	}
@@ -370,15 +334,39 @@ func generateBabylonScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 		return []byte{}, errors.New("There was an error processing the provided script template")
 	}
 
+	filename := l.Model
+
+	if l.Configuration.NMQual {
+		filename = l.FileName + ".ctl"
+	}
+
 	type content struct {
 		WorkingDirectory string
 		Command          string
 	}
 
-	//The assumption is that at this point, the config will have been written to the original path directory.
+	commandComponents := []string{
+		l.Configuration.BabylonBinary,
+		"nonmem",
+		"run",
+	}
+
+	commandComponents = append(commandComponents, []string{
+		"local",
+		filepath.Join(l.OutputDir, filename),
+	}...)
+
+	if !l.Configuration.Local.CreateChildDirs {
+		commandComponents = append(commandComponents, []string{
+			"--createChildDirs=false",
+		}...)
+	}
+
+	generatedCommand := strings.TrimSpace(strings.Join(commandComponents, " "))
+	log.Debugf("Generated command is %s", generatedCommand)
 
 	err = t.Execute(buf, content{
-		Command:          viper.GetString("babylonBinary") + " nonmem run local " + l.Path,
+		Command:          generatedCommand,
 		WorkingDirectory: l.OutputDir,
 	})
 
@@ -387,15 +375,4 @@ func generateBabylonScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 	}
 
 	return buf.Bytes(), nil
-}
-
-//Specifically used to return the name of a SGE script, modified if it begins with an integer a SGE doesn't care for that.
-func getSGEScriptName(modelFileName string) string {
-	r := regexp.MustCompile(`^[0-9]{1,}.*$`)
-
-	if r.MatchString(modelFileName) {
-		return "run_" + modelFileName
-	}
-
-	return modelFileName
 }

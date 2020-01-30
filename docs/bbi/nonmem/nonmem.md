@@ -77,4 +77,4 @@ saveexe: ""
 threads: 8
 ```
 
-Using an `nmVersion` of nm74_gf would load the nonmem binary named `nmfe74` from `/opt/NONMEM/nm74gf/run` during nonmem local execution
+Using an `nmVersion` of nm74_gf would load the nonmem binary named `nmfe74` from `ls/opt/NONMEM/nm74gf/run` during nonmem local execution

@@ -58,8 +58,6 @@ $DIRECTORIES
 1:NONE
 2-[nodes]:worker{#-1}`
 
-const paraFileName string = "para.pnm"
-
 type nonmemParallelDirective struct {
 	TotalNodes        int
 	CompletionTimeout int
@@ -157,7 +155,7 @@ type NonMemModel struct {
 	//OutputDir is the directory into which the copied models and work will be located
 	OutputDir string `json:"output_dir"`
 	//Settings are basically the cobra definitions / requirements for the iteration
-	Configuration configlib.Config `json:"configuration"`
+	Configuration *configlib.Config `json:"configuration"`
 	//Whether or not the model had an error on generation or execution
 	Error error `json:"error"`
 }
@@ -207,12 +205,23 @@ func init() {
 	const parafileIdentifier string = "parafile"
 	nonmemCmd.PersistentFlags().String(parafileIdentifier, "", "Location of a user-provided parafile to use for parallel execution")
 	viper.BindPFlag("parallel."+parafileIdentifier, nonmemCmd.PersistentFlags().Lookup(parafileIdentifier))
+
+	const nmQualIdentifier string = "nmqual"
+	nonmemCmd.PersistentFlags().Bool(nmQualIdentifier, false, "Whether or not to execute with nmqual (autolog.pl")
+	viper.BindPFlag(nmQualIdentifier, nonmemCmd.PersistentFlags().Lookup(nmQualIdentifier))
 }
 
 // "Copies" a file by reading its content (optionally updating the path)
-func copyFileToDestination(l NonMemModel, modifyPath bool) error {
+func copyFileToDestination(l *NonMemModel, modifyPath bool) error {
 
 	fs := afero.NewOsFs()
+
+	filename := l.Model
+
+	//Set it to a ctl file if we're in NMQual mode
+	if l.Configuration.NMQual {
+		filename = l.FileName + ".ctl"
+	}
 
 	if exists, _ := afero.DirExists(fs, l.OutputDir); !exists {
 		//Create the directory
@@ -245,14 +254,14 @@ func copyFileToDestination(l NonMemModel, modifyPath bool) error {
 	//Write the file contents
 	fileContents := strings.Join(sourceLines, "\n")
 
-	afero.WriteFile(fs, path.Join(l.OutputDir, l.Model), []byte(fileContents), stats.Mode())
+	afero.WriteFile(fs, path.Join(l.OutputDir, filename), []byte(fileContents), stats.Mode())
 
 	return nil
 }
 
 //processes any template (inlcuding the const one here) to create a byte slice of the entire file
-func generateScript(fileTemplate string, l NonMemModel) ([]byte, error) {
-
+func generateScript(fileTemplate string, l *NonMemModel) ([]byte, error) {
+	log.Debugf("%s beginning script command generation. NMQual is set to %t", l.LogIdentifier(), l.Configuration.NMQual)
 	t, err := template.New("file").Parse(fileTemplate)
 	buf := new(bytes.Buffer)
 	if err != nil {
@@ -264,10 +273,17 @@ func generateScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 		Command          string
 	}
 
-	err = t.Execute(buf, content{
+	cont := content{
 		WorkingDirectory: l.OutputDir,
 		Command:          buildNonMemCommandString(l),
-	})
+	}
+
+	//Set the command to autolog contents if we're set to nmqual
+	if l.Configuration.NMQual {
+		cont.Command = buildAutologCommandString(l)
+	}
+
+	err = t.Execute(buf, cont)
 
 	if err != nil {
 		return []byte{}, errors.New("An error occured during the execution of the provided script template")
@@ -280,7 +296,7 @@ func generateScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func writeParaFile(l NonMemModel) error {
+func writeParaFile(l *NonMemModel) error {
 
 	contentBytes, err := generateParaFile(l)
 
@@ -303,11 +319,11 @@ func writeParaFile(l NonMemModel) error {
 		}
 	}
 
-	return utils.WriteLines(contentLines, path.Join(l.OutputDir, paraFileName))
+	return utils.WriteLines(contentLines, path.Join(l.OutputDir, l.FileName+".pnm"))
 
 }
 
-func generateParaFile(l NonMemModel) ([]byte, error) {
+func generateParaFile(l *NonMemModel) ([]byte, error) {
 	nmp := nonmemParallelDirective{
 		TotalNodes:        l.Configuration.Parallel.Nodes,
 		HeadNodes:         1,
@@ -334,7 +350,7 @@ func generateParaFile(l NonMemModel) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func buildNonMemCommandString(l NonMemModel) string {
+func buildNonMemCommandString(l *NonMemModel) string {
 
 	var nmHome string
 	var nmBinary string
@@ -378,22 +394,39 @@ func buildNonMemCommandString(l NonMemModel) string {
 
 	//Section for Appending the parafile command
 	if l.Configuration.Parallel.Parallel {
-		cmdArgs = append(cmdArgs, "-parafile="+path.Join(l.OutputDir, paraFileName))
+		cmdArgs = append(cmdArgs, "-parafile="+path.Join(l.OutputDir, l.FileName+".pnm"))
 	}
 
 	return nmExecutable + " " + strings.Join(cmdArgs, " ")
+}
+
+func buildAutologCommandString(l *NonMemModel) string {
+	//`perl  -S /opt/NONMEM/nm74gf/nmqual/autolog.pl /opt/NONMEM/nm74gf/nmqual/log.xml para ce /data/tmp/001 001`
+	nm := l.Configuration.Nonmem[l.Configuration.NMVersion]
+	commandComponents := []string{
+		"perl",
+		"-S",
+		filepath.Join(nm.Home, "nmqual", "autolog.pl"),
+		filepath.Join(nm.Home, "nmqual", "log.xml"),
+		"para",
+		"ce",
+		l.OutputDir,
+		l.FileName,
+	}
+
+	return strings.TrimSpace(strings.Join(commandComponents, " "))
 }
 
 //modelName is the full file + ext representation of the model (ie acop.mod)
 //directory is the directory in which we will be performing cleanup
 //exceptions is a variadic input for allowing exceptions / overrides.
 //We're taking a local model because grid engine execution doesn't wait for completion. Nothing to do :)
-func filesToCleanup(model NonMemModel, exceptions ...string) runner.FileCleanInstruction {
+func filesToCleanup(model *NonMemModel, exceptions ...string) runner.FileCleanInstruction {
 	fci := runner.FileCleanInstruction{
 		Location: model.OutputDir,
 	}
 
-	files := getCleanableFileList(model.Model, model.Configuration.CleanLvl)
+	files := getCleanableFileList(model.FileName, model.Configuration.CleanLvl)
 
 	for _, v := range files {
 		if !isFilenameInExceptions(exceptions, v) {
@@ -444,7 +477,7 @@ func newTargetFile(filename string, level int) runner.TargetedFile {
 	}
 }
 
-func filesToCopy(model NonMemModel, mandatoryFiles ...string) runner.FileCopyInstruction {
+func filesToCopy(model *NonMemModel, mandatoryFiles ...string) runner.FileCopyInstruction {
 	fci := runner.FileCopyInstruction{
 		CopyTo:   model.OriginalPath,
 		CopyFrom: model.OutputDir,
@@ -583,7 +616,7 @@ func extrapolateCopyFilesFromExtensions(filename string, level int, filepath str
 	return output
 }
 
-func newPostWorkInstruction(model NonMemModel, cleanupExclusions []string, mandatoryCopyFiles []string) runner.PostWorkInstructions {
+func newPostWorkInstruction(model *NonMemModel, cleanupExclusions []string, mandatoryCopyFiles []string) runner.PostWorkInstructions {
 
 	return runner.PostWorkInstructions{
 		FilesToCopy:  filesToCopy(model, mandatoryCopyFiles...),
@@ -647,8 +680,17 @@ func NewNonMemModel(modelname string) NonMemModel {
 	//Get the raw path of the original by stripping the actual file from it
 	lm.OriginalPath = strings.Replace(lm.Path, "/"+lm.Model, "", 1)
 
-	//If no config has been loaded, let's check to see if a config exists with the model and load it
-	configlib.LocateAndReadConfigFile(lm.OriginalPath)
+	config, err := os.Open(filepath.Join(lm.OriginalPath, "babylon.yaml"))
+
+	if err != nil {
+		log.Fatalf("A failure occurred accessing the initial configuration at %s", filepath.Join(lm.OriginalPath, "babylon.yaml"))
+	}
+
+	err = viper.ReadConfig(config)
+
+	if err != nil {
+		log.Fatalf("Viper had issues parsing the configuration file provided. Details are: %s", err)
+	}
 
 	//Process The template from the viper content for output Dir
 	t, err := template.New("output").Parse(viper.GetString("outputDir"))
@@ -684,17 +726,10 @@ func NewNonMemModel(modelname string) NonMemModel {
 		}
 	}
 
-	lm.Configuration = configlib.UnmarshalViper()
-
-	//Check to see if We for some reason have no nonmem contents
-	if len(lm.Configuration.Nonmem) == 0 {
-		log.Fatal("No nonmem configurations were loaded in from file. Please make sure the nonmem key and its children are present in babylon.yaml")
-	}
-
 	return lm
 }
 
-func executeNonMemJob(executor func(model NonMemModel) turnstile.ConcurrentError, model NonMemModel) turnstile.ConcurrentError {
+func executeNonMemJob(executor func(model *NonMemModel) turnstile.ConcurrentError, model *NonMemModel) turnstile.ConcurrentError {
 	return executor(model)
 }
 
@@ -781,4 +816,59 @@ func doesDirectoryContainOutputFiles(path string, modelname string) bool {
 
 func (n NonMemModel) LogIdentifier() string {
 	return fmt.Sprintf("[%s]", n.FileName)
+}
+
+func createChildDirectories(l *NonMemModel, cancel chan bool, channels *turnstile.ChannelMap, sge bool) error {
+	fs := afero.NewOsFs()
+	log.Debugf("%s Overwrite is currently set to %t", l.LogIdentifier(), viper.GetBool("debug"))
+	//Does output directory exist?
+	if ok, _ := afero.DirExists(fs, l.OutputDir); ok {
+		//If so are we configured to overwrite?
+		if l.Configuration.Overwrite {
+			log.Debugf("%s Removing directory %s", l.LogIdentifier(), l.OutputDir)
+			err := fs.RemoveAll(l.OutputDir)
+			if err != nil {
+				return err
+			}
+		}
+
+		if !l.Configuration.Overwrite {
+			//If not, we only want to panic if there are nonmem output files in the directory
+			if !doesDirectoryContainOutputFiles(l.OutputDir, l.Model) {
+				//Continue along if we find no relevant content
+				log.Infof("%s No Nonmem output files detected in %s. Good to continue", l.LogIdentifier(), l.OutputDir)
+			} else {
+				//Or panic because we're in a scenario where we shouldn't purge, but there's content in the directory from previous runs
+				log.Debugf("%s Configuration for overwrite was %t, but %s had Nonmem outputs. As such, we will hault operations", l.LogIdentifier(), viper.GetBool("debug"), l.OutputDir)
+				return fmt.Errorf("The target directory, %s already exist, but we are configured not to overwrite. Invalid configuration / run state", l.OutputDir)
+			}
+		}
+	}
+
+	//Copy Model into destination and update Data Path
+	err := copyFileToDestination(l, true)
+
+	if err != nil {
+		return err
+	}
+
+	//Now that the directory is created, let's create the gitignore file if specified
+	if viper.GetBool("git") {
+		log.Debugf("%s Writing initial gitignore file", l.LogIdentifier())
+		WriteGitIgnoreFile(l.OutputDir)
+	}
+
+	if err != nil {
+		RecordConcurrentError(l.Model, fmt.Sprintf("There appears to have been an issue trying to copy %s to %s", l.Model, l.OutputDir), err, channels, cancel)
+		return err
+	}
+
+	err = configlib.WriteViperConfig(l.OutputDir, sge, l.Configuration)
+
+	if err != nil {
+		RecordConcurrentError(l.Model, "Error writing updated viper config", err, channels, cancel)
+		return err
+	}
+
+	return nil
 }
