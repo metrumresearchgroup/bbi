@@ -3,6 +3,7 @@ package cmd
 import (
 	"crypto/md5"
 	"encoding/json"
+	"errors"
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"io"
@@ -48,16 +49,16 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 
 	log.Debugf("%s Beginning local preparation phase", l.Nonmem.LogIdentifier())
 
-	//Try loading the original config
-	log.Debug("Attempting to load config file")
-
 	//Load the original config if specified, otherwise pull locally relative.
-	var err error
+	var config string
 	if len(viper.GetString("config")) > 0 {
-		err = configlib.LoadViperFromPath(viper.GetString("config"))
+		config = viper.GetString("config")
 	} else {
-		err = configlib.LoadViperFromPath(l.Nonmem.OriginalPath)
+		config = filepath.Join(l.Nonmem.OriginalPath, "babylon.yaml")
 	}
+
+	log.Debugf("Attempting to load configuration file from %s", config)
+	err := configlib.LoadViperFromFile(config)
 
 	//If we can't load the configuration, let's basically stop
 	if err != nil {
@@ -67,6 +68,23 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 
 	//Load it discretely into the model
 	l.Nonmem.Configuration = configlib.UnmarshalViper()
+
+	//Check for invalid selected versions of Nonmem if NMQual selected
+	if l.Nonmem.Configuration.NMQual {
+
+		//Set parallelism to true
+		l.Nonmem.Configuration.Parallel.Parallel = true
+		//TODO: What about the other parallel components?
+
+		//If we can locate the key
+		if selected, ok := l.Nonmem.Configuration.Nonmem[l.Nonmem.Configuration.NMVersion]; ok {
+			//Is it not set to nmqual?
+			if !selected.Nmqual {
+				RecordConcurrentError(l.Nonmem.FileName, "Invalid nonmem / nmqual configuration", errors.New("NMQual was selected, but the selected nmversion does not support nmqual"), channels, l.Cancel)
+				return
+			}
+		}
+	}
 
 	log.Infof("Successfully inserted configuration from %s into model structs", filepath.Join(l.Nonmem.OutputDir, viper.GetString("config")))
 
@@ -98,6 +116,14 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 			RecordConcurrentError(l.Nonmem.FileName, err.Error(), err, channels, l.Cancel)
 			return
 		}
+	}
+
+	//Now that we've copied the files, let's make sure we reflect a .ctl file if we're in nmqual operational mode
+	if l.Nonmem.Configuration.NMQual {
+		log.Debugf("%s since we're in nmqual mode operationally, we're going to change the model from "+
+			"%s to %s ", l.Nonmem.LogIdentifier(), l.Nonmem.Model, l.Nonmem.FileName+".ctl")
+		l.Nonmem.Model = l.Nonmem.FileName + ".ctl"
+
 	}
 
 	//Create Execution Script
@@ -399,7 +425,7 @@ func executeLocalJob(model *NonMemModel) turnstile.ConcurrentError {
 
 	output, err := command.CombinedOutput()
 
-	if err != nil {
+	if err != nil && !strings.Contains(string(output), "not well-formed (invalid token)") {
 		log.Debug(err)
 		if exitError, ok := err.(*exec.ExitError); ok {
 			code := exitError.ExitCode()

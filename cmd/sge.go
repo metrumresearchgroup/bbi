@@ -46,12 +46,14 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 	channels.Working <- 1
 
 	//Load the original config if specified, otherwise pull locally relative.
-	var err error
+	var config string
 	if len(viper.GetString("config")) > 0 {
-		err = configlib.LoadViperFromPath(viper.GetString("config"))
+		config = viper.GetString("config")
 	} else {
-		err = configlib.LoadViperFromPath(l.Nonmem.OriginalPath)
+		config = filepath.Join(l.Nonmem.OriginalPath, "babylon.yaml")
 	}
+
+	err := configlib.LoadViperFromFile(config)
 
 	//If we can't load the configuration, let's basically stop
 	if err != nil {
@@ -332,6 +334,12 @@ func generateBabylonScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 		return []byte{}, errors.New("There was an error processing the provided script template")
 	}
 
+	filename := l.Model
+
+	if l.Configuration.NMQual {
+		filename = l.FileName + ".ctl"
+	}
+
 	type content struct {
 		WorkingDirectory string
 		Command          string
@@ -345,7 +353,7 @@ func generateBabylonScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 
 	commandComponents = append(commandComponents, []string{
 		"local",
-		filepath.Join(l.OutputDir, l.Model),
+		filepath.Join(l.OutputDir, filename),
 	}...)
 
 	if !l.Configuration.Local.CreateChildDirs {

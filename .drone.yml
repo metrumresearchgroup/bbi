@@ -1,0 +1,21 @@
+  name: BabylonTesting
+  type: docker
+  kind: pipeline
+  steps:
+    - name: test
+      image: dukeofubuntu/babylon:nmqual
+      environment:
+        MPIEXEC_PATH: /usr/bin/mpiexec
+        NONMEMROOT: /opt
+        NMVERSION: nm
+        NONMEM_LICENSE:
+          from_secret: NONMEM_LICENSE
+      commands:
+        - echo "$NONMEM_LICENSE" > /opt/nm/license/nonmem.lic
+        - cat /opt/nm/license/nonmem.lic
+        - mkdir /test
+        - cd /test
+        - git clone https://github.com/metrumresearchgroup/babylontest.git
+        - cd babylontest
+        - go mod download
+        - go test ./... -v

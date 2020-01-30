@@ -5,6 +5,7 @@ go 1.13
 require (
 	github.com/clbanning/mxj v1.8.4
 	github.com/coreos/bbolt v1.3.3
+	github.com/ghodss/yaml v1.0.0
 	github.com/go-chi/chi v4.0.2+incompatible
 	github.com/go-chi/render v1.0.1
 	github.com/gobwas/glob v0.2.3
