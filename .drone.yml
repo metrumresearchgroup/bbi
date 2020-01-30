@@ -4,9 +4,6 @@
   steps:
     - name: Clone and Test
       image: agur/drone-ecr-puller
-      access_key:
-      secret_access_key:
-      region: us-east-1
       volumes:
         - name: dockersock
           path: /var/run/docker.sock
