@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"errors"
+	"github.com/ghodss/yaml"
+	"github.com/metrumresearchgroup/babylon/configlib"
 	"log"
 	"path/filepath"
 	"regexp"
@@ -73,33 +75,18 @@ func initializer(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	//Let's Manually set the known keys for nonmem:
+	c := configlib.Config{}
 
-	// //nm73_gf
-	// viper.Set("nonmem.nm73_gf.default", false)
-	// viper.Set("nonmem.nm73_gf.executable", "nmfe73")
-	// viper.Set("nonmem.nm73_gf.home", "/opt/NONMEM/nm73gf")
-	// viper.Set("nonmem.nm73_gf.nmqual", true)
+	viper.Unmarshal(&c)
 
-	// //nm74_gf
-	// viper.Set("nonmem.nm74_gf.default", true)
-	// viper.Set("nonmem.nm74_gf.executable", "nmfe74")
-	// viper.Set("nonmem.nm74_gf.home", "/opt/NONMEM/nm74gf")
-	// viper.Set("nonmem.nm74_gf.nmqual", true)
+	yamlString, err := yaml.Marshal(c)
 
-	// //nm73_nmfe
-	// viper.Set("nonmem.nm73_nmfe.default", false)
-	// viper.Set("nonmem.nm73_nmfe.executable", "nmfe73")
-	// viper.Set("nonmem.nm73_nmfe.home", "/opt/NONMEM/nm73gf_nmfe")
-	// viper.Set("nonmem.nm73_nmfe.nmqual", true)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	// //nm74_nmfe
-	// viper.Set("nonmem.nm74_nmfe.default", false)
-	// viper.Set("nonmem.nm74_nmfe.executable", "nmfe74")
-	// viper.Set("nonmem.nm74_nmfe.home", "/opt/NONMEM/nm74gf_nmfe")
-	// viper.Set("nonmem.nm74_nmfe.nmqual", true)
-
-	viper.WriteConfigAs("./babylon.yaml")
+	//Write the byte array to file
+	afero.WriteFile(fs, "./babylon.yaml", yamlString, 0755)
 
 }
 

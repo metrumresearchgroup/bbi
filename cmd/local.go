@@ -49,9 +49,6 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 
 	log.Debugf("%s Beginning local preparation phase", l.Nonmem.LogIdentifier())
 
-	//Try loading the original config
-	log.Debug("Attempting to load config file")
-
 	//Load the original config if specified, otherwise pull locally relative.
 	var config string
 	if len(viper.GetString("config")) > 0 {
@@ -60,6 +57,7 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 		config = filepath.Join(l.Nonmem.OriginalPath, "babylon.yaml")
 	}
 
+	log.Debugf("Attempting to load configuration file from %s", config)
 	err := configlib.LoadViperFromFile(config)
 
 	//If we can't load the configuration, let's basically stop
