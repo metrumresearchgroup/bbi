@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #Write out the nonmem file to current dir
-echo "${NONMEM_LICENSE}" | base64 -d > nonmem.lic
-cp nonmem.lic /opt/NONMEM/nm74gf/license/nonmem.lic
+echo "$NONMEM_LICENSE"
+echo "$NONMEM_LICENSE" > /opt/NONMEM/nm74gf/license/nonmem.lic
 
 #Clone operations
 git clone https://github.com/metrumresearchgroup/babylontest.git
@@ -15,4 +15,4 @@ go mod download
 go test -run TestBabylonCompletesLocalExecution
 
 #Sge basic tests
-go test -run TestBabylonCompletesSGEExecution
+#go test -run TestBabylonCompletesSGEExecution
