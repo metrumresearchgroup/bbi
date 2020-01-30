@@ -9,4 +9,10 @@ git clone https://github.com/metrumresearchgroup/babylontest.git
 cd babylontest
 
 go mod download
-go test ./....
+
+
+#Run the Non Parallel Tests
+go test -run TestBabylonCompletesLocalExecution
+
+#Sge basic tests
+go test -run TestBabylonCompletesSGEExecution

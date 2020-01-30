@@ -2,7 +2,7 @@
   type: docker
   kind: pipeline
   steps:
-    - name: Pull
+    - name: Clone and Test
       image: omerxx/drone-ecr-auth
       pull: true
       privileged: true
@@ -12,6 +12,10 @@
       environment:
         MPICH_PATH:  /usr/local/mpich3/bin/mpiexec
         NMVERSION: nm74gf
+        LICENSE:
+            from_secret: NONMEM_LICENSE
+        GITHUB_TOKEN:
+            from_secret: GITHUB_TOKEN
         AWS_ACCESS_KEY:
             from_secret AWS_ACCESS_KEY
         AWS_SECRET_ACCESS_KEY:
@@ -19,20 +23,7 @@
       commands:
         - $(aws ecr get-login --no-include-email --region us-east-1)
         - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/nonmem
-    - name: Clone and Test
-      image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/nonmem
-      pull: true
-      privileged: true
-      environment:
-        MPICH_PATH:  /usr/local/mpich3/bin/mpiexec
-        NMVERSION: nm74gf
-        LICENSE:
-          from_secret: NONMEM_LICENSE
-        GITHUB_TOKEN:
-          from_secret: GITHUB_TOKEN
-      commands:
-        - echo "Beginning Execution!"
-        - sh test.sh
+        - docker run --rm -t -v $(pwd):/app -e LICENSE="${LICENSE}" -e GITHUB_TOKEN="${GITHUB_TOKEN}" 906087756158.dkr.ecr.us-east-1.amazonaws.com/nonmem sh /app/test.sh
   volumes:
     - name: dockersock
       host:
