@@ -12,9 +12,9 @@
         password:
           from_secret: DOCKERHUB_PASSWORD
         repo: dukeofubuntu/babylon
-        tags: ${DRONE_BRANCH}
+        tags: $$BRANCH
         build_args:
-          - BBI_BRANCH=$DRONE_BRANCH
+          - BBI_BRANCH=$$BRANCH
     - name: test
       image: dukeofubuntu/babylon:${DRONE_BRANCH}
       environment:
