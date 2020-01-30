@@ -3,31 +3,31 @@
   kind: pipeline
   steps:
     - name: Pull nonmem image
-        image: agur/drone-ecr-puller
-        access_key:
-        secret_access_key:
-        region: us-east-1
-        environment:
-          MPICH_PATH:  /usr/local/mpich3/bin/mpiexec
-          NMVERSION: nm74gf
-          LICENSE:
-              from_secret: NONMEM_LICENSE
-          GITHUB_TOKEN:
-              from_secret: GITHUB_TOKEN
-        commands:
-          - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/nonmem
-    - name: Clone and Test
-        image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/nonmem
-        environment:
-          MPICH_PATH:  /usr/local/mpich3/bin/mpiexec
-          NMVERSION: nm74gf
-          LICENSE:
+      image: agur/drone-ecr-puller
+      access_key:
+      secret_access_key:
+      region: us-east-1
+      environment:
+        MPICH_PATH:  /usr/local/mpich3/bin/mpiexec
+        NMVERSION: nm74gf
+        LICENSE:
             from_secret: NONMEM_LICENSE
-          GITHUB_TOKEN:
+        GITHUB_TOKEN:
             from_secret: GITHUB_TOKEN
-        commands:
-          - git clone https://github.com/metrumresearchgroup/babylontest.git
-          - cd babylontest
-          - go mod download
-          - echo $NONMEM_LICENSE | base64 -d > nonmem.lic
-          - go test -v ./...
+      commands:
+        - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/nonmem
+    - name: Clone and Test
+      image: 906087756158.dkr.ecr.us-east-1.amazonaws.com/nonmem
+      environment:
+        MPICH_PATH:  /usr/local/mpich3/bin/mpiexec
+        NMVERSION: nm74gf
+        LICENSE:
+          from_secret: NONMEM_LICENSE
+        GITHUB_TOKEN:
+          from_secret: GITHUB_TOKEN
+      commands:
+        - git clone https://github.com/metrumresearchgroup/babylontest.git
+        - cd babylontest
+        - go mod download
+        - echo $NONMEM_LICENSE | base64 -d > nonmem.lic
+        - go test -v ./...
