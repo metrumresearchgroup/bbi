@@ -27,7 +27,7 @@ import (
 )
 
 // VERSION is the current bbi version
-var VERSION string = "2.1.0-alpha.7"
+var VERSION string = "2.1.0-alpha.9"
 
 var (
 	// name of config file
