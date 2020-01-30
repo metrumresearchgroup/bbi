@@ -2,8 +2,19 @@
   type: docker
   kind: pipeline
   steps:
+    - name: build image
+      image: plugins/docker
+      settings:
+        username:
+          from_secret: DOCKERHUB_USERNAME
+        password:
+          from_secret: DOCKERHUB_PASSWORD
+        repo: dukeofubuntu/babylon
+        tags: ${DRONE_BRANCH}
+        build_args:
+          - BBI_BRANCH=$$DRONE_BRANCH
     - name: test
-      image: dukeofubuntu/babylon:nmqual
+      image: dukeofubuntu/babylon:${DRONE_BRANCH}
       environment:
         MPIEXEC_PATH: /usr/bin/mpiexec
         NONMEMROOT: /opt
@@ -12,7 +23,6 @@
           from_secret: NONMEM_LICENSE
       commands:
         - echo "$NONMEM_LICENSE" > /opt/nm/license/nonmem.lic
-        - cat /opt/nm/license/nonmem.lic
         - mkdir /test
         - cd /test
         - git clone https://github.com/metrumresearchgroup/babylontest.git
