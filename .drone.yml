@@ -18,10 +18,7 @@
         GITHUB_TOKEN:
             from_secret: GITHUB_TOKEN
       commands:
-        - git clone https://github.com/metrumresearchgroup/babylontest.git
-        - cd babylontest
-        - go mod download
-        - docker run --rm -it -v $(pwd)/nonmem.lic:/opt/NONMEM/nm74gf/license/nonmem.lic 906087756158.dkr.ecr.us-east-1.amazonaws.com/nonmem go test -v ./...
+        - docker run --rm -it -v $(pwd):/app -e LICENSE="${NONMEM_LICENSE}" -e GITHUB_TOKEN="${GITHUB_TOKEN}" 906087756158.dkr.ecr.us-east-1.amazonaws.com/nonmem sh /app/test.sh
   volumes:
     - name: dockersock
       host:
