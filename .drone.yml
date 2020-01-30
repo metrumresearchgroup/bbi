@@ -4,8 +4,12 @@
   steps:
     - name: Clone and Test
       image: agur/drone-ecr-puller
+      access_key:
+      secret_access_key:
+      region: us-east-1
       volumes:
-        - /var/run/docker.sock:/var/run/docker.sock
+        - name: dockersock
+          path: /var/run/docker.sock
       environment:
         MPICH_PATH:  /usr/local/mpich3/bin/mpiexec
         NMVERSION: nm74gf
@@ -19,3 +23,7 @@
         - cd babylontest
         - go mod download
         - docker run --rm -it -v $(pwd)/nonmem.lic:/opt/NONMEM/nm74gf/license/nonmem.lic 906087756158.dkr.ecr.us-east-1.amazonaws.com/nonmem go test -v ./...
+  volumes:
+    - name: dockersock
+      host:
+        path: /var/run/docker.sock
