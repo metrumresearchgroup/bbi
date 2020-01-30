@@ -18,7 +18,7 @@
         GITHUB_TOKEN:
             from_secret: GITHUB_TOKEN
       commands:
-        - docker run --rm -it -v $(pwd):/app -e LICENSE="${NONMEM_LICENSE}" -e GITHUB_TOKEN="${GITHUB_TOKEN}" 906087756158.dkr.ecr.us-east-1.amazonaws.com/nonmem sh /app/test.sh
+        - docker run --rm -v $(pwd):/app -e LICENSE="${NONMEM_LICENSE}" -e GITHUB_TOKEN="${GITHUB_TOKEN}" 906087756158.dkr.ecr.us-east-1.amazonaws.com/nonmem sh /app/test.sh
   volumes:
     - name: dockersock
       host:
