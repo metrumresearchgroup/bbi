@@ -3,12 +3,9 @@
   kind: pipeline
   steps:
     - name: Clone and Test
-      image: agur/drone-ecr-puller
-      access_key:
-        from_secret: AWS_ACCESS_KEY
-      secret_access_key:
-        from_secret: AWS_SECRET_KEY
-      region: us-east-1
+      image: omerxx/drone-ecr-auth
+      pull: true
+      privileged: true
       volumes:
         - name: dockersock
           path: /var/run/docker.sock
@@ -19,7 +16,12 @@
             from_secret: NONMEM_LICENSE
         GITHUB_TOKEN:
             from_secret: GITHUB_TOKEN
+        AWS_ACCESS_KEY:
+            from_secret AWS_ACCESS_KEY
+        AWS_SECRET_ACCESS_KEY:
+            from_secret: AWS_SECRET_KEY
       commands:
+        - $(aws ecr get-login --no-include-email --region us-east-1)
         - docker run --rm -v $(pwd):/app -e LICENSE="${NONMEM_LICENSE}" -e GITHUB_TOKEN="${GITHUB_TOKEN}" 906087756158.dkr.ecr.us-east-1.amazonaws.com/nonmem sh /app/test.sh
   volumes:
     - name: dockersock
