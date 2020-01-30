@@ -18,7 +18,6 @@
         GITHUB_TOKEN:
             from_secret: GITHUB_TOKEN
       commands:
-        - docker run [your image @ ecr]
         - git clone https://github.com/metrumresearchgroup/babylontest.git
         - cd babylontest
         - go mod download
