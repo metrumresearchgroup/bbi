@@ -24,7 +24,7 @@
         - $(aws ecr get-login --no-include-email --region us-east-1)
         - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/nonmem
         - chmod +x test.sh
-        - docker run --rm -t -v /workspace:/app --command="ls -la /" 906087756158.dkr.ecr.us-east-1.amazonaws.com/nonmem
+        - docker run --rm -t -v /workspace:/app --entrypoint="" 906087756158.dkr.ecr.us-east-1.amazonaws.com/nonmem ls -la /app
         - docker run --rm -t -v /drone/src:/app -e NONMEM_LICENSE="$NONMEM_LICENSE" -e GITHUB_TOKEN="$GITHUB_TOKEN" -e NMVERSION="nm74gf" --entrypoint="/app/test.sh"  906087756158.dkr.ecr.us-east-1.amazonaws.com/nonmem
   volumes:
     - name: dockersock
