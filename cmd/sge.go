@@ -286,7 +286,7 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 	command := exec.Command(binary, qsubArguments...)
 
 	//Print the whole command if we're in debug mode
-	log.Debug(command.String())
+	log.Debugf("QSUB command is:%s", command.String())
 
 	command.Env = os.Environ() //Take in OS Environment
 
