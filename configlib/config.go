@@ -1,18 +1,14 @@
 package configlib
 
 import (
-	"fmt"
-	"github.com/metrumresearchgroup/babylon/utils"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
+	"github.com/spf13/viper"
 	"gopkg.in/yaml.v2"
 	"os"
 	"path"
 	"path/filepath"
 	"runtime"
-	"strings"
-
-	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 )
 
 //Whenever
@@ -108,91 +104,11 @@ func loadDefaultSettings() {
 	viper.SetDefault("threads", runtime.NumCPU())
 }
 
-//LocateAndReadConfigFile will take a priority based approach to loading configs starting with those closest to the model all the way out to the home directory for the users
-func LocateAndReadConfigFile(modelPath string) {
-
-	if viper.ConfigFileUsed() != "" {
-		//We've already read and loaded a config. Nothing to see here. Move along.
-		return
-	}
-
-	//Should be the new output Directory only
-	locations := []string{
-		modelPath,
-	}
-
-	for _, v := range locations {
-		//Add the path and try to load the config
-		viper.AddConfigPath(v)
-		err := viper.ReadInConfig()
-
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			//No config here
-			continue
-		}
-
-		//Handle parse issues
-		if err, ok := err.(viper.ConfigParseError); ok {
-			log.Errorf("An error occurred trying to parse the config file located at %s. Error details are %s", v, err.Error())
-			continue
-		}
-
-		//Let's print out the config we loaded
-		if viper.GetBool("debug") {
-			lines, _ := utils.ReadLines(filepath.Join(v, "babylon.yaml"))
-			log.Debugf("Contents of loaded config file are: \n%s", strings.Join(lines, "\n"))
-		}
-
-		//If no errors we return to prevent further processing
-		log.Infof("Configuration file successfully loaded from %s", path.Join(v, "babylon.yml"))
-		return
-	}
-}
-
 //SaveConfig takes the viper settings and writes them to a file in the original path
 func SaveConfig(configpath string) {
 	if viper.GetBool("saveConfig") {
 		viper.WriteConfigAs(path.Join(configpath, "babylon.yaml"))
 	}
-}
-
-//UnmarshalViper collects the viper details and inserts them into the class struct
-func UnmarshalViper() *Config {
-	if !ConfigurationLoaded {
-		c := Config{}
-		viper.Unmarshal(&c)
-		ConfigurationLoaded = true
-		AvailableConfiguration = c
-		log.Debug("Loading configuration from viper into struct and memory")
-		return &AvailableConfiguration
-	} else {
-		log.Debug("Returning preloaded configuration")
-		return &AvailableConfiguration
-	}
-}
-
-//LoadViperFromFile allows the read of viper from file reader
-func LoadViperFromFile(path string) error {
-	log.Debugf("Attempting to load configuration from %s", path)
-	viper.SetConfigType("yaml")
-
-	config, err := os.Open(path)
-
-	if err != nil {
-		log.Error(err)
-		return fmt.Errorf("unable to load or access the configuration file (%s) located at %s", "babylon.yaml", path)
-	}
-
-	err = viper.ReadConfig(config)
-
-	if err != nil {
-		log.Error(err)
-		return fmt.Errorf("viper had issues parsing the configuration file provided. Details are: %s", err)
-	}
-
-	log.Infof("Configuration successfully loaded from %s", path)
-	log.Infof("Read viper values. Threads are %d", viper.GetInt("threads"))
-	return nil
 }
 
 func WriteViperConfig(path string, sge bool, config *Config) error {
@@ -206,7 +122,7 @@ func WriteViperConfig(path string, sge bool, config *Config) error {
 		config.Local.CreateChildDirs = false
 	}
 
-	//TODO: How to process variable config names
+	log.Debugf("Requested save of config file %s", path)
 
 	err := config.RenderYamlToFile(path)
 
@@ -215,4 +131,65 @@ func WriteViperConfig(path string, sge bool, config *Config) error {
 	}
 
 	return nil
+}
+
+func ReadSpecifiedFileIntoConfigStruct(config string) (Config, error) {
+	var returnConfig Config
+
+	file, err := os.Open(config)
+	if err != nil {
+		return returnConfig, err
+	}
+	defer file.Close()
+
+	err = viper.ReadConfig(file)
+
+	if err != nil {
+		log.Errorf("An error occurred trying to read the file %s into viper", config)
+		return returnConfig, err
+	}
+
+	err = viper.Unmarshal(&returnConfig)
+
+	if err != nil {
+		log.Errorf("Unable to read file %s into viper!", config)
+		return returnConfig, err
+	}
+
+	return returnConfig, nil
+}
+
+func LocateAndReadConfigFile() Config {
+
+	var config Config
+
+	if len(viper.GetString("config")) == 0 {
+		currentDir, err := os.Getwd()
+
+		if err != nil {
+			log.Fatalf("No specific config file provided, and we couldn't get the current working directory for some reason: %s", err)
+		}
+
+		config, err = ReadSpecifiedFileIntoConfigStruct(filepath.Join(currentDir, "babylon.yaml"))
+
+		if err != nil {
+			log.Fatalf("We couldn't open and read the details from the default configuration file location: %s", err)
+		}
+
+		log.Infof("Successfully loaded default configuration from %s", filepath.Join(currentDir, "babylon.yaml"))
+	}
+
+	//Config provided
+	if len(viper.GetString("config")) > 0 {
+		var err error
+		config, err = ReadSpecifiedFileIntoConfigStruct(viper.GetString("config"))
+
+		if err != nil {
+			log.Fatalf("Configuration file provided at %s could not be loaded. Error is: %s ", viper.GetString("config"), err)
+		}
+
+		log.Infof("Successfully loaded default configuration from %s", viper.GetString("config"))
+	}
+
+	return config
 }

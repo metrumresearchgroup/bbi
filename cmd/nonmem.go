@@ -639,7 +639,7 @@ func postWorkNotice(m *turnstile.Manager, t time.Time) {
 }
 
 //NewNonMemModel creates the core nonmem dataset from the passed arguments
-func NewNonMemModel(modelname string) NonMemModel {
+func NewNonMemModel(modelname string, config *configlib.Config) (NonMemModel, error) {
 
 	lm := NonMemModel{
 		BBIVersion: VERSION,
@@ -659,9 +659,7 @@ func NewNonMemModel(modelname string) NonMemModel {
 	fi, err := fs.Stat(lm.Path)
 
 	if err != nil {
-		return NonMemModel{
-			Error: err,
-		}
+		return NonMemModel{}, err
 	}
 
 	lm.Model = fi.Name()
@@ -680,26 +678,14 @@ func NewNonMemModel(modelname string) NonMemModel {
 	//Get the raw path of the original by stripping the actual file from it
 	lm.OriginalPath = strings.Replace(lm.Path, "/"+lm.Model, "", 1)
 
-	config, err := os.Open(filepath.Join(lm.OriginalPath, "babylon.yaml"))
-
-	if err != nil {
-		log.Fatalf("A failure occurred accessing the initial configuration at %s", filepath.Join(lm.OriginalPath, "babylon.yaml"))
-	}
-
-	err = viper.ReadConfig(config)
-
-	if err != nil {
-		log.Fatalf("Viper had issues parsing the configuration file provided. Details are: %s", err)
-	}
+	lm.Configuration = config
 
 	//Process The template from the viper content for output Dir
 	t, err := template.New("output").Parse(viper.GetString("outputDir"))
 	buf := new(bytes.Buffer)
 
 	if err != nil {
-		return NonMemModel{
-			Error: err,
-		}
+		return NonMemModel{}, err
 	}
 
 	type outputName struct {
@@ -712,28 +698,24 @@ func NewNonMemModel(modelname string) NonMemModel {
 	})
 
 	if err != nil {
-		return NonMemModel{
-			Error: err,
-		}
+		return NonMemModel{}, err
 	}
 
 	//Use the template content plus the original path
 	lm.OutputDir = path.Join(lm.OriginalPath, buf.String())
 
 	if err != nil {
-		return NonMemModel{
-			Error: err,
-		}
+		return NonMemModel{}, err
 	}
 
-	return lm
+	return lm, nil
 }
 
 func executeNonMemJob(executor func(model *NonMemModel) turnstile.ConcurrentError, model *NonMemModel) turnstile.ConcurrentError {
 	return executor(model)
 }
 
-func nonmemModelsFromArguments(args []string) []NonMemModel {
+func nonmemModelsFromArguments(args []string, config *configlib.Config) ([]NonMemModel, error) {
 	// regex for filename expansion check
 	var output []NonMemModel
 	AppFs := afero.NewOsFs()
@@ -763,7 +745,11 @@ func nonmemModelsFromArguments(args []string) []NonMemModel {
 			}
 
 			for _, model := range modelsInDir {
-				output = append(output, NewNonMemModel(path.Join(arg, model)))
+				model, err := NewNonMemModel(path.Join(arg, model), config)
+				if err != nil {
+					return output, err
+				}
+				output = append(output, model)
 			}
 
 		} else {
@@ -780,15 +766,23 @@ func nonmemModelsFromArguments(args []string) []NonMemModel {
 					log.Debugf("expanded models: %s \n", pat)
 				}
 				for _, p := range pat {
-					output = append(output, NewNonMemModel(p))
+					model, err := NewNonMemModel(p, config)
+					if err != nil {
+						return output, err
+					}
+					output = append(output, model)
 				}
 			} else {
-				output = append(output, NewNonMemModel(arg))
+				model, err := NewNonMemModel(arg, config)
+				if err != nil {
+					return output, err
+				}
+				output = append(output, model)
 			}
 		}
 	}
 
-	return output
+	return output, nil
 }
 
 func doesDirectoryContainOutputFiles(path string, modelname string) bool {
