@@ -164,6 +164,7 @@ func LocateAndReadConfigFile() Config {
 	var config Config
 
 	if len(viper.GetString("config")) == 0 {
+		log.Debug("No config has been specified. Attempting to load default")
 		currentDir, err := os.Getwd()
 
 		if err != nil {
@@ -181,6 +182,7 @@ func LocateAndReadConfigFile() Config {
 
 	//Config provided
 	if len(viper.GetString("config")) > 0 {
+		log.Debugf("A config file has been specified at %s", viper.GetString("config"))
 		var err error
 		config, err = ReadSpecifiedFileIntoConfigStruct(viper.GetString("config"))
 
