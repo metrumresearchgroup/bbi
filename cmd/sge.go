@@ -60,13 +60,6 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 		return
 	}
 
-	//err = configlib.WriteViperConfig(l.Nonmem.OutputDir, true, l.Nonmem.Configuration)
-	//
-	//if err != nil {
-	//	log.Errorf("Error Details are %s", err)
-	//	RecordConcurrentError(l.Nonmem.FileName, "Failure occurred saving the babylon yaml into the child dir", err, channels, l.Cancel)
-	//}
-
 	//Create Execution Script
 	scriptContents, err := generateBabylonScript(nonMemExecutionTemplate, *l.Nonmem)
 

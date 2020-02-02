@@ -188,7 +188,7 @@ func LocateAndReadConfigFile() Config {
 			log.Fatalf("Configuration file provided at %s could not be loaded. Error is: %s ", viper.GetString("config"), err)
 		}
 
-		log.Infof("Successfully loaded default configuration from %s", viper.GetString("config"))
+		log.Infof("Successfully loaded specified configuration from %s", viper.GetString("config"))
 	}
 
 	return config
