@@ -45,31 +45,14 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 	//Mark the model as started some work
 	channels.Working <- 1
 
-	//Load the original config if specified, otherwise pull locally relative.
-	var config string
-	if len(viper.GetString("config")) > 0 {
-		config = viper.GetString("config")
-	} else {
-		config = filepath.Join(l.Nonmem.OriginalPath, "babylon.yaml")
-	}
-
-	err := configlib.LoadViperFromFile(config)
-
-	//If we can't load the configuration, let's basically stop
-	if err != nil {
-		RecordConcurrentError(l.Nonmem.FileName, "An error occurred trying to"+
-			" load the configuration file", err, channels, l.Cancel)
-		return
-	}
-
-	l.Nonmem.Configuration = configlib.UnmarshalViper()
-
 	fs := afero.NewOsFs()
 
 	log.Debugf("%s Overwrite is currrently set to %t", l.Nonmem.LogIdentifier(), l.Nonmem.Configuration.Overwrite)
 	log.Debugf("%s Beginning evaluation of whether or not %s exists", l.Nonmem.LogIdentifier(), l.Nonmem.OutputDir)
 
-	err = createChildDirectories(l.Nonmem, l.Cancel, channels, true)
+	err := createChildDirectories(l.Nonmem, l.Cancel, channels, true)
+
+	//Save the config into the output directory
 
 	if err != nil {
 		//Handles the cancel operation
@@ -152,51 +135,30 @@ func init() {
 
 func sge(cmd *cobra.Command, args []string) {
 
+	config := configlib.LocateAndReadConfigFile()
+	log.Info("Beginning Local Path")
+
 	lo := sgeOperation{}
 
 	//If we're in debug mode, let's set the logger to debug
-	if viper.GetBool("debug") {
+	if config.Debug {
 		log.SetLevel(log.DebugLevel)
 	}
 
 	log.Debug("Searching for models based on arguments")
+	lomodels, err := sgeModelsFromArguments(args, &config)
+	if err != nil {
+		log.Fatalf("An error occurred during model processing: %s", err)
+	}
 
-	lo.Models = sgeModelsFromArguments(args)
+	lo.Models = lomodels
 
 	if len(lo.Models) == 0 {
 		log.Fatal("No models were located or loaded. Please verify the arguments provided and try again")
 	}
 
-	//TODO: Change this logic
-	log.Debug("Beginning config save / load operations for SGE Path")
-	//Save the config file to the directory to facilitate further execution
-	configlib.SaveConfig(lo.Models[0].Nonmem.OriginalPath)
-	//Read it in to make sure we're not trying to save it again later
-	configlib.LocateAndReadConfigFile(lo.Models[0].Nonmem.OriginalPath)
-
 	//Models Added
 	log.Infof("A total of %d models have been located for work", len(lo.Models))
-
-	//Models in Error
-	//Locate 'em
-	var errors []*NonMemModel
-	for _, v := range lo.Models {
-		if v.Nonmem.Error != nil {
-			errors = append(errors, v.Nonmem)
-		}
-	}
-
-	if len(errors) > 0 {
-		log.Errorf("It appears that %d models generated an error during the initial setup phase", len(errors))
-		for _, v := range errors {
-			log.Errorf("Model named %s has errored. Details: %s", v.Model, v.Error.Error())
-		}
-
-		log.Fatal("Errors occurred during the setup of models. Please rectify these issues and try again")
-	}
-
-	//Models in OK state
-	log.Infof("%d models successfully completed initial setup phase.", len(lo.Models)-len(errors))
 
 	//Create signature safe slice for manager
 	var scalables []turnstile.Scalable
@@ -310,9 +272,13 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 	return turnstile.ConcurrentError{}
 }
 
-func sgeModelsFromArguments(args []string) []SGEModel {
+func sgeModelsFromArguments(args []string, config *configlib.Config) ([]SGEModel, error) {
 	var output []SGEModel
-	nonmemmodels := nonmemModelsFromArguments(args)
+	nonmemmodels, err := nonmemModelsFromArguments(args, config)
+
+	if err != nil {
+		return output, err
+	}
 
 	for _, v := range nonmemmodels {
 		n := v
@@ -322,7 +288,7 @@ func sgeModelsFromArguments(args []string) []SGEModel {
 		})
 	}
 
-	return output
+	return output, nil
 }
 
 //Generate the command line script to execute babylon on the grid.

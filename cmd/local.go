@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/metrumresearchgroup/babylon/configlib"
 	log "github.com/sirupsen/logrus"
 	"io"
 	"os/exec"
@@ -15,7 +16,6 @@ import (
 
 	"os"
 
-	"github.com/metrumresearchgroup/babylon/configlib"
 	"github.com/metrumresearchgroup/babylon/runner"
 	"github.com/metrumresearchgroup/babylon/utils"
 	"github.com/metrumresearchgroup/turnstile"
@@ -49,26 +49,6 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 
 	log.Debugf("%s Beginning local preparation phase", l.Nonmem.LogIdentifier())
 
-	//Load the original config if specified, otherwise pull locally relative.
-	var config string
-	if len(viper.GetString("config")) > 0 {
-		config = viper.GetString("config")
-	} else {
-		config = filepath.Join(l.Nonmem.OriginalPath, "babylon.yaml")
-	}
-
-	log.Debugf("Attempting to load configuration file from %s", config)
-	err := configlib.LoadViperFromFile(config)
-
-	//If we can't load the configuration, let's basically stop
-	if err != nil {
-		RecordConcurrentError(l.Nonmem.FileName, err.Error(), err, channels, l.Cancel)
-		return
-	}
-
-	//Load it discretely into the model
-	l.Nonmem.Configuration = configlib.UnmarshalViper()
-
 	//Check for invalid selected versions of Nonmem if NMQual selected
 	if l.Nonmem.Configuration.NMQual {
 
@@ -85,8 +65,6 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 			}
 		}
 	}
-
-	log.Infof("Successfully inserted configuration from %s into model structs", filepath.Join(l.Nonmem.OutputDir, viper.GetString("config")))
 
 	//Jitter / Delay
 	if l.Nonmem.Configuration.Delay > 0 {
@@ -320,51 +298,31 @@ func init() {
 
 func local(cmd *cobra.Command, args []string) {
 
+	config := configlib.LocateAndReadConfigFile()
 	log.Info("Beginning Local Path")
 
 	//Set Logrus level if we're debug
-	if viper.GetBool("debug") {
+	if config.Debug {
 		log.SetLevel(log.DebugLevel)
-	}
-
-	if viper.ConfigFileUsed() != "" {
-		log.Infof("Config file loaded from %s", viper.ConfigFileUsed())
 	}
 
 	lo := localOperation{}
 
 	log.Debug("Locating models from arguments")
-	lo.Models = localModelsFromArguments(args)
+	localmodels, err := localModelsFromArguments(args, &config)
+
+	if err != nil {
+		log.Fatalf("An error occurred during model processing: %s", err)
+	}
+
+	lo.Models = localmodels
 
 	if len(lo.Models) == 0 {
 		log.Fatal("No models were located or loaded. Please verify the arguments provided and try again")
 	}
 
-	//Display Summary
-
 	//Models Added
-	log.Infof("A total of %d models have been located for work", len(lo.Models))
-
-	//Models in Error
-	//Locate 'em
-	var errors []*NonMemModel
-	for _, v := range lo.Models {
-		if v.Nonmem.Error != nil {
-			errors = append(errors, v.Nonmem)
-		}
-	}
-
-	if len(errors) > 0 {
-		log.Infof("It appears that %d models generated an error during the initial setup phase", len(errors))
-		for _, v := range errors {
-			log.Errorf("Model named %s has errored. Details: %s", v.Model, v.Error.Error())
-		}
-
-		log.Fatal("Errors occurred during the setup of models. Please rectify these issues and try again")
-	}
-
-	//Models in OK state
-	log.Infof("%d models successfully completed initial setup phase.", len(lo.Models)-len(errors))
+	log.Infof("A total of %d models have completed the initial preparation phase", len(lo.Models))
 
 	//Create signature safe slice for manager
 	var scalables []turnstile.Scalable
@@ -443,12 +401,15 @@ func executeLocalJob(model *NonMemModel) turnstile.ConcurrentError {
 	return turnstile.ConcurrentError{}
 }
 
-func localModelsFromArguments(args []string) []LocalModel {
+func localModelsFromArguments(args []string, config *configlib.Config) ([]LocalModel, error) {
 	var output []LocalModel
-	nonmemmodels := nonmemModelsFromArguments(args)
+	nonmemmodels, err := nonmemModelsFromArguments(args, config)
+
+	if err != nil {
+		return output, err
+	}
 
 	for _, v := range nonmemmodels {
-		log.Info(v.FileName)
 		//Creating a copy of it here to avoid duplicate memory references
 		n := v
 
@@ -458,7 +419,7 @@ func localModelsFromArguments(args []string) []LocalModel {
 		})
 	}
 
-	return output
+	return output, nil
 }
 
 func createNewGitIgnoreFile(m *NonMemModel) error {
