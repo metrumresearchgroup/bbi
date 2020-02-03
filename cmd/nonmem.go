@@ -382,9 +382,9 @@ func buildNonMemCommandString(l *NonMemModel) string {
 	noBuild := false
 	nmExecutable := path.Join(nmHome, "run", nmBinary)
 	cmdArgs := []string{
-		path.Join(l.OutputDir, l.Model),
+		l.Model,
 		"",
-		path.Join(l.OutputDir, l.FileName+".lst"),
+		l.FileName + ".lst",
 		"",
 	}
 
@@ -394,7 +394,7 @@ func buildNonMemCommandString(l *NonMemModel) string {
 
 	//Section for Appending the parafile command
 	if l.Configuration.Parallel.Parallel {
-		cmdArgs = append(cmdArgs, "-parafile="+path.Join(l.OutputDir, l.FileName+".pnm"))
+		cmdArgs = append(cmdArgs, "-parafile="+l.FileName+".pnm")
 	}
 
 	return nmExecutable + " " + strings.Join(cmdArgs, " ")
