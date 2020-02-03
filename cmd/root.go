@@ -16,8 +16,13 @@ package cmd
 
 import (
 	"fmt"
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/afero"
+	"io"
 	"math/rand"
 	"os"
+	"path"
+	"path/filepath"
 	"time"
 
 	"github.com/metrumresearchgroup/babylon/configlib"
@@ -86,6 +91,7 @@ func init() {
 	RootCmd.PersistentFlags().IntVar(&threads, "threads", 4, "number of threads to execute with")
 	viper.BindPFlag("threads", RootCmd.PersistentFlags().Lookup("threads")) //Update to make sure viper binds to the flag
 	RootCmd.PersistentFlags().BoolVar(&Json, "json", false, "json tree of output, if possible")
+	viper.BindPFlag("json", RootCmd.PersistentFlags().Lookup("json")) //Bind to viper
 	RootCmd.PersistentFlags().BoolVarP(&preview, "preview", "p", false, "preview action, but don't actually run command")
 	//Used for Summary
 	RootCmd.PersistentFlags().BoolVarP(&noExt, "no-ext-file", "", false, "do not use ext file")
@@ -115,4 +121,56 @@ func flagChanged(flags *flag.FlagSet, key string) bool {
 //Here random is set during root.go setup
 func randomFloat(min int, max int) float64 {
 	return float64(float64(min) + rand.Float64()*(float64(max)-float64(min)))
+}
+
+func logSetup(config configlib.Config) {
+	//Set Logrus level if we're debug
+	if config.Debug {
+		log.Info("Setting logging to DEBUG")
+		log.SetLevel(log.DebugLevel)
+	}
+
+	if config.JSON {
+		log.Debugf("Setting logrus output formatter to JSON")
+		log.SetFormatter(&log.JSONFormatter{})
+	}
+
+	if len(config.Logfile) > 0 {
+		log.Debugf("A logfile has been specified at %s", config.Logfile)
+		logfile := config.Logfile
+
+		//If the path is relative
+		if !path.IsAbs(config.Logfile) {
+			log.Debugf("The config file specified at %s appears to be relatively referenced", config.Logfile)
+			whereami, err := os.Getwd()
+			if err != nil {
+				log.Fatalf("Unable to get current directory! Details are mysteriously: %s", err)
+			}
+
+			log.Debugf("Updating to use log file of %s", filepath.Join(whereami, config.Logfile))
+			logfile = filepath.Join(whereami, config.Logfile)
+		}
+
+		fs := afero.NewOsFs()
+		var outfile afero.File
+
+		if ok, _ := afero.Exists(fs, logfile); ok {
+			of, err := fs.OpenFile(logfile, os.O_APPEND|os.O_WRONLY, 0755)
+
+			if err != nil {
+				log.Fatalf("Unable to open file at %s. Error is %s", logfile, err)
+			}
+			outfile = of
+		} else {
+			//Doesn't exist. Let's create
+			of, err := fs.Create(logfile)
+			if err != nil {
+				log.Fatalf("Error creating new log file located at %s. Details are: %s", logfile, err)
+			}
+			outfile = of
+		}
+
+		tee := io.MultiWriter(outfile, os.Stdout)
+		log.SetOutput(tee)
+	}
 }

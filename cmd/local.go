@@ -301,10 +301,7 @@ func local(cmd *cobra.Command, args []string) {
 	config := configlib.LocateAndReadConfigFile()
 	log.Info("Beginning Local Path")
 
-	//Set Logrus level if we're debug
-	if config.Debug {
-		log.SetLevel(log.DebugLevel)
-	}
+	logSetup(config)
 
 	lo := localOperation{}
 
