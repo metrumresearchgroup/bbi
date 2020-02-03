@@ -414,10 +414,6 @@ func buildNonMemCommandString(l *NonMemModel) string {
 
 	var cmdArgs []string
 
-	if len(nmfeOptions) > 0 {
-		cmdArgs = append(cmdArgs, nmfeOptions...)
-	}
-
 	cmdArgs = append(cmdArgs, []string{
 		l.Model,
 		"",
@@ -428,6 +424,10 @@ func buildNonMemCommandString(l *NonMemModel) string {
 	//Section for Appending the parafile command
 	if l.Configuration.Parallel.Parallel {
 		cmdArgs = append(cmdArgs, "-parafile="+l.FileName+".pnm")
+	}
+
+	if len(nmfeOptions) > 0 {
+		cmdArgs = append(cmdArgs, nmfeOptions...)
 	}
 
 	return nmExecutable + " " + strings.Join(cmdArgs, " ")
