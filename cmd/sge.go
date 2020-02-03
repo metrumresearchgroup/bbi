@@ -139,10 +139,7 @@ func sge(cmd *cobra.Command, args []string) {
 
 	lo := sgeOperation{}
 
-	//If we're in debug mode, let's set the logger to debug
-	if config.Debug {
-		log.SetLevel(log.DebugLevel)
-	}
+	logSetup(config)
 
 	log.Debug("Searching for models based on arguments")
 	lomodels, err := sgeModelsFromArguments(args, &config)

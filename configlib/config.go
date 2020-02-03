@@ -31,6 +31,8 @@ type Config struct {
 	Parallel      ParallelConfig          `mapstructure:"parallel" json:"parallel" yaml:"parallel"`
 	Delay         int                     `yaml:"delay" json:"delay,omitempty" yaml:"delay"`
 	NMQual        bool                    `yaml:"nmqual" json:"nmqual,omitempty"`
+	JSON          bool                    `yaml:"json_logging" json:"json_logging,omitempty"`
+	Logfile       string                  `yaml:"log_file" json:"log_file,omitempty"`
 }
 
 type NonMemDetail struct {

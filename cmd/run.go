@@ -74,6 +74,10 @@ func init() {
 	runCmd.PersistentFlags().Int(delayIdentifier, 0, "Selects a random number of seconds between 1 and this value to stagger / jitter job execution. Assists in dealing with large volumes of work dealing with the same data set. May avoid NMTRAN issues about not being able read / close files")
 	viper.BindPFlag(delayIdentifier, runCmd.PersistentFlags().Lookup(delayIdentifier))
 
+	const logFileIdentifier string = "logFile"
+	runCmd.PersistentFlags().String(logFileIdentifier, "", "If populated, specifies the file into which to store the output / logging details from Babylon")
+	viper.BindPFlag(logFileIdentifier, runCmd.PersistentFlags().Lookup(logFileIdentifier))
+
 	nonmemCmd.AddCommand(runCmd)
 
 }
