@@ -33,6 +33,7 @@ type Config struct {
 	NMQual        bool                    `yaml:"nmqual" json:"nmqual,omitempty"`
 	JSON          bool                    `yaml:"json_logging" json:"json_logging,omitempty"`
 	Logfile       string                  `yaml:"log_file" json:"log_file,omitempty"`
+	NMFEOptions   NMFEOptions             `yaml:"nmfe_optiions" json:"nmfe_options,omitempty" mapstructure:"nmfeoptions"`
 }
 
 type NonMemDetail struct {
@@ -52,6 +53,15 @@ type ParallelConfig struct {
 	MPIExecPath string `yaml:"mpiExecPath" json:"mpiExecPath,omitempty"`
 	Timeout     int    `yaml:"timeout" json:"timeout,omitempty"`
 	Parafile    string `yaml:"parafile" json:"parafile,omitempty"`
+}
+
+type NMFEOptions struct {
+	LicenseFile string `yaml:"license_file" json:"license_file,omitempty" mapstructure:"licfile"`
+	PRSame      bool   `yaml:"prsame" json:"prsame,omitempty"`
+	Background  bool   `yaml:"background" json:"background,omitempty"`
+	PRCompile   bool   `yaml:"prcompile" json:"prcompile,omitempty"`
+	NoBuild     bool   `yaml:"nobuild" json:"nobuild,omitempty"`
+	MaxLim      int    `yaml:"maxlim" jason:"maxlim,omitempty"` //Default (empty value) is 100
 }
 
 func (c Config) RenderYamlToFile(path string) error {

@@ -22,6 +22,7 @@ import (
 	"path"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 	"text/template"
 	"time"
@@ -209,6 +210,33 @@ func init() {
 	const nmQualIdentifier string = "nmqual"
 	nonmemCmd.PersistentFlags().Bool(nmQualIdentifier, false, "Whether or not to execute with nmqual (autolog.pl")
 	viper.BindPFlag(nmQualIdentifier, nonmemCmd.PersistentFlags().Lookup(nmQualIdentifier))
+
+	//NMFE Options
+	const nmfeGroup string = "nmfeoptions"
+	const licFileIdentifier string = "licfile"
+	nonmemCmd.PersistentFlags().String(licFileIdentifier, "", "RAW NMFE OPTION - Specify a license file to use with NMFE (Nonmem)")
+	viper.BindPFlag(nmfeGroup+"."+licFileIdentifier, nonmemCmd.PersistentFlags().Lookup(licFileIdentifier))
+
+	const prSameIdentifier string = "prsame"
+	nonmemCmd.PersistentFlags().Bool(prSameIdentifier, false, "RAW NMFE OPTION - Indicates to nonmem that the PREDPP compilation step should be skipped")
+	viper.BindPFlag(nmfeGroup+"."+prSameIdentifier, nonmemCmd.PersistentFlags().Lookup(prSameIdentifier))
+
+	const backgroundIdentifier string = "background"
+	nonmemCmd.PersistentFlags().Bool(backgroundIdentifier, false, "RAW NMFE OPTION - Tells nonmem not to scan StdIn for control characters")
+	viper.BindPFlag(nmfeGroup+"."+backgroundIdentifier, nonmemCmd.PersistentFlags().Lookup(backgroundIdentifier))
+
+	const prCompileIdentifier string = "prcompile"
+	nonmemCmd.PersistentFlags().Bool(prCompileIdentifier, false, "RAW NMFE OPTION - Forces PREDPP compilation")
+	viper.BindPFlag(nmfeGroup+"."+prCompileIdentifier, nonmemCmd.PersistentFlags().Lookup(prCompileIdentifier))
+
+	const noBuildIdentifier string = "nobuild"
+	nonmemCmd.PersistentFlags().Bool(noBuildIdentifier, false, "RAW NMFE OPTION - Skips recompiling and rebuilding on nonmem executable")
+	viper.BindPFlag(nmfeGroup+"."+noBuildIdentifier, nonmemCmd.PersistentFlags().Lookup(noBuildIdentifier))
+
+	const maxLimIdentifier string = "maxlim"
+	nonmemCmd.PersistentFlags().Int(maxLimIdentifier, 100, "RAW NMFE OPTION - Set the maximum values set for the buffers used by Nonmem")
+	viper.BindPFlag(nmfeGroup+"."+maxLimIdentifier, nonmemCmd.PersistentFlags().Lookup(maxLimIdentifier))
+
 }
 
 // "Copies" a file by reading its content (optionally updating the path)
@@ -379,18 +407,23 @@ func buildNonMemCommandString(l *NonMemModel) string {
 	}
 
 	// TODO: Implement cache
-	noBuild := false
 	nmExecutable := path.Join(nmHome, "run", nmBinary)
-	cmdArgs := []string{
+
+	//Are values present for raw options?
+	nmfeOptions := processNMFEOptions(l.Configuration)
+
+	var cmdArgs []string
+
+	if len(nmfeOptions) > 0 {
+		cmdArgs = append(cmdArgs, nmfeOptions...)
+	}
+
+	cmdArgs = append(cmdArgs, []string{
 		l.Model,
 		"",
 		l.FileName + ".lst",
 		"",
-	}
-
-	if noBuild {
-		cmdArgs = append(cmdArgs, "--nobuild")
-	}
+	}...)
 
 	//Section for Appending the parafile command
 	if l.Configuration.Parallel.Parallel {
@@ -741,7 +774,7 @@ func nonmemModelsFromArguments(args []string, config *configlib.Config) ([]NonMe
 				continue
 			}
 			if viper.GetBool("verbose") || viper.GetBool("debug") {
-				log.Debug("adding %v model files in directory %s to queue", len(modelsInDir), arg)
+				log.Debugf("adding %v model files in directory %s to queue", len(modelsInDir), arg)
 			}
 
 			for _, model := range modelsInDir {
@@ -865,4 +898,35 @@ func createChildDirectories(l *NonMemModel, cancel chan bool, channels *turnstil
 	}
 
 	return nil
+}
+
+func processNMFEOptions(config *configlib.Config) []string {
+	var output []string
+
+	if len(config.NMFEOptions.LicenseFile) > 0 {
+		output = append(output, "-licfile="+config.NMFEOptions.LicenseFile)
+	}
+
+	if config.NMFEOptions.PRSame {
+		output = append(output, "-prsame")
+	}
+
+	if config.NMFEOptions.Background {
+		output = append(output, "-background")
+	}
+
+	if config.NMFEOptions.PRCompile {
+		output = append(output, "-prcompile")
+	}
+
+	if config.NMFEOptions.NoBuild {
+		output = append(output, "-nobuild")
+	}
+
+	//Only goes to 3, defaults to 100. Just a quick way to check for "empty" setting
+	if config.NMFEOptions.MaxLim < 50 {
+		output = append(output, "maxlim="+strconv.Itoa(config.NMFEOptions.MaxLim))
+	}
+
+	return output
 }
