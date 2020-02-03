@@ -18,6 +18,7 @@ import (
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
+	"io"
 	"math/rand"
 	"os"
 	"path"
@@ -169,6 +170,7 @@ func logSetup(config configlib.Config) {
 			outfile = of
 		}
 
-		log.SetOutput(outfile)
+		tee := io.MultiWriter(outfile, os.Stdout)
+		log.SetOutput(tee)
 	}
 }
