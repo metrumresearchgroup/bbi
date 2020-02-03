@@ -7,7 +7,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"os/exec"
 	"path"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"text/template"
@@ -218,7 +217,7 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 	fs := afero.NewOsFs()
 	//Execute the script we created
 
-	scriptName := filepath.Join(model.OutputDir, "grid.sh")
+	scriptName := "grid.sh"
 
 	//Find Qsub
 	binary, err := exec.LookPath("qsub")
@@ -243,6 +242,12 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 
 	if err != nil {
 		return newConcurrentError(model.Model, "Could not locate qsub binary in path", err)
+	}
+
+	err = os.Chdir(model.OutputDir)
+
+	if err != nil {
+		return newConcurrentError(model.Model, "An error occurred trying to enter the output dir", err)
 	}
 
 	command := exec.Command(binary, qsubArguments...)
@@ -319,7 +324,7 @@ func generateBabylonScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 
 	commandComponents = append(commandComponents, []string{
 		"local",
-		filepath.Join(l.OutputDir, filename),
+		filename,
 	}...)
 
 	if !l.Configuration.Local.CreateChildDirs {
