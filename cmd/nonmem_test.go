@@ -3,8 +3,10 @@ package cmd
 import (
 	"github.com/google/uuid"
 	"github.com/metrumresearchgroup/babylon/configlib"
+	"github.com/spf13/afero"
 	"os"
 	"path"
+	"path/filepath"
 	"reflect"
 	"testing"
 )
@@ -152,6 +154,100 @@ func Test_processNMFEOptions(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := processNMFEOptions(tt.args.config); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("processNMFEOptions() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_modelDataFile(t *testing.T) {
+	type args struct {
+		modelLines []string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    string
+		wantErr bool
+	}{
+		{
+			name: "Data File in 2nd line",
+			args: args{
+				modelLines: []string{
+					"random first line",
+					"$DATA /tmp/data.csv",
+					"random third line",
+				},
+			},
+			want:    "/tmp/data.csv",
+			wantErr: false,
+		},
+		{
+			name: "Data file present without target",
+			args: args{
+				modelLines: []string{
+					"random first line",
+					"$DATA",
+					"random third line",
+				},
+			},
+			want:    "",
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := modelDataFile(tt.args.modelLines)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("modelDataFile() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("modelDataFile() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_dataFileIsPresent(t *testing.T) {
+	const testingDir string = "/tmp/testing/babylon"
+	const testingFile string = "test.txt"
+	//Temporary working directory
+	fs := afero.NewOsFs()
+	fs.RemoveAll(testingDir)
+	fs.MkdirAll(testingDir, 0755)
+	file, _ := fs.Create(filepath.Join(testingDir, testingFile))
+	file.Sync()
+	file.Close()
+
+	type args struct {
+		datafile  string
+		modelpath string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "File can be located",
+			args: args{
+				datafile:  filepath.Join(testingDir, testingFile),
+				modelpath: testingDir,
+			},
+			wantErr: false,
+		}, {
+			name: "File cannot be located",
+			args: args{
+				datafile:  "/meow/pants.txt",
+				modelpath: "don'texist",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := dataFileIsPresent(tt.args.datafile, tt.args.modelpath); (err != nil) != tt.wantErr {
+				t.Errorf("dataFileIsPresent() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

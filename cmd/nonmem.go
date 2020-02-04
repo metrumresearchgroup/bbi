@@ -687,7 +687,7 @@ func NewNonMemModel(modelname string, config *configlib.Config) (NonMemModel, er
 	}
 
 	//Verify the file can be accessed
-	err = dataFileIsSane(datafile, modelname)
+	err = dataFileIsPresent(datafile, modelname)
 
 	if err != nil {
 		return NonMemModel{}, err
@@ -956,7 +956,7 @@ func modelDataFile(modelLines []string) (string, error) {
 			fields := strings.Fields(v)
 			if len(fields) < 2 {
 				return "", fmt.Errorf("the model file contains a $DATA directive, but doesn't appear to specify "+
-					"a target. %s is the line contents", v)
+					"a target. %s is the content of the line", v)
 			}
 
 			return fields[1], nil
@@ -966,7 +966,7 @@ func modelDataFile(modelLines []string) (string, error) {
 	return "", fmt.Errorf("no $DATA line as found in the model file")
 }
 
-func dataFileIsSane(datafile string, modelpath string) error {
+func dataFileIsPresent(datafile string, modelpath string) error {
 
 	var dataFile *os.File
 	var err error
