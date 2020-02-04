@@ -674,10 +674,21 @@ func postWorkNotice(m *turnstile.Manager, t time.Time) {
 //NewNonMemModel creates the core nonmem dataset from the passed arguments
 func NewNonMemModel(modelname string, config *configlib.Config) (NonMemModel, error) {
 
-	//Verify data content even exists
-	err := dataFileIsPresent(modelname)
+	modelLines, err := utils.ReadLines(modelname)
 
-	//Return the error such that it can be displayed farther up the chain
+	if err != nil {
+		return NonMemModel{}, err
+	}
+
+	//Verify contains data reference and extract
+	datafile, err := modelDataFile(modelLines)
+	if err != nil {
+		return NonMemModel{}, err
+	}
+
+	//Verify the file can be accessed
+	err = dataFileIsSane(datafile, modelname)
+
 	if err != nil {
 		return NonMemModel{}, err
 	}
@@ -939,50 +950,44 @@ func processNMFEOptions(config *configlib.Config) []string {
 	return output
 }
 
-//Read the provided model file (from args) and determine if the
-//file contains a data directive and if so, does the file exist at the
-//specified path
-func dataFileIsPresent(modelPath string) error {
-	lines, err := utils.ReadLines(modelPath)
-
-	if err != nil {
-		return fmt.Errorf("an error occurred trying to access the model at %s. Please verify"+
-			"the file is in place and try again. ", modelPath)
-	}
-
-	for _, v := range lines {
+func modelDataFile(modelLines []string) (string, error) {
+	for _, v := range modelLines {
 		if strings.Contains(v, "$DATA") {
 			fields := strings.Fields(v)
 			if len(fields) < 2 {
-				return fmt.Errorf("the model file contains a $DATA directive, but doesn't appear to specify "+
+				return "", fmt.Errorf("the model file contains a $DATA directive, but doesn't appear to specify "+
 					"a target. %s is the line contents", v)
 			}
 
-			dataPath := fields[1]
-			var dataFile *os.File
-
-			if filepath.IsAbs(dataPath) {
-				dataFile, err = os.Open(dataPath)
-			} else {
-				dataFile, err = os.Open(filepath.Join(filepath.Dir(modelPath), dataPath))
-			}
-
-			if err != nil {
-				return fmt.Errorf("unable to access the data file located at %s referenced in %s further details are %s", dataPath, modelPath, err)
-			}
-
-			//Close handle immediately
-			err = dataFile.Close()
-
-			if err != nil {
-				return fmt.Errorf("unable to remove lock for data file at %s", dataPath)
-			}
-
-			//Everything looks good at this point
-			return nil
+			return fields[1], nil
 		}
 	}
+	//Everything looks good at this point
+	return "", fmt.Errorf("no $DATA line as found in the model file")
+}
 
-	return fmt.Errorf("the model file located at %s does not have a $DATA directive. Please make sure it "+
-		"references a dataset", modelPath)
+func dataFileIsSane(datafile string, modelpath string) error {
+
+	var dataFile *os.File
+	var err error
+
+	if filepath.IsAbs(datafile) {
+		dataFile, err = os.Open(datafile)
+	} else {
+		dataFile, err = os.Open(filepath.Join(filepath.Dir(modelpath), datafile))
+	}
+
+	if err != nil {
+		return fmt.Errorf("unable to open datafile at %s referenced in "+
+			"model file %s. Error details are %s", datafile, modelpath, err)
+	}
+
+	err = dataFile.Close()
+
+	//Can't close the file ?!
+	if err != nil {
+		return fmt.Errorf("unable to release lock on file %s", datafile)
+	}
+
+	return nil
 }
