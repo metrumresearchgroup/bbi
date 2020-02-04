@@ -674,6 +674,25 @@ func postWorkNotice(m *turnstile.Manager, t time.Time) {
 //NewNonMemModel creates the core nonmem dataset from the passed arguments
 func NewNonMemModel(modelname string, config *configlib.Config) (NonMemModel, error) {
 
+	modelLines, err := utils.ReadLines(modelname)
+
+	if err != nil {
+		return NonMemModel{}, err
+	}
+
+	//Verify contains data reference and extract
+	datafile, err := modelDataFile(modelLines)
+	if err != nil {
+		return NonMemModel{}, err
+	}
+
+	//Verify the file can be accessed
+	err = dataFileIsPresent(datafile, modelname)
+
+	if err != nil {
+		return NonMemModel{}, err
+	}
+
 	lm := NonMemModel{
 		BBIVersion: VERSION,
 	}
@@ -929,4 +948,46 @@ func processNMFEOptions(config *configlib.Config) []string {
 	}
 
 	return output
+}
+
+func modelDataFile(modelLines []string) (string, error) {
+	for _, v := range modelLines {
+		if strings.Contains(v, "$DATA") {
+			fields := strings.Fields(v)
+			if len(fields) < 2 {
+				return "", fmt.Errorf("the model file contains a $DATA directive, but doesn't appear to specify "+
+					"a target. %s is the content of the line", v)
+			}
+
+			return fields[1], nil
+		}
+	}
+	//Everything looks good at this point
+	return "", fmt.Errorf("no $DATA line as found in the model file")
+}
+
+func dataFileIsPresent(datafile string, modelpath string) error {
+
+	var dataFile *os.File
+	var err error
+
+	if filepath.IsAbs(datafile) {
+		dataFile, err = os.Open(datafile)
+	} else {
+		dataFile, err = os.Open(filepath.Join(filepath.Dir(modelpath), datafile))
+	}
+
+	if err != nil {
+		return fmt.Errorf("unable to open datafile at %s referenced in "+
+			"model file %s. Error details are %s", datafile, modelpath, err)
+	}
+
+	err = dataFile.Close()
+
+	//Can't close the file ?!
+	if err != nil {
+		return fmt.Errorf("unable to release lock on file %s", datafile)
+	}
+
+	return nil
 }
