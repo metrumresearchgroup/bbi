@@ -2,8 +2,10 @@ package cmd
 
 import (
 	"github.com/google/uuid"
+	"github.com/metrumresearchgroup/babylon/configlib"
 	"os"
 	"path"
+	"reflect"
 	"testing"
 )
 
@@ -58,4 +60,99 @@ func Test_doesDirectoryContainOutputFiles(t *testing.T) {
 func emptyFile(path string) {
 	empty, _ := os.Create(path)
 	empty.Close()
+}
+
+func Test_processNMFEOptions(t *testing.T) {
+
+	type args struct {
+		config *configlib.Config
+	}
+	tests := []struct {
+		name string
+		args args
+		want []string
+	}{
+		{
+			name: "Normal Operation",
+			args: args{
+				config: &configlib.Config{
+					NMVersion:     "",
+					Overwrite:     false,
+					CleanLvl:      0,
+					CopyLvl:       0,
+					Git:           false,
+					BabylonBinary: "",
+					SaveConfig:    false,
+					OutputDir:     "",
+					Threads:       0,
+					Debug:         false,
+					Local:         configlib.LocalDetail{},
+					Nonmem:        nil,
+					Parallel:      configlib.ParallelConfig{},
+					Delay:         0,
+					NMQual:        false,
+					JSON:          false,
+					Logfile:       "",
+					NMFEOptions: configlib.NMFEOptions{
+						LicenseFile: "/tmp/nonmem.lic",
+						PRSame:      false,
+						Background:  true,
+						PRCompile:   false,
+						NoBuild:     true,
+						MaxLim:      1,
+					},
+				},
+			},
+			want: []string{
+				"-licfile=/tmp/nonmem.lic",
+				"-background",
+				"-nobuild",
+				"maxlim=1",
+			},
+		},
+		{
+			name: "All booleans, no text",
+			args: args{
+				config: &configlib.Config{
+					NMVersion:     "",
+					Overwrite:     false,
+					CleanLvl:      0,
+					CopyLvl:       0,
+					Git:           false,
+					BabylonBinary: "",
+					SaveConfig:    false,
+					OutputDir:     "",
+					Threads:       0,
+					Debug:         false,
+					Local:         configlib.LocalDetail{},
+					Nonmem:        nil,
+					Parallel:      configlib.ParallelConfig{},
+					Delay:         0,
+					NMQual:        false,
+					JSON:          false,
+					Logfile:       "",
+					NMFEOptions: configlib.NMFEOptions{
+						LicenseFile: "",
+						PRSame:      true,
+						Background:  true,
+						PRCompile:   true,
+						NoBuild:     false,
+						MaxLim:      100,
+					},
+				},
+			},
+			want: []string{
+				"-prsame",
+				"-background",
+				"-prcompile",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := processNMFEOptions(tt.args.config); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("processNMFEOptions() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
