@@ -147,6 +147,8 @@ type NonMemModel struct {
 	DataPath string `json:"data_path"`
 	// DataMD5 is the md5hash of the data
 	DataMD5 string `json:"data_md5"`
+	//ModelMD5 is the digest of the executing model file
+	ModelMD5 string `json:"model_md5"`
 	//FileName is the Filename component (sans extension)
 	FileName string `json:"model_filename"`
 	//Extension is the extension of the file
@@ -686,13 +688,6 @@ func NewNonMemModel(modelname string, config *configlib.Config) (NonMemModel, er
 		return NonMemModel{}, err
 	}
 
-	//Verify the file can be accessed
-	err = dataFileIsPresent(datafile, modelname)
-
-	if err != nil {
-		return NonMemModel{}, err
-	}
-
 	lm := NonMemModel{
 		BBIVersion: VERSION,
 	}
@@ -724,8 +719,23 @@ func NewNonMemModel(modelname string, config *configlib.Config) (NonMemModel, er
 		lm.Extension = modelPieces[1]
 	} else {
 		lm.FileName = lm.Model
-		//Leave Extnsion to default
+		//Leave Extension to default
 	}
+
+	//Verify the file can be accessed
+	//If this is a mod file we'll access the dir as is.
+	if strings.ToLower(lm.Extension) == "mod" {
+		err = dataFileIsPresent(datafile, modelname)
+	} else {
+		//If not we will strip a directory from it
+		err = dataFileIsPresent(filepath.Base(datafile), modelname)
+	}
+
+	if err != nil {
+		return NonMemModel{}, err
+	}
+
+	err = dataFileIsPresent(datafile, modelname)
 
 	//Get the raw path of the original by stripping the actual file from it
 	lm.OriginalPath = strings.Replace(lm.Path, "/"+lm.Model, "", 1)
@@ -892,7 +902,7 @@ func createChildDirectories(l *NonMemModel, cancel chan bool, channels *turnstil
 	}
 
 	//Copy Model into destination and update Data Path
-	err := copyFileToDestination(l, true)
+	err := copyFileToDestination(l, strings.ToLower(l.Extension) == "mod")
 
 	if err != nil {
 		return err
@@ -967,7 +977,6 @@ func modelDataFile(modelLines []string) (string, error) {
 }
 
 func dataFileIsPresent(datafile string, modelpath string) error {
-
 	var dataFile *os.File
 	var err error
 

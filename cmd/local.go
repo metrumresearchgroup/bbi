@@ -171,22 +171,11 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 		}
 	}
 
-	hashChan := make(chan string)
-	go func() {
-		f, err := os.Open(l.Nonmem.DataPath)
-		if err != nil {
-			log.Errorf("%s error reading data to hash: %s", l.Nonmem.LogIdentifier(), err)
-			hashChan <- ""
-		}
-		defer f.Close()
+	dataHashChan := make(chan string)
+	go HashFileOnChannel(dataHashChan, l.Nonmem.DataPath, l.Nonmem.FileName)
 
-		h := md5.New()
-		if _, err := io.Copy(h, f); err != nil {
-			log.Errorf("%s error hashing data: %s", l.Nonmem.LogIdentifier(), err)
-			hashChan <- ""
-		}
-		hashChan <- fmt.Sprintf("%x", h.Sum(nil))
-	}()
+	modelHashChan := make(chan string)
+	go HashFileOnChannel(modelHashChan, l.Nonmem.Model, l.Nonmem.FileName)
 
 	log.Debugf("%s Beginning selection of cleanable / copiable files", l.Nonmem.LogIdentifier())
 	//Magical instructions
@@ -263,7 +252,9 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 
 	// this should have been either completed well before, or must at least wait now to complete the hash
 	// before writing out the config
-	l.Nonmem.DataMD5 = <-hashChan
+	l.Nonmem.DataMD5 = <-dataHashChan
+	l.Nonmem.ModelMD5 = <-modelHashChan
+
 	//Serialize and Write the Config down to a file
 	log.Debugf("%s Writing out configuration as json into %s", l.Nonmem.LogIdentifier(), l.Nonmem.OutputDir)
 	err = writeNonmemConfig(l.Nonmem)
@@ -448,4 +439,20 @@ func writeNonmemConfig(model *NonMemModel) error {
 	}
 
 	return afero.WriteFile(afero.NewOsFs(), path.Join(model.OutputDir, "bbi_config.json"), outBytes, 0750)
+}
+
+func HashFileOnChannel(ch chan string, file string, identifier string) {
+	f, err := os.Open(file)
+	if err != nil {
+		log.Errorf("%s error reading data to hash: %s", identifier, err)
+		ch <- ""
+	}
+	defer f.Close()
+
+	h := md5.New()
+	if _, err := io.Copy(h, f); err != nil {
+		log.Errorf("%s error hashing data: %s", identifier, err)
+		ch <- ""
+	}
+	ch <- fmt.Sprintf("%x", h.Sum(nil))
 }
