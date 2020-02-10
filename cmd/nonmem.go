@@ -733,17 +733,11 @@ func NewNonMemModel(modelname string, config *configlib.Config) (NonMemModel, er
 		err = dataFileIsPresent(datafile, modelname)
 	} else {
 		if config.Local.CreateChildDirs {
-			path, err := filepath.Abs(filepath.Join(lm.OriginalPath, filepath.Base(datafile)))
-			if err != nil {
-				return NonMemModel{}, err
-			}
-			err = dataFileIsPresent(path, modelname)
+			component := filepath.Join(lm.OriginalPath, filepath.Base(datafile))
+			err = dataFileIsPresent(component, modelname)
 		} else {
-			path, err := filepath.Abs(filepath.Join(filepath.Base(lm.OriginalPath), filepath.Base(datafile)))
-			if err != nil {
-				return NonMemModel{}, err
-			}
-			err = dataFileIsPresent(path, modelname)
+			component := filepath.Join(filepath.Dir(lm.OriginalPath), filepath.Base(datafile))
+			err = dataFileIsPresent(component, modelname)
 		}
 
 	}
