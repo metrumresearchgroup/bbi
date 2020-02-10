@@ -722,23 +722,35 @@ func NewNonMemModel(modelname string, config *configlib.Config) (NonMemModel, er
 		//Leave Extension to default
 	}
 
-	//Verify the file can be accessed
-	//If this is a mod file we'll access the dir as is.
-	if strings.ToLower(lm.Extension) == "mod" {
+	//Get the raw path of the original by stripping the actual file from it
+	lm.OriginalPath = strings.Replace(lm.Path, "/"+lm.Model, "", 1)
+
+	//Since filepath.base will return Data.csv for both ../Data.csv and Data.csv,
+	//We'll leverage that to locate the file in the original location regardless of
+	//file type.
+
+	if filepath.IsAbs(datafile) {
 		err = dataFileIsPresent(datafile, modelname)
 	} else {
-		//If not we will strip a directory from it
-		err = dataFileIsPresent(filepath.Base(datafile), modelname)
+		if config.Local.CreateChildDirs {
+			path, err := filepath.Abs(filepath.Join(lm.OriginalPath, filepath.Base(datafile)))
+			if err != nil {
+				return NonMemModel{}, err
+			}
+			err = dataFileIsPresent(path, modelname)
+		} else {
+			path, err := filepath.Abs(filepath.Join(filepath.Base(lm.OriginalPath), filepath.Base(datafile)))
+			if err != nil {
+				return NonMemModel{}, err
+			}
+			err = dataFileIsPresent(path, modelname)
+		}
+
 	}
 
 	if err != nil {
 		return NonMemModel{}, err
 	}
-
-	err = dataFileIsPresent(datafile, modelname)
-
-	//Get the raw path of the original by stripping the actual file from it
-	lm.OriginalPath = strings.Replace(lm.Path, "/"+lm.Model, "", 1)
 
 	lm.Configuration = config
 
