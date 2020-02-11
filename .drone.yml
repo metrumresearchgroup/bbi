@@ -29,7 +29,8 @@
       commands:
         - echo "$NONMEM_LICENSE" > /opt/NONMEM/nm74gf/license/nonmem.lic
         - cd /tmp/babylontest
-        - go test ./... -v
+        - go test ./... -v --json | tee /test_output.json
+        - cat /test_output.json
 
   trigger:
     event:
