@@ -28,6 +28,7 @@
       pull: never
       commands:
         - echo "$NONMEM_LICENSE" > /opt/NONMEM/nm74gf/license/nonmem.lic
+        - cd /tmp/babylontest
         - go test ./... -v
 
   trigger:
