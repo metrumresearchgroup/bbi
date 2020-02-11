@@ -2,37 +2,41 @@
   type: docker
   kind: pipeline
   steps:
-    - name: build image
-      environment:
-        BBI_BRANCH: ${DRONE_COMMIT_BRANCH}
-      image: plugins/docker
-      settings:
-        username:
-          from_secret: DOCKERHUB_USERNAME
-        password:
-          from_secret: DOCKERHUB_PASSWORD
-        repo: dukeofubuntu/babylon
-        tags:
-          - BBI-${DRONE_BUILD_NUMBER}
-        build_args_from_env:
-          - BBI_BRANCH
-    - name: test
-      image: dukeofubuntu/babylon:BBI-${DRONE_BUILD_NUMBER}
+    - name: pull core image
+      image: omerxx/drone-ecr-auth
+      volumes:
+        - name: docker.sock
+          path: /var/run/docker.sock
+      commands:
+        - $(aws ecr get-login --no-include-email --region us-east-1)
+        - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/nonmem
+    - name: Build updated image
+      image: omerxx/drone-ecr-auth
+      commands:
+        - docker build -t "nmtest" .
+      volumes:
+        - name: docker.sock
+          path: /var/run/docker.sock
+    - name: Test
       environment:
         MPIEXEC_PATH: /usr/bin/mpiexec
-        NONMEMROOT: /opt
-        NMVERSION: nm
+        NONMEMROOT: /opt/NONMEM
+        NMVERSION: nm74gf
         NONMEM_LICENSE:
           from_secret: NONMEM_LICENSE
+      image: nmtest
+      pull: never
       commands:
-        - echo "$NONMEM_LICENSE" > /opt/nm/license/nonmem.lic
-        - mkdir /test
-        - cd /test
-        - git clone https://github.com/metrumresearchgroup/babylontest.git
-        - cd babylontest
-        - go mod download
+        - echo "$NONMEM_LICENSE" > /opt/NONMEM/nm74gf/license/nonmem.lic
+        - cd /tmp/babylontest
         - go test ./... -v
 
   trigger:
     event:
       - push
+
+
+  volumes:
+    - name: docker.sock
+      host:
+        path: /var/run/docker.sock
