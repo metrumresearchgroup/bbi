@@ -191,23 +191,19 @@ func init() {
 	//Parallelization Components
 	const parallelIdentifier string = "parallel"
 	nonmemCmd.PersistentFlags().Bool(parallelIdentifier, false, "Whether or not to run nonmem in parallel mode")
-	viper.BindPFlag("parallel."+parallelIdentifier, nonmemCmd.PersistentFlags().Lookup(parallelIdentifier))
+	viper.BindPFlag(parallelIdentifier, nonmemCmd.PersistentFlags().Lookup(parallelIdentifier))
 
-	const parallelNodesIdentifier string = "nodes"
-	nonmemCmd.PersistentFlags().Int(parallelNodesIdentifier, 8, "The number of nodes on which to perform parallel operations")
-	viper.BindPFlag("parallel."+parallelNodesIdentifier, nonmemCmd.PersistentFlags().Lookup(parallelNodesIdentifier))
-
-	const parallelCompletionTimeoutIdentifier string = "timeout"
+	const parallelCompletionTimeoutIdentifier string = "parallelTimeout"
 	nonmemCmd.PersistentFlags().Int(parallelCompletionTimeoutIdentifier, 2147483647, "The amount of time to wait for parallel operations in nonmem before timing out")
-	viper.BindPFlag("parallel."+parallelCompletionTimeoutIdentifier, nonmemCmd.PersistentFlags().Lookup(parallelCompletionTimeoutIdentifier))
+	viper.BindPFlag(parallelCompletionTimeoutIdentifier, nonmemCmd.PersistentFlags().Lookup(parallelCompletionTimeoutIdentifier))
 
 	const mpiExecPathIdentifier string = "mpiExecPath"
 	nonmemCmd.PersistentFlags().String(mpiExecPathIdentifier, "/usr/local/mpich3/bin/mpiexec", "The fully qualified path to mpiexec. Used for nonmem parallel operations")
-	viper.BindPFlag("parallel."+mpiExecPathIdentifier, nonmemCmd.PersistentFlags().Lookup(mpiExecPathIdentifier))
+	viper.BindPFlag(mpiExecPathIdentifier, nonmemCmd.PersistentFlags().Lookup(mpiExecPathIdentifier))
 
 	const parafileIdentifier string = "parafile"
 	nonmemCmd.PersistentFlags().String(parafileIdentifier, "", "Location of a user-provided parafile to use for parallel execution")
-	viper.BindPFlag("parallel."+parafileIdentifier, nonmemCmd.PersistentFlags().Lookup(parafileIdentifier))
+	viper.BindPFlag(parafileIdentifier, nonmemCmd.PersistentFlags().Lookup(parafileIdentifier))
 
 	const nmQualIdentifier string = "nmqual"
 	nonmemCmd.PersistentFlags().Bool(nmQualIdentifier, false, "Whether or not to execute with nmqual (autolog.pl")
@@ -340,12 +336,12 @@ func writeParaFile(l *NonMemModel) error {
 	var contentLines []string
 
 	//If no parafile is provided, generate one
-	if l.Configuration.Parallel.Parafile == "" {
+	if l.Configuration.Parafile == "" {
 		contentLines = strings.Split(string(contentBytes), "\n")
 	} else {
-		contentLines, err = utils.ReadLines(l.Configuration.Parallel.Parafile)
+		contentLines, err = utils.ReadLines(l.Configuration.Parafile)
 		if err != nil {
-			log.Fatalf("Unable to read the contents of the parafile provided: %s, Error is %s ", l.Configuration.Parallel.Parafile, err)
+			log.Fatalf("Unable to read the contents of the parafile provided: %s, Error is %s ", l.Configuration.Parafile, err)
 		}
 	}
 
@@ -355,11 +351,11 @@ func writeParaFile(l *NonMemModel) error {
 
 func generateParaFile(l *NonMemModel) ([]byte, error) {
 	nmp := nonmemParallelDirective{
-		TotalNodes:        l.Configuration.Parallel.Nodes,
+		TotalNodes:        l.Configuration.Threads,
 		HeadNodes:         1,
-		WorkerNodes:       l.Configuration.Parallel.Nodes - 1,
-		CompletionTimeout: l.Configuration.Parallel.Timeout,
-		MpiExecPath:       l.Configuration.Parallel.MPIExecPath,
+		WorkerNodes:       l.Configuration.Threads - 1,
+		CompletionTimeout: l.Configuration.ParallelTimeout,
+		MpiExecPath:       l.Configuration.MPIExecPath,
 	}
 
 	buf := new(bytes.Buffer)
@@ -424,7 +420,7 @@ func buildNonMemCommandString(l *NonMemModel) string {
 	}...)
 
 	//Section for Appending the parafile command
-	if l.Configuration.Parallel.Parallel {
+	if l.Configuration.Parallel {
 		cmdArgs = append(cmdArgs, "-parafile="+l.FileName+".pnm")
 	}
 
@@ -470,7 +466,7 @@ func filesToCleanup(model *NonMemModel, exceptions ...string) runner.FileCleanIn
 		}
 	}
 
-	if model.Configuration.Parallel.Parallel {
+	if model.Configuration.Parallel {
 		fs := afero.NewOsFs()
 		for _, variant := range parallelRegexesToRemove {
 

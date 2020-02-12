@@ -16,24 +16,27 @@ var AvailableConfiguration Config
 var ConfigurationLoaded bool = false
 
 type Config struct {
-	NMVersion     string                  `yaml:"nmVersion" json:"nm_version,omitempty"`
-	Overwrite     bool                    `yaml:"overwrite" json:"overwrite,omitempty"`
-	CleanLvl      int                     `yaml:"cleanLvl" json:"clean_lvl,omitempty"`
-	CopyLvl       int                     `yaml:"copyLvl" json:"copy_lvl,omitempty"`
-	Git           bool                    `yaml:"git" json:"git,omitempty"`
-	BabylonBinary string                  `yaml:"babylonbinary" json:"babylon_binary,omitempty"`
-	SaveConfig    bool                    `yaml:"saveConfig" json:"save_config,omitempty"`
-	OutputDir     string                  `yaml:"outputDir" json:"output_dir,omitempty"`
-	Threads       int                     `yaml:"threads" json:"threads,omitempty"`
-	Debug         bool                    `yaml:"debug" json:"debug,omitempty"`
-	Local         LocalDetail             `mapstructure:"local" yaml:"local" json:"local,omitempty"`
-	Nonmem        map[string]NonMemDetail `mapstructure:"nonmem" json:"nonmem,omitempty" yaml:"nonmem"`
-	Parallel      ParallelConfig          `mapstructure:"parallel" json:"parallel" yaml:"parallel"`
-	Delay         int                     `yaml:"delay" json:"delay,omitempty" yaml:"delay"`
-	NMQual        bool                    `yaml:"nmqual" json:"nmqual,omitempty"`
-	JSON          bool                    `yaml:"json_logging" json:"json_logging,omitempty"`
-	Logfile       string                  `yaml:"log_file" json:"log_file,omitempty"`
-	NMFEOptions   NMFEOptions             `yaml:"nmfe_optiions" json:"nmfe_options,omitempty" mapstructure:"nmfeoptions"`
+	NMVersion       string                  `yaml:"nmVersion" json:"nm_version,omitempty"`
+	Overwrite       bool                    `yaml:"overwrite" json:"overwrite,omitempty"`
+	CleanLvl        int                     `yaml:"cleanLvl" json:"clean_lvl,omitempty"`
+	CopyLvl         int                     `yaml:"copyLvl" json:"copy_lvl,omitempty"`
+	Git             bool                    `yaml:"git" json:"git,omitempty"`
+	BabylonBinary   string                  `yaml:"babylonbinary" json:"babylon_binary,omitempty"`
+	SaveConfig      bool                    `yaml:"saveConfig" json:"save_config,omitempty"`
+	OutputDir       string                  `yaml:"outputDir" json:"output_dir,omitempty"`
+	Threads         int                     `yaml:"threads" json:"threads,omitempty"`
+	Debug           bool                    `yaml:"debug" json:"debug,omitempty"`
+	Local           LocalDetail             `mapstructure:"local" yaml:"local" json:"local,omitempty"`
+	Nonmem          map[string]NonMemDetail `mapstructure:"nonmem" json:"nonmem,omitempty" yaml:"nonmem"`
+	Parallel        bool                    `mapstructure:"parallel" json:"parallel" yaml:"parallel"`
+	Delay           int                     `yaml:"delay" json:"delay,omitempty" yaml:"delay"`
+	NMQual          bool                    `yaml:"nmqual" json:"nmqual,omitempty"`
+	JSON            bool                    `yaml:"json_logging" json:"json_logging,omitempty"`
+	Logfile         string                  `yaml:"log_file" json:"log_file,omitempty"`
+	NMFEOptions     NMFEOptions             `yaml:"nmfe_optiions" json:"nmfe_options,omitempty" mapstructure:"nmfeoptions"`
+	MPIExecPath     string                  `yaml:"mpiExecPath" json:"mpiExecPath,omitempty"`
+	ParallelTimeout int                     `yaml:"parallel_timeout" json:"parallel_timeout,omitempty"`
+	Parafile        string                  `yaml:"parafile" json:"parafile,omitempty"`
 }
 
 type NonMemDetail struct {
@@ -45,14 +48,6 @@ type NonMemDetail struct {
 
 type LocalDetail struct {
 	CreateChildDirs bool `yaml:"create_child_dirs" json:"create_child_dirs,omitempty"`
-}
-
-type ParallelConfig struct {
-	Parallel    bool   `yaml:"parallel" json:"parallel,omitempty"`
-	Nodes       int    `yaml:"nodes" json:"nodes,omitempty"`
-	MPIExecPath string `yaml:"mpiExecPath" json:"mpiExecPath,omitempty"`
-	Timeout     int    `yaml:"timeout" json:"timeout,omitempty"`
-	Parafile    string `yaml:"parafile" json:"parafile,omitempty"`
 }
 
 type NMFEOptions struct {

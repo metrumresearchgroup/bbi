@@ -53,7 +53,7 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 	if l.Nonmem.Configuration.NMQual {
 
 		//Set parallelism to true
-		l.Nonmem.Configuration.Parallel.Parallel = true
+		l.Nonmem.Configuration.Parallel = true
 		//TODO: What about the other parallel components?
 
 		//If we can locate the key
@@ -123,7 +123,7 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 	//rwxr-x---
 	afero.WriteFile(fs, path.Join(l.Nonmem.OutputDir, l.Nonmem.FileName+".sh"), scriptContents, 0750) //TODO: Handle this error
 
-	if l.Nonmem.Configuration.Parallel.Parallel {
+	if l.Nonmem.Configuration.Parallel {
 		err = writeParaFile(l.Nonmem)
 		if err != nil {
 			log.Fatalf("%s Configuration requires parallel operation, but generation or writing of the parafile has failed: %s", l.Nonmem.LogIdentifier(), err)
