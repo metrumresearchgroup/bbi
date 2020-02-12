@@ -28,7 +28,7 @@ type Config struct {
 	Debug           bool                    `yaml:"debug" json:"debug,omitempty"`
 	Local           LocalDetail             `mapstructure:"local" yaml:"local" json:"local,omitempty"`
 	Nonmem          map[string]NonMemDetail `mapstructure:"nonmem" json:"nonmem,omitempty" yaml:"nonmem"`
-	Parallel        bool                    `mapstructure:"parallel" json:"parallel" yaml:"parallel"`
+	Parallel        bool                    `json:"parallel" yaml:"parallel"`
 	Delay           int                     `yaml:"delay" json:"delay,omitempty" yaml:"delay"`
 	NMQual          bool                    `yaml:"nmqual" json:"nmqual,omitempty"`
 	JSON            bool                    `yaml:"json_logging" json:"json_logging,omitempty"`
