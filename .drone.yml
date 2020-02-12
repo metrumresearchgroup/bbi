@@ -46,7 +46,7 @@
         - cd goProjectValidator/cmd/pvgo
         - go build -o gpv main.go
         - cp gpv /usr/local/bin
-        - cd ../../../
+        - cp ../../../validation.json .
         - ls -larth
         - mkdir testoutput
         - mkdir rendered
