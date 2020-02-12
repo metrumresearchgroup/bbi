@@ -175,7 +175,7 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 	go HashFileOnChannel(dataHashChan, l.Nonmem.DataPath, l.Nonmem.FileName)
 
 	modelHashChan := make(chan string)
-	go HashFileOnChannel(modelHashChan, l.Nonmem.Model, l.Nonmem.FileName)
+	go HashFileOnChannel(modelHashChan, path.Join(l.Nonmem.OriginalPath, l.Nonmem.Model), l.Nonmem.FileName)
 
 	log.Debugf("%s Beginning selection of cleanable / copiable files", l.Nonmem.LogIdentifier())
 	//Magical instructions
@@ -444,6 +444,7 @@ func writeNonmemConfig(model *NonMemModel) error {
 func HashFileOnChannel(ch chan string, file string, identifier string) {
 	f, err := os.Open(file)
 	if err != nil {
+		log.Debugf("File requested was %s, Identifier is %s", file, identifier)
 		log.Errorf("%s error reading data to hash: %s", identifier, err)
 		ch <- ""
 	}
