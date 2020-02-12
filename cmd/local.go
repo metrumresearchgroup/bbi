@@ -53,7 +53,7 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 	if l.Nonmem.Configuration.NMQual {
 
 		//Set parallelism to true
-		l.Nonmem.Configuration.Parallel.Parallel = true
+		l.Nonmem.Configuration.Parallel = true
 		//TODO: What about the other parallel components?
 
 		//If we can locate the key
@@ -123,7 +123,7 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 	//rwxr-x---
 	afero.WriteFile(fs, path.Join(l.Nonmem.OutputDir, l.Nonmem.FileName+".sh"), scriptContents, 0750) //TODO: Handle this error
 
-	if l.Nonmem.Configuration.Parallel.Parallel {
+	if l.Nonmem.Configuration.Parallel {
 		err = writeParaFile(l.Nonmem)
 		if err != nil {
 			log.Fatalf("%s Configuration requires parallel operation, but generation or writing of the parafile has failed: %s", l.Nonmem.LogIdentifier(), err)
@@ -175,7 +175,7 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 	go HashFileOnChannel(dataHashChan, l.Nonmem.DataPath, l.Nonmem.FileName)
 
 	modelHashChan := make(chan string)
-	go HashFileOnChannel(modelHashChan, l.Nonmem.Model, l.Nonmem.FileName)
+	go HashFileOnChannel(modelHashChan, path.Join(l.Nonmem.OriginalPath, l.Nonmem.Model), l.Nonmem.FileName)
 
 	log.Debugf("%s Beginning selection of cleanable / copiable files", l.Nonmem.LogIdentifier())
 	//Magical instructions
@@ -444,6 +444,7 @@ func writeNonmemConfig(model *NonMemModel) error {
 func HashFileOnChannel(ch chan string, file string, identifier string) {
 	f, err := os.Open(file)
 	if err != nil {
+		log.Debugf("File requested was %s, Identifier is %s", file, identifier)
 		log.Errorf("%s error reading data to hash: %s", identifier, err)
 		ch <- ""
 	}

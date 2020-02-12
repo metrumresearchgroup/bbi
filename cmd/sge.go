@@ -227,11 +227,11 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 		"y",
 	}...)
 
-	if model.Configuration.Parallel.Parallel {
+	if model.Configuration.Parallel {
 		qsubArguments = append(qsubArguments, []string{
 			"-pe",  // Parallel execution
 			"orte", // Parallel environment name for the grid (Namespace for mpi messages)
-			strconv.Itoa(model.Configuration.Parallel.Nodes),
+			strconv.Itoa(model.Configuration.Threads),
 		}...)
 	}
 

@@ -19,7 +19,7 @@ babylon cli version 1.0.0
       --no-grd-file     do not use grd file
       --no-shk-file     do not use shk file
   -p, --preview         preview action, but don't actually run command
-      --threads int     number of threads to execute with (default 4)
+      --threads int     number of threads to execute with locally or nodes to execute on in parallel
   -v, --verbose         verbose output
 ```
 
