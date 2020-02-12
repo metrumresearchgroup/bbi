@@ -41,11 +41,13 @@
       image: nmtest
       pull: never
       commands:
+        - ls -larth
         - git clone https://github.com/metrumresearchgroup/goProjectValidator.git
         - cd goProjectValidator/cmd/pvgo
         - go build -o gpv main.go
         - cp gpv /usr/local/bin
         - cd ../../../
+        - ls -larth
         - mkdir testoutput
         - mkdir rendered
         - cp test_output.json testoutput
