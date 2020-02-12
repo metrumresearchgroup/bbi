@@ -1,0 +1,101 @@
+{
+  "project" : "Babylon",
+  "scope" : "A next-generation modeling tool that allows for local and grid-based execution of NonMem jobs. Supports legacy functionality such as NMQual execution mode and the ability to pass raw options to NMFE. Self-bootstrapping, Babylon can evaluate your environment to locate Nonmem locations and codify them into configuration",
+  "markdown" : [
+    {
+      "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/master/markdown/expectations.md"
+    }
+  ],
+  "stories" : [
+    {
+      "name" : "Babylon should allow users to run NonMem locally",
+      "tags" : [
+        "TestBabylonCompletesLocalExecution",
+        "TestBabylonParallelExecution"
+      ],
+      "risk" : "high",
+      "markdown" : [
+        {
+          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/master/markdown/stories/run_jobs_locally.md"
+        }
+      ]
+    },
+    {
+      "name" : "Babylon should allow users to run NonMem jobs on the Grid",
+      "tags" : [
+        "qsub",
+        "qstat",
+        "validate_nonmem_output",
+        "TestBabylonCompletesSGEExecution",
+        "TestBabylonCompletesParallelSGEExecution"
+      ],
+      "risk" : "high",
+      "markdown" : [
+        {
+          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/master/markdown/stories/run_jobs_on_grid.md"
+        }
+      ]
+    },
+    {
+      "name" : "Babylon should notify users of issues with the data referenced in the control stream",
+      "tags" : [
+        "TestHasValidPathForCTL",
+        "TestHasInvalidDataPath"
+      ],
+      "risk" : "low",
+      "markdown" : [
+        {
+          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/master/markdown/stories/invalid_data.md"
+        }
+      ]
+    },
+    {
+      "name" : "Babylon should be able to initialize a project with minimum configs required for execution",
+      "tags" : [
+        "TestInitialization"
+      ],
+      "risk" : "medium",
+      "markdown" : [
+        {
+          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/master/markdown/stories/project_initialization.md"
+        }
+      ]
+    },
+    {
+      "name" : "Babylon should allow passage of some NMFE options directly to NonMem",
+      "tags" : [
+        "TestNMFEOptionsEndInScript"
+      ],
+      "risk" : "low",
+      "markdown" : [
+        {
+          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/master/markdown/stories/nmfe_options.md"
+        }
+      ]
+    },
+    {
+      "name" : "Babylon should capture all configurations and render them into a file that can be stored in version control",
+      "tags" : [
+        "TestBBIConfigJSONCreated"
+      ],
+      "risk" : "low",
+      "markdown" : [
+        {
+          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/master/markdown/stories/store_configuration.md"
+        }
+      ]
+    },
+    {
+      "name" : "Babylon should allow for NonMem execution via NMQual",
+      "tags" : [
+        "TestNMQUALExecutionSucceeds"
+      ],
+      "risk" : "medium",
+      "markdown" : [
+        {
+          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/master/markdown/stories/nmqual_execution.md"
+        }
+      ]
+    }
+  ]
+}
