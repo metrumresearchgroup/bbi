@@ -47,6 +47,7 @@
         - go build -o gpv main.go
         - cp gpv /usr/local/bin
         - cd ../../../
+        - ls -larth
         - mkdir testoutput
         - mkdir rendered
         - aws s3 cp s3://babylon-validation/babylon/${DRONE_COMMIT_BRANCH}/${DRONE_BUILD_NUMBER}/results.json testoutput/results.json
