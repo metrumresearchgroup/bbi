@@ -22,6 +22,7 @@ import (
 	"path"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strconv"
 	"strings"
 	"text/template"
@@ -725,18 +726,44 @@ func NewNonMemModel(modelname string, config *configlib.Config) (NonMemModel, er
 	//We'll leverage that to locate the file in the original location regardless of
 	//file type.
 
-	if filepath.IsAbs(datafile) {
-		err = dataFileIsPresent(datafile, modelname)
-	} else {
-		if config.Local.CreateChildDirs {
-			component := filepath.Join(lm.OriginalPath, filepath.Base(datafile))
-			err = dataFileIsPresent(component, modelname)
-		} else {
-			component := filepath.Join(filepath.Dir(lm.OriginalPath), filepath.Base(datafile))
-			err = dataFileIsPresent(component, modelname)
-		}
-
+	whereami, err := os.Getwd()
+	if err != nil {
+		return NonMemModel{}, err
 	}
+
+	err = os.Chdir(lm.OriginalPath)
+
+	if err != nil {
+		return NonMemModel{}, err
+	}
+
+	basefilePath := datafile
+
+	//If the file is a ctl let's strip one ".." off. This is because we are trying to locate the data file from the
+	//perspective of the model file we're targeting, and the file has already been updated for the future state directory
+	//Note that we only do this in the scope of creating child directories.
+	if lm.Extension == "ctl" && config.Local.CreateChildDirs {
+		basefilePath = strings.Replace(basefilePath, "../", "", 1)
+	}
+
+	absDataFile, err := filepath.Abs(basefilePath)
+
+	if err != nil {
+		return NonMemModel{}, err
+	}
+
+	//If Mac, strip the /private from the interpreted symlink https://apple.stackexchange.com/questions/1043/why-is-tmp-a-symlink-to-private-tmp
+	if runtime.GOOS == "darwin" {
+		absDataFile = strings.TrimPrefix(absDataFile, "/private")
+	}
+
+	err = dataFileIsPresent(absDataFile, modelname)
+
+	if err != nil {
+		return NonMemModel{}, err
+	}
+
+	err = os.Chdir(whereami)
 
 	if err != nil {
 		return NonMemModel{}, err

@@ -40,7 +40,8 @@
       "name" : "Babylon should notify users of issues with the data referenced in the control stream",
       "tags" : [
         "TestHasValidPathForCTL",
-        "TestHasInvalidDataPath"
+        "TestHasInvalidDataPath",
+        "TestHasValidComplexPathCTLAndMod"
       ],
       "risk" : "low",
       "markdown" : [
