@@ -800,15 +800,33 @@ func nonmemModelsFromArguments(args []string, config *configlib.Config) ([]NonMe
 				continue
 			}
 			modelsInDir, err := utils.ListModels(arg, ".mod", AppFs)
+
 			if err != nil {
 				log.Errorf("issue getting models in dir %s, if this is a run please add the extension. Err: (%s)", arg, err)
 				continue
 			}
+
+			//Also look for CTLs in the directory
+			ctlsInDir, err := utils.ListModels(arg, ".ctl", AppFs)
+
+			if err != nil {
+				log.Errorf("issue getting models in dir %s, if this is a run please add the extension. Err: (%s)", arg, err)
+				continue
+			}
+
 			if viper.GetBool("verbose") || viper.GetBool("debug") {
 				log.Debugf("adding %v model files in directory %s to queue", len(modelsInDir), arg)
 			}
 
 			for _, model := range modelsInDir {
+				model, err := NewNonMemModel(path.Join(arg, model), config)
+				if err != nil {
+					return output, err
+				}
+				output = append(output, model)
+			}
+
+			for _, model := range ctlsInDir {
 				model, err := NewNonMemModel(path.Join(arg, model), config)
 				if err != nil {
 					return output, err
