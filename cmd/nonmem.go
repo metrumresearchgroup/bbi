@@ -741,14 +741,9 @@ func NewNonMemModel(modelname string, config *configlib.Config) (NonMemModel, er
 
 	//If the file is a ctl let's strip one ".." off. This is because we are trying to locate the data file from the
 	//perspective of the model file we're targeting, and the file has already been updated for the future state directory
-	if lm.Extension == "ctl" {
+	//Note that we only do this in the scope of creating child directories.
+	if lm.Extension == "ctl" && config.Local.CreateChildDirs {
 		basefilePath = strings.Replace(basefilePath, "../", "", 1)
-	}
-
-	//If we're operating in the perspectus of the output directory, we'll need to append the parent directory
-	//to the base file path to target the same file
-	if !config.Local.CreateChildDirs {
-		basefilePath = filepath.Join("../", basefilePath)
 	}
 
 	absDataFile, err := filepath.Abs(basefilePath)
