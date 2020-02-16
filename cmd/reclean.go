@@ -38,7 +38,7 @@ func reclean(cmd *cobra.Command, args []string) error {
 		viper.Debug()
 	}
 	AppFs := afero.NewOsFs()
-	err := runner.CleanEstFolder(AppFs, args[0], []string{}, viper.GetInt("cleanLvl"), verbose, debug, preview)
+	err := runner.CleanEstFolder(AppFs, args[0], []string{}, viper.GetInt("clean_lvl"), verbose, debug, preview)
 	if err != nil {
 		fmt.Printf("err: %v", err)
 	}

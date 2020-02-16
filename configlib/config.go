@@ -18,12 +18,12 @@ var ConfigurationLoaded bool = false
 type Config struct {
 	NMVersion       string                  `yaml:"nmVersion" json:"nm_version,omitempty"`
 	Overwrite       bool                    `yaml:"overwrite" json:"overwrite,omitempty"`
-	CleanLvl        int                     `yaml:"cleanLvl" json:"clean_lvl,omitempty"`
-	CopyLvl         int                     `yaml:"copyLvl" json:"copy_lvl,omitempty"`
+	CleanLvl        int                     `mapstructure:"clean_lvl" yaml:"clean_lvl" json:"clean_lvl,omitempty"`
+	CopyLvl         int                     `mapstructure:"copy_lvl" yaml:"copy_lvl" json:"copy_lvl,omitempty"`
 	Git             bool                    `yaml:"git" json:"git,omitempty"`
 	BabylonBinary   string                  `yaml:"babylonbinary" json:"babylon_binary,omitempty"`
-	SaveConfig      bool                    `yaml:"saveConfig" json:"save_config,omitempty"`
-	OutputDir       string                  `yaml:"outputDir" json:"output_dir,omitempty"`
+	SaveConfig      bool                    `mapstructure:"save_config" yaml:"save_config" json:"save_config,omitempty"`
+	OutputDir       string                  `mapstructure:"output_dir" yaml:"output_dir" json:"output_dir,omitempty"`
 	Threads         int                     `yaml:"threads" json:"threads,omitempty"`
 	Debug           bool                    `yaml:"debug" json:"debug,omitempty"`
 	Local           LocalDetail             `mapstructure:"local" yaml:"local" json:"local,omitempty"`
@@ -32,10 +32,10 @@ type Config struct {
 	Delay           int                     `yaml:"delay" json:"delay,omitempty" yaml:"delay"`
 	NMQual          bool                    `yaml:"nmqual" json:"nmqual,omitempty"`
 	JSON            bool                    `yaml:"json_logging" json:"json_logging,omitempty"`
-	Logfile         string                  `yaml:"log_file" json:"log_file,omitempty"`
-	NMFEOptions     NMFEOptions             `yaml:"nmfe_optiions" json:"nmfe_options,omitempty" mapstructure:"nmfeoptions"`
-	MPIExecPath     string                  `yaml:"mpiExecPath" json:"mpiExecPath,omitempty"`
-	ParallelTimeout int                     `yaml:"parallel_timeout" json:"parallel_timeout,omitempty"`
+	Logfile         string                  `mapstructure:"log_file" yaml:"log_file" json:"log_file,omitempty"`
+	NMFEOptions     NMFEOptions             `yaml:"nmfe_options" json:"nmfe_options,omitempty" mapstructure:"nmfe_options"`
+	MPIExecPath     string                  `mapstructure:"mpi_exec_path" yaml:"mpi_exec_path" json:"mpi_exec_path,omitempty"`
+	ParallelTimeout int                     `mapstructure:"parallel_timeout" yaml:"parallel_timeout" json:"parallel_timeout,omitempty"`
 	Parafile        string                  `yaml:"parafile" json:"parafile,omitempty"`
 }
 
@@ -47,7 +47,7 @@ type NonMemDetail struct {
 }
 
 type LocalDetail struct {
-	CreateChildDirs bool `yaml:"create_child_dirs" json:"create_child_dirs,omitempty"`
+	CreateChildDirs bool `mapstructure:"create_child_dirs" yaml:"create_child_dirs" json:"create_child_dirs,omitempty"`
 }
 
 type NMFEOptions struct {
@@ -55,8 +55,10 @@ type NMFEOptions struct {
 	PRSame      bool   `yaml:"prsame" json:"prsame,omitempty"`
 	Background  bool   `yaml:"background" json:"background,omitempty"`
 	PRCompile   bool   `yaml:"prcompile" json:"prcompile,omitempty"`
+	PRDefault   bool   `yaml:"prdefault" json:"prdefault,omitempty"`
+	TPRDefault   bool   `yaml:"tprdefault" json:"tprdefault,omitempty"`
 	NoBuild     bool   `yaml:"nobuild" json:"nobuild,omitempty"`
-	MaxLim      int    `yaml:"maxlim" jason:"maxlim,omitempty"` //Default (empty value) is 100
+	MaxLim      int    `yaml:"maxlim" jason:"maxlim,omitempty"` //Default (empty value) is 3
 }
 
 func (c Config) RenderYamlToFile(path string) error {
@@ -100,14 +102,6 @@ func LoadGlobalConfig(configFilename string) error {
 }
 
 func loadDefaultSettings() {
-	viper.SetDefault("cacheDir", "mdlcache")
-	viper.SetDefault("cacheExe", "")
-	viper.SetDefault("gitignoreLvl", 1)
-	viper.SetDefault("cleanLvl", 1)
-	viper.SetDefault("git", true)
-	viper.SetDefault("nmExecutable", "")
-	viper.SetDefault("noBuild", false)
-	viper.SetDefault("oneEst", false)
 	viper.SetDefault("threads", runtime.NumCPU())
 }
 

@@ -283,7 +283,7 @@ func init() {
 
 	childDirIdentifier := "createChildDirs"
 	localCmd.PersistentFlags().Bool(childDirIdentifier, true, "Indicates whether or not local branch execution"+
-		"should create a new subdirectory with the outputDir variable as its name and execute in that directory")
+		"should create a new subdirectory with the output_dir variable as its name and execute in that directory")
 	viper.BindPFlag("local."+childDirIdentifier, localCmd.PersistentFlags().Lookup(childDirIdentifier))
 }
 
