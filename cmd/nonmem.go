@@ -986,6 +986,15 @@ func processNMFEOptions(config *configlib.Config) []string {
 	if config.NMFEOptions.PRSame {
 		output = append(output, "-prsame")
 	}
+	if config.NMFEOptions.PRDefault && config.NMFEOptions.TPRDefault {
+		log.Fatal("tprdefault and prdefault cannot be both set")
+	}
+	if config.NMFEOptions.PRDefault {
+		output = append(output, "-prdefault")
+	}
+	if config.NMFEOptions.TPRDefault {
+		output = append(output, "-tprdefault")
+	}
 
 	if config.NMFEOptions.Background {
 		output = append(output, "-background")
