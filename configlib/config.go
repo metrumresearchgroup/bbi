@@ -1,14 +1,15 @@
 package configlib
 
 import (
-	log "github.com/sirupsen/logrus"
-	"github.com/spf13/afero"
-	"github.com/spf13/viper"
-	"gopkg.in/yaml.v2"
 	"os"
 	"path"
 	"path/filepath"
 	"runtime"
+
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/afero"
+	"github.com/spf13/viper"
+	"gopkg.in/yaml.v2"
 )
 
 //Whenever
@@ -16,7 +17,7 @@ var AvailableConfiguration Config
 var ConfigurationLoaded bool = false
 
 type Config struct {
-	NMVersion       string                  `yaml:"nmVersion" json:"nm_version,omitempty"`
+	NMVersion       string                  `mapstructure:"nm_version" yaml:"nmVersion" json:"nm_version,omitempty"`
 	Overwrite       bool                    `yaml:"overwrite" json:"overwrite,omitempty"`
 	CleanLvl        int                     `mapstructure:"clean_lvl" yaml:"clean_lvl" json:"clean_lvl,omitempty"`
 	CopyLvl         int                     `mapstructure:"copy_lvl" yaml:"copy_lvl" json:"copy_lvl,omitempty"`
@@ -31,9 +32,9 @@ type Config struct {
 	Parallel        bool                    `json:"parallel" yaml:"parallel"`
 	Delay           int                     `yaml:"delay" json:"delay,omitempty" yaml:"delay"`
 	NMQual          bool                    `yaml:"nmqual" json:"nmqual,omitempty"`
-	JSON            bool                    `yaml:"json_logging" json:"json_logging,omitempty"`
+	JSON            bool                    `mapstructure:"json" yaml:"json_logging" json:"json_logging,omitempty"`
 	Logfile         string                  `mapstructure:"log_file" yaml:"log_file" json:"log_file,omitempty"`
-	NMFEOptions     NMFEOptions             `yaml:"nmfe_options" json:"nmfe_options,omitempty" mapstructure:"nmfe_options"`
+	NMFEOptions     NMFEOptions             `mapstructure:"nmfe_options" yaml:"nmfe_options" json:"nmfe_options,omitempty" mapstructure:"nmfe_options"`
 	MPIExecPath     string                  `mapstructure:"mpi_exec_path" yaml:"mpi_exec_path" json:"mpi_exec_path,omitempty"`
 	ParallelTimeout int                     `mapstructure:"parallel_timeout" yaml:"parallel_timeout" json:"parallel_timeout,omitempty"`
 	Parafile        string                  `yaml:"parafile" json:"parafile,omitempty"`
@@ -56,7 +57,7 @@ type NMFEOptions struct {
 	Background  bool   `yaml:"background" json:"background,omitempty"`
 	PRCompile   bool   `yaml:"prcompile" json:"prcompile,omitempty"`
 	PRDefault   bool   `yaml:"prdefault" json:"prdefault,omitempty"`
-	TPRDefault   bool   `yaml:"tprdefault" json:"tprdefault,omitempty"`
+	TPRDefault  bool   `yaml:"tprdefault" json:"tprdefault,omitempty"`
 	NoBuild     bool   `yaml:"nobuild" json:"nobuild,omitempty"`
 	MaxLim      int    `yaml:"maxlim" jason:"maxlim,omitempty"` //Default (empty value) is 3
 }
@@ -102,6 +103,9 @@ func LoadGlobalConfig(configFilename string) error {
 }
 
 func loadDefaultSettings() {
+	viper.SetDefault("clean_lvl", 1)
+	viper.SetDefault("git", true)
+	viper.SetDefault("one_est", false)
 	viper.SetDefault("threads", runtime.NumCPU())
 }
 

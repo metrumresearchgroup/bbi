@@ -185,7 +185,7 @@ func init() {
 	RootCmd.AddCommand(nonmemCmd)
 
 	//NM Selector
-	const nmVersionIdentifier string = "nmVersion"
+	const nmVersionIdentifier string = "nm_version"
 	nonmemCmd.PersistentFlags().String(nmVersionIdentifier, "", "Version of nonmem from the configuration list to use")
 	viper.BindPFlag(nmVersionIdentifier, nonmemCmd.PersistentFlags().Lookup(nmVersionIdentifier))
 
@@ -194,11 +194,11 @@ func init() {
 	nonmemCmd.PersistentFlags().Bool(parallelIdentifier, false, "Whether or not to run nonmem in parallel mode")
 	viper.BindPFlag(parallelIdentifier, nonmemCmd.PersistentFlags().Lookup(parallelIdentifier))
 
-	const parallelCompletionTimeoutIdentifier string = "parallelTimeout"
+	const parallelCompletionTimeoutIdentifier string = "parallel_timeout"
 	nonmemCmd.PersistentFlags().Int(parallelCompletionTimeoutIdentifier, 2147483647, "The amount of time to wait for parallel operations in nonmem before timing out")
 	viper.BindPFlag(parallelCompletionTimeoutIdentifier, nonmemCmd.PersistentFlags().Lookup(parallelCompletionTimeoutIdentifier))
 
-	const mpiExecPathIdentifier string = "mpiExecPath"
+	const mpiExecPathIdentifier string = "mpi_exec_path"
 	nonmemCmd.PersistentFlags().String(mpiExecPathIdentifier, "/usr/local/mpich3/bin/mpiexec", "The fully qualified path to mpiexec. Used for nonmem parallel operations")
 	viper.BindPFlag(mpiExecPathIdentifier, nonmemCmd.PersistentFlags().Lookup(mpiExecPathIdentifier))
 
@@ -211,7 +211,7 @@ func init() {
 	viper.BindPFlag(nmQualIdentifier, nonmemCmd.PersistentFlags().Lookup(nmQualIdentifier))
 
 	//NMFE Options
-	const nmfeGroup string = "nmfeoptions"
+	const nmfeGroup string = "nmfe_options"
 	const licFileIdentifier string = "licfile"
 	nonmemCmd.PersistentFlags().String(licFileIdentifier, "", "RAW NMFE OPTION - Specify a license file to use with NMFE (Nonmem)")
 	viper.BindPFlag(nmfeGroup+"."+licFileIdentifier, nonmemCmd.PersistentFlags().Lookup(licFileIdentifier))
@@ -382,7 +382,7 @@ func buildNonMemCommandString(l *NonMemModel) string {
 	var nmHome string
 	var nmBinary string
 
-	if viper.GetString("nmVersion") == "" {
+	if l.Configuration.NMVersion == "" {
 		//Find the default location
 		for _, v := range l.Configuration.Nonmem {
 			if v.Default {
@@ -392,7 +392,7 @@ func buildNonMemCommandString(l *NonMemModel) string {
 		}
 	} else {
 		//Try to access the Provided value
-		if val, ok := l.Configuration.Nonmem[viper.GetString("nmVersion")]; ok {
+		if val, ok := l.Configuration.Nonmem[l.Configuration.NMVersion]; ok {
 			nmHome = val.Home
 			nmBinary = val.Executable
 		} else {

@@ -2,12 +2,13 @@ package cmd
 
 import (
 	"errors"
-	"github.com/ghodss/yaml"
-	"github.com/metrumresearchgroup/babylon/configlib"
 	"log"
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	"github.com/ghodss/yaml"
+	"github.com/metrumresearchgroup/babylon/configlib"
 
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
@@ -20,7 +21,7 @@ var startingDirectory string
 var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "Create configuration file with defaults",
-	Long: `Run bbi init to create a babylon.yaml configuration file in the current directory.
+	Long: `Ru	n bbi init to create a babylon.yaml configuration file in the current directory.
  `,
 	Run: initializer,
 }
@@ -76,7 +77,6 @@ func initializer(cmd *cobra.Command, args []string) {
 	}
 
 	c := configlib.Config{}
-
 	viper.Unmarshal(&c)
 
 	yamlString, err := yaml.Marshal(c)

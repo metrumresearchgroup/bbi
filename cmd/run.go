@@ -27,32 +27,32 @@ func run(cmd *cobra.Command, args []string) {
 func init() {
 
 	//String Variables
-	runCmd.PersistentFlags().String("cacheDir", "", "directory path for cache of nonmem executables for NM7.4+")
-	viper.BindPFlag("cacheDir", runCmd.PersistentFlags().Lookup("cacheDir"))
+	// runCmd.PersistentFlags().String("cacheDir", "", "directory path for cache of nonmem executables for NM7.4+")
+	// viper.BindPFlag("cacheDir", runCmd.PersistentFlags().Lookup("cacheDir"))
 
-	runCmd.PersistentFlags().String("cacheExe", "", "name of executable stored in cache")
-	viper.BindPFlag("cacheExe", runCmd.PersistentFlags().Lookup("cacheExe"))
+	// runCmd.PersistentFlags().String("cacheExe", "", "name of executable stored in cache")
+	// viper.BindPFlag("cacheExe", runCmd.PersistentFlags().Lookup("cacheExe"))
 
-	runCmd.PersistentFlags().String("saveExe", "", "what to name the executable when stored in cache")
-	viper.BindPFlag("saveExe", runCmd.PersistentFlags().Lookup("saveExe"))
+	// runCmd.PersistentFlags().String("saveExe", "", "what to name the executable when stored in cache")
+	// viper.BindPFlag("saveExe", runCmd.PersistentFlags().Lookup("saveExe"))
 
-	runCmd.PersistentFlags().String("outputDir", "{{ .Name }}", "Go template for the output directory to use for storging details of each executed model")
-	viper.BindPFlag("output_dir", runCmd.PersistentFlags().Lookup("outputDir"))
+	runCmd.PersistentFlags().String("output_dir", "{{ .Name }}", "Go template for the output directory to use for storging details of each executed model")
+	viper.BindPFlag("output_dir", runCmd.PersistentFlags().Lookup("output_dir"))
 	viper.SetDefault("output_dir", "{{ .Name }}")
 
 	//Int Variables
-	runCmd.PersistentFlags().Int("cleanLvl", 1, "clean level used for file output from a given (set of) runs")
+	runCmd.PersistentFlags().Int("clean_lvl", 1, "clean level used for file output from a given (set of) runs")
 	viper.BindPFlag("clean_lvl", runCmd.PersistentFlags().Lookup("clean_lvl"))
 	// TODO: these are likely not meangingful as should be set in configlib, but want to configm
 	viper.SetDefault("clean_lvl", 1)
 
-	runCmd.PersistentFlags().Int("copyLvl", 0, "copy level used for file output from a given (set of) runs")
+	runCmd.PersistentFlags().Int("copy_lvl", 0, "copy level used for file output from a given (set of) runs")
 	viper.BindPFlag("copy_lvl", runCmd.PersistentFlags().Lookup("copy_lvl"))
 	viper.SetDefault("copy_lvl", 0)
 
-	runCmd.PersistentFlags().Int("gitignoreLvl", 0, "gitignore lvl for a given (set of) runs")
-	viper.BindPFlag("gitignoreLvl", runCmd.PersistentFlags().Lookup("gitignoreLvl"))
-	viper.SetDefault("gitignoreLvl", 1)
+	// runCmd.PersistentFlags().Int("gitignoreLvl", 0, "gitignore lvl for a given (set of) runs")
+	// viper.BindPFlag("gitignoreLvl", runCmd.PersistentFlags().Lookup("gitignoreLvl"))
+	// viper.SetDefault("gitignoreLvl", 1)
 
 	//Bool Variables
 	runCmd.PersistentFlags().Bool("git", false, "whether git is used")
