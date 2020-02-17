@@ -772,7 +772,7 @@ func NewNonMemModel(modelname string, config *configlib.Config) (NonMemModel, er
 	lm.Configuration = config
 
 	//Process The template from the viper content for output Dir
-	t, err := template.New("output").Parse(viper.GetString("outputDir"))
+	t, err := template.New("output").Parse(config.OutputDir)
 	buf := new(bytes.Buffer)
 
 	if err != nil {
@@ -1010,7 +1010,7 @@ func processNMFEOptions(config *configlib.Config) []string {
 
 	//Only goes to 3, defaults to 100. Just a quick way to check for "empty" setting
 	if config.NMFEOptions.MaxLim < 50 {
-		output = append(output, "maxlim="+strconv.Itoa(config.NMFEOptions.MaxLim))
+		output = append(output, "-maxlim="+strconv.Itoa(config.NMFEOptions.MaxLim))
 	}
 
 	return output

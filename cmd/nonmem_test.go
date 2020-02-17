@@ -1,14 +1,15 @@
 package cmd
 
 import (
-	"github.com/google/uuid"
-	"github.com/metrumresearchgroup/babylon/configlib"
-	"github.com/spf13/afero"
 	"os"
 	"path"
 	"path/filepath"
 	"reflect"
 	"testing"
+
+	"github.com/google/uuid"
+	"github.com/metrumresearchgroup/babylon/configlib"
+	"github.com/spf13/afero"
 )
 
 func Test_doesDirectoryContainOutputFiles(t *testing.T) {
@@ -109,7 +110,7 @@ func Test_processNMFEOptions(t *testing.T) {
 				"-licfile=/tmp/nonmem.lic",
 				"-background",
 				"-nobuild",
-				"maxlim=1",
+				"-maxlim=1",
 			},
 		},
 		{
