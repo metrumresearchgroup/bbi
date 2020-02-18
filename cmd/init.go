@@ -21,7 +21,7 @@ var startingDirectory string
 var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "Create configuration file with defaults",
-	Long: `Ru	n bbi init to create a babylon.yaml configuration file in the current directory.
+	Long: `Run bbi init to create a babylon.yaml configuration file in the current directory.
  `,
 	Run: initializer,
 }

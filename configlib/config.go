@@ -32,7 +32,7 @@ type Config struct {
 	Parallel        bool                    `mapstructure:"parallel" json:"parallel" yaml:"parallel"`
 	Delay           int                     `mapstructure:"delay" yaml:"delay" json:"delay,omitempty" yaml:"delay"`
 	NMQual          bool                    `mapstructure:"nmqual" yaml:"nmqual" json:"nmqual,omitempty"`
-	JSON            bool                    `mapstructure:"json" yaml:"json" json:"json,omitempty"`
+	JSON            bool                    `mapstructure:"json_logging" yaml:"json_logging" json_logging:"json,omitempty"`
 	Logfile         string                  `mapstructure:"log_file" yaml:"log_file" json:"log_file,omitempty"`
 	NMFEOptions     NMFEOptions             `mapstructure:"nmfe_options" yaml:"nmfe_options" json:"nmfe_options,omitempty"`
 	MPIExecPath     string                  `mapstructure:"mpi_exec_path" yaml:"mpi_exec_path" json:"mpi_exec_path,omitempty"`
