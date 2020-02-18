@@ -128,8 +128,8 @@ func init() {
 	}
 
 	//String Variables
-	sgeCMD.PersistentFlags().String("babylonBinary", babylon, "directory path for babylon to be called in goroutines (SGE Execution)")
-	viper.BindPFlag("babylonBinary", sgeCMD.PersistentFlags().Lookup("babylonBinary"))
+	sgeCMD.PersistentFlags().String("babylon_binary", babylon, "directory path for babylon to be called in goroutines (SGE Execution)")
+	viper.BindPFlag("babylon_binary", sgeCMD.PersistentFlags().Lookup("babylon_binary"))
 }
 
 func sge(cmd *cobra.Command, args []string) {
