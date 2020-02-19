@@ -326,7 +326,7 @@ func generateBabylonScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 
 	if !l.Configuration.Local.CreateChildDirs {
 		commandComponents = append(commandComponents, []string{
-			"--createChildDirs=false",
+			"--create_child_dirs=false",
 		}...)
 	}
 
