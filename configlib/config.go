@@ -1,14 +1,15 @@
 package configlib
 
 import (
-	log "github.com/sirupsen/logrus"
-	"github.com/spf13/afero"
-	"github.com/spf13/viper"
-	"gopkg.in/yaml.v2"
 	"os"
 	"path"
 	"path/filepath"
 	"runtime"
+
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/afero"
+	"github.com/spf13/viper"
+	"gopkg.in/yaml.v2"
 )
 
 //Whenever
@@ -16,47 +17,49 @@ var AvailableConfiguration Config
 var ConfigurationLoaded bool = false
 
 type Config struct {
-	NMVersion       string                  `yaml:"nmVersion" json:"nm_version,omitempty"`
-	Overwrite       bool                    `yaml:"overwrite" json:"overwrite,omitempty"`
-	CleanLvl        int                     `yaml:"cleanLvl" json:"clean_lvl,omitempty"`
-	CopyLvl         int                     `yaml:"copyLvl" json:"copy_lvl,omitempty"`
-	Git             bool                    `yaml:"git" json:"git,omitempty"`
-	BabylonBinary   string                  `yaml:"babylonbinary" json:"babylon_binary,omitempty"`
-	SaveConfig      bool                    `yaml:"saveConfig" json:"save_config,omitempty"`
-	OutputDir       string                  `yaml:"outputDir" json:"output_dir,omitempty"`
-	Threads         int                     `yaml:"threads" json:"threads,omitempty"`
-	Debug           bool                    `yaml:"debug" json:"debug,omitempty"`
+	NMVersion       string                  `mapstructure:"nm_version" yaml:"nm_version" json:"nm_version,omitempty"`
+	Overwrite       bool                    `mapstructure:"overwrite" yaml:"overwrite" json:"overwrite,omitempty"`
+	CleanLvl        int                     `mapstructure:"clean_lvl" yaml:"clean_lvl" json:"clean_lvl,omitempty"`
+	CopyLvl         int                     `mapstructure:"copy_lvl" yaml:"copy_lvl" json:"copy_lvl,omitempty"`
+	Git             bool                    `mapstructure:"git" yaml:"git" json:"git,omitempty"`
+	BabylonBinary   string                  `mapstructure:"babylon_binary" yaml:"babylon_binary" json:"babylon_binary,omitempty"`
+	SaveConfig      bool                    `mapstructure:"save_config" yaml:"save_config" json:"save_config,omitempty"`
+	OutputDir       string                  `mapstructure:"output_dir" yaml:"output_dir" json:"output_dir,omitempty"`
+	Threads         int                     `mapstructure:"threads" yaml:"threads" json:"threads,omitempty"`
+	Debug           bool                    `mapstructure:"debug" yaml:"debug" json:"debug,omitempty"`
 	Local           LocalDetail             `mapstructure:"local" yaml:"local" json:"local,omitempty"`
 	Nonmem          map[string]NonMemDetail `mapstructure:"nonmem" json:"nonmem,omitempty" yaml:"nonmem"`
-	Parallel        bool                    `json:"parallel" yaml:"parallel"`
-	Delay           int                     `yaml:"delay" json:"delay,omitempty" yaml:"delay"`
-	NMQual          bool                    `yaml:"nmqual" json:"nmqual,omitempty"`
-	JSON            bool                    `yaml:"json_logging" json:"json_logging,omitempty"`
-	Logfile         string                  `yaml:"log_file" json:"log_file,omitempty"`
-	NMFEOptions     NMFEOptions             `yaml:"nmfe_optiions" json:"nmfe_options,omitempty" mapstructure:"nmfeoptions"`
-	MPIExecPath     string                  `yaml:"mpiExecPath" json:"mpiExecPath,omitempty"`
-	ParallelTimeout int                     `yaml:"parallel_timeout" json:"parallel_timeout,omitempty"`
-	Parafile        string                  `yaml:"parafile" json:"parafile,omitempty"`
+	Parallel        bool                    `mapstructure:"parallel" json:"parallel" yaml:"parallel"`
+	Delay           int                     `mapstructure:"delay" yaml:"delay" json:"delay,omitempty" yaml:"delay"`
+	NMQual          bool                    `mapstructure:"nmqual" yaml:"nmqual" json:"nmqual,omitempty"`
+	JSON            bool                    `mapstructure:"json_logging" yaml:"json_logging" json_logging:"json,omitempty"`
+	Logfile         string                  `mapstructure:"log_file" yaml:"log_file" json:"log_file,omitempty"`
+	NMFEOptions     NMFEOptions             `mapstructure:"nmfe_options" yaml:"nmfe_options" json:"nmfe_options,omitempty"`
+	MPIExecPath     string                  `mapstructure:"mpi_exec_path" yaml:"mpi_exec_path" json:"mpi_exec_path,omitempty"`
+	ParallelTimeout int                     `mapstructure:"parallel_timeout" yaml:"parallel_timeout" json:"parallel_timeout,omitempty"`
+	Parafile        string                  `mapstructure:"parafile" yaml:"parafile" json:"parafile,omitempty"`
 }
 
 type NonMemDetail struct {
-	Home       string `yaml:"home" json:"home,omitempty"`
-	Executable string `yaml:"executable" json:"executable,omitempty"`
-	Nmqual     bool   `yaml:"nmqual" json:"nmqual,omitempty"`
-	Default    bool   `yaml:"default" json:"default,omitempty"`
+	Home       string `mapstructure:"home" yaml:"home" json:"home,omitempty"`
+	Executable string `mapstructure:"executable" yaml:"executable" json:"executable,omitempty"`
+	Nmqual     bool   `mapstructure:"nmqual" yaml:"nmqual" json:"nmqual,omitempty"`
+	Default    bool   `mapstructure:"default" yaml:"default" json:"default,omitempty"`
 }
 
 type LocalDetail struct {
-	CreateChildDirs bool `yaml:"create_child_dirs" json:"create_child_dirs,omitempty"`
+	CreateChildDirs bool `mapstructure:"create_child_dirs" yaml:"create_child_dirs" json:"create_child_dirs,omitempty"`
 }
 
 type NMFEOptions struct {
-	LicenseFile string `yaml:"license_file" json:"license_file,omitempty" mapstructure:"licfile"`
-	PRSame      bool   `yaml:"prsame" json:"prsame,omitempty"`
-	Background  bool   `yaml:"background" json:"background,omitempty"`
-	PRCompile   bool   `yaml:"prcompile" json:"prcompile,omitempty"`
-	NoBuild     bool   `yaml:"nobuild" json:"nobuild,omitempty"`
-	MaxLim      int    `yaml:"maxlim" jason:"maxlim,omitempty"` //Default (empty value) is 100
+	LicenseFile string `mapstructure:"license_file" yaml:"license_file" json:"license_file,omitempty"`
+	PRSame      bool   `mapstructure:"prsame" yaml:"prsame" json:"prsame,omitempty"`
+	Background  bool   `mapstructure:"background" yaml:"background" json:"background,omitempty"`
+	PRCompile   bool   `mapstructure:"prcompile" yaml:"prcompile" json:"prcompile,omitempty"`
+	PRDefault   bool   `mapstructure:"prdefault" yaml:"prdefault" json:"prdefault,omitempty"`
+	TPRDefault  bool   `mapstructure:"tprdefault" yaml:"tprdefault" json:"tprdefault,omitempty"`
+	NoBuild     bool   `mapstructure:"nobuild" yaml:"nobuild" json:"nobuild,omitempty"`
+	MaxLim      int    `mapstructure:"maxlim" yaml:"maxlim" jason:"maxlim,omitempty"` //Default (empty value) is 3
 }
 
 func (c Config) RenderYamlToFile(path string) error {
@@ -100,14 +103,9 @@ func LoadGlobalConfig(configFilename string) error {
 }
 
 func loadDefaultSettings() {
-	viper.SetDefault("cacheDir", "mdlcache")
-	viper.SetDefault("cacheExe", "")
-	viper.SetDefault("gitignoreLvl", 1)
-	viper.SetDefault("cleanLvl", 1)
+	viper.SetDefault("clean_lvl", 1)
 	viper.SetDefault("git", true)
-	viper.SetDefault("nmExecutable", "")
-	viper.SetDefault("noBuild", false)
-	viper.SetDefault("oneEst", false)
+	viper.SetDefault("one_est", false)
 	viper.SetDefault("threads", runtime.NumCPU())
 }
 

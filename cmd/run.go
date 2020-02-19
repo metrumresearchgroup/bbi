@@ -7,7 +7,7 @@ import (
 
 const runLongDescription string = `run nonmem model(s), for example: 
 bbi nonmem run <local|sge> run001.mod
-bbi nonmem run  --cleanLvl=1 <local|sge> run001.mod run002.mod
+bbi nonmem run  --clean_lvl=1 <local|sge> run001.mod run002.mod
 bbi nonmem run <local|sge> run[001:006].mod // expand to run001.mod run002.mod ... run006.mod local
 bbi nonmem run <local|sge> .// run all models in directory
  `
@@ -27,31 +27,32 @@ func run(cmd *cobra.Command, args []string) {
 func init() {
 
 	//String Variables
-	runCmd.PersistentFlags().String("cacheDir", "", "directory path for cache of nonmem executables for NM7.4+")
-	viper.BindPFlag("cacheDir", runCmd.PersistentFlags().Lookup("cacheDir"))
+	// runCmd.PersistentFlags().String("cacheDir", "", "directory path for cache of nonmem executables for NM7.4+")
+	// viper.BindPFlag("cacheDir", runCmd.PersistentFlags().Lookup("cacheDir"))
 
-	runCmd.PersistentFlags().String("cacheExe", "", "name of executable stored in cache")
-	viper.BindPFlag("cacheExe", runCmd.PersistentFlags().Lookup("cacheExe"))
+	// runCmd.PersistentFlags().String("cacheExe", "", "name of executable stored in cache")
+	// viper.BindPFlag("cacheExe", runCmd.PersistentFlags().Lookup("cacheExe"))
 
-	runCmd.PersistentFlags().String("saveExe", "", "what to name the executable when stored in cache")
-	viper.BindPFlag("saveExe", runCmd.PersistentFlags().Lookup("saveExe"))
+	// runCmd.PersistentFlags().String("saveExe", "", "what to name the executable when stored in cache")
+	// viper.BindPFlag("saveExe", runCmd.PersistentFlags().Lookup("saveExe"))
 
-	runCmd.PersistentFlags().String("outputDir", "{{ .Name }}", "Go template for the output directory to use for storging details of each executed model")
-	viper.BindPFlag("outputDir", runCmd.PersistentFlags().Lookup("outputDir"))
-	viper.SetDefault("outputDir", "{{ .Name }}")
+	runCmd.PersistentFlags().String("output_dir", "{{ .Name }}", "Go template for the output directory to use for storging details of each executed model")
+	viper.BindPFlag("output_dir", runCmd.PersistentFlags().Lookup("output_dir"))
+	viper.SetDefault("output_dir", "{{ .Name }}")
 
 	//Int Variables
-	runCmd.PersistentFlags().Int("cleanLvl", 1, "clean level used for file output from a given (set of) runs")
-	viper.BindPFlag("cleanLvl", runCmd.PersistentFlags().Lookup("cleanLvl"))
-	viper.SetDefault("cleanLvl", 1)
+	runCmd.PersistentFlags().Int("clean_lvl", 1, "clean level used for file output from a given (set of) runs")
+	viper.BindPFlag("clean_lvl", runCmd.PersistentFlags().Lookup("clean_lvl"))
+	// TODO: these are likely not meangingful as should be set in configlib, but want to configm
+	viper.SetDefault("clean_lvl", 1)
 
-	runCmd.PersistentFlags().Int("copyLvl", 0, "copy level used for file output from a given (set of) runs")
-	viper.BindPFlag("copyLvl", runCmd.PersistentFlags().Lookup("copyLvl"))
-	viper.SetDefault("copyLvl", 0)
+	runCmd.PersistentFlags().Int("copy_lvl", 0, "copy level used for file output from a given (set of) runs")
+	viper.BindPFlag("copy_lvl", runCmd.PersistentFlags().Lookup("copy_lvl"))
+	viper.SetDefault("copy_lvl", 0)
 
-	runCmd.PersistentFlags().Int("gitignoreLvl", 0, "gitignore lvl for a given (set of) runs")
-	viper.BindPFlag("gitignoreLvl", runCmd.PersistentFlags().Lookup("gitignoreLvl"))
-	viper.SetDefault("gitignoreLvl", 1)
+	// runCmd.PersistentFlags().Int("gitignoreLvl", 0, "gitignore lvl for a given (set of) runs")
+	// viper.BindPFlag("gitignoreLvl", runCmd.PersistentFlags().Lookup("gitignoreLvl"))
+	// viper.SetDefault("gitignoreLvl", 1)
 
 	//Bool Variables
 	runCmd.PersistentFlags().Bool("git", false, "whether git is used")
@@ -66,7 +67,7 @@ func init() {
 	runCmd.PersistentFlags().String(configIdentifier, "", "Path (relative or absolute) to another babylon.yaml to load")
 	viper.BindPFlag(configIdentifier, runCmd.PersistentFlags().Lookup(configIdentifier))
 
-	const saveconfig string = "saveConfig"
+	const saveconfig string = "save_config"
 	runCmd.PersistentFlags().Bool(saveconfig, true, "Whether or not to save the existing configuration to a file with the model")
 	viper.BindPFlag(saveconfig, runCmd.PersistentFlags().Lookup(saveconfig))
 
@@ -74,7 +75,7 @@ func init() {
 	runCmd.PersistentFlags().Int(delayIdentifier, 0, "Selects a random number of seconds between 1 and this value to stagger / jitter job execution. Assists in dealing with large volumes of work dealing with the same data set. May avoid NMTRAN issues about not being able read / close files")
 	viper.BindPFlag(delayIdentifier, runCmd.PersistentFlags().Lookup(delayIdentifier))
 
-	const logFileIdentifier string = "logFile"
+	const logFileIdentifier string = "log_file"
 	runCmd.PersistentFlags().String(logFileIdentifier, "", "If populated, specifies the file into which to store the output / logging details from Babylon")
 	viper.BindPFlag(logFileIdentifier, runCmd.PersistentFlags().Lookup(logFileIdentifier))
 

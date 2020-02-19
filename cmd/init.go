@@ -2,12 +2,13 @@ package cmd
 
 import (
 	"errors"
-	"github.com/ghodss/yaml"
-	"github.com/metrumresearchgroup/babylon/configlib"
 	"log"
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	"github.com/ghodss/yaml"
+	"github.com/metrumresearchgroup/babylon/configlib"
 
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
@@ -76,7 +77,6 @@ func initializer(cmd *cobra.Command, args []string) {
 	}
 
 	c := configlib.Config{}
-
 	viper.Unmarshal(&c)
 
 	yamlString, err := yaml.Marshal(c)
