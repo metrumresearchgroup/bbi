@@ -227,7 +227,7 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 		"-j",
 		"y",
 		"-N",
-		fmt.Sprintf("%s%s", "R_", model.FileName),
+		fmt.Sprintf("%s%s", "Run_", model.FileName),
 	}...)
 
 	if model.Configuration.Parallel {
