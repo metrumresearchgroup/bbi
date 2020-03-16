@@ -3,6 +3,7 @@ package cmd
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"github.com/metrumresearchgroup/babylon/utils"
 	log "github.com/sirupsen/logrus"
 	"os/exec"
@@ -225,6 +226,8 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 		"-V",
 		"-j",
 		"y",
+		"-N",
+		fmt.Sprintf("%s%s", "Run_", model.FileName),
 	}...)
 
 	if model.Configuration.Parallel {
