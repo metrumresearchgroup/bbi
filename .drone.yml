@@ -63,7 +63,7 @@
       host:
         path: /var/run/docker.sock
 
-  ---
+---
   name: tagged releases
   kind: pipeline
   type: docker
