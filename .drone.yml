@@ -13,6 +13,7 @@
       when:
         event:
           - push
+          - pull_request
     - name: Build updated image
       image: omerxx/drone-ecr-auth
       commands:
@@ -23,6 +24,7 @@
       when:
         event:
           - push
+          - pull_request
     - name: Test
       environment:
         MPIEXEC_PATH: /usr/bin/mpiexec
@@ -41,6 +43,7 @@
       when:
         event:
           - push
+          - pull_request
     - name: Validation
       environment:
         MPIEXEC_PATH: /usr/bin/mpiexec
