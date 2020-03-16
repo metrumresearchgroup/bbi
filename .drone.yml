@@ -78,6 +78,7 @@
         - git config --global user.email "drone@metrumrg.com"
         - git config --global user.name "Drony"
         - git tag -a $DRONE_TAG -m "$DRONE_COMMIT_MESSAGE"
+        - cd cmd/bbi
         - goreleaser --rm-dist --debug
   trigger:
     event:
