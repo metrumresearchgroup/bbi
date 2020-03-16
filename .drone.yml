@@ -73,7 +73,7 @@
       environment:
         VERSION: ${DRONE_TAG}
         GITHUB_TOKEN:
-          from_secret: GHE_TOKEN
+          from_secret: GITHUB_TOKEN
       commands:
         - git config --global user.email "drone@metrumrg.com"
         - git config --global user.name "Drony"
@@ -82,3 +82,5 @@
   trigger:
     event:
       - tag
+    status:
+      - success
