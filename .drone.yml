@@ -58,8 +58,27 @@
   trigger:
     event:
       - push
-
   volumes:
     - name: docker.sock
       host:
         path: /var/run/docker.sock
+
+  ---
+  name: tagged releases
+  kind: pipeline
+  type: docker
+  steps:
+    - name: goreleaser
+      image: dukeofubuntu/goreleasergcc
+      environment:
+        VERSION: ${DRONE_TAG}
+        GITHUB_TOKEN:
+          from_secret: GHE_TOKEN
+      commands:
+        - git config --global user.email "drone@metrumrg.com"
+        - git config --global user.name "Drony"
+        - git tag -a $DRONE_TAG -m "$DRONE_COMMIT_MESSAGE"
+        - goreleaser --rm-dist --debug
+  trigger:
+    event:
+      - tag
