@@ -194,6 +194,10 @@ func sge(cmd *cobra.Command, args []string) {
 	}
 
 	postWorkNotice(m, now)
+
+	if len(m.ErrorList) > 0 {
+		os.Exit(1)
+	}
 }
 
 func newConcurrentError(model string, notes string, err error) turnstile.ConcurrentError {
