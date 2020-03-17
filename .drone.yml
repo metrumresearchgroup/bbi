@@ -79,7 +79,7 @@
       commands:
         - git config --global user.email "drone@metrumrg.com"
         - git config --global user.name "Drony"
-        - git tag -a $DRONE_TAG -m "$DRONE_COMMIT_MESSAGE"
+        - git fetch --tags
         - cd cmd/bbi
         - goreleaser --rm-dist
   trigger:
