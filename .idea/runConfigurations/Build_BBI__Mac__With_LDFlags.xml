@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Build BBI (Mac) With LDFlags" type="GoApplicationRunConfiguration" factoryName="Go Application">
+    <module name="babylon" />
+    <working_directory value="$PROJECT_DIR$/cmd/bbi" />
+    <go_parameters value="-i -ldflags &quot;-X 'github.com/metrumresearchgroup/babylon/cmd.VERSION=v1.0.0' -X 'github.com/metrumresearchgroup/babylon/cmd.BUILD_NUMBER=102'&quot; -o bbi" />
+    <kind value="FILE" />
+    <filePath value="$PROJECT_DIR$/cmd/bbi/main.go" />
+    <package value="github.com/metrumresearchgroup/babylon" />
+    <directory value="$PROJECT_DIR$/" />
+    <output_directory value="$PROJECT_DIR$/cmd/bbi/" />
+    <option name="run" value="false" />
+    <method v="2" />
+  </configuration>
+</component>

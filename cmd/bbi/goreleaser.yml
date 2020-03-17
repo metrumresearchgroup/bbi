@@ -18,3 +18,9 @@ brews:
     github:
       owner: metrumresearchgroup 
       name: homebrew-tap 
+
+
+builds:
+  -
+    ldflags:
+      - -s -w -X 'github.com/metrumresearchgroup/babylon/cmd.VERSION={{ .Env.VERSION }}' -X 'github.com/metrumresearchgroup/babylon/cmd.BUILD_NUMBER={{ .Env.BUILD_NUMBER }}'
