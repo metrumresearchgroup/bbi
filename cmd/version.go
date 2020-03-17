@@ -31,18 +31,8 @@ bbi version
 }
 
 func version(cmd *cobra.Command, args []string) {
-	fmt.Println(buildVersionText(VERSION, BUILD_NUMBER))
+	fmt.Println(VERSION)
 }
 func init() {
 	RootCmd.AddCommand(versionCmd)
-}
-
-func buildVersionText(version string, buildidentifier string) string {
-
-	//If no build number provided
-	if buildidentifier == "" {
-		return version
-	}
-
-	return version + "-" + buildidentifier
 }

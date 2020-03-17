@@ -72,6 +72,8 @@
       image: goreleaser/goreleaser
       environment:
         VERSION: ${DRONE_TAG}
+        #Forcing DBN to be empty such that we don't set it for hte LDFLags
+        DRONE_BUILD_NUMBER: ""
         GITHUB_TOKEN:
           from_secret: GITHUB_TOKEN
       commands:
@@ -79,7 +81,7 @@
         - git config --global user.name "Drony"
         - git tag -a $DRONE_TAG -m "$DRONE_COMMIT_MESSAGE"
         - cd cmd/bbi
-        - goreleaser --rm-dist --debug
+        - goreleaser --rm-dist
   trigger:
     event:
       - tag
