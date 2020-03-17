@@ -69,7 +69,7 @@
   type: docker
   steps:
     - name: goreleaser
-      image: dukeofubuntu/goreleasergcc
+      image: goreleaser/goreleaser
       environment:
         VERSION: ${DRONE_TAG}
         GITHUB_TOKEN:
