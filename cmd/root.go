@@ -33,8 +33,7 @@ import (
 
 // VERSION is the current bbi version
 var (
-	BUILD_NUMBER string = ""
-	VERSION      string = "develop"
+	VERSION string = "develop"
 )
 
 var (
