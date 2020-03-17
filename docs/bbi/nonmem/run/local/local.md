@@ -9,29 +9,15 @@ Specifies to run the targeted model on the local machine
 ### Options
 
 ```
-      --cacheDir string       directory path for cache of nonmem executables for NM7.4+
-      --cacheExe string       name of executable stored in cache
-      --cleanLvl int          clean level used for file output from a given (set of) runs
-      --config string         config file (default is $HOME/babylon.yaml)
-      --copyLvl int           copy level used for file output from a given (set of) runs
-  -d, --debug                 debug mode
-      --git                   whether git is used
-      --gitignoreLvl int      gitignore lvl for a given (set of) runs
-      --json                  json tree of output, if possible
-      --nmExecutable string   Name of nonmem executable to use. Defaults to nmfe74 (NM7.4) (default "nmfe74")
-      --no-cor-file           do not use cor file
-      --no-cov-file           do not use cov file
-      --no-ext-file           do not use ext file
-      --no-grd-file           do not use grd file
-      --no-shk-file           do not use shk file
-      --outputDir string      Go template for the output directory to use for storging details of each executed model (default "{{ .Name }}")
-      --overwrite             Whether or not to remove existing output directories if they are present (default true)
-  -p, --preview               preview action, but don't actually run command
-      --saveConfig            Whether or not to save the existing configuration to a file with the model (default true)
-      --saveExe string        what to name the executable when stored in cache
-      --threads int           number of threads to execute with (default 4)
-  -v, --verbose               verbose output
+--create_child_dirs   Indicates whether or not local branch executionshould create a new subdirectory with the output_dir variable as its name and execute in that directory (defaulttrue)
 ```
+
+The `create_child_dirs` flag is used to determine whether a new directory should be created for nonmem to place its
+output into. By default this is no, but whenever a job is run in the SGE mode, the SGE phase will create a directory
+so the local mode of execution will be set to no such that it does not create another child directory underneath. 
+
+This also avoids issues dealing with overwrite. This pattern allows us to maintain resiliency of files across execution 
+modes and not have to have constant override logic for `overwrite`
 
 ### Sample Output
 ```

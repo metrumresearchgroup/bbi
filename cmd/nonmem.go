@@ -170,9 +170,9 @@ var nonmemCmd = &cobra.Command{
 	Short: "nonmem a (set of) models locally or on the grid",
 	Long: `run nonmem model(s), for example: 
 bbi nonmem <local|sge> run001.mod
-bbi nonmem  --cleanLvl=1 <local|sge> run001.mod run002.mod
-bbi nonmem <local|sge> run[001:006].mod // expand to run001.mod run002.mod ... run006.mod local
-bbi nonmem <local|sge> .// run all models in directory
+bbi nonmem  --clean_lvl=1 <local|sge> run001.mod run002.mod
+bbi nonmem run <local|sge> [001:006].mod // expand to run001.mod run002.mod ... run006.mod local
+bbi nonmem run <local|sge> .// run all models in directory
  `,
 	Run: nonmem,
 }

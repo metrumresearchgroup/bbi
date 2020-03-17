@@ -7,7 +7,7 @@ Targets a model or collection of models for execution on the Sun Grid Engine
 Specifies to run the targeted model on the Sun Grid Engine. The SGE execution method basically operates as a qsub wrapper for `bbi nonmem run local` to ensure uniformity.
 
 ### Babylon Binary Location
-You may note that this command has an additional flag, the `--babylonBinary` flag. This is because the SGE command will create a script that will basically run babylon in local mode as a SGE command. This means that the job being fired off onto the grid isn't saying
+You may note that this command has an additional flag, the `--babylon_binary` flag. This is because the SGE command will create a script that will basically run babylon in local mode as a SGE command. This means that the job being fired off onto the grid isn't saying
 
 `"nmfe74 ..."`
 
@@ -21,35 +21,14 @@ This means that:
 * The only difference in execution for local vs SGE all follow local execution in the end
 * There is no difference in output / structure  between local or SGE execution
 
-In order for this to work, when building the script to send to SGE, we will need to know where babylon's binary is located. The default is /data/bbi, but it will depend on your implementation.
+In order for this to work, when building the script to send to SGE, we will need to know where babylon's binary is
+located. Thankfully this is handled automatically by bbi. When you initialize BBI, it'll automatically set the 
+`babylon_binary` value based on the location BBI was run from. No need to manually set this. 
 
 ### Options
 
 ```
-      --babylonBinary string   directory path for babylon to be called in goroutines (SGE Execution) (default "/data/bbi")
-  -h, --help                   help for sge
-      --cacheDir string       directory path for cache of nonmem executables for NM7.4+
-      --cacheExe string       name of executable stored in cache
-      --cleanLvl int          clean level used for file output from a given (set of) runs
-      --config string         config file (default is $HOME/babylon.yaml)
-      --copyLvl int           copy level used for file output from a given (set of) runs
-  -d, --debug                 debug mode
-      --git                   whether git is used
-      --gitignoreLvl int      gitignore lvl for a given (set of) runs
-      --json                  json tree of output, if possible
-      --nmExecutable string   Name of nonmem executable to use. Defaults to nmfe74 (NM7.4) (default "nmfe74")
-      --no-cor-file           do not use cor file
-      --no-cov-file           do not use cov file
-      --no-ext-file           do not use ext file
-      --no-grd-file           do not use grd file
-      --no-shk-file           do not use shk file
-      --outputDir string      Go template for the output directory to use for storging details of each executed model (default "{{ .Name }}")
-      --overwrite             Whether or not to remove existing output directories if they are present (default true)
-  -p, --preview               preview action, but don't actually run command
-      --saveConfig            Whether or not to save the existing configuration to a file with the model (default true)
-      --saveExe string        what to name the executable when stored in cache
-      --threads int           number of threads to execute with (default 4)
-  -v, --verbose               verbose output
+    --babylon_binary string   directory path for babylon to be called in goroutines (SGE Execution) (default "/data/apps/bbi")
 ```
 
 ### Sample Output
