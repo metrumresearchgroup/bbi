@@ -264,6 +264,18 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 		return
 	}
 
+	//PostWorkExecution phase if the script value is not empty
+	if l.Nonmem.Configuration.PostWorkExecutable != "" {
+		log.Debugf("Beginning post work hooks. Targeted binary is %s", l.Nonmem.Configuration.PostWorkExecutable)
+		directive := NewPostHookEnvironmentFromNonMemModel(l.Nonmem.Configuration.PostWorkExecutable, l.Nonmem, true, nil)
+		output, err := PostExecutionHook(directive)
+		log.Debugf("Output from the execution is %s", output)
+		if err != nil {
+			RecordConcurrentError(l.Nonmem.FileName, "A failure occurred during execution of the designated post-work execution script: %s", err, channels, l.Cancel)
+			return
+		}
+	}
+
 	//Mark as completed and move on to cleanup
 	channels.Completed <- 1
 }

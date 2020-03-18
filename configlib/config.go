@@ -17,27 +17,28 @@ var AvailableConfiguration Config
 var ConfigurationLoaded bool = false
 
 type Config struct {
-	NMVersion       string                  `mapstructure:"nm_version" yaml:"nm_version" json:"nm_version,omitempty"`
-	Overwrite       bool                    `mapstructure:"overwrite" yaml:"overwrite" json:"overwrite,omitempty"`
-	CleanLvl        int                     `mapstructure:"clean_lvl" yaml:"clean_lvl" json:"clean_lvl,omitempty"`
-	CopyLvl         int                     `mapstructure:"copy_lvl" yaml:"copy_lvl" json:"copy_lvl,omitempty"`
-	Git             bool                    `mapstructure:"git" yaml:"git" json:"git,omitempty"`
-	BabylonBinary   string                  `mapstructure:"babylon_binary" yaml:"babylon_binary" json:"babylon_binary,omitempty"`
-	SaveConfig      bool                    `mapstructure:"save_config" yaml:"save_config" json:"save_config,omitempty"`
-	OutputDir       string                  `mapstructure:"output_dir" yaml:"output_dir" json:"output_dir,omitempty"`
-	Threads         int                     `mapstructure:"threads" yaml:"threads" json:"threads,omitempty"`
-	Debug           bool                    `mapstructure:"debug" yaml:"debug" json:"debug,omitempty"`
-	Local           LocalDetail             `mapstructure:"local" yaml:"local" json:"local,omitempty"`
-	Nonmem          map[string]NonMemDetail `mapstructure:"nonmem" json:"nonmem,omitempty" yaml:"nonmem"`
-	Parallel        bool                    `mapstructure:"parallel" json:"parallel" yaml:"parallel"`
-	Delay           int                     `mapstructure:"delay" yaml:"delay" json:"delay,omitempty" yaml:"delay"`
-	NMQual          bool                    `mapstructure:"nmqual" yaml:"nmqual" json:"nmqual,omitempty"`
-	JSON            bool                    `mapstructure:"json_logging" yaml:"json_logging" json_logging:"json,omitempty"`
-	Logfile         string                  `mapstructure:"log_file" yaml:"log_file" json:"log_file,omitempty"`
-	NMFEOptions     NMFEOptions             `mapstructure:"nmfe_options" yaml:"nmfe_options" json:"nmfe_options,omitempty"`
-	MPIExecPath     string                  `mapstructure:"mpi_exec_path" yaml:"mpi_exec_path" json:"mpi_exec_path,omitempty"`
-	ParallelTimeout int                     `mapstructure:"parallel_timeout" yaml:"parallel_timeout" json:"parallel_timeout,omitempty"`
-	Parafile        string                  `mapstructure:"parafile" yaml:"parafile" json:"parafile,omitempty"`
+	NMVersion          string                  `mapstructure:"nm_version" yaml:"nm_version" json:"nm_version,omitempty"`
+	Overwrite          bool                    `mapstructure:"overwrite" yaml:"overwrite" json:"overwrite,omitempty"`
+	CleanLvl           int                     `mapstructure:"clean_lvl" yaml:"clean_lvl" json:"clean_lvl,omitempty"`
+	CopyLvl            int                     `mapstructure:"copy_lvl" yaml:"copy_lvl" json:"copy_lvl,omitempty"`
+	Git                bool                    `mapstructure:"git" yaml:"git" json:"git,omitempty"`
+	BabylonBinary      string                  `mapstructure:"babylon_binary" yaml:"babylon_binary" json:"babylon_binary,omitempty"`
+	SaveConfig         bool                    `mapstructure:"save_config" yaml:"save_config" json:"save_config,omitempty"`
+	OutputDir          string                  `mapstructure:"output_dir" yaml:"output_dir" json:"output_dir,omitempty"`
+	Threads            int                     `mapstructure:"threads" yaml:"threads" json:"threads,omitempty"`
+	Debug              bool                    `mapstructure:"debug" yaml:"debug" json:"debug,omitempty"`
+	Local              LocalDetail             `mapstructure:"local" yaml:"local" json:"local,omitempty"`
+	Nonmem             map[string]NonMemDetail `mapstructure:"nonmem" json:"nonmem,omitempty" yaml:"nonmem"`
+	Parallel           bool                    `mapstructure:"parallel" json:"parallel" yaml:"parallel"`
+	Delay              int                     `mapstructure:"delay" yaml:"delay" json:"delay,omitempty" yaml:"delay"`
+	NMQual             bool                    `mapstructure:"nmqual" yaml:"nmqual" json:"nmqual,omitempty"`
+	JSON               bool                    `mapstructure:"json_logging" yaml:"json_logging" json_logging:"json,omitempty"`
+	Logfile            string                  `mapstructure:"log_file" yaml:"log_file" json:"log_file,omitempty"`
+	NMFEOptions        NMFEOptions             `mapstructure:"nmfe_options" yaml:"nmfe_options" json:"nmfe_options,omitempty"`
+	MPIExecPath        string                  `mapstructure:"mpi_exec_path" yaml:"mpi_exec_path" json:"mpi_exec_path,omitempty"`
+	ParallelTimeout    int                     `mapstructure:"parallel_timeout" yaml:"parallel_timeout" json:"parallel_timeout,omitempty"`
+	Parafile           string                  `mapstructure:"parafile" yaml:"parafile" json:"parafile,omitempty"`
+	PostWorkExecutable string                  `mapstructure:"post_work_executable" yaml:"post_work_executable" json:"post_work_executable,omitempty"`
 }
 
 type NonMemDetail struct {

@@ -3,6 +3,10 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"os"
+	"os/exec"
+	"path"
+	"strconv"
 )
 
 const runLongDescription string = `run nonmem model(s), for example: 
@@ -79,6 +83,88 @@ func init() {
 	runCmd.PersistentFlags().String(logFileIdentifier, "", "If populated, specifies the file into which to store the output / logging details from Babylon")
 	viper.BindPFlag(logFileIdentifier, runCmd.PersistentFlags().Lookup(logFileIdentifier))
 
+	const postExecutionHookIdentifier string = "post_work_executable"
+	runCmd.PersistentFlags().String(postExecutionHookIdentifier, "", "A script or binary to run when job execution completes or fails")
+	viper.BindPFlag(postExecutionHookIdentifier, runCmd.PersistentFlags().Lookup(postExecutionHookIdentifier))
+
 	nonmemCmd.AddCommand(runCmd)
 
+}
+
+type PostExecutionHookEnvironment struct {
+	ExecutionBinary string `yaml:"execution_binary" json:"execution_binary, omitempty"`
+	ModelPath       string `yaml:"model_path" json:"model_path,omitempty"`
+	Model           string `yaml:"model" json:"model,omitempty"`
+	Filename        string `yaml:"filename" json:"filename,omitempty"`
+	Extension       string `yaml:"extension" json:"extension,omitempty"`
+	OutputDirectory string `yaml:"output_directory" json:"output_directory,omitempty"`
+	Successful      bool   `yaml:"successful" json:"successful,omitempty"`
+	Error           error  `yaml:"error" json:"error,omitempty"`
+}
+
+//NewPostHookEnvironmentFromNonMemModel creates an execution directive from the common model. Will eventually have
+//another method for STAN or other execution types
+func NewPostHookEnvironmentFromNonMemModel(execution_binary string, nonmem *NonMemModel, successful bool, err error) PostExecutionHookEnvironment {
+	return PostExecutionHookEnvironment{
+		ModelPath:       nonmem.OutputDir,
+		Model:           nonmem.Model,
+		Filename:        nonmem.FileName,
+		Extension:       nonmem.Extension,
+		OutputDirectory: nonmem.OutputDir,
+		Successful:      successful,
+		Error:           err,
+		ExecutionBinary: execution_binary,
+	}
+}
+
+func PostExecutionHook(directive PostExecutionHookEnvironment) (string, error) {
+	environmentalPrefix := "BABYLON_"
+	var fullyQualifiedExecutionPath string
+
+	//Is the path provided for execution Binary absolute?
+	if path.IsAbs(directive.ExecutionBinary) {
+		//Nothing to change. We'll use this value
+		fullyQualifiedExecutionPath = directive.ExecutionBinary
+	} else {
+		//Need to get current dir and append to value
+		whereami, err := os.Getwd()
+		if err != nil {
+			return "", err
+		}
+
+		fullyQualifiedExecutionPath = path.Join(whereami, directive.ExecutionBinary)
+	}
+
+	pathEnvironment := environmentalPrefix + "MODEL_PATH"
+	modelEnvironment := environmentalPrefix + "MODEL"
+	filenameEnvironment := environmentalPrefix + "FILENAME"
+	extensionEnvironment := environmentalPrefix + "MODEL_EXT"
+	outputDirEnvironment := environmentalPrefix + "OUTPUT_DIR"
+	successEnvironment := environmentalPrefix + "SUCCESSFUL"
+	errorEnvironment := environmentalPrefix + "ERROR"
+
+	var executionEnvironment []string
+
+	executionEnvironment = append(executionEnvironment, pathEnvironment+"="+directive.ModelPath)
+	executionEnvironment = append(executionEnvironment, modelEnvironment+"="+directive.Model)
+	executionEnvironment = append(executionEnvironment, filenameEnvironment+"="+directive.Filename)
+	executionEnvironment = append(executionEnvironment, extensionEnvironment+"="+directive.Extension)
+	executionEnvironment = append(executionEnvironment, outputDirEnvironment+"="+directive.OutputDirectory)
+	executionEnvironment = append(executionEnvironment, successEnvironment+"="+strconv.FormatBool(directive.Successful))
+
+	var errorText string
+
+	if directive.Error != nil {
+		errorText = directive.Error.Error()
+	}
+
+	executionEnvironment = append(executionEnvironment, errorEnvironment+"="+errorText)
+
+	cmd := exec.Command(fullyQualifiedExecutionPath)
+
+	//Set the environment for the binary.
+	cmd.Env = executionEnvironment
+	bytes, err := cmd.CombinedOutput()
+
+	return string(bytes), err
 }
