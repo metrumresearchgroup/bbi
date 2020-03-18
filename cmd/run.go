@@ -1,11 +1,10 @@
 package cmd
 
 import (
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"os"
 	"os/exec"
-	"path"
 	"strconv"
 )
 
@@ -91,6 +90,12 @@ func init() {
 
 }
 
+type PostWorkExecutor interface {
+	BuildExecutionEnvironment(completed bool, err error) //Sets the Struct content for the PostExecutionHookEnvironment
+	GetPostWorkConfig() *PostExecutionHookEnvironment
+	GetPostWorkExecutablePath() string
+}
+
 type PostExecutionHookEnvironment struct {
 	ExecutionBinary string `yaml:"execution_binary" json:"execution_binary, omitempty"`
 	ModelPath       string `yaml:"model_path" json:"model_path,omitempty"`
@@ -102,42 +107,12 @@ type PostExecutionHookEnvironment struct {
 	Error           error  `yaml:"error" json:"error,omitempty"`
 }
 
-//NewPostHookEnvironmentFromNonMemModel creates an execution directive from the common model. Will eventually have
-//another method for STAN or other execution types
-func NewPostHookEnvironmentFromNonMemModel(execution_binary string, nonmem *NonMemModel, successful bool, err error) PostExecutionHookEnvironment {
-	return PostExecutionHookEnvironment{
-		ModelPath:       nonmem.OutputDir,
-		Model:           nonmem.Model,
-		Filename:        nonmem.FileName,
-		Extension:       nonmem.Extension,
-		OutputDirectory: nonmem.OutputDir,
-		Successful:      successful,
-		Error:           err,
-		ExecutionBinary: execution_binary,
-	}
-}
-
-func PostExecutionHook(directive PostExecutionHookEnvironment) (string, error) {
+func PostExecutionEnvironment(directive *PostExecutionHookEnvironment) ([]string, error) {
 	environmentalPrefix := "BABYLON_"
-	var fullyQualifiedExecutionPath string
-
-	//Is the path provided for execution Binary absolute?
-	if path.IsAbs(directive.ExecutionBinary) {
-		//Nothing to change. We'll use this value
-		fullyQualifiedExecutionPath = directive.ExecutionBinary
-	} else {
-		//Need to get current dir and append to value
-		whereami, err := os.Getwd()
-		if err != nil {
-			return "", err
-		}
-
-		fullyQualifiedExecutionPath = path.Join(whereami, directive.ExecutionBinary)
-	}
 
 	pathEnvironment := environmentalPrefix + "MODEL_PATH"
 	modelEnvironment := environmentalPrefix + "MODEL"
-	filenameEnvironment := environmentalPrefix + "FILENAME"
+	filenameEnvironment := environmentalPrefix + "MODEL_FILENAME"
 	extensionEnvironment := environmentalPrefix + "MODEL_EXT"
 	outputDirEnvironment := environmentalPrefix + "OUTPUT_DIR"
 	successEnvironment := environmentalPrefix + "SUCCESSFUL"
@@ -160,11 +135,40 @@ func PostExecutionHook(directive PostExecutionHookEnvironment) (string, error) {
 
 	executionEnvironment = append(executionEnvironment, errorEnvironment+"="+errorText)
 
-	cmd := exec.Command(fullyQualifiedExecutionPath)
+	return executionEnvironment, nil
+}
+
+func ExecutePostWorkDirectivesWithEnvironment(worker PostWorkExecutor) (string, error) {
+	log.Debug("Beginning Execution of post work scripts")
+
+	toExecute := worker.GetPostWorkExecutablePath()
+
+	log.Debugf("Fully qualified path to executable is %s", toExecute)
+
+	environment, err := PostExecutionEnvironment(worker.GetPostWorkConfig())
+
+	cmd := exec.Command(toExecute)
 
 	//Set the environment for the binary.
-	cmd.Env = executionEnvironment
-	bytes, err := cmd.CombinedOutput()
+	cmd.Env = environment
 
-	return string(bytes), err
+	log.WithFields(log.Fields{
+		"environment": cmd.Env,
+	}).Debug("Environment generated for commandline")
+
+	log.Debugf("Command will be %s", cmd.String())
+
+	outputBytes, err := cmd.CombinedOutput()
+
+	if err != nil {
+		if exitError, ok := err.(*exec.ExitError); ok {
+			code := exitError.ExitCode()
+			details := exitError.String()
+
+			log.Errorf("Exit code was %d, details were %s", code, details)
+			log.Errorf("output details were: %s", string(outputBytes))
+		}
+	}
+
+	return string(outputBytes), err
 }

@@ -162,6 +162,28 @@ func ReadSpecifiedFileIntoConfigStruct(config string) (Config, error) {
 		return returnConfig, err
 	}
 
+	//Fully qualify path for Post Execution script
+	if returnConfig.PostWorkExecutable != "" {
+		var fullyQualifiedExecutionPath string
+
+		//Is the path provided for execution Binary absolute?
+		if path.IsAbs(returnConfig.PostWorkExecutable) {
+			//Nothing to change. We'll use this value
+			fullyQualifiedExecutionPath = returnConfig.PostWorkExecutable
+		} else {
+			//Need to get current dir and append to value
+			whereami, err := os.Getwd()
+			if err != nil {
+				return returnConfig, err
+			}
+
+			fullyQualifiedExecutionPath = path.Join(whereami, returnConfig.PostWorkExecutable)
+		}
+
+
+		returnConfig.PostWorkExecutable = fullyQualifiedExecutionPath
+	}
+
 	return returnConfig, nil
 }
 

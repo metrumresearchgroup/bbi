@@ -28,12 +28,33 @@ type sgeOperation struct {
 
 //SGEModel is the struct used for SGE operations containing the NonMemModel
 type SGEModel struct {
-	Nonmem *NonMemModel
-	Cancel chan bool
+	Nonmem               *NonMemModel
+	Cancel               chan bool
+	postworkInstructions *PostExecutionHookEnvironment
+}
+
+func (s *SGEModel) BuildExecutionEnvironment(completed bool, err error) {
+	s.postworkInstructions = &PostExecutionHookEnvironment{
+		ExecutionBinary: s.Nonmem.Configuration.PostWorkExecutable,
+		ModelPath:       s.Nonmem.Path,
+		Model:           s.Nonmem.Model,
+		Filename:        s.Nonmem.FileName,
+		Extension:       s.Nonmem.Extension,
+		OutputDirectory: s.Nonmem.Configuration.OutputDir,
+		Successful:      completed,
+		Error:           err,
+	}
+}
+
+func (s *SGEModel) GetPostWorkConfig() *PostExecutionHookEnvironment {
+	return s.postworkInstructions
+}
+
+func (s *SGEModel) GetPostWorkExecutablePath() string {
+	return s.Nonmem.Configuration.PostWorkExecutable
 }
 
 //Begin Scalable method definitions
-
 func (l SGEModel) CancellationChannel() chan bool {
 	return l.Cancel
 }

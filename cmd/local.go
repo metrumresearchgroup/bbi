@@ -32,12 +32,34 @@ type localOperation struct {
 
 //LocalModel is the struct used for local operations containing the NonMemModel
 type LocalModel struct {
-	Nonmem *NonMemModel
-	Cancel chan bool
+	Nonmem               *NonMemModel
+	Cancel               chan bool
+	postworkInstructions *PostExecutionHookEnvironment
+}
+
+func (l *LocalModel) BuildExecutionEnvironment(completed bool, err error) {
+	l.postworkInstructions = &PostExecutionHookEnvironment{
+		ExecutionBinary: l.Nonmem.Configuration.PostWorkExecutable,
+		ModelPath:       l.Nonmem.Path,
+		Model:           l.Nonmem.Model,
+		Filename:        l.Nonmem.FileName,
+		Extension:       l.Nonmem.Extension,
+		OutputDirectory: l.Nonmem.OutputDir,
+		Successful:      completed,
+		Error:           err,
+	}
+}
+
+func (l *LocalModel) GetPostWorkConfig() *PostExecutionHookEnvironment {
+	return l.postworkInstructions
+}
+
+
+func (l *LocalModel) GetPostWorkExecutablePath() string {
+	return l.Nonmem.Configuration.PostWorkExecutable
 }
 
 //Begin Scalable method definitions
-
 func (l LocalModel) CancellationChannel() chan bool {
 	return l.Cancel
 }
@@ -264,16 +286,24 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 		return
 	}
 
+	log.Debugf("Post Work Executable set as %s", l.Nonmem.Configuration.PostWorkExecutable)
 	//PostWorkExecution phase if the script value is not empty
 	if l.Nonmem.Configuration.PostWorkExecutable != "" {
-		log.Debugf("Beginning post work hooks. Targeted binary is %s", l.Nonmem.Configuration.PostWorkExecutable)
-		directive := NewPostHookEnvironmentFromNonMemModel(l.Nonmem.Configuration.PostWorkExecutable, l.Nonmem, true, nil)
-		output, err := PostExecutionHook(directive)
-		log.Debugf("Output from the execution is %s", output)
+		l.BuildExecutionEnvironment(true, nil)
+		log.WithFields(log.Fields{
+			"configuration": l.postworkInstructions,
+			"executable":    l.Nonmem.Configuration.PostWorkExecutable,
+		}).Debugf("Preparing to execute")
+
+		output, err := ExecutePostWorkDirectivesWithEnvironment(&l)
+
 		if err != nil {
-			RecordConcurrentError(l.Nonmem.FileName, "A failure occurred during execution of the designated post-work execution script: %s", err, channels, l.Cancel)
+			log.Errorf("Error during execution: %s", err)
+			RecordConcurrentError(l.Nonmem.FileName, "A failure occurred during execution of the designated post-work execution script", err, channels, l.Cancel)
 			return
 		}
+
+		log.Debugf("Output content from post work hook is: %s", output)
 	}
 
 	//Mark as completed and move on to cleanup
