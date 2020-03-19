@@ -54,6 +54,10 @@ func (s *SGEModel) GetPostWorkExecutablePath() string {
 	return s.Nonmem.Configuration.PostWorkExecutable
 }
 
+func (s *SGEModel) GetGlobalConfig() *configlib.Config{
+	return s.Nonmem.Configuration
+}
+
 //Begin Scalable method definitions
 func (l SGEModel) CancellationChannel() chan bool {
 	return l.Cancel

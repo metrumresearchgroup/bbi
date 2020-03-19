@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/metrumresearchgroup/babylon/configlib"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -86,6 +87,10 @@ func init() {
 	runCmd.PersistentFlags().String(postExecutionHookIdentifier, "", "A script or binary to run when job execution completes or fails")
 	viper.BindPFlag(postExecutionHookIdentifier, runCmd.PersistentFlags().Lookup(postExecutionHookIdentifier))
 
+	const additionalEnvIdentifier string = "additional_post_work_envs"
+	runCmd.PersistentFlags().StringSlice(additionalEnvIdentifier,[]string{}, "Any additional values (as ENV KEY=VALUE) to provide for the post execution environment")
+	viper.BindPFlag(additionalEnvIdentifier, runCmd.PersistentFlags().Lookup(additionalEnvIdentifier))
+
 	nonmemCmd.AddCommand(runCmd)
 
 }
@@ -94,6 +99,7 @@ type PostWorkExecutor interface {
 	BuildExecutionEnvironment(completed bool, err error) //Sets the Struct content for the PostExecutionHookEnvironment
 	GetPostWorkConfig() *PostExecutionHookEnvironment
 	GetPostWorkExecutablePath() string
+	GetGlobalConfig() *configlib.Config
 }
 
 type PostExecutionHookEnvironment struct {
@@ -107,7 +113,7 @@ type PostExecutionHookEnvironment struct {
 	Error           error  `yaml:"error" json:"error,omitempty"`
 }
 
-func PostExecutionEnvironment(directive *PostExecutionHookEnvironment) ([]string, error) {
+func PostExecutionEnvironment(directive *PostExecutionHookEnvironment, additional []string) ([]string, error) {
 	environmentalPrefix := "BABYLON_"
 
 	pathEnvironment := environmentalPrefix + "MODEL_PATH"
@@ -135,6 +141,9 @@ func PostExecutionEnvironment(directive *PostExecutionHookEnvironment) ([]string
 
 	executionEnvironment = append(executionEnvironment, errorEnvironment+"="+errorText)
 
+	//Add user provided values
+	executionEnvironment = append(executionEnvironment, additional...)
+
 	return executionEnvironment, nil
 }
 
@@ -145,7 +154,7 @@ func ExecutePostWorkDirectivesWithEnvironment(worker PostWorkExecutor) (string, 
 
 	log.Debugf("Fully qualified path to executable is %s", toExecute)
 
-	environment, err := PostExecutionEnvironment(worker.GetPostWorkConfig())
+	environment, err := PostExecutionEnvironment(worker.GetPostWorkConfig(), worker.GetGlobalConfig().PostWorkExecEnvs)
 
 	cmd := exec.Command(toExecute)
 

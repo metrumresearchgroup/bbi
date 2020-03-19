@@ -39,6 +39,7 @@ type Config struct {
 	ParallelTimeout    int                     `mapstructure:"parallel_timeout" yaml:"parallel_timeout" json:"parallel_timeout,omitempty"`
 	Parafile           string                  `mapstructure:"parafile" yaml:"parafile" json:"parafile,omitempty"`
 	PostWorkExecutable string                  `mapstructure:"post_work_executable" yaml:"post_work_executable" json:"post_work_executable,omitempty"`
+	PostWorkExecEnvs 	[]string				`mapstructure:"additional_post_work_envs" yaml:"additional_post_work_envs" json:"additional_post_work_envs,omitempty"`
 }
 
 type NonMemDetail struct {

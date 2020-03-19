@@ -59,6 +59,10 @@ func (l *LocalModel) GetPostWorkExecutablePath() string {
 	return l.Nonmem.Configuration.PostWorkExecutable
 }
 
+func (l *LocalModel) GetGlobalConfig() *configlib.Config{
+	return l.Nonmem.Configuration
+}
+
 //Begin Scalable method definitions
 func (l LocalModel) CancellationChannel() chan bool {
 	return l.Cancel
