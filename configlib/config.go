@@ -12,10 +12,6 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-//Whenever
-var AvailableConfiguration Config
-var ConfigurationLoaded bool = false
-
 type Config struct {
 	NMVersion       string                  `mapstructure:"nm_version" yaml:"nm_version" json:"nm_version,omitempty"`
 	Overwrite       bool                    `mapstructure:"overwrite" yaml:"overwrite" json:"overwrite,omitempty"`
@@ -32,7 +28,7 @@ type Config struct {
 	Parallel        bool                    `mapstructure:"parallel" json:"parallel" yaml:"parallel"`
 	Delay           int                     `mapstructure:"delay" yaml:"delay" json:"delay,omitempty" yaml:"delay"`
 	NMQual          bool                    `mapstructure:"nmqual" yaml:"nmqual" json:"nmqual,omitempty"`
-	JSON            bool                    `mapstructure:"json_logging" yaml:"json_logging" json_logging:"json,omitempty"`
+	JSON            bool                    `mapstructure:"json" yaml:"json" json:"json,omitempty"`
 	Logfile         string                  `mapstructure:"log_file" yaml:"log_file" json:"log_file,omitempty"`
 	NMFEOptions     NMFEOptions             `mapstructure:"nmfe_options" yaml:"nmfe_options" json:"nmfe_options,omitempty"`
 	MPIExecPath     string                  `mapstructure:"mpi_exec_path" yaml:"mpi_exec_path" json:"mpi_exec_path,omitempty"`
@@ -59,7 +55,7 @@ type NMFEOptions struct {
 	PRDefault   bool   `mapstructure:"prdefault" yaml:"prdefault" json:"prdefault,omitempty"`
 	TPRDefault  bool   `mapstructure:"tprdefault" yaml:"tprdefault" json:"tprdefault,omitempty"`
 	NoBuild     bool   `mapstructure:"nobuild" yaml:"nobuild" json:"nobuild,omitempty"`
-	MaxLim      int    `mapstructure:"maxlim" yaml:"maxlim" jason:"maxlim,omitempty"` //Default (empty value) is 3
+	MaxLim      int    `mapstructure:"maxlim" yaml:"maxlim" json:"maxlim,omitempty"` //Default (empty value) is 3
 }
 
 func (c Config) RenderYamlToFile(path string) error {
