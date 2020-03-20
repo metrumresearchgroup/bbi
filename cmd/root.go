@@ -32,7 +32,9 @@ import (
 )
 
 // VERSION is the current bbi version
-var VERSION string = "2.1.0-alpha.17"
+var (
+	VERSION string = "develop"
+)
 
 var (
 	// name of config file
