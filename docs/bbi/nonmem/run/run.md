@@ -20,28 +20,25 @@ The run command collects a series of flags necessary to define the behavior for:
      * During initial model execution, a wildcard (`*`) gitignore file is placed into the model execution directory
         * While not explicitly necessary, if you are using something like RStudio or other platform that is tracking changes to git, this will keep those other platforms sane while nonmem is generating all of its temporary files. Vastly important when multiple runs are being done at once. 
      * After execution is done, the gitignore file is updated with various temp files to prevent them from being committed into a repo on accident
-* `--outputDir {{ .Name }}` : A valid go-template (Defaults to the one listed here) that will be used for creating the directories in which model execution will occur. `Name` is the only variable interpreted, but you can append / prepend items to it:
+* `--output_dir {{ .Name }}` : A valid go-template (Defaults to the one listed here) that will be used for creating the directories in which model execution will occur. `Name` is the only variable interpreted, but you can append / prepend items to it:
     * `'{{ .Name }}_output` : yields modelname_output
     * `'output_{{ .Name }}'` : yields output_modelname
-* `--cleanLvl <1|2|3>` : Based on a list of extensions and files (See below), will remove any matching files from the output directory after the work is done. Default is 2
-* `--copyLvl <1|2|3>` : Based on a list of extension and files (See below), will remove copy any of the matched files back into the original model directory prepended with the model name. Mirrors PSN functionality, although the default is 0 (or off)
+* `--clean_lvl <1|2|3>` : Based on a list of extensions and files (See below), will remove any matching files from the output directory after the work is done. Default is 2
+* `--copy_lvl <1|2|3>` : Based on a list of extension and files (See below), will remove copy any of the matched files back into the original model directory prepended with the model name. Mirrors PSN functionality, although the default is 0 (or off)
 
 ### Options
 
 ```
-  -h, --help                  help for nonmem
-      --nmExecutable string   Name of nonmem executable to use. Defaults to nmfe74 (NM7.4) (default "nmfe74")
-      --config string   config file (default is $HOME/babylon.yaml)
-  -d, --debug           debug mode
-      --json            json tree of output, if possible
-      --no-cor-file     do not use cor file
-      --no-cov-file     do not use cov file
-      --no-ext-file     do not use ext file
-      --no-grd-file     do not use grd file
-      --no-shk-file     do not use shk file
-  -p, --preview         preview action, but don't actually run command
-      --threads int     number of threads to execute with (default 4)
-  -v, --verbose         verbose output
+      --clean_lvl int       clean level used for file output from a given (set of) runs (default 1)
+      --config string       Path (relative or absolute) to another babylon.yaml to load
+      --copy_lvl int        copy level used for file output from a given (set of) runs
+      --delay int           Selects a random number of seconds between 1 and this value to stagger / jitter job execution. Assists in dealing with large volumes of work dealing with the same data set. May avoid NMTRAN issues about not being able read / close files
+      --git                 whether git is used
+  -h, --help                help for run
+      --log_file string     If populated, specifies the file into which to store the output / logging details from Babylon
+      --output_dir string   Go template for the output directory to use for storging details of each executed model (default "{{ .Name }}")
+      --overwrite           Whether or not to remove existing output directories if they are present
+      --save_config         Whether or not to save the existing configuration to a file with the model (default true)
 ```
 
 ### Subcommands
