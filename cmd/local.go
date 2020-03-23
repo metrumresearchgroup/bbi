@@ -338,7 +338,12 @@ func init() {
 
 func local(cmd *cobra.Command, args []string) {
 
-	config := configlib.LocateAndReadConfigFile()
+	config, err := configlib.LocateAndReadConfigFile()
+
+	if err != nil {
+		log.Fatalf("Failed to process configuration: %s", err)
+	}
+
 	log.Info("Beginning Local Path")
 
 	logSetup(config)
