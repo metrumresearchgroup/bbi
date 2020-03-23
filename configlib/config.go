@@ -170,7 +170,7 @@ func ReadSpecifiedFileIntoConfigStruct(config string) (Config, error) {
 	return returnConfig, nil
 }
 
-func LocateAndReadConfigFile() Config {
+func LocateAndReadConfigFile() (Config, error) {
 
 	var config Config
 
@@ -207,5 +207,17 @@ func LocateAndReadConfigFile() Config {
 	// Write in the additional (private) contentss
 	config.SetPostWorkExecEnvs(viper.GetStringSlice("additional_post_work_envs"))
 
-	return config
+	// Now, let's make sure we have a fully qualified path to the Execution script
+	if config.PostWorkExecutable != "" && !filepath.IsAbs(config.PostWorkExecutable) {
+		//Let's re-write with the full path.
+		whereami, err := os.Getwd()
+
+		if err != nil {
+			return config, err
+		}
+
+		config.PostWorkExecutable = filepath.Join(whereami, config.PostWorkExecutable)
+	}
+
+	return config, nil
 }
