@@ -12,10 +12,6 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-//Whenever
-var AvailableConfiguration Config
-var ConfigurationLoaded bool = false
-
 type Config struct {
 	NMVersion          string                  `mapstructure:"nm_version" yaml:"nm_version" json:"nm_version,omitempty"`
 	Overwrite          bool                    `mapstructure:"overwrite" yaml:"overwrite" json:"overwrite,omitempty"`
@@ -32,14 +28,14 @@ type Config struct {
 	Parallel           bool                    `mapstructure:"parallel" json:"parallel" yaml:"parallel"`
 	Delay              int                     `mapstructure:"delay" yaml:"delay" json:"delay,omitempty" yaml:"delay"`
 	NMQual             bool                    `mapstructure:"nmqual" yaml:"nmqual" json:"nmqual,omitempty"`
-	JSON               bool                    `mapstructure:"json_logging" yaml:"json_logging" json_logging:"json,omitempty"`
+	JSON               bool                    `mapstructure:"json" yaml:"json" json:"json,omitempty"`
 	Logfile            string                  `mapstructure:"log_file" yaml:"log_file" json:"log_file,omitempty"`
 	NMFEOptions        NMFEOptions             `mapstructure:"nmfe_options" yaml:"nmfe_options" json:"nmfe_options,omitempty"`
 	MPIExecPath        string                  `mapstructure:"mpi_exec_path" yaml:"mpi_exec_path" json:"mpi_exec_path,omitempty"`
 	ParallelTimeout    int                     `mapstructure:"parallel_timeout" yaml:"parallel_timeout" json:"parallel_timeout,omitempty"`
 	Parafile           string                  `mapstructure:"parafile" yaml:"parafile" json:"parafile,omitempty"`
 	PostWorkExecutable string                  `mapstructure:"post_work_executable" yaml:"post_work_executable" json:"post_work_executable,omitempty"`
-	PostWorkExecEnvs 	[]string				`mapstructure:"additional_post_work_envs" yaml:"additional_post_work_envs" json:"additional_post_work_envs,omitempty"`
+	PostWorkExecEnvs   []string                `mapstructure:"additional_post_work_envs" yaml:"additional_post_work_envs" json:"additional_post_work_envs,omitempty"`
 }
 
 type NonMemDetail struct {
@@ -61,7 +57,7 @@ type NMFEOptions struct {
 	PRDefault   bool   `mapstructure:"prdefault" yaml:"prdefault" json:"prdefault,omitempty"`
 	TPRDefault  bool   `mapstructure:"tprdefault" yaml:"tprdefault" json:"tprdefault,omitempty"`
 	NoBuild     bool   `mapstructure:"nobuild" yaml:"nobuild" json:"nobuild,omitempty"`
-	MaxLim      int    `mapstructure:"maxlim" yaml:"maxlim" jason:"maxlim,omitempty"` //Default (empty value) is 3
+	MaxLim      int    `mapstructure:"maxlim" yaml:"maxlim" json:"maxlim,omitempty"` //Default (empty value) is 3
 }
 
 func (c Config) RenderYamlToFile(path string) error {
@@ -161,28 +157,6 @@ func ReadSpecifiedFileIntoConfigStruct(config string) (Config, error) {
 	if err != nil {
 		log.Errorf("Unable to read file %s into viper!", config)
 		return returnConfig, err
-	}
-
-	//Fully qualify path for Post Execution script
-	if returnConfig.PostWorkExecutable != "" {
-		var fullyQualifiedExecutionPath string
-
-		//Is the path provided for execution Binary absolute?
-		if path.IsAbs(returnConfig.PostWorkExecutable) {
-			//Nothing to change. We'll use this value
-			fullyQualifiedExecutionPath = returnConfig.PostWorkExecutable
-		} else {
-			//Need to get current dir and append to value
-			whereami, err := os.Getwd()
-			if err != nil {
-				return returnConfig, err
-			}
-
-			fullyQualifiedExecutionPath = path.Join(whereami, returnConfig.PostWorkExecutable)
-		}
-
-
-		returnConfig.PostWorkExecutable = fullyQualifiedExecutionPath
 	}
 
 	return returnConfig, nil

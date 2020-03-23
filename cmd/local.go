@@ -54,12 +54,11 @@ func (l *LocalModel) GetPostWorkConfig() *PostExecutionHookEnvironment {
 	return l.postworkInstructions
 }
 
-
 func (l *LocalModel) GetPostWorkExecutablePath() string {
 	return l.Nonmem.Configuration.PostWorkExecutable
 }
 
-func (l *LocalModel) GetGlobalConfig() *configlib.Config{
+func (l *LocalModel) GetGlobalConfig() *configlib.Config {
 	return l.Nonmem.Configuration
 }
 

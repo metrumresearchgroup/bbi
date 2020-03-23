@@ -54,7 +54,7 @@ func (s *SGEModel) GetPostWorkExecutablePath() string {
 	return s.Nonmem.Configuration.PostWorkExecutable
 }
 
-func (s *SGEModel) GetGlobalConfig() *configlib.Config{
+func (s *SGEModel) GetGlobalConfig() *configlib.Config {
 	return s.Nonmem.Configuration
 }
 

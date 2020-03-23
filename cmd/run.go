@@ -88,7 +88,7 @@ func init() {
 	viper.BindPFlag(postExecutionHookIdentifier, runCmd.PersistentFlags().Lookup(postExecutionHookIdentifier))
 
 	const additionalEnvIdentifier string = "additional_post_work_envs"
-	runCmd.PersistentFlags().StringSlice(additionalEnvIdentifier,[]string{}, "Any additional values (as ENV KEY=VALUE) to provide for the post execution environment")
+	runCmd.PersistentFlags().StringSlice(additionalEnvIdentifier, []string{}, "Any additional values (as ENV KEY=VALUE) to provide for the post execution environment")
 	viper.BindPFlag(additionalEnvIdentifier, runCmd.PersistentFlags().Lookup(additionalEnvIdentifier))
 
 	nonmemCmd.AddCommand(runCmd)
