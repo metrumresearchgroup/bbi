@@ -62,6 +62,10 @@ func (l *LocalModel) GetGlobalConfig() *configlib.Config {
 	return l.Nonmem.Configuration
 }
 
+func (l *LocalModel) GetWorkingPath() string {
+	return l.Nonmem.OutputDir
+}
+
 //Begin Scalable method definitions
 func (l LocalModel) CancellationChannel() chan bool {
 	return l.Cancel

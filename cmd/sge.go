@@ -58,6 +58,10 @@ func (s *SGEModel) GetGlobalConfig() *configlib.Config {
 	return s.Nonmem.Configuration
 }
 
+func (s *SGEModel) GetWorkingPath() string {
+	return s.Nonmem.OutputDir
+}
+
 //Begin Scalable method definitions
 func (l SGEModel) CancellationChannel() chan bool {
 	return l.Cancel

@@ -1,12 +1,17 @@
 package cmd
 
 import (
+	"bytes"
 	"github.com/metrumresearchgroup/babylon/configlib"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"io/ioutil"
 	"os/exec"
+	"path/filepath"
 	"strconv"
+	"strings"
+	"text/template"
 )
 
 const runLongDescription string = `run nonmem model(s), for example: 
@@ -15,6 +20,35 @@ bbi nonmem run  --clean_lvl=1 <local|sge> run001.mod run002.mod
 bbi nonmem run <local|sge> run[001:006].mod // expand to run001.mod run002.mod ... run006.mod local
 bbi nonmem run <local|sge> .// run all models in directory
  `
+
+const postProcessingScriptTemplate string = `#!/bin/bash
+
+###################
+#
+# Babylon post-processing script
+# 
+# Please note that the environment variables written here
+# do not represent all used during execution. Private variables,
+# such as additional environments provided for external systems authentication
+# are not written into this file for security reasons.
+#
+# Only environment values prefixed with BABYLON_ are written into this file at
+# execution time.
+#
+###################
+
+{{ range .EnvironmentVariables }}
+	{{- . }}
+{{end}}
+
+
+###################
+#
+# Below is the actual post execution target.
+#
+###################
+{{ .Script }}
+`
 
 // RunCmd represents the run command
 var runCmd = &cobra.Command{
@@ -100,6 +134,7 @@ type PostWorkExecutor interface {
 	GetPostWorkConfig() *PostExecutionHookEnvironment
 	GetPostWorkExecutablePath() string
 	GetGlobalConfig() *configlib.Config
+	GetWorkingPath() string
 }
 
 type PostExecutionHookEnvironment struct {
@@ -149,14 +184,62 @@ func PostExecutionEnvironment(directive *PostExecutionHookEnvironment, additiona
 
 func ExecutePostWorkDirectivesWithEnvironment(worker PostWorkExecutor) (string, error) {
 	log.Debug("Beginning Execution of post work scripts")
+	var outBytesBuffer = new(bytes.Buffer)
 
 	toExecute := worker.GetPostWorkExecutablePath()
+	config := worker.GetGlobalConfig()
+
+	environment, err := PostExecutionEnvironment(worker.GetPostWorkConfig(), config.GetPostWorkExecEnvs())
+	environmentToPersist := onlyBabylonVariables(environment)
+
+	if err != nil {
+		return "", err
+	}
+
+	log.Debug("Beginning template operations")
+
+	tmpl, err := template.New("post_processing").Parse(postProcessingScriptTemplate)
+
+	if err != nil {
+		return "", err
+	}
+
+	type postProcessingDetails struct {
+		EnvironmentVariables []string
+		Script               string
+	}
+
+	ppd := postProcessingDetails{
+		EnvironmentVariables: environmentToPersist,
+		Script:               toExecute,
+	}
 
 	log.Debugf("Fully qualified path to executable is %s", toExecute)
 
-	environment, err := PostExecutionEnvironment(worker.GetPostWorkConfig(), worker.GetGlobalConfig().PostWorkExecEnvs)
+	log.WithFields(log.Fields{
+		"details": ppd,
+	}).Debug("Executing template")
 
-	cmd := exec.Command(toExecute)
+	err = tmpl.Execute(outBytesBuffer, ppd)
+
+	if err != nil {
+		return "", err
+	}
+
+	processedBytes := outBytesBuffer.Bytes()
+
+	log.WithFields(log.Fields{
+		"rendered": string(processedBytes),
+	}).Debug("Writing contents to file in output directory")
+
+	err = ioutil.WriteFile(filepath.Join(worker.GetWorkingPath(), "post_processing.sh"), processedBytes, 0755)
+
+	if err != nil {
+		return "", err
+	}
+
+	//Needs to be the processed value, not the config template.
+	cmd := exec.Command(filepath.Join(worker.GetWorkingPath(), "post_processing.sh"))
 
 	//Set the environment for the binary.
 	cmd.Env = environment
@@ -180,4 +263,15 @@ func ExecutePostWorkDirectivesWithEnvironment(worker PostWorkExecutor) (string, 
 	}
 
 	return string(outputBytes), err
+}
+
+func onlyBabylonVariables(provided []string) []string {
+	var matched []string
+	for _, v := range provided {
+		if strings.HasPrefix(v, "BABYLON_") {
+			matched = append(matched, v)
+		}
+	}
+
+	return matched
 }

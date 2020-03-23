@@ -35,7 +35,15 @@ type Config struct {
 	ParallelTimeout    int                     `mapstructure:"parallel_timeout" yaml:"parallel_timeout" json:"parallel_timeout,omitempty"`
 	Parafile           string                  `mapstructure:"parafile" yaml:"parafile" json:"parafile,omitempty"`
 	PostWorkExecutable string                  `mapstructure:"post_work_executable" yaml:"post_work_executable" json:"post_work_executable,omitempty"`
-	PostWorkExecEnvs   []string                `mapstructure:"additional_post_work_envs" yaml:"additional_post_work_envs" json:"additional_post_work_envs,omitempty"`
+	postWorkExecEnvs   []string                `mapstructure:"additional_post_work_envs" yaml:"additional_post_work_envs" json:"additional_post_work_envs,omitempty"`
+}
+
+func (c *Config) GetPostWorkExecEnvs() []string {
+	return c.postWorkExecEnvs
+}
+
+func (c *Config) SetPostWorkExecEnvs(envs []string) {
+	c.postWorkExecEnvs = envs
 }
 
 type NonMemDetail struct {
@@ -195,6 +203,9 @@ func LocateAndReadConfigFile() Config {
 
 		log.Infof("Successfully loaded specified configuration from %s", viper.GetString("config"))
 	}
+
+	// Write in the additional (private) contentss
+	config.SetPostWorkExecEnvs(viper.GetStringSlice("additional_post_work_envs"))
 
 	return config
 }
