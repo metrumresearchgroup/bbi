@@ -38,8 +38,8 @@ const postProcessingScriptTemplate string = `#!/bin/bash
 ###################
 
 {{ range .EnvironmentVariables }}
-	{{- . }}
-{{end}}
+	export {{ . }}
+{{- end}}
 
 
 ###################
