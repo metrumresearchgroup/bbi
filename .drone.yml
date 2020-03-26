@@ -58,9 +58,32 @@
   trigger:
     event:
       - push
-
-
   volumes:
     - name: docker.sock
       host:
         path: /var/run/docker.sock
+
+---
+  name: tagged releases
+  kind: pipeline
+  type: docker
+  steps:
+    - name: goreleaser
+      image: goreleaser/goreleaser
+      environment:
+        VERSION: ${DRONE_TAG}
+        #Forcing DBN to be empty such that we don't set it for hte LDFLags
+        DRONE_BUILD_NUMBER: ""
+        GITHUB_TOKEN:
+          from_secret: GITHUB_TOKEN
+      commands:
+        - git config --global user.email "drone@metrumrg.com"
+        - git config --global user.name "Drony"
+        - git fetch --tags
+        - cd cmd/bbi
+        - goreleaser --rm-dist
+  trigger:
+    event:
+      - tag
+    status:
+      - success

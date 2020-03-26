@@ -18,3 +18,18 @@ brews:
     github:
       owner: metrumresearchgroup 
       name: homebrew-tap 
+
+
+builds:
+  -
+    id: "default"
+    ldflags:
+      - -s -w -X 'github.com/metrumresearchgroup/babylon/cmd.VERSION={{ .Env.VERSION }}'
+
+archives:
+  -
+    builds:
+      - default
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+    wrap_in_directory: true
+    format: tar.gz

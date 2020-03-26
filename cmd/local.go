@@ -343,9 +343,11 @@ func local(cmd *cobra.Command, args []string) {
 		time.Sleep(5 * time.Millisecond)
 	}
 
-	//TODO: Move saveconfig operations to cleanup for both paths
-
 	postWorkNotice(m, now)
+
+	if len(m.ErrorList) > 0 {
+		os.Exit(1)
+	}
 }
 
 //WriteGitIgnoreFile takes a provided path and does best attempt work to write a "Exclude all" gitignore file in the location
