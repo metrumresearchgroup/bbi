@@ -25,6 +25,10 @@ builds:
     id: "default"
     ldflags:
       - -s -w -X 'github.com/metrumresearchgroup/babylon/cmd.VERSION={{ .Env.VERSION }}'
+    goos:
+      - windows
+      - darwin
+      - linux
 
 archives:
   -
