@@ -204,7 +204,7 @@ func LocateAndReadConfigFile() (Config, error) {
 		log.Infof("Successfully loaded specified configuration from %s", viper.GetString("config"))
 	}
 
-	// Write in the additional (private) contentss
+	// Write in the additional (private) contents
 	config.SetPostWorkExecEnvs(viper.GetStringSlice("additional_post_work_envs"))
 
 	// Now, let's make sure we have a fully qualified path to the Execution script

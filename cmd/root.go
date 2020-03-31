@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/metrumresearchgroup/turnstile"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 	"io"
@@ -174,5 +175,18 @@ func logSetup(config configlib.Config) {
 
 		tee := io.MultiWriter(outfile, os.Stdout)
 		log.SetOutput(tee)
+	}
+}
+
+//RecordConcurrentError handles the processing of cancellation messages as well placing concurrent errors onto the statck
+func RecordConcurrentError(model string, notes string, err error, channels *turnstile.ChannelMap, cancel chan bool, executor PostWorkExecutor) {
+	cancel <- true
+	channels.Errors <- newConcurrentError(model, notes, err)
+
+	//Handle post executions for errors uniformly in this one place
+	_, newErr := ExecutePostWorkDirectivesWithEnvironment(executor)
+
+	if newErr != nil {
+		log.Errorf("A failure occurred trying to perform the post-execution hooks for failure notification: %s", newErr)
 	}
 }

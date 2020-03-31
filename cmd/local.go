@@ -89,7 +89,11 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 		if selected, ok := l.Nonmem.Configuration.Nonmem[l.Nonmem.Configuration.NMVersion]; ok {
 			//Is it not set to nmqual?
 			if !selected.Nmqual {
-				RecordConcurrentError(l.Nonmem.FileName, "Invalid nonmem / nmqual configuration", errors.New("NMQual was selected, but the selected nmversion does not support nmqual"), channels, l.Cancel)
+				reportedError := errors.New("NMQual was selected, but the selected nmversion does not support nmqual")
+				//Build the post execution environment
+				p := &l
+				p.BuildExecutionEnvironment(false, reportedError)
+				RecordConcurrentError(p.Nonmem.FileName, "Invalid nonmem / nmqual configuration", reportedError, channels, p.Cancel, p)
 				return
 			}
 		}
@@ -120,7 +124,9 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 
 		if err != nil {
 			//Handles the cancel operation
-			RecordConcurrentError(l.Nonmem.FileName, err.Error(), err, channels, l.Cancel)
+			p := &l //Use the pointer from here to manage value manipulations
+			p.BuildExecutionEnvironment(false, err)
+			RecordConcurrentError(p.Nonmem.FileName, err.Error(), err, channels, p.Cancel, p)
 			return
 		}
 	}
@@ -166,7 +172,9 @@ func (l LocalModel) Work(channels *turnstile.ChannelMap) {
 	cerr := executeNonMemJob(executeLocalJob, l.Nonmem)
 
 	if cerr.Error != nil {
-		RecordConcurrentError(l.Nonmem.Model, cerr.Notes, cerr.Error, channels, l.Cancel)
+		p := &l
+		p.BuildExecutionEnvironment(false, cerr.Error)
+		RecordConcurrentError(p.Nonmem.Model, cerr.Notes, cerr.Error, channels, p.Cancel, p)
 	}
 
 }
@@ -289,7 +297,9 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 	err = writeNonmemConfig(l.Nonmem)
 
 	if err != nil {
-		RecordConcurrentError(l.Nonmem.FileName, "An error occurred trying to write the config file to the directory", err, channels, l.Cancel)
+		p := &l
+		p.BuildExecutionEnvironment(false, err)
+		RecordConcurrentError(p.Nonmem.FileName, "An error occurred trying to write the config file to the directory", err, channels, p.Cancel, p)
 		return
 	}
 
@@ -306,7 +316,9 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 
 		if err != nil {
 			log.Errorf("Error during execution: %s", err)
-			RecordConcurrentError(l.Nonmem.FileName, "A failure occurred during execution of the designated post-work execution script", err, channels, l.Cancel)
+			p := &l
+			p.BuildExecutionEnvironment(false, err)
+			RecordConcurrentError(p.Nonmem.FileName, "A failure occurred during execution of the designated post-work execution script", err, channels, p.Cancel, p)
 			return
 		}
 

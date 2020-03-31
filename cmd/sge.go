@@ -85,7 +85,9 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 
 	if err != nil {
 		//Handles the cancel operation
-		RecordConcurrentError(l.Nonmem.FileName, err.Error(), err, channels, l.Cancel)
+		p := &l
+		p.BuildExecutionEnvironment(false, err)
+		RecordConcurrentError(p.Nonmem.FileName, err.Error(), err, channels, p.Cancel, p)
 		return
 	}
 
@@ -93,7 +95,9 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 	scriptContents, err := generateBabylonScript(nonMemExecutionTemplate, *l.Nonmem)
 
 	if err != nil {
-		RecordConcurrentError(l.Nonmem.Model, "An error occurred during the creation of the executable script for this model", err, channels, l.Cancel)
+		p := &l
+		p.BuildExecutionEnvironment(false, err)
+		RecordConcurrentError(p.Nonmem.Model, "An error occurred during the creation of the executable script for this model", err, channels, p.Cancel, p)
 		return
 	}
 
@@ -106,7 +110,9 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 	}
 
 	if err != nil {
-		RecordConcurrentError(l.Nonmem.Model, "There was an issue writing the executable file", err, channels, l.Cancel)
+		p := &l
+		p.BuildExecutionEnvironment(false, err)
+		RecordConcurrentError(p.Nonmem.Model, "There was an issue writing the executable file", err, channels, p.Cancel, p)
 	}
 }
 
@@ -115,7 +121,9 @@ func (l SGEModel) Work(channels *turnstile.ChannelMap) {
 	cerr := executeNonMemJob(executeSGEJob, l.Nonmem)
 
 	if cerr.Error != nil {
-		RecordConcurrentError(l.Nonmem.Model, cerr.Notes, cerr.Error, channels, l.Cancel)
+		p := &l
+		p.BuildExecutionEnvironment(false, cerr.Error)
+		RecordConcurrentError(p.Nonmem.Model, cerr.Notes, cerr.Error, channels, p.Cancel, p)
 		return
 	}
 
@@ -239,12 +247,6 @@ func newConcurrentError(model string, notes string, err error) turnstile.Concurr
 		Error:         err,
 		Notes:         notes,
 	}
-}
-
-//RecordConcurrentError handles the processing of cancellation messages as well placing concurrent errors onto the statck
-func RecordConcurrentError(model string, notes string, err error, channels *turnstile.ChannelMap, cancel chan bool) {
-	cancel <- true
-	channels.Errors <- newConcurrentError(model, notes, err)
 }
 
 func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {

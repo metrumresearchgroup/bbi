@@ -949,6 +949,8 @@ func createChildDirectories(l *NonMemModel, cancel chan bool, channels *turnstil
 	}
 
 	//Copy Model into destination and update Data Path
+	//We're only modifying the data path (second parameter as bool) if the model is a "mod" file.
+	//This would be PSN style behavior, so we avoid that for non PSN file extensions
 	err := copyFileToDestination(l, strings.ToLower(l.Extension) == "mod")
 
 	if err != nil {
@@ -961,15 +963,9 @@ func createChildDirectories(l *NonMemModel, cancel chan bool, channels *turnstil
 		WriteGitIgnoreFile(l.OutputDir)
 	}
 
-	if err != nil {
-		RecordConcurrentError(l.Model, fmt.Sprintf("There appears to have been an issue trying to copy %s to %s", l.Model, l.OutputDir), err, channels, cancel)
-		return err
-	}
-
 	err = configlib.WriteViperConfig(l.OutputDir, sge, l.Configuration)
 
 	if err != nil {
-		RecordConcurrentError(l.Model, "Error writing updated viper config", err, channels, cancel)
 		return err
 	}
 

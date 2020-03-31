@@ -155,7 +155,8 @@ func PostExecutionEnvironment(directive *PostExecutionHookEnvironment, additiona
 	modelEnvironment := environmentalPrefix + "MODEL"
 	filenameEnvironment := environmentalPrefix + "MODEL_FILENAME"
 	extensionEnvironment := environmentalPrefix + "MODEL_EXT"
-	outputDirEnvironment := environmentalPrefix + "OUTPUT_DIR"
+	outputDirEnvironment := environmentalPrefix + "OUTPUT_DI" +
+		"R"
 	successEnvironment := environmentalPrefix + "SUCCESSFUL"
 	errorEnvironment := environmentalPrefix + "ERROR"
 
@@ -174,7 +175,7 @@ func PostExecutionEnvironment(directive *PostExecutionHookEnvironment, additiona
 		errorText = directive.Error.Error()
 	}
 
-	executionEnvironment = append(executionEnvironment, errorEnvironment+"="+errorText)
+	executionEnvironment = append(executionEnvironment, errorEnvironment+"="+`"`+errorText+`"`)
 
 	//Add user provided values
 	executionEnvironment = append(executionEnvironment, additional...)
@@ -188,8 +189,15 @@ func ExecutePostWorkDirectivesWithEnvironment(worker PostWorkExecutor) (string, 
 
 	toExecute := worker.GetPostWorkExecutablePath()
 	config := worker.GetGlobalConfig()
+	postworkConfig := worker.GetPostWorkConfig()
+	postWorkEnv := config.GetPostWorkExecEnvs()
 
-	environment, err := PostExecutionEnvironment(worker.GetPostWorkConfig(), config.GetPostWorkExecEnvs())
+	log.WithFields(log.Fields{
+		"postWorkConfig": postworkConfig,
+		"postWorkEnv":    postWorkEnv,
+	}).Debug("Collected details. Preparing to set environment")
+
+	environment, err := PostExecutionEnvironment(postworkConfig, postWorkEnv)
 	environmentToPersist := onlyBabylonVariables(environment)
 
 	if err != nil {
