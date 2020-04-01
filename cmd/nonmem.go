@@ -657,6 +657,11 @@ func newPostWorkInstruction(model *NonMemModel, cleanupExclusions []string, mand
 }
 
 func postWorkNotice(m *turnstile.Manager, t time.Time) {
+
+	//Wait for any post execution processes to finish
+	log.Info("Waiting for any post execution hooks to finish")
+	executionWaitGroup.Wait()
+
 	log.Debug("Work has completed. Beginning detail display via console")
 	if m.Errors > 0 {
 		log.Errorf("%d errors were experienced during the run", m.Errors)

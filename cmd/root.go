@@ -185,10 +185,8 @@ func RecordConcurrentError(model string, notes string, err error, channels *turn
 	cancel <- true
 	channels.Errors <- newConcurrentError(model, notes, err)
 
-	//Handle post executions for errors uniformly in this one place
-	_, newErr := ExecutePostWorkDirectivesWithEnvironment(executor)
+	//TODO: Why are you hanging?
+	//I think it's the deferred cancellation
+	PostWorkExecution(executor, model, channels, cancel)
 
-	if newErr != nil {
-		log.Errorf("A failure occurred trying to perform the post-execution hooks for failure notification: %s", newErr)
-	}
 }

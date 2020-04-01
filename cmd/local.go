@@ -315,9 +315,7 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 
 	PostWorkExecution(&l, l.Nonmem.FileName, channels, l.Cancel)
 
-	log.Info("Waiting for any post execution hooks to finish")
-	executionWaitGroup.Wait()
-
+	log.Infof("%s Cleanup completed", l.Nonmem.LogIdentifier())
 	channels.Completed <- 1
 }
 

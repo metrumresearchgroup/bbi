@@ -192,15 +192,11 @@ func PostWorkExecution(job PostWorkExecutor, filename string, channels *turnstil
 
 		outputChannel := make(chan string, 1)
 		errorChannel := make(chan error, 1)
-		cancelChannel := make(chan bool, 1)
-
-		defer func() {
-			cancelChannel <- true
-		}()
 
 		go func() {
 			for {
 				select {
+				//Failure processing
 				case err := <-errorChannel:
 					output := <-outputChannel
 					log.Debugf("An error occurred trying to perform the post execution hook. Error Details are"+
@@ -209,9 +205,9 @@ func PostWorkExecution(job PostWorkExecutor, filename string, channels *turnstil
 					RecordConcurrentError(filename, output, err, channels, cancel, job)
 					executionWaitGroup.Done()
 					return
-				case <-cancelChannel:
+					//Normal processing
+				case <-outputChannel:
 					executionWaitGroup.Done()
-					return
 				default:
 					//
 				}
@@ -220,10 +216,12 @@ func PostWorkExecution(job PostWorkExecutor, filename string, channels *turnstil
 
 		go func() {
 			output, err := ExecutePostWorkDirectivesWithEnvironment(job)
+
 			if err != nil {
 				errorChannel <- err
-				outputChannel <- output
 			}
+
+			outputChannel <- output
 		}()
 	}
 }
