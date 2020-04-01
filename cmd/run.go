@@ -3,6 +3,7 @@ package cmd
 import (
 	"bytes"
 	"github.com/metrumresearchgroup/babylon/configlib"
+	"github.com/metrumresearchgroup/turnstile"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -181,6 +182,50 @@ func PostExecutionEnvironment(directive *PostExecutionHookEnvironment, additiona
 	executionEnvironment = append(executionEnvironment, additional...)
 
 	return executionEnvironment, nil
+}
+
+func PostWorkExecution(job PostWorkExecutor, filename string, channels *turnstile.ChannelMap, cancel chan bool) {
+	config := job.GetGlobalConfig()
+	if config.PostWorkExecutable != "" {
+		executionWaitGroup.Add(1)
+		job.BuildExecutionEnvironment(true, nil)
+
+		outputChannel := make(chan string, 1)
+		errorChannel := make(chan error, 1)
+		cancelChannel := make(chan bool, 1)
+
+		defer func() {
+			cancelChannel <- true
+		}()
+
+		go func() {
+			for {
+				select {
+				case err := <-errorChannel:
+					output := <-outputChannel
+					log.Debugf("An error occurred trying to perform the post execution hook. Error Details are"+
+						"%s. Output was: %s", err, output)
+					job.BuildExecutionEnvironment(false, err)
+					RecordConcurrentError(filename, output, err, channels, cancel, job)
+					executionWaitGroup.Done()
+					return
+				case <-cancelChannel:
+					executionWaitGroup.Done()
+					return
+				default:
+					//
+				}
+			}
+		}()
+
+		go func() {
+			output, err := ExecutePostWorkDirectivesWithEnvironment(job)
+			if err != nil {
+				errorChannel <- err
+				outputChannel <- output
+			}
+		}()
+	}
 }
 
 func ExecutePostWorkDirectivesWithEnvironment(worker PostWorkExecutor) (string, error) {

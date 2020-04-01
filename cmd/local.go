@@ -304,28 +304,20 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 	}
 
 	log.Debugf("Post Work Executable set as %s", l.Nonmem.Configuration.PostWorkExecutable)
+
+	/*
+
+		Post Execution Instructions
+
+	*/
+
 	//PostWorkExecution phase if the script value is not empty
-	if l.Nonmem.Configuration.PostWorkExecutable != "" {
-		l.BuildExecutionEnvironment(true, nil)
-		log.WithFields(log.Fields{
-			"configuration": l.postworkInstructions,
-			"executable":    l.Nonmem.Configuration.PostWorkExecutable,
-		}).Debugf("Preparing to execute")
 
-		output, err := ExecutePostWorkDirectivesWithEnvironment(&l)
+	PostWorkExecution(&l, l.Nonmem.FileName, channels, l.Cancel)
 
-		if err != nil {
-			log.Errorf("Error during execution: %s", err)
-			p := &l
-			p.BuildExecutionEnvironment(false, err)
-			RecordConcurrentError(p.Nonmem.FileName, "A failure occurred during execution of the designated post-work execution script", err, channels, p.Cancel, p)
-			return
-		}
+	log.Info("Waiting for any post execution hooks to finish")
+	executionWaitGroup.Wait()
 
-		log.Debugf("Output content from post work hook is: %s", output)
-	}
-
-	//Mark as completed and move on to cleanup
 	channels.Completed <- 1
 }
 

@@ -24,6 +24,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"sync"
 	"time"
 
 	"github.com/metrumresearchgroup/babylon/configlib"
@@ -45,13 +46,14 @@ var (
 	debug   bool
 	threads int
 	//Json indicates whether we should have a JSON tree of output
-	Json    bool
-	preview bool
-	noExt   bool
-	noGrd   bool
-	noCov   bool
-	noCor   bool
-	noShk   bool
+	Json               bool
+	preview            bool
+	noExt              bool
+	noGrd              bool
+	noCov              bool
+	noCor              bool
+	noShk              bool
+	executionWaitGroup sync.WaitGroup
 )
 
 // RootCmd represents the base command when called without any subcommands
