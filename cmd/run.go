@@ -3,6 +3,7 @@ package cmd
 import (
 	"bytes"
 	"github.com/metrumresearchgroup/babylon/configlib"
+	"github.com/metrumresearchgroup/turnstile"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -183,6 +184,51 @@ func PostExecutionEnvironment(directive *PostExecutionHookEnvironment, additiona
 	return executionEnvironment, nil
 }
 
+func PostWorkExecution(job PostWorkExecutor, filename string, channels *turnstile.ChannelMap, cancel chan bool, successful bool) {
+	config := job.GetGlobalConfig()
+	if config.PostWorkExecutable != "" {
+		log.Debug("Beginning execution of post work hooks")
+		executionWaitGroup.Add(1)
+		job.BuildExecutionEnvironment(successful, nil)
+
+		outputChannel := make(chan string, 1)
+		errorChannel := make(chan error, 1)
+
+		go func() {
+			for {
+				select {
+				//Failure processing
+				case err := <-errorChannel:
+					if err != nil {
+						output := <-outputChannel
+						log.Debugf("An error occurred trying to perform the post execution hook. Error Details are"+
+							"%s. Output was: %s", err, output)
+						job.BuildExecutionEnvironment(false, err)
+						RecordConcurrentError(filename, output, err, channels, cancel, job)
+						executionWaitGroup.Done()
+					}
+					return
+					//Normal processing
+				case <-outputChannel:
+					executionWaitGroup.Done()
+				default:
+					//
+				}
+			}
+		}()
+
+		go func() {
+			output, err := ExecutePostWorkDirectivesWithEnvironment(job)
+
+			if err != nil {
+				errorChannel <- err
+			}
+
+			outputChannel <- output
+		}()
+	}
+}
+
 func ExecutePostWorkDirectivesWithEnvironment(worker PostWorkExecutor) (string, error) {
 	log.Debug("Beginning Execution of post work scripts")
 	var outBytesBuffer = new(bytes.Buffer)
@@ -198,6 +244,11 @@ func ExecutePostWorkDirectivesWithEnvironment(worker PostWorkExecutor) (string, 
 	}).Debug("Collected details. Preparing to set environment")
 
 	environment, err := PostExecutionEnvironment(postworkConfig, postWorkEnv)
+
+	log.WithFields(log.Fields{
+		"environment": environment,
+	}).Debug("Environment prepared")
+
 	environmentToPersist := onlyBabylonVariables(environment)
 
 	if err != nil {
@@ -259,6 +310,8 @@ func ExecutePostWorkDirectivesWithEnvironment(worker PostWorkExecutor) (string, 
 	log.Debugf("Command will be %s", cmd.String())
 
 	outputBytes, err := cmd.CombinedOutput()
+
+	log.Debugf("Output from command was %s", string(outputBytes))
 
 	if err != nil {
 		if exitError, ok := err.(*exec.ExitError); ok {
