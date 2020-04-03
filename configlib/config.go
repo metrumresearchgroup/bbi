@@ -113,19 +113,22 @@ func SaveConfig(configpath string) {
 }
 
 func WriteViperConfig(path string, sge bool, config *Config) error {
-	if sge {
 
+	//Dereference to avoid touching the original values for multiple run targets
+	lc := *config
+
+	if sge {
 		//Set the config to overwrite false and re-write config. This ensures that the local phase will not deal with io contention
 		//around the SGE output streams
 		log.Debug("Updating babylon config to overwrite=false. This avoids IO contention with the grid engine for the next execution round")
-		config.Overwrite = false
-		config.SaveConfig = false
-		config.Local.CreateChildDirs = false
+		lc.Overwrite = false
+		lc.SaveConfig = false
+		lc.Local.CreateChildDirs = false
 	}
 
 	log.Debugf("Requested save of config file %s", path)
 
-	err := config.RenderYamlToFile(path)
+	err := lc.RenderYamlToFile(path)
 
 	if err != nil {
 		return err
