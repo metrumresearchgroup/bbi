@@ -313,7 +313,7 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 
 	//PostWorkExecution phase if the script value is not empty
 
-	PostWorkExecution(&l, l.Nonmem.FileName, channels, l.Cancel, true)
+	PostWorkExecution(&l, l.Nonmem.FileName, channels, l.Cancel, true, nil)
 
 	log.Infof("%s Cleanup completed", l.Nonmem.LogIdentifier())
 	channels.Completed <- 1

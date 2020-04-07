@@ -184,32 +184,30 @@ func PostExecutionEnvironment(directive *PostExecutionHookEnvironment, additiona
 	return executionEnvironment, nil
 }
 
-func PostWorkExecution(job PostWorkExecutor, filename string, channels *turnstile.ChannelMap, cancel chan bool, successful bool) {
+func PostWorkExecution(job PostWorkExecutor, filename string, channels *turnstile.ChannelMap, cancel chan bool, successful bool, err error) {
 	config := job.GetGlobalConfig()
 	if config.PostWorkExecutable != "" {
 		log.Debug("Beginning execution of post work hooks")
 		executionWaitGroup.Add(1)
-		job.BuildExecutionEnvironment(successful, nil)
+		job.BuildExecutionEnvironment(successful, err)
 
-		outputChannel := make(chan string, 1)
-		errorChannel := make(chan error, 1)
+		type executionStatus struct {
+			output string
+			err    error
+		}
+
+		executionChannel := make(chan executionStatus, 1)
 
 		go func() {
 			for {
 				select {
 				//Failure processing
-				case err := <-errorChannel:
-					if err != nil {
-						output := <-outputChannel
-						log.Debugf("An error occurred trying to perform the post execution hook. Error Details are"+
-							"%s. Output was: %s", err, output)
-						job.BuildExecutionEnvironment(false, err)
-						RecordConcurrentError(filename, output, err, channels, cancel, job)
-						executionWaitGroup.Done()
+				case status := <-executionChannel:
+					if status.err != nil {
+						job.BuildExecutionEnvironment(false, status.err)
+						RecordConcurrentError(filename, status.output, status.err, channels, cancel, job)
 					}
-					return
-					//Normal processing
-				case <-outputChannel:
+
 					executionWaitGroup.Done()
 				default:
 					//
@@ -219,12 +217,11 @@ func PostWorkExecution(job PostWorkExecutor, filename string, channels *turnstil
 
 		go func() {
 			output, err := ExecutePostWorkDirectivesWithEnvironment(job)
-
-			if err != nil {
-				errorChannel <- err
+			es := executionStatus{
+				output: output,
+				err:    err,
 			}
-
-			outputChannel <- output
+			executionChannel <- es
 		}()
 	}
 }

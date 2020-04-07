@@ -187,6 +187,6 @@ func RecordConcurrentError(model string, notes string, err error, channels *turn
 
 	//TODO: Why are you hanging?
 	//I think it's the deferred cancellation
-	PostWorkExecution(executor, model, channels, cancel, false)
+	PostWorkExecution(executor, model, channels, cancel, false, err)
 
 }
