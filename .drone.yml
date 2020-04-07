@@ -19,6 +19,7 @@
           path: /var/run/docker.sock
     - name: Test
       environment:
+        POST_EXECUTION: true
         MPIEXEC_PATH: /usr/bin/mpiexec
         NONMEMROOT: /opt/NONMEM
         NMVERSION: nm74gf
