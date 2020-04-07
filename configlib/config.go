@@ -112,7 +112,7 @@ func SaveConfig(configpath string) {
 	}
 }
 
-func WriteViperConfig(path string, sge bool, config *Config) error {
+func WriteViperConfig(path string, sge bool, config Config) error {
 	if sge {
 
 		//Set the config to overwrite false and re-write config. This ensures that the local phase will not deal with io contention

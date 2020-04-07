@@ -159,7 +159,7 @@ type NonMemModel struct {
 	//OutputDir is the directory into which the copied models and work will be located
 	OutputDir string `json:"output_dir"`
 	//Settings are basically the cobra definitions / requirements for the iteration
-	Configuration *configlib.Config `json:"configuration"`
+	Configuration configlib.Config `json:"configuration"`
 	//Whether or not the model had an error on generation or execution
 	Error error `json:"error"`
 }
@@ -671,7 +671,7 @@ func postWorkNotice(m *turnstile.Manager, t time.Time) {
 }
 
 //NewNonMemModel creates the core nonmem dataset from the passed arguments
-func NewNonMemModel(modelname string, config *configlib.Config) (NonMemModel, error) {
+func NewNonMemModel(modelname string, config configlib.Config) (NonMemModel, error) {
 
 	modelLines, err := utils.ReadLines(modelname)
 
@@ -806,7 +806,7 @@ func executeNonMemJob(executor func(model *NonMemModel) turnstile.ConcurrentErro
 	return executor(model)
 }
 
-func nonmemModelsFromArguments(args []string, config *configlib.Config) ([]NonMemModel, error) {
+func nonmemModelsFromArguments(args []string, config configlib.Config) ([]NonMemModel, error) {
 	// regex for filename expansion check
 	var output []NonMemModel
 	AppFs := afero.NewOsFs()
@@ -976,7 +976,7 @@ func createChildDirectories(l *NonMemModel, cancel chan bool, channels *turnstil
 	return nil
 }
 
-func processNMFEOptions(config *configlib.Config) []string {
+func processNMFEOptions(config configlib.Config) []string {
 	var output []string
 
 	if len(config.NMFEOptions.LicenseFile) > 0 {
