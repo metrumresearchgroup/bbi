@@ -180,7 +180,7 @@ func logSetup(config configlib.Config) {
 	}
 }
 
-//RecordConcurrentError handles the processing of cancellation messages as well placing concurrent errors onto the statck
+//RecordConcurrentError handles the processing of cancellation messages as well placing concurrent errors onto the stack
 func RecordConcurrentError(model string, notes string, err error, channels *turnstile.ChannelMap, cancel chan bool, executor PostWorkExecutor) {
 	cancel <- true
 	channels.Errors <- newConcurrentError(model, notes, err)

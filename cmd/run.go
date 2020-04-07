@@ -205,7 +205,6 @@ func PostWorkExecution(job PostWorkExecutor, filename string, channels *turnstil
 				case status := <-executionChannel:
 					if status.err != nil {
 						job.BuildExecutionEnvironment(false, status.err)
-						RecordConcurrentError(filename, status.output, status.err, channels, cancel, job)
 					}
 
 					executionWaitGroup.Done()
