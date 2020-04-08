@@ -21,6 +21,18 @@ steps:
   - name: hostname
     commands:
       - hostname
+  - name: Build and Install BBI
+    commands:
+      - cd cmd/bbi
+      - go build -o bbi
+      - mv bbi /data/apps
+  - name: SGE Test Submission
+    environment:
+      PATH: *sge_path
+      <<: *sge_environment
+    commands:
+      - cd /data/export
+      - ./sge.sh
   - name: SGE execution
     environment:
       PATH: *sge_path
