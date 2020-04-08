@@ -7,6 +7,15 @@ platform:
   os: linux
   arch: amd64
 
+global_variables:
+  SGE: &sge_environment
+    SGE_CELL: default
+    SGE_EXECD_PORT: 6445
+    SGE_ROOT: /opt/sge
+    SGE_ARCH: lx-amd64
+    SGE_QMASTER_PORT: 6444
+    SGE_CLUSTER_NAME: p6444
+
 steps:
   - name: hostname
     commands:
@@ -14,11 +23,6 @@ steps:
   - name: SGE execution
     environment:
       PATH: /usr/local/texlive/2019/bin/x86_64-linux:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/bin:/opt/amazon/openmpi/bin:/opt/amazon/efa/bin/:/usr/local/texlive/2019/bin/x86_64-linux:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/bin:/opt/amazon/openmpi/bin:/opt/amazon/efa/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
-      SGE_CELL: default
-      SGE_EXECD_PORT: 6445
-      SGE_ROOT: /opt/sge
-      SGE_ARCH: lx-amd64
-      SGE_QMASTER_PORT: 6444
-      SGE_CLUSTER_NAME: p6444
+      <<: *sge_environment
     commands:
       - qstat -f -xml
