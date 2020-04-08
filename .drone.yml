@@ -11,3 +11,6 @@ steps:
   - name: hostname
     commands:
       - hostname
+  - name: SGE execution
+    commands:
+      - qstat -f -xml
