@@ -20,7 +20,7 @@ global_variables:
 steps:
   - name: Sanity and Cleanup
     commands:
-      - if [ -d /tmp/babylontest ] ; then rm -rf /tmp/babylontest fi
+      - if [ -d /tmp/babylontest ] ; then rm -rf /tmp/babylontest; fi
   - name: Get BabylonTest
     commands:
       - git clone https://github.com/metrumresearchgroup/babylontest.git /tmp/babylontest
