@@ -19,6 +19,9 @@ global_variables:
 
 steps:
   - name: Sanity and Cleanup
+    volumes:
+      - name: tmp
+        path: /tmp
     commands:
       - if [ -d /tmp/babylontest ] ; then rm -rf /tmp/babylontest; fi
   - name: Build Babylon
@@ -26,6 +29,9 @@ steps:
       - go build -o bbi cmd/bbi/main.go
       - ./bbi version
   - name: Get BabylonTest
+    volumes:
+      - name: tmp
+        path: /tmp
     commands:
       - git clone https://github.com/metrumresearchgroup/babylontest.git /tmp/babylontest
   - name: Test
