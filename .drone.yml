@@ -21,6 +21,10 @@ steps:
   - name: Sanity and Cleanup
     commands:
       - if [ -d /tmp/babylontest ] ; then rm -rf /tmp/babylontest; fi
+  - name: Build Babylon
+    commands:
+      - go build -o bbi cmd/bbi/main.go
+      - cmd/bbi/bbi version
   - name: Get BabylonTest
     commands:
       - git clone https://github.com/metrumresearchgroup/babylontest.git /tmp/babylontest
