@@ -38,6 +38,8 @@ steps:
     volumes:
       - name: nonmem
         path: /opt/NONMEM
+      - name: tmp
+        path: /tmp
     commands:
       #Move the built BBI binary into path
       - export PATH=$PATH:.
@@ -72,3 +74,6 @@ volumes:
   - name: nonmem
     host:
       path: /opt/NONMEM
+  - name: tmp
+    host:
+      path: /tmp
