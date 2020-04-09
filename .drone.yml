@@ -40,7 +40,7 @@ steps:
         path: /opt/NONMEM
     commands:
       #Move the built BBI binary into path
-      - export PATH=$PATH:/.
+      - export PATH=$PATH:.
       - ls -la /opt/NONMEM
       #See if we can even get version to run
       - bbi version
