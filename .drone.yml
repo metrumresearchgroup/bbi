@@ -24,7 +24,7 @@ steps:
   - name: Build Babylon
     commands:
       - go build -o bbi cmd/bbi/main.go
-      - cmd/bbi/bbi version
+      - bbi version
   - name: Get BabylonTest
     commands:
       - git clone https://github.com/metrumresearchgroup/babylontest.git /tmp/babylontest
