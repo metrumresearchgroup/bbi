@@ -29,11 +29,15 @@ steps:
       - go build -o bbi cmd/bbi/main.go
       - ./bbi version
   - name: Get BabylonTest
+    environment:
+      BABYLONTEST_BRANCH: feature/full_sge_testing
     volumes:
       - name: tmp
         path: /tmp
     commands:
       - git clone https://github.com/metrumresearchgroup/babylontest.git /tmp/babylontest
+      - cd /tmp/babylontest
+      - if [ ! -z $BABYLONTEST_BRANCH ]; git checkout $BABYLONTEST_BRANCH; fi
   - name: Test
     environment:
       <<: *sge_environment
