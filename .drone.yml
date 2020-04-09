@@ -45,6 +45,9 @@ steps:
       MPIEXEC_PATH: /usr/bin/mpiexec
       NONMEMROOT: /opt/NONMEM
       NMVERSION: nm74gf
+      SGE: true
+      POST_EXECUTION: true
+      NMQUAL: true
     volumes:
       - name: nonmem
         path: /opt/NONMEM
