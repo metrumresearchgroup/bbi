@@ -37,7 +37,7 @@ steps:
     commands:
       - git clone https://github.com/metrumresearchgroup/babylontest.git /tmp/babylontest
       - cd /tmp/babylontest
-      - if [ ! -z $BABYLONTEST_BRANCH ]; git checkout $BABYLONTEST_BRANCH; fi
+      - if [ ! -z $BABYLONTEST_BRANCH ]; then git checkout $BABYLONTEST_BRANCH; fi
   - name: Test
     environment:
       <<: *sge_environment
