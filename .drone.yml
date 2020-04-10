@@ -57,6 +57,8 @@ steps:
         path: /opt/NONMEM
       - name: tmp
         path: /tmp
+      - name: data
+        path: /data
     commands:
       #Move the built BBI binary into path
       - if [ ! -d /data/apps ] ; then mkdir /data/apps; chmod -R 0755 /data/apps; cp bbi /data/apps; fi
@@ -93,3 +95,6 @@ volumes:
   - name: tmp
     host:
       path: /tmp
+  - name: data
+    host:
+      path: /data
