@@ -7,6 +7,9 @@ platform:
   os: linux
   arch: amd64
 
+workspace:
+  path: /tmp/drone
+
 global_variables:
   SGE: &sge_environment
     SGE_CELL: default
