@@ -49,7 +49,7 @@ steps:
       NONMEMROOT: /opt/NONMEM
       NMVERSION: nm74gf
       SGE: true
-      POST_EXECUTION: true
+      POST_EXECUTION: false
       NMQUAL: true
       ROOT_EXECUTION_DIR: /data
     volumes:
