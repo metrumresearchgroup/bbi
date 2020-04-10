@@ -61,7 +61,7 @@ steps:
         path: /data
     commands:
       #Move the built BBI binary into path
-      - if [ ! -d /data/apps ] ; then mkdir /data/apps; chmod -R 0755 /data/apps; cp bbi /data/apps; fi
+      - if [ ! -d /data/apps ] ; then mkdir /data/apps; chmod -R 0755 /data/apps; cp bbi /data/apps; else cp bbi /data/apps; fi
       - cd /tmp/babylontest
       - bbi init --dir /opt/NONMEM
       - go test ./... -v --json | tee test_output.json
