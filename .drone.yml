@@ -55,7 +55,7 @@ steps:
         path: /tmp
     commands:
       #Move the built BBI binary into path
-      - ls -la /opt/NONMEM
+      - if [ ! -d /data/apps ] ; then mkdir /data/apps; chmod -R 0755 /data/apps; cp bbi /data/apps; fi
       - sudo cp bbi /usr/local/bin
       - cd /tmp/babylontest
       - bbi init --dir /opt/NONMEM
