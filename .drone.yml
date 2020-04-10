@@ -51,7 +51,7 @@ steps:
       SGE: true
       POST_EXECUTION: true
       NMQUAL: true
-      ROOT_EXECUTION_DIR:/data
+      ROOT_EXECUTION_DIR: /data
     volumes:
       - name: nonmem
         path: /opt/NONMEM
