@@ -184,7 +184,7 @@ func sge(cmd *cobra.Command, args []string) {
 	logSetup(config)
 
 	log.Debug("Searching for models based on arguments")
-	lomodels, err := sgeModelsFromArguments(args, &config)
+	lomodels, err := sgeModelsFromArguments(args, config)
 	if err != nil {
 		log.Fatalf("An error occurred during model processing: %s", err)
 	}
@@ -316,7 +316,7 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 	return turnstile.ConcurrentError{}
 }
 
-func sgeModelsFromArguments(args []string, config *configlib.Config) ([]SGEModel, error) {
+func sgeModelsFromArguments(args []string, config configlib.Config) ([]SGEModel, error) {
 	var output []SGEModel
 	nonmemmodels, err := nonmemModelsFromArguments(args, config)
 

@@ -23,6 +23,7 @@
         MPIEXEC_PATH: /usr/bin/mpiexec
         NONMEMROOT: /opt/NONMEM
         NMVERSION: nm74gf
+        NMQUAL: true
         NONMEM_LICENSE:
           from_secret: NONMEM_LICENSE
       image: nmtest
