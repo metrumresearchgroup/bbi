@@ -134,7 +134,7 @@ type PostWorkExecutor interface {
 	BuildExecutionEnvironment(completed bool, err error) //Sets the Struct content for the PostExecutionHookEnvironment
 	GetPostWorkConfig() *PostExecutionHookEnvironment
 	GetPostWorkExecutablePath() string
-	GetGlobalConfig() *configlib.Config
+	GetGlobalConfig() configlib.Config
 	GetWorkingPath() string
 }
 
