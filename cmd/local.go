@@ -175,7 +175,7 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 	go HashFileOnChannel(dataHashChan, l.Nonmem.DataPath, l.Nonmem.FileName)
 
 	modelHashChan := make(chan string)
-	go HashFileOnChannel(modelHashChan, path.Join(l.Nonmem.OriginalPath, l.Nonmem.Model), l.Nonmem.FileName)
+	go HashFileOnChannel(modelHashChan, path.Join(l.Nonmem.OriginalPath, l.Nonmem.OriginalModel), l.Nonmem.FileName)
 
 	log.Debugf("%s Beginning selection of cleanable / copiable files", l.Nonmem.LogIdentifier())
 	//Magical instructions
@@ -297,7 +297,7 @@ func local(cmd *cobra.Command, args []string) {
 	lo := localOperation{}
 
 	log.Debug("Locating models from arguments")
-	localmodels, err := localModelsFromArguments(args, &config)
+	localmodels, err := localModelsFromArguments(args, config)
 
 	if err != nil {
 		log.Fatalf("An error occurred during model processing: %s", err)
@@ -391,7 +391,7 @@ func executeLocalJob(model *NonMemModel) turnstile.ConcurrentError {
 	return turnstile.ConcurrentError{}
 }
 
-func localModelsFromArguments(args []string, config *configlib.Config) ([]LocalModel, error) {
+func localModelsFromArguments(args []string, config configlib.Config) ([]LocalModel, error) {
 	var output []LocalModel
 	nonmemmodels, err := nonmemModelsFromArguments(args, config)
 
