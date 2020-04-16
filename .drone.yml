@@ -50,8 +50,11 @@ steps:
       - name: data
         path: /data
     commands:
-      #Move the built BBI binary into path
-      - if [ ! -d /data/apps ] ; then mkdir /data/apps; chmod -R 0755 /data/apps; cp bbi /data/apps; else cp bbi /data/apps; fi
+      #Move the built BBI binary into build root
+      - if [ ! -d /data/${DRONE_BUILD_NUMBER}/apps ] ; then mkdir /data/${DRONE_BUILD_NUMBER}/apps; chmod -R 0755 /data/${DRONE_BUILD_NUMBER}/apps; cp bbi /data/${DRONE_BUILD_NUMBER}/apps; else cp bbi /data/${DRONE_BUILD_NUMBER}/apps; fi
+      #Update path to include build root
+      - export PATH = $PATH:/data/${DRONE_BUID_NUMBER}/apps
+      - which bbi
       - cd /tmp/babylontest
       - export ROOT_EXECUTION_DIR=/data/${DRONE_BUILD_NUMBER}
       - export BABYLON_GRID_NAME_PREFIX="drone_${DRONE_BUILD_NUMBER}"
