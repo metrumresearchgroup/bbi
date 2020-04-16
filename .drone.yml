@@ -18,9 +18,6 @@ global_variables:
   SGE_PATH: &sge_path /usr/local/texlive/2019/bin/x86_64-linux:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/bin:/opt/amazon/openmpi/bin:/opt/amazon/efa/bin/:/usr/local/texlive/2019/bin/x86_64-linux:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/bin:/opt/amazon/openmpi/bin:/opt/amazon/efa/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/data/apps
 steps:
   - name: Sanity and Cleanup
-    volumes:
-      - name: tmp
-        path: /tmp
     commands:
       - if [ -d /tmp/babylontest ] ; then rm -rf /tmp/babylontest; fi
   - name: Build Babylon
@@ -30,9 +27,6 @@ steps:
   - name: Get BabylonTest
     environment:
       BABYLONTEST_BRANCH: master
-    volumes:
-      - name: tmp
-        path: /tmp
     commands:
       - git clone https://github.com/metrumresearchgroup/babylontest.git /tmp/babylontest
       - cd /tmp/babylontest
