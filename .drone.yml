@@ -92,7 +92,7 @@ steps:
       - pandoc -o testing_and_validation.pdf -V geometry:"paperwidth=8in, paperheight=11in, margin=15pt" rendered/testing_and_validation.md
       - pandoc -o traceability_matrix.pdf -V "paperwidth=11in, paperheight=8in, margin=0pt" rendered/traceability_matrix.md
       #Copy PDFs to S3
-      - aws s3 cp specification.pdf s3://mrg-validation/babylon/${DRONE_COMMIT_BRANCH}/${DRONE_BUILD_NUMBER}/specification.md
+      - aws s3 cp specification.pdf s3://mrg-validation/babylon/${DRONE_COMMIT_BRANCH}/${DRONE_BUILD_NUMBER}/specification.pdf
       - aws s3 cp testing_and_validation.pdf s3://mrg-validation/babylon/${DRONE_COMMIT_BRANCH}/${DRONE_BUILD_NUMBER}/testing_and_validation.pdf
       - aws s3 cp traceability_matrix.pdf s3://mrg-validation/babylon/${DRONE_COMMIT_BRANCH}/${DRONE_BUILD_NUMBER}/traceability_matrix.pdf
 volumes:
