@@ -51,7 +51,7 @@ steps:
         path: /data
     commands:
       #Move the built BBI binary into build root
-      - if [ ! -d /data/${DRONE_BUILD_NUMBER}/apps ] ; then mkdir /data/${DRONE_BUILD_NUMBER}/apps; chmod -R 0755 /data/${DRONE_BUILD_NUMBER}/apps; cp bbi /data/${DRONE_BUILD_NUMBER}/apps; else cp bbi /data/${DRONE_BUILD_NUMBER}/apps; fi
+      - if [ ! -d /data/${DRONE_BUILD_NUMBER}/apps ] ; then mkdir -p /data/${DRONE_BUILD_NUMBER}/apps; chmod -R 0755 /data/${DRONE_BUILD_NUMBER}/apps; cp bbi /data/${DRONE_BUILD_NUMBER}/apps; else cp bbi /data/${DRONE_BUILD_NUMBER}/apps; fi
       #Update path to include build root
       - export PATH = $PATH:/data/${DRONE_BUID_NUMBER}/apps
       - which bbi
