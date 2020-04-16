@@ -47,6 +47,7 @@ steps:
       SGE: true
       POST_EXECUTION: false
       NMQUAL: true
+      LOCAL: true
     volumes:
       - name: nonmem
         path: /opt/NONMEM
