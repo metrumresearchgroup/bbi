@@ -15,7 +15,7 @@ global_variables:
     SGE_ARCH: lx-amd64
     SGE_QMASTER_PORT: 6444
     SGE_CLUSTER_NAME: p6444
-  SGE_PATH: &sge_path /usr/local/texlive/2019/bin/x86_64-linux:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/bin:/opt/amazon/openmpi/bin:/opt/amazon/efa/bin/:/usr/local/texlive/2019/bin/x86_64-linux:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/bin:/opt/amazon/openmpi/bin:/opt/amazon/efa/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/data/apps
+  SGE_PATH: &sge_path /usr/local/texlive/2019/bin/x86_64-linux:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/bin:/opt/amazon/openmpi/bin:/opt/amazon/efa/bin/:/usr/local/texlive/2019/bin/x86_64-linux:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/bin:/opt/amazon/openmpi/bin:/opt/amazon/efa/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
 steps:
   - name: Sanity and Cleanup
     commands:
