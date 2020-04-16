@@ -142,6 +142,8 @@ type NonMemModel struct {
 	BBIVersion string `json:"bbi_version"`
 	//Model is the name of the model on which we will action: acop.mod
 	Model string `json:"model_name"`
+	//OriginalModel is the original filename, primarily used for NMQual or others that require changing filenames
+	OriginalModel string `json:"original_model"`
 	//Path is the Fully Qualified Path to the original model
 	Path string `json:"model_path"`
 	// DataPath is the path to the data when executing the model
@@ -707,6 +709,7 @@ func NewNonMemModel(modelname string, config configlib.Config) (NonMemModel, err
 	}
 
 	lm.Model = fi.Name()
+	lm.OriginalModel = lm.Model
 
 	modelPieces := strings.Split(lm.Model, ".")
 
