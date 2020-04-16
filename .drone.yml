@@ -33,7 +33,7 @@ steps:
       - ./bbi version
   - name: Get BabylonTest
     environment:
-      BABYLONTEST_BRANCH: feature/full_sge_testing
+      BABYLONTEST_BRANCH: master
     volumes:
       - name: tmp
         path: /tmp
