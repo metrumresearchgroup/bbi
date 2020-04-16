@@ -3,7 +3,7 @@
   "scope" : "A next-generation modeling tool that allows for local and grid-based execution of NonMem jobs. Supports legacy functionality such as NMQual execution mode and the ability to pass raw options to NMFE. Self-bootstrapping, Babylon can evaluate your environment to locate Nonmem locations and codify them into configuration",
   "markdown" : [
     {
-      "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/feature/full_sge_testing/markdown/expectations.md"
+      "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/master/markdown/expectations.md"
     }
   ],
   "stories" : [
@@ -16,7 +16,7 @@
       "risk" : "high",
       "markdown" : [
         {
-          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/feature/full_sge_testing/markdown/stories/run_jobs_locally.md"
+          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/master/markdown/stories/run_jobs_locally.md"
         }
       ]
     },
@@ -29,7 +29,7 @@
       "risk" : "high",
       "markdown" : [
         {
-          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/feature/full_sge_testing/markdown/stories/run_jobs_on_grid.md"
+          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/master/markdown/stories/run_jobs_on_grid.md"
         }
       ]
     },
@@ -43,7 +43,7 @@
       "risk" : "low",
       "markdown" : [
         {
-          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/feature/full_sge_testing/markdown/stories/invalid_data.md"
+          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/master/markdown/stories/invalid_data.md"
         }
       ]
     },
@@ -55,7 +55,7 @@
       "risk" : "medium",
       "markdown" : [
         {
-          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/feature/full_sge_testing/markdown/stories/project_initialization.md"
+          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/master/markdown/stories/project_initialization.md"
         }
       ]
     },
@@ -67,7 +67,7 @@
       "risk" : "low",
       "markdown" : [
         {
-          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/feature/full_sge_testing/markdown/stories/nmfe_options.md"
+          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/master/markdown/stories/nmfe_options.md"
         }
       ]
     },
@@ -79,7 +79,7 @@
       "risk" : "low",
       "markdown" : [
         {
-          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/feature/full_sge_testing/markdown/stories/store_configuration.md"
+          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/master/markdown/stories/store_configuration.md"
         }
       ]
     },
@@ -91,7 +91,7 @@
       "risk" : "medium",
       "markdown" : [
         {
-          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/feature/full_sge_testing/markdown/stories/nmqual_execution.md"
+          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/master/markdown/stories/nmqual_execution.md"
         }
       ]
     }
