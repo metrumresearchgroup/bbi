@@ -53,7 +53,7 @@ steps:
       #Move the built BBI binary into build root
       - if [ ! -d /data/${DRONE_BUILD_NUMBER}/apps ] ; then mkdir -p /data/${DRONE_BUILD_NUMBER}/apps; chmod -R 0755 /data/${DRONE_BUILD_NUMBER}/apps; cp bbi /data/${DRONE_BUILD_NUMBER}/apps; else cp bbi /data/${DRONE_BUILD_NUMBER}/apps; fi
       #Update path to include build root
-      - export PATH = $PATH:/data/${DRONE_BUILD_NUMBER}/apps
+      - export PATH=$PATH:/data/${DRONE_BUILD_NUMBER}/apps
       - which bbi
       - cd /tmp/babylontest
       - export ROOT_EXECUTION_DIR=/data/${DRONE_BUILD_NUMBER}
