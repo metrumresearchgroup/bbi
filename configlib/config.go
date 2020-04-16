@@ -34,6 +34,7 @@ type Config struct {
 	MPIExecPath     string                  `mapstructure:"mpi_exec_path" yaml:"mpi_exec_path" json:"mpi_exec_path,omitempty"`
 	ParallelTimeout int                     `mapstructure:"parallel_timeout" yaml:"parallel_timeout" json:"parallel_timeout,omitempty"`
 	Parafile        string                  `mapstructure:"parafile" yaml:"parafile" json:"parafile,omitempty"`
+	GridNamePrefix  string                  `mapstructure:"grid_name_prefix" yaml:"grid_name_prefix" json:"grid_name_prefix,omitempty"`
 }
 
 type NonMemDetail struct {
