@@ -47,7 +47,7 @@ steps:
       SGE: true
       POST_EXECUTION: false
       NMQUAL: true
-      ROOT_EXECUTION_DIR: /data
+      ROOT_EXECUTION_DIR: /data/$${DRONE_BUILD_NUMBER}
     volumes:
       - name: nonmem
         path: /opt/NONMEM
