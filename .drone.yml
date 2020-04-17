@@ -58,6 +58,7 @@ steps:
       - export ROOT_EXECUTION_DIR=/data/${DRONE_BUILD_NUMBER}
       - export BABYLON_GRID_NAME_PREFIX="drone_${DRONE_BUILD_NUMBER}"
       - if [ -d $ROOT_EXECUTION_DIR ] ; then rm -rf $ROOT_EXECUTION_DIR; fi
+      - echo $PATH
       - which bbi
       - bbi init --dir /opt/NONMEM
       - go test ./... -v --json --timeout 30m | tee test_output.json
