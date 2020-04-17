@@ -19,7 +19,7 @@ global_variables:
 steps:
   - name: Sanity and Cleanup
     commands:
-      - if [ -d /tmp/babylontest ] ; then rm -rf /tmp/babylontest; fi
+      - if [ -d /tmp/${DRONE_BUILD_NUMBER}/babylontest ] ; then rm -rf /tmp/${DRONE_BUILD_NUMBER}/babylontest; fi
   - name: Build Babylon
     commands:
       - go build -o bbi cmd/bbi/main.go
@@ -28,8 +28,8 @@ steps:
     environment:
       BABYLONTEST_BRANCH: master
     commands:
-      - git clone https://github.com/metrumresearchgroup/babylontest.git /tmp/babylontest
-      - cd /tmp/babylontest
+      - git clone https://github.com/metrumresearchgroup/babylontest.git /tmp/${DRONE_BUILD_NUMBER}/babylontest
+      - cd /tmp/${DRONE_BUILD_NUMBER}/babylontest
       - if [ ! -z $BABYLONTEST_BRANCH ]; then git checkout $BABYLONTEST_BRANCH; fi
   - name: Test
     environment:
@@ -54,19 +54,21 @@ steps:
       - if [ ! -d /data/${DRONE_BUILD_NUMBER}/apps ] ; then mkdir -p /data/${DRONE_BUILD_NUMBER}/apps; chmod -R 0755 /data/${DRONE_BUILD_NUMBER}/apps; cp bbi /data/${DRONE_BUILD_NUMBER}/apps; else cp bbi /data/${DRONE_BUILD_NUMBER}/apps; fi
       #Update path to include build root
       - export PATH=$PATH:/data/${DRONE_BUILD_NUMBER}/apps
-      - cd /tmp/babylontest
+      - cd /tmp/${DRONE_BUILD_NUMBER}/babylontest
       - export ROOT_EXECUTION_DIR=/data/${DRONE_BUILD_NUMBER}
       - export BABYLON_GRID_NAME_PREFIX="drone_${DRONE_BUILD_NUMBER}"
       - bbi init --dir /opt/NONMEM
       - go test ./... -v --json --timeout 30m | tee test_output.json
       - aws s3 cp test_output.json s3://mrg-validation/babylon/${DRONE_BUILD_NUMBER}/results.json
       - rm -rf /data/${DRONE_BUILD_NUMBER}
+      - rm -rf /tmp/${DRONE_BUILD_NUMBER}/babylontest
   - name: Cleanup on failure
     volumes:
       - name: data
         path: /data
     commands:
       - rm -rf /data/${DRONE_BUILD_NUMBER}
+      - rm -rf /tmp/${DRONE_BUILD_NUMBER}/babylontest
     when:
       status: failure
 volumes:
