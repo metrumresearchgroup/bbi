@@ -33,6 +33,12 @@ release:
     name: babylon
     #Turning on auto marking of non standard releases as "pre" releases
   prerelease: auto
+      - -s -w -X 'github.com/metrumresearchgroup/babylon/cmd.VERSION={{ .Env.VERSION }}'
+  goos:
+    - windows
+    - darwin
+    - linux
+
 archives:
   -
     builds:
