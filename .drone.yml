@@ -25,6 +25,7 @@
         NMVERSION: nm74gf
         NMQUAL: true
         SGE: false
+        LOCAL: true
         NONMEM_LICENSE:
           from_secret: NONMEM_LICENSE
       image: nmtest
