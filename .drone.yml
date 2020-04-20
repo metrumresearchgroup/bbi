@@ -24,12 +24,14 @@
         NONMEMROOT: /opt/NONMEM
         NMVERSION: nm74gf
         NMQUAL: true
+        SGE: false
         NONMEM_LICENSE:
           from_secret: NONMEM_LICENSE
       image: nmtest
       pull: never
       commands:
         - echo "$NONMEM_LICENSE" > /opt/NONMEM/nm74gf/license/nonmem.lic
+        - export ROOT_EXECUTION_DIR=/data/${DRONE_BUILD_NUMBER}
         - echo $(pwd) > HOMEDIR
         - cd /tmp/babylontest
         - go test ./... -v --json | tee test_output.json
