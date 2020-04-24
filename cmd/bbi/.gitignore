@@ -1,9 +1,4 @@
-go_build_main_go
-bbi
-babylon.yaml
-Execute_with_Delay
-Local_Execution
-SGE_Execution
-Specified_Configuration
-JSON_Logging
-dist
+!goreleaser.yml
+!main.go
+*
+Local_Execution_with_Post_Execution

@@ -39,7 +39,7 @@ steps:
       NONMEMROOT: /opt/NONMEM
       NMVERSION: nm74gf
       SGE: true
-      POST_EXECUTION: false
+      POST_EXECUTION: true
       NMQUAL: true
       LOCAL: true
     volumes:

@@ -27,12 +27,41 @@ type sgeOperation struct {
 
 //SGEModel is the struct used for SGE operations containing the NonMemModel
 type SGEModel struct {
-	Nonmem *NonMemModel
-	Cancel chan bool
+	Nonmem               *NonMemModel
+	Cancel               chan bool
+	postworkInstructions *PostExecutionHookEnvironment
+}
+
+func (s *SGEModel) BuildExecutionEnvironment(completed bool, err error) {
+	s.postworkInstructions = &PostExecutionHookEnvironment{
+		ExecutionBinary: s.Nonmem.Configuration.PostWorkExecutable,
+		ModelPath:       s.Nonmem.Path,
+		Model:           s.Nonmem.Model,
+		Filename:        s.Nonmem.FileName,
+		Extension:       s.Nonmem.Extension,
+		OutputDirectory: s.Nonmem.Configuration.OutputDir,
+		Successful:      completed,
+		Error:           err,
+	}
+}
+
+func (s *SGEModel) GetPostWorkConfig() *PostExecutionHookEnvironment {
+	return s.postworkInstructions
+}
+
+func (s *SGEModel) GetPostWorkExecutablePath() string {
+	return s.Nonmem.Configuration.PostWorkExecutable
+}
+
+func (s *SGEModel) GetGlobalConfig() configlib.Config {
+	return s.Nonmem.Configuration
+}
+
+func (s *SGEModel) GetWorkingPath() string {
+	return s.Nonmem.OutputDir
 }
 
 //Begin Scalable method definitions
-
 func (l SGEModel) CancellationChannel() chan bool {
 	return l.Cancel
 }
@@ -55,7 +84,9 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 
 	if err != nil {
 		//Handles the cancel operation
-		RecordConcurrentError(l.Nonmem.FileName, err.Error(), err, channels, l.Cancel)
+		p := &l
+		p.BuildExecutionEnvironment(false, err)
+		RecordConcurrentError(p.Nonmem.FileName, err.Error(), err, channels, p.Cancel, p)
 		return
 	}
 
@@ -63,7 +94,9 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 	scriptContents, err := generateBabylonScript(nonMemExecutionTemplate, *l.Nonmem)
 
 	if err != nil {
-		RecordConcurrentError(l.Nonmem.Model, "An error occurred during the creation of the executable script for this model", err, channels, l.Cancel)
+		p := &l
+		p.BuildExecutionEnvironment(false, err)
+		RecordConcurrentError(p.Nonmem.Model, "An error occurred during the creation of the executable script for this model", err, channels, p.Cancel, p)
 		return
 	}
 
@@ -76,7 +109,9 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 	}
 
 	if err != nil {
-		RecordConcurrentError(l.Nonmem.Model, "There was an issue writing the executable file", err, channels, l.Cancel)
+		p := &l
+		p.BuildExecutionEnvironment(false, err)
+		RecordConcurrentError(p.Nonmem.Model, "There was an issue writing the executable file", err, channels, p.Cancel, p)
 	}
 }
 
@@ -85,7 +120,9 @@ func (l SGEModel) Work(channels *turnstile.ChannelMap) {
 	cerr := executeNonMemJob(executeSGEJob, l.Nonmem)
 
 	if cerr.Error != nil {
-		RecordConcurrentError(l.Nonmem.Model, cerr.Notes, cerr.Error, channels, l.Cancel)
+		p := &l
+		p.BuildExecutionEnvironment(false, cerr.Error)
+		RecordConcurrentError(p.Nonmem.Model, cerr.Notes, cerr.Error, channels, p.Cancel, p)
 		return
 	}
 
@@ -138,7 +175,11 @@ func init() {
 
 func sge(cmd *cobra.Command, args []string) {
 
-	config := configlib.LocateAndReadConfigFile()
+	config, err := configlib.LocateAndReadConfigFile()
+	if err != nil {
+		log.Fatalf("Failed to process configuration: %s", err)
+	}
+
 	log.Info("Beginning Local Path")
 
 	lo := sgeOperation{}
@@ -209,12 +250,6 @@ func newConcurrentError(model string, notes string, err error) turnstile.Concurr
 		Error:         err,
 		Notes:         notes,
 	}
-}
-
-//RecordConcurrentError handles the processing of cancellation messages as well placing concurrent errors onto the statck
-func RecordConcurrentError(model string, notes string, err error, channels *turnstile.ChannelMap, cancel chan bool) {
-	cancel <- true
-	channels.Errors <- newConcurrentError(model, notes, err)
 }
 
 func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
