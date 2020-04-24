@@ -23,9 +23,6 @@
     {
       "name" : "Babylon should allow users to run NonMem jobs on the Grid",
       "tags" : [
-        "qsub",
-        "qstat",
-        "validate_nonmem_output",
         "TestBabylonCompletesSGEExecution",
         "TestBabylonCompletesParallelSGEExecution"
       ],

@@ -2,4 +2,5 @@
 .idea
 dist
 babylon.log
-!.idea
+babylon.yaml
+.idea
