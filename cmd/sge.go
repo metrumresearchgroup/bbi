@@ -3,7 +3,6 @@ package cmd
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"github.com/metrumresearchgroup/babylon/utils"
 	log "github.com/sirupsen/logrus"
 	"os/exec"
@@ -168,6 +167,10 @@ func init() {
 	//String Variables
 	sgeCMD.PersistentFlags().String("babylon_binary", babylon, "directory path for babylon to be called in goroutines (SGE Execution)")
 	viper.BindPFlag("babylon_binary", sgeCMD.PersistentFlags().Lookup("babylon_binary"))
+
+	const gridNamePrefixIdentifier string = "grid_name_prefix"
+	sgeCMD.PersistentFlags().String(gridNamePrefixIdentifier, "", "Any prefix you wish to add to the name of jobs being submitted to the grid")
+	viper.BindPFlag(gridNamePrefixIdentifier, sgeCMD.PersistentFlags().Lookup(gridNamePrefixIdentifier))
 }
 
 func sge(cmd *cobra.Command, args []string) {
@@ -254,6 +257,13 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 	fs := afero.NewOsFs()
 	//Execute the script we created
 
+	//Compute the grid name for submission
+	submittedName, err := gridengineJobName(model)
+
+	if err != nil {
+		return newConcurrentError(model.FileName, "Failed to template out name for job submission", err)
+	}
+
 	scriptName := "grid.sh"
 
 	//Find Qsub
@@ -266,7 +276,7 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 		"-j",
 		"y",
 		"-N",
-		fmt.Sprintf("%s%s", "Run_", model.FileName),
+		submittedName,
 	}...)
 
 	if model.Configuration.Parallel {
@@ -385,4 +395,31 @@ func generateBabylonScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 	}
 
 	return buf.Bytes(), nil
+}
+
+func gridengineJobName(model *NonMemModel) (string, error) {
+	templateString := `{{ if .Prefix }}{{ .Prefix }}_Run_{{ .Filename }}{{else}}Run_{{ .Filename }}{{end}}`
+	t, err := template.New("run_name").Parse(templateString)
+
+	if err != nil {
+		return "", err
+	}
+
+	type templateContent struct {
+		Prefix   string
+		Filename string
+	}
+
+	outBytesBuffer := new(bytes.Buffer)
+
+	err = t.Execute(outBytesBuffer, templateContent{
+		Prefix:   model.Configuration.GridNamePrefix,
+		Filename: model.FileName,
+	})
+
+	if err != nil {
+		return "", err
+	}
+
+	return outBytesBuffer.String(), nil
 }

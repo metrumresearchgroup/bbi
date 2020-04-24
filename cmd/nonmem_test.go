@@ -68,7 +68,7 @@ func emptyFile(path string) {
 func Test_processNMFEOptions(t *testing.T) {
 
 	type args struct {
-		config *configlib.Config
+		config configlib.Config
 	}
 	tests := []struct {
 		name string
@@ -78,7 +78,7 @@ func Test_processNMFEOptions(t *testing.T) {
 		{
 			name: "Normal Operation",
 			args: args{
-				config: &configlib.Config{
+				config: configlib.Config{
 					NMVersion:     "",
 					Overwrite:     false,
 					CleanLvl:      0,
@@ -91,7 +91,6 @@ func Test_processNMFEOptions(t *testing.T) {
 					Debug:         false,
 					Local:         configlib.LocalDetail{},
 					Nonmem:        nil,
-					Parallel:      configlib.ParallelConfig{},
 					Delay:         0,
 					NMQual:        false,
 					JSON:          false,
@@ -116,7 +115,7 @@ func Test_processNMFEOptions(t *testing.T) {
 		{
 			name: "All booleans, no text",
 			args: args{
-				config: &configlib.Config{
+				config: configlib.Config{
 					NMVersion:     "",
 					Overwrite:     false,
 					CleanLvl:      0,
@@ -129,7 +128,6 @@ func Test_processNMFEOptions(t *testing.T) {
 					Debug:         false,
 					Local:         configlib.LocalDetail{},
 					Nonmem:        nil,
-					Parallel:      configlib.ParallelConfig{},
 					Delay:         0,
 					NMQual:        false,
 					JSON:          false,
