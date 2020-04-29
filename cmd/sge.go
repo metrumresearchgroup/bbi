@@ -3,7 +3,6 @@ package cmd
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"github.com/metrumresearchgroup/babylon/utils"
 	log "github.com/sirupsen/logrus"
 	"os/exec"
@@ -28,12 +27,41 @@ type sgeOperation struct {
 
 //SGEModel is the struct used for SGE operations containing the NonMemModel
 type SGEModel struct {
-	Nonmem *NonMemModel
-	Cancel chan bool
+	Nonmem               *NonMemModel
+	Cancel               chan bool
+	postworkInstructions *PostExecutionHookEnvironment
+}
+
+func (s *SGEModel) BuildExecutionEnvironment(completed bool, err error) {
+	s.postworkInstructions = &PostExecutionHookEnvironment{
+		ExecutionBinary: s.Nonmem.Configuration.PostWorkExecutable,
+		ModelPath:       s.Nonmem.Path,
+		Model:           s.Nonmem.Model,
+		Filename:        s.Nonmem.FileName,
+		Extension:       s.Nonmem.Extension,
+		OutputDirectory: s.Nonmem.Configuration.OutputDir,
+		Successful:      completed,
+		Error:           err,
+	}
+}
+
+func (s *SGEModel) GetPostWorkConfig() *PostExecutionHookEnvironment {
+	return s.postworkInstructions
+}
+
+func (s *SGEModel) GetPostWorkExecutablePath() string {
+	return s.Nonmem.Configuration.PostWorkExecutable
+}
+
+func (s *SGEModel) GetGlobalConfig() configlib.Config {
+	return s.Nonmem.Configuration
+}
+
+func (s *SGEModel) GetWorkingPath() string {
+	return s.Nonmem.OutputDir
 }
 
 //Begin Scalable method definitions
-
 func (l SGEModel) CancellationChannel() chan bool {
 	return l.Cancel
 }
@@ -56,7 +84,9 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 
 	if err != nil {
 		//Handles the cancel operation
-		RecordConcurrentError(l.Nonmem.FileName, err.Error(), err, channels, l.Cancel)
+		p := &l
+		p.BuildExecutionEnvironment(false, err)
+		RecordConcurrentError(p.Nonmem.FileName, err.Error(), err, channels, p.Cancel, p)
 		return
 	}
 
@@ -64,7 +94,9 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 	scriptContents, err := generateBabylonScript(nonMemExecutionTemplate, *l.Nonmem)
 
 	if err != nil {
-		RecordConcurrentError(l.Nonmem.Model, "An error occurred during the creation of the executable script for this model", err, channels, l.Cancel)
+		p := &l
+		p.BuildExecutionEnvironment(false, err)
+		RecordConcurrentError(p.Nonmem.Model, "An error occurred during the creation of the executable script for this model", err, channels, p.Cancel, p)
 		return
 	}
 
@@ -77,7 +109,9 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 	}
 
 	if err != nil {
-		RecordConcurrentError(l.Nonmem.Model, "There was an issue writing the executable file", err, channels, l.Cancel)
+		p := &l
+		p.BuildExecutionEnvironment(false, err)
+		RecordConcurrentError(p.Nonmem.Model, "There was an issue writing the executable file", err, channels, p.Cancel, p)
 	}
 }
 
@@ -86,7 +120,9 @@ func (l SGEModel) Work(channels *turnstile.ChannelMap) {
 	cerr := executeNonMemJob(executeSGEJob, l.Nonmem)
 
 	if cerr.Error != nil {
-		RecordConcurrentError(l.Nonmem.Model, cerr.Notes, cerr.Error, channels, l.Cancel)
+		p := &l
+		p.BuildExecutionEnvironment(false, cerr.Error)
+		RecordConcurrentError(p.Nonmem.Model, cerr.Notes, cerr.Error, channels, p.Cancel, p)
 		return
 	}
 
@@ -131,11 +167,19 @@ func init() {
 	//String Variables
 	sgeCMD.PersistentFlags().String("babylon_binary", babylon, "directory path for babylon to be called in goroutines (SGE Execution)")
 	viper.BindPFlag("babylon_binary", sgeCMD.PersistentFlags().Lookup("babylon_binary"))
+
+	const gridNamePrefixIdentifier string = "grid_name_prefix"
+	sgeCMD.PersistentFlags().String(gridNamePrefixIdentifier, "", "Any prefix you wish to add to the name of jobs being submitted to the grid")
+	viper.BindPFlag(gridNamePrefixIdentifier, sgeCMD.PersistentFlags().Lookup(gridNamePrefixIdentifier))
 }
 
 func sge(cmd *cobra.Command, args []string) {
 
-	config := configlib.LocateAndReadConfigFile()
+	config, err := configlib.LocateAndReadConfigFile()
+	if err != nil {
+		log.Fatalf("Failed to process configuration: %s", err)
+	}
+
 	log.Info("Beginning Local Path")
 
 	lo := sgeOperation{}
@@ -143,7 +187,7 @@ func sge(cmd *cobra.Command, args []string) {
 	logSetup(config)
 
 	log.Debug("Searching for models based on arguments")
-	lomodels, err := sgeModelsFromArguments(args, &config)
+	lomodels, err := sgeModelsFromArguments(args, config)
 	if err != nil {
 		log.Fatalf("An error occurred during model processing: %s", err)
 	}
@@ -208,16 +252,17 @@ func newConcurrentError(model string, notes string, err error) turnstile.Concurr
 	}
 }
 
-//RecordConcurrentError handles the processing of cancellation messages as well placing concurrent errors onto the statck
-func RecordConcurrentError(model string, notes string, err error, channels *turnstile.ChannelMap, cancel chan bool) {
-	cancel <- true
-	channels.Errors <- newConcurrentError(model, notes, err)
-}
-
 func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 	log.Printf("%s Beginning SGE work phase", model.LogIdentifier())
 	fs := afero.NewOsFs()
 	//Execute the script we created
+
+	//Compute the grid name for submission
+	submittedName, err := gridengineJobName(model)
+
+	if err != nil {
+		return newConcurrentError(model.FileName, "Failed to template out name for job submission", err)
+	}
 
 	scriptName := "grid.sh"
 
@@ -231,7 +276,7 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 		"-j",
 		"y",
 		"-N",
-		fmt.Sprintf("%s%s", "Run_", model.FileName),
+		submittedName,
 	}...)
 
 	if model.Configuration.Parallel {
@@ -281,7 +326,7 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 	return turnstile.ConcurrentError{}
 }
 
-func sgeModelsFromArguments(args []string, config *configlib.Config) ([]SGEModel, error) {
+func sgeModelsFromArguments(args []string, config configlib.Config) ([]SGEModel, error) {
 	var output []SGEModel
 	nonmemmodels, err := nonmemModelsFromArguments(args, config)
 
@@ -350,4 +395,31 @@ func generateBabylonScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 	}
 
 	return buf.Bytes(), nil
+}
+
+func gridengineJobName(model *NonMemModel) (string, error) {
+	templateString := `{{ if .Prefix }}{{ .Prefix }}_Run_{{ .Filename }}{{else}}Run_{{ .Filename }}{{end}}`
+	t, err := template.New("run_name").Parse(templateString)
+
+	if err != nil {
+		return "", err
+	}
+
+	type templateContent struct {
+		Prefix   string
+		Filename string
+	}
+
+	outBytesBuffer := new(bytes.Buffer)
+
+	err = t.Execute(outBytesBuffer, templateContent{
+		Prefix:   model.Configuration.GridNamePrefix,
+		Filename: model.FileName,
+	})
+
+	if err != nil {
+		return "", err
+	}
+
+	return outBytesBuffer.String(), nil
 }

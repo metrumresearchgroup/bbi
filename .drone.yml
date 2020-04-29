@@ -1,89 +1,146 @@
-  name: BabylonTesting
-  type: docker
-  kind: pipeline
-  steps:
-    - name: pull core image
-      image: omerxx/drone-ecr-auth
-      volumes:
-        - name: docker.sock
-          path: /var/run/docker.sock
-      commands:
-        - $(aws ecr get-login --no-include-email --region us-east-1)
-        - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/nonmem
-    - name: Build updated image
-      image: omerxx/drone-ecr-auth
-      commands:
-        - docker build -t "nmtest" .
-      volumes:
-        - name: docker.sock
-          path: /var/run/docker.sock
-    - name: Test
-      environment:
-        MPIEXEC_PATH: /usr/bin/mpiexec
-        NONMEMROOT: /opt/NONMEM
-        NMVERSION: nm74gf
-        NONMEM_LICENSE:
-          from_secret: NONMEM_LICENSE
-      image: nmtest
-      pull: never
-      commands:
-        - echo "$NONMEM_LICENSE" > /opt/NONMEM/nm74gf/license/nonmem.lic
-        - echo $(pwd) > HOMEDIR
-        - cd /tmp/babylontest
-        - go test ./... -v --json | tee test_output.json
-        - aws s3 cp test_output.json s3://babylon-validation/babylon/${DRONE_COMMIT_BRANCH}/${DRONE_BUILD_NUMBER}/results.json
-    - name: Validation
-      environment:
-        MPIEXEC_PATH: /usr/bin/mpiexec
-        NONMEMROOT: /opt/NONMEM
-        NMVERSION: nm74gf
-        NONMEM_LICENSE:
-          from_secret: NONMEM_LICENSE
-      image: nmtest
-      pull: never
-      commands:
-        - git clone https://github.com/metrumresearchgroup/goProjectValidator.git
-        - cd goProjectValidator/cmd/pvgo
-        - go build -o gpv main.go
-        - cp gpv /usr/local/bin
-        - cp ../../../validation.json .
-        - ls -larth
-        - mkdir testoutput
-        - mkdir rendered
-        - aws s3 cp s3://babylon-validation/babylon/${DRONE_COMMIT_BRANCH}/${DRONE_BUILD_NUMBER}/results.json testoutput/results.json
-        - gpv --scenarioFile validation.json --testsDirectory testoutput --outputDirectory rendered
-        - aws s3 cp rendered/specification.md s3://babylon-validation/babylon/${DRONE_COMMIT_BRANCH}/${DRONE_BUILD_NUMBER}/specification.md
-        - aws s3 cp rendered/testing_and_validation.md s3://babylon-validation/babylon/${DRONE_COMMIT_BRANCH}/${DRONE_BUILD_NUMBER}/testing_and_validation.md
-        - aws s3 cp rendered/traceability_matrix.md s3://babylon-validation/babylon/${DRONE_COMMIT_BRANCH}/${DRONE_BUILD_NUMBER}/traceability_matrix.md
-  trigger:
-    event:
-      - push
-  volumes:
-    - name: docker.sock
-      host:
-        path: /var/run/docker.sock
+---
+kind: pipeline
+type: exec
+name: testing
+platform:
+  os: linux
+  arch: amd64
+workspace:
+  path: /tmp/drone
+global_variables:
+  SGE: &sge_environment
+    SGE_CELL: default
+    SGE_EXECD_PORT: 6445
+    SGE_ROOT: /opt/sge
+    SGE_ARCH: lx-amd64
+    SGE_QMASTER_PORT: 6444
+    SGE_CLUSTER_NAME: p6444
+  SGE_PATH: &sge_path /usr/local/texlive/2019/bin/x86_64-linux:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/bin:/opt/amazon/openmpi/bin:/opt/amazon/efa/bin/:/usr/local/texlive/2019/bin/x86_64-linux:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/bin:/opt/amazon/openmpi/bin:/opt/amazon/efa/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+steps:
+  - name: Sanity and Cleanup
+    commands:
+      - if [ -d /tmp/${DRONE_BUILD_NUMBER}/babylontest ] ; then rm -rf /tmp/${DRONE_BUILD_NUMBER}/babylontest; fi
+  - name: Build Babylon
+    commands:
+      - go build -o bbi cmd/bbi/main.go
+      - ./bbi version
+  - name: Get BabylonTest
+    environment:
+      BABYLONTEST_BRANCH: master
+    commands:
+      - git clone https://github.com/metrumresearchgroup/babylontest.git /tmp/${DRONE_BUILD_NUMBER}/babylontest
+      - cd /tmp/${DRONE_BUILD_NUMBER}/babylontest
+      - if [ ! -z $BABYLONTEST_BRANCH ]; then git checkout $BABYLONTEST_BRANCH; fi
+  - name: Test
+    environment:
+      <<: *sge_environment
+      PATH: *sge_path
+      MPIEXEC_PATH: /usr/bin/mpiexec
+      NONMEMROOT: /opt/NONMEM
+      NMVERSION: nm74gf
+      SGE: true
+      POST_EXECUTION: true
+      NMQUAL: true
+      LOCAL: true
+    volumes:
+      - name: nonmem
+        path: /opt/NONMEM
+      - name: tmp
+        path: /tmp
+      - name: data
+        path: /data
+    commands:
+      #Move the built BBI binary into build root
+      - if [ ! -d /data/${DRONE_BUILD_NUMBER}/apps ] ; then mkdir -p /data/${DRONE_BUILD_NUMBER}/apps; chmod -R 0755 /data/${DRONE_BUILD_NUMBER}/apps; cp bbi /data/${DRONE_BUILD_NUMBER}/apps; else cp bbi /data/${DRONE_BUILD_NUMBER}/apps; fi
+      #Update path to include build root
+      - export PATH=$PATH:/data/${DRONE_BUILD_NUMBER}/apps
+      - cd /tmp/${DRONE_BUILD_NUMBER}/babylontest
+      - export ROOT_EXECUTION_DIR=/data/${DRONE_BUILD_NUMBER}
+      - export BABYLON_GRID_NAME_PREFIX="drone_${DRONE_BUILD_NUMBER}"
+      - bbi init --dir /opt/NONMEM
+      - go test ./... -v --json --timeout 30m | tee test_output.json
+      - aws s3 cp test_output.json s3://mrg-validation/babylon/${DRONE_BUILD_NUMBER}/results.json
+      - rm -rf /data/${DRONE_BUILD_NUMBER}
+      - rm -rf /tmp/${DRONE_BUILD_NUMBER}/babylontest
+  - name: Cleanup on failure
+    volumes:
+      - name: data
+        path: /data
+    commands:
+      - rm -rf /data/${DRONE_BUILD_NUMBER}
+      - rm -rf /tmp/${DRONE_BUILD_NUMBER}/babylontest
+    when:
+      status: failure
+volumes:
+  - name: nonmem
+    host:
+      path: /opt/NONMEM
+  - name: tmp
+    host:
+      path: /tmp
+  - name: data
+    host:
+      path: /data
 
 ---
-  name: tagged releases
-  kind: pipeline
-  type: docker
-  steps:
-    - name: goreleaser
-      image: goreleaser/goreleaser
-      environment:
-        VERSION: ${DRONE_TAG}
-        #Forcing DBN to be empty such that we don't set it for hte LDFLags
-        DRONE_BUILD_NUMBER: ""
-        GITHUB_TOKEN:
-          from_secret: GITHUB_TOKEN
-      commands:
-        - git config --global user.email "drone@metrumrg.com"
-        - git config --global user.name "Drony"
-        - git fetch --tags
-        - cd cmd/bbi
-        - goreleaser --rm-dist
-  trigger:
-    event:
-      - tag
-    status:
-      - success
+kind: pipeline
+type: exec
+name: validation
+platform:
+  os: linux
+  arch: amd64
+workspace:
+  path: /tmp/drone
+steps:
+  - name: GoProjectValidator
+    commands:
+      - git clone https://github.com/metrumresearchgroup/goProjectValidator.git
+      - cd goProjectValidator/cmd/pvgo
+      - go build -o gpv main.go
+      - cp ../../../validation.json .
+      - ls -larth
+      - mkdir testoutput
+      - mkdir rendered
+      - aws s3 cp s3://mrg-validation/babylon/${DRONE_BUILD_NUMBER}/results.json testoutput/results.json
+      - ./gpv --scenarioFile validation.json --testsDirectory testoutput --outputDirectory rendered
+      - aws s3 cp rendered/specification.md s3://mrg-validation/babylon/${DRONE_TAG}/specification.md
+      - aws s3 cp rendered/testing_and_validation.md s3://mrg-validation/babylon/${DRONE_TAG}/testing_and_validation.md
+      - aws s3 cp rendered/traceability_matrix.md s3://mrg-validation/babylon/${DRONE_TAG}/traceability_matrix.md
+      #Render PDFs of the documents
+      - pandoc -o specification.pdf -V geometry:"paperwidth=8in, paperheight=11in, margin=15pt" rendered/specification.md
+      - pandoc -o testing_and_validation.pdf -V geometry:"paperwidth=8in, paperheight=11in, margin=15pt" rendered/testing_and_validation.md
+      - pandoc -o traceability_matrix.pdf -V geometry:"paperwidth=22in, paperheight=210mm, margin=2cm" rendered/traceability_matrix.md
+      #Copy PDFs to S3
+      - aws s3 cp specification.pdf s3://mrg-validation/babylon/${DRONE_TAG}/specification.pdf
+      - aws s3 cp testing_and_validation.pdf s3://mrg-validation/babylon/${DRONE_TAG}/testing_and_validation.pdf
+      - aws s3 cp traceability_matrix.pdf s3://mrg-validation/babylon/${DRONE_TAG}/traceability_matrix.pdf
+trigger:
+  event:
+    - tag
+depends_on:
+  - testing
+
+---
+name: goreleaser
+kind: pipeline
+type: docker
+steps:
+  - name: goreleaser
+    image: goreleaser/goreleaser
+    environment:
+      VERSION: ${DRONE_TAG}
+      #Forcing DBN to be empty such that we don't set it for hte LDFLags
+      DRONE_BUILD_NUMBER: ""
+      GITHUB_TOKEN:
+        from_secret: GITHUB_TOKEN
+    commands:
+      - git config --global user.email "drone@metrumrg.com"
+      - git config --global user.name "Drony"
+      - git fetch --tags
+      - cd cmd/bbi
+      - goreleaser --rm-dist
+trigger:
+  event:
+    - tag
+depends_on:
+  - testing

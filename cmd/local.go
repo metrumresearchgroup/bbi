@@ -32,12 +32,41 @@ type localOperation struct {
 
 //LocalModel is the struct used for local operations containing the NonMemModel
 type LocalModel struct {
-	Nonmem *NonMemModel
-	Cancel chan bool
+	Nonmem               *NonMemModel
+	Cancel               chan bool
+	postworkInstructions *PostExecutionHookEnvironment
+}
+
+func (l *LocalModel) BuildExecutionEnvironment(completed bool, err error) {
+	l.postworkInstructions = &PostExecutionHookEnvironment{
+		ExecutionBinary: l.Nonmem.Configuration.PostWorkExecutable,
+		ModelPath:       l.Nonmem.Path,
+		Model:           l.Nonmem.Model,
+		Filename:        l.Nonmem.FileName,
+		Extension:       l.Nonmem.Extension,
+		OutputDirectory: l.Nonmem.OutputDir,
+		Successful:      completed,
+		Error:           err,
+	}
+}
+
+func (l *LocalModel) GetPostWorkConfig() *PostExecutionHookEnvironment {
+	return l.postworkInstructions
+}
+
+func (l *LocalModel) GetPostWorkExecutablePath() string {
+	return l.Nonmem.Configuration.PostWorkExecutable
+}
+
+func (l *LocalModel) GetGlobalConfig() configlib.Config {
+	return l.Nonmem.Configuration
+}
+
+func (l *LocalModel) GetWorkingPath() string {
+	return l.Nonmem.OutputDir
 }
 
 //Begin Scalable method definitions
-
 func (l LocalModel) CancellationChannel() chan bool {
 	return l.Cancel
 }
@@ -60,7 +89,11 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 		if selected, ok := l.Nonmem.Configuration.Nonmem[l.Nonmem.Configuration.NMVersion]; ok {
 			//Is it not set to nmqual?
 			if !selected.Nmqual {
-				RecordConcurrentError(l.Nonmem.FileName, "Invalid nonmem / nmqual configuration", errors.New("NMQual was selected, but the selected nmversion does not support nmqual"), channels, l.Cancel)
+				reportedError := errors.New("NMQual was selected, but the selected nmversion does not support nmqual")
+				//Build the post execution environment
+				p := &l
+				p.BuildExecutionEnvironment(false, reportedError)
+				RecordConcurrentError(p.Nonmem.FileName, "Invalid nonmem / nmqual configuration", reportedError, channels, p.Cancel, p)
 				return
 			}
 		}
@@ -91,7 +124,9 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 
 		if err != nil {
 			//Handles the cancel operation
-			RecordConcurrentError(l.Nonmem.FileName, err.Error(), err, channels, l.Cancel)
+			p := &l //Use the pointer from here to manage value manipulations
+			p.BuildExecutionEnvironment(false, err)
+			RecordConcurrentError(p.Nonmem.FileName, err.Error(), err, channels, p.Cancel, p)
 			return
 		}
 	}
@@ -137,7 +172,9 @@ func (l LocalModel) Work(channels *turnstile.ChannelMap) {
 	cerr := executeNonMemJob(executeLocalJob, l.Nonmem)
 
 	if cerr.Error != nil {
-		RecordConcurrentError(l.Nonmem.Model, cerr.Notes, cerr.Error, channels, l.Cancel)
+		p := &l
+		p.BuildExecutionEnvironment(false, cerr.Error)
+		RecordConcurrentError(p.Nonmem.Model, cerr.Notes, cerr.Error, channels, p.Cancel, p)
 	}
 
 }
@@ -175,7 +212,7 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 	go HashFileOnChannel(dataHashChan, l.Nonmem.DataPath, l.Nonmem.FileName)
 
 	modelHashChan := make(chan string)
-	go HashFileOnChannel(modelHashChan, path.Join(l.Nonmem.OriginalPath, l.Nonmem.Model), l.Nonmem.FileName)
+	go HashFileOnChannel(modelHashChan, path.Join(l.Nonmem.OriginalPath, l.Nonmem.OriginalModel), l.Nonmem.FileName)
 
 	log.Debugf("%s Beginning selection of cleanable / copiable files", l.Nonmem.LogIdentifier())
 	//Magical instructions
@@ -260,11 +297,25 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 	err = writeNonmemConfig(l.Nonmem)
 
 	if err != nil {
-		RecordConcurrentError(l.Nonmem.FileName, "An error occurred trying to write the config file to the directory", err, channels, l.Cancel)
+		p := &l
+		p.BuildExecutionEnvironment(false, err)
+		RecordConcurrentError(p.Nonmem.FileName, "An error occurred trying to write the config file to the directory", err, channels, p.Cancel, p)
 		return
 	}
 
-	//Mark as completed and move on to cleanup
+	log.Debugf("Post Work Executable set as %s", l.Nonmem.Configuration.PostWorkExecutable)
+
+	/*
+
+		Post Execution Instructions
+
+	*/
+
+	//PostWorkExecution phase if the script value is not empty
+
+	PostWorkExecution(&l, l.Nonmem.FileName, channels, l.Cancel, true, nil)
+
+	log.Infof("%s Cleanup completed", l.Nonmem.LogIdentifier())
 	channels.Completed <- 1
 }
 
@@ -289,7 +340,12 @@ func init() {
 
 func local(cmd *cobra.Command, args []string) {
 
-	config := configlib.LocateAndReadConfigFile()
+	config, err := configlib.LocateAndReadConfigFile()
+
+	if err != nil {
+		log.Fatalf("Failed to process configuration: %s", err)
+	}
+
 	log.Info("Beginning Local Path")
 
 	logSetup(config)
@@ -297,7 +353,7 @@ func local(cmd *cobra.Command, args []string) {
 	lo := localOperation{}
 
 	log.Debug("Locating models from arguments")
-	localmodels, err := localModelsFromArguments(args, &config)
+	localmodels, err := localModelsFromArguments(args, config)
 
 	if err != nil {
 		log.Fatalf("An error occurred during model processing: %s", err)
@@ -391,7 +447,7 @@ func executeLocalJob(model *NonMemModel) turnstile.ConcurrentError {
 	return turnstile.ConcurrentError{}
 }
 
-func localModelsFromArguments(args []string, config *configlib.Config) ([]LocalModel, error) {
+func localModelsFromArguments(args []string, config configlib.Config) ([]LocalModel, error) {
 	var output []LocalModel
 	nonmemmodels, err := nonmemModelsFromArguments(args, config)
 

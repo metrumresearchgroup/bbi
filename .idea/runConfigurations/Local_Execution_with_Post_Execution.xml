@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Local Execution with Post Execution" type="GoApplicationRunConfiguration" factoryName="Go Application">
+    <module name="babylon" />
+    <working_directory value="$PROJECT_DIR$/" />
+    <go_parameters value="-i" />
+    <parameters value="-d nonmem run --nm_version nm74 local --config $USER_HOME$/babylon.yaml --post_work_executable $USER_HOME$/Documents/scripts/post_execution.sh --overwrite=true --additional_post_work_envs=&quot;THIS=THAT,THOSE=THESE,CAT=DOG,BABYLON_OAUTH_TOKEN=meowmeowwoof&quot; $USER_HOME$/Documents/models/test_data/240/001.mod" />
+    <kind value="FILE" />
+    <filePath value="$PROJECT_DIR$/cmd/bbi/main.go" />
+    <package value="github.com/metrumresearchgroup/babylon" />
+    <directory value="$PROJECT_DIR$/" />
+    <output_directory value="$PROJECT_DIR$/cmd/bbi/" />
+    <method v="2" />
+  </configuration>
+</component>

@@ -1,8 +1,18 @@
 package cmd
 
 import (
+	"bytes"
+	"github.com/metrumresearchgroup/babylon/configlib"
+	"github.com/metrumresearchgroup/turnstile"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"io/ioutil"
+	"os/exec"
+	"path/filepath"
+	"strconv"
+	"strings"
+	"text/template"
 )
 
 const runLongDescription string = `run nonmem model(s), for example: 
@@ -11,6 +21,35 @@ bbi nonmem run  --clean_lvl=1 <local|sge> run001.mod run002.mod
 bbi nonmem run <local|sge> run[001:006].mod // expand to run001.mod run002.mod ... run006.mod local
 bbi nonmem run <local|sge> .// run all models in directory
  `
+
+const postProcessingScriptTemplate string = `#!/bin/bash
+
+###################
+#
+# Babylon post-processing script
+# 
+# Please note that the environment variables written here
+# do not represent all used during execution. Private variables,
+# such as additional environments provided for external systems authentication
+# are not written into this file for security reasons.
+#
+# Only environment values prefixed with BABYLON_ are written into this file at
+# execution time.
+#
+###################
+
+{{ range .EnvironmentVariables }}
+	export {{ . }}
+{{- end}}
+
+
+###################
+#
+# Below is the actual post execution target.
+#
+###################
+{{ .Script }}
+`
 
 // RunCmd represents the run command
 var runCmd = &cobra.Command{
@@ -79,6 +118,217 @@ func init() {
 	runCmd.PersistentFlags().String(logFileIdentifier, "", "If populated, specifies the file into which to store the output / logging details from Babylon")
 	viper.BindPFlag(logFileIdentifier, runCmd.PersistentFlags().Lookup(logFileIdentifier))
 
+	const postExecutionHookIdentifier string = "post_work_executable"
+	runCmd.PersistentFlags().String(postExecutionHookIdentifier, "", "A script or binary to run when job execution completes or fails")
+	viper.BindPFlag(postExecutionHookIdentifier, runCmd.PersistentFlags().Lookup(postExecutionHookIdentifier))
+
+	const additionalEnvIdentifier string = "additional_post_work_envs"
+	runCmd.PersistentFlags().StringSlice(additionalEnvIdentifier, []string{}, "Any additional values (as ENV KEY=VALUE) to provide for the post execution environment")
+	viper.BindPFlag(additionalEnvIdentifier, runCmd.PersistentFlags().Lookup(additionalEnvIdentifier))
+
 	nonmemCmd.AddCommand(runCmd)
 
+}
+
+type PostWorkExecutor interface {
+	BuildExecutionEnvironment(completed bool, err error) //Sets the Struct content for the PostExecutionHookEnvironment
+	GetPostWorkConfig() *PostExecutionHookEnvironment
+	GetPostWorkExecutablePath() string
+	GetGlobalConfig() configlib.Config
+	GetWorkingPath() string
+}
+
+type PostExecutionHookEnvironment struct {
+	ExecutionBinary string `yaml:"execution_binary" json:"execution_binary, omitempty"`
+	ModelPath       string `yaml:"model_path" json:"model_path,omitempty"`
+	Model           string `yaml:"model" json:"model,omitempty"`
+	Filename        string `yaml:"filename" json:"filename,omitempty"`
+	Extension       string `yaml:"extension" json:"extension,omitempty"`
+	OutputDirectory string `yaml:"output_directory" json:"output_directory,omitempty"`
+	Successful      bool   `yaml:"successful" json:"successful,omitempty"`
+	Error           error  `yaml:"error" json:"error,omitempty"`
+}
+
+func PostExecutionEnvironment(directive *PostExecutionHookEnvironment, additional []string) ([]string, error) {
+	environmentalPrefix := "BABYLON_"
+
+	pathEnvironment := environmentalPrefix + "MODEL_PATH"
+	modelEnvironment := environmentalPrefix + "MODEL"
+	filenameEnvironment := environmentalPrefix + "MODEL_FILENAME"
+	extensionEnvironment := environmentalPrefix + "MODEL_EXT"
+	outputDirEnvironment := environmentalPrefix + "OUTPUT_DI" +
+		"R"
+	successEnvironment := environmentalPrefix + "SUCCESSFUL"
+	errorEnvironment := environmentalPrefix + "ERROR"
+
+	var executionEnvironment []string
+
+	executionEnvironment = append(executionEnvironment, pathEnvironment+"="+directive.ModelPath)
+	executionEnvironment = append(executionEnvironment, modelEnvironment+"="+directive.Model)
+	executionEnvironment = append(executionEnvironment, filenameEnvironment+"="+directive.Filename)
+	executionEnvironment = append(executionEnvironment, extensionEnvironment+"="+directive.Extension)
+	executionEnvironment = append(executionEnvironment, outputDirEnvironment+"="+directive.OutputDirectory)
+	executionEnvironment = append(executionEnvironment, successEnvironment+"="+strconv.FormatBool(directive.Successful))
+
+	var errorText string
+
+	if directive.Error != nil {
+		errorText = directive.Error.Error()
+	}
+
+	executionEnvironment = append(executionEnvironment, errorEnvironment+"="+`"`+errorText+`"`)
+
+	//Add user provided values
+	executionEnvironment = append(executionEnvironment, additional...)
+
+	return executionEnvironment, nil
+}
+
+func PostWorkExecution(job PostWorkExecutor, filename string, channels *turnstile.ChannelMap, cancel chan bool, successful bool, err error) {
+	config := job.GetGlobalConfig()
+	if config.PostWorkExecutable != "" {
+		log.Debug("Beginning execution of post work hooks")
+		executionWaitGroup.Add(1)
+		job.BuildExecutionEnvironment(successful, err)
+
+		type executionStatus struct {
+			output string
+			err    error
+		}
+
+		executionChannel := make(chan executionStatus, 1)
+
+		go func() {
+			for {
+				select {
+				//Failure processing
+				case status := <-executionChannel:
+					if status.err != nil {
+						job.BuildExecutionEnvironment(false, status.err)
+					}
+
+					executionWaitGroup.Done()
+				default:
+					//
+				}
+			}
+		}()
+
+		go func() {
+			output, err := ExecutePostWorkDirectivesWithEnvironment(job)
+			es := executionStatus{
+				output: output,
+				err:    err,
+			}
+			executionChannel <- es
+		}()
+	}
+}
+
+func ExecutePostWorkDirectivesWithEnvironment(worker PostWorkExecutor) (string, error) {
+	log.Debug("Beginning Execution of post work scripts")
+	var outBytesBuffer = new(bytes.Buffer)
+
+	toExecute := worker.GetPostWorkExecutablePath()
+	config := worker.GetGlobalConfig()
+	postworkConfig := worker.GetPostWorkConfig()
+	postWorkEnv := config.GetPostWorkExecEnvs()
+
+	log.WithFields(log.Fields{
+		"postWorkConfig": postworkConfig,
+		"postWorkEnv":    postWorkEnv,
+	}).Debug("Collected details. Preparing to set environment")
+
+	environment, err := PostExecutionEnvironment(postworkConfig, postWorkEnv)
+
+	log.WithFields(log.Fields{
+		"environment": environment,
+	}).Debug("Environment prepared")
+
+	environmentToPersist := onlyBabylonVariables(environment)
+
+	if err != nil {
+		return "", err
+	}
+
+	log.Debug("Beginning template operations")
+
+	tmpl, err := template.New("post_processing").Parse(postProcessingScriptTemplate)
+
+	if err != nil {
+		return "", err
+	}
+
+	type postProcessingDetails struct {
+		EnvironmentVariables []string
+		Script               string
+	}
+
+	ppd := postProcessingDetails{
+		EnvironmentVariables: environmentToPersist,
+		Script:               toExecute,
+	}
+
+	log.Debugf("Fully qualified path to executable is %s", toExecute)
+
+	log.WithFields(log.Fields{
+		"details": ppd,
+	}).Debug("Executing template")
+
+	err = tmpl.Execute(outBytesBuffer, ppd)
+
+	if err != nil {
+		return "", err
+	}
+
+	processedBytes := outBytesBuffer.Bytes()
+
+	log.WithFields(log.Fields{
+		"rendered": string(processedBytes),
+	}).Debug("Writing contents to file in output directory")
+
+	err = ioutil.WriteFile(filepath.Join(worker.GetWorkingPath(), "post_processing.sh"), processedBytes, 0755)
+
+	if err != nil {
+		return "", err
+	}
+
+	//Needs to be the processed value, not the config template.
+	cmd := exec.Command(filepath.Join(worker.GetWorkingPath(), "post_processing.sh"))
+
+	//Set the environment for the binary.
+	cmd.Env = environment
+
+	log.WithFields(log.Fields{
+		"environment": cmd.Env,
+	}).Debug("Environment generated for commandline")
+
+	log.Debugf("Command will be %s", cmd.String())
+
+	outputBytes, err := cmd.CombinedOutput()
+
+	log.Debugf("Output from command was %s", string(outputBytes))
+
+	if err != nil {
+		if exitError, ok := err.(*exec.ExitError); ok {
+			code := exitError.ExitCode()
+			details := exitError.String()
+
+			log.Errorf("Exit code was %d, details were %s", code, details)
+			log.Errorf("output details were: %s", string(outputBytes))
+		}
+	}
+
+	return string(outputBytes), err
+}
+
+func onlyBabylonVariables(provided []string) []string {
+	var matched []string
+	for _, v := range provided {
+		if strings.HasPrefix(v, "BABYLON_") {
+			matched = append(matched, v)
+		}
+	}
+
+	return matched
 }

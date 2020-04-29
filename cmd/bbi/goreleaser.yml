@@ -23,8 +23,21 @@ brews:
 builds:
   -
     id: "default"
+    env:
+      - CGO_ENABLED=0
     ldflags:
-      - -s -w -X 'github.com/metrumresearchgroup/babylon/cmd.VERSION={{ .Env.VERSION }}'
+      - -s -w -extldflags "-static" -X 'github.com/metrumresearchgroup/babylon/cmd.VERSION={{ .Env.VERSION }}'
+    goos:
+      - windows
+      - darwin
+      - linux
+
+release:
+  github:
+    owner: metrumresearchgroup
+    name: babylon
+    #Turning on auto marking of non standard releases as "pre" releases
+  prerelease: auto
 
 archives:
   -
@@ -33,3 +46,8 @@ archives:
     name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
     wrap_in_directory: true
     format: tar.gz
+changelog:
+  filters:
+    exclude:
+      - '^ci:'
+      - '^docs:'

@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/metrumresearchgroup/turnstile"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 	"io"
@@ -23,6 +24,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"sync"
 	"time"
 
 	"github.com/metrumresearchgroup/babylon/configlib"
@@ -44,13 +46,14 @@ var (
 	debug   bool
 	threads int
 	//Json indicates whether we should have a JSON tree of output
-	Json    bool
-	preview bool
-	noExt   bool
-	noGrd   bool
-	noCov   bool
-	noCor   bool
-	noShk   bool
+	Json               bool
+	preview            bool
+	noExt              bool
+	noGrd              bool
+	noCov              bool
+	noCor              bool
+	noShk              bool
+	executionWaitGroup sync.WaitGroup
 )
 
 // RootCmd represents the base command when called without any subcommands
@@ -175,4 +178,12 @@ func logSetup(config configlib.Config) {
 		tee := io.MultiWriter(outfile, os.Stdout)
 		log.SetOutput(tee)
 	}
+}
+
+//RecordConcurrentError handles the processing of cancellation messages as well placing concurrent errors onto the stack
+func RecordConcurrentError(model string, notes string, err error, channels *turnstile.ChannelMap, cancel chan bool, executor PostWorkExecutor) {
+	cancel <- true
+	channels.Errors <- newConcurrentError(model, notes, err)
+
+	PostWorkExecution(executor, model, channels, cancel, false, err)
 }
