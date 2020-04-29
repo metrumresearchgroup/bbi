@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"io/ioutil"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"strconv"
@@ -240,6 +241,8 @@ func ExecutePostWorkDirectivesWithEnvironment(worker PostWorkExecutor) (string, 
 	}).Debug("Collected details. Preparing to set environment")
 
 	environment, err := PostExecutionEnvironment(postworkConfig, postWorkEnv)
+
+	environment = append(environment,os.Environ()...)
 
 	log.WithFields(log.Fields{
 		"environment": environment,

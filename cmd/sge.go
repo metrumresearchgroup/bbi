@@ -7,6 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"os/exec"
 	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"text/template"
@@ -287,16 +288,10 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 		}...)
 	}
 
-	qsubArguments = append(qsubArguments, scriptName)
+	qsubArguments = append(qsubArguments, filepath.Join(model.OutputDir,scriptName))
 
 	if err != nil {
 		return newConcurrentError(model.Model, "Could not locate qsub binary in path", err)
-	}
-
-	err = os.Chdir(model.OutputDir)
-
-	if err != nil {
-		return newConcurrentError(model.Model, "An error occurred trying to enter the output dir", err)
 	}
 
 	command := exec.Command(binary, qsubArguments...)
@@ -305,6 +300,13 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 	log.Debugf("QSUB command is:%s", command.String())
 
 	command.Env = os.Environ() //Take in OS Environment
+
+	additionalEnvs := model.Configuration.GetPostWorkExecEnvs()
+
+	if len(additionalEnvs) > 0 {
+		log.Debugf("Additional post work envs were provided. Total of %d", len(additionalEnvs))
+		command.Env = append(command.Env,additionalEnvs...)
+	}
 
 	output, err := command.CombinedOutput()
 
