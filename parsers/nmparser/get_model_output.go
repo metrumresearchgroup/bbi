@@ -36,7 +36,6 @@ func GetModelOutput(filePath string, verbose, noExt, noGrd, noCov, noCor, noShk 
 		"NUTS Bayesian Analysis",
 	} , results.RunDetails.EstimationMethods[len(results.RunDetails.EstimationMethods) - 1])
 
-	log.Printf("gradient method?: %s, method detected: %s \n", isNotGradientBased, results.RunDetails.EstimationMethods[len(results.RunDetails.EstimationMethods) - 1])
 
 	if !noExt {
 		extFilePath := strings.Join([]string{filepath.Join(dir, runNum), ".ext"}, "")
