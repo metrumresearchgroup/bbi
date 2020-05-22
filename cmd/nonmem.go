@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -257,38 +258,50 @@ func copyFileToDestination(l *NonMemModel, modifyPath bool) error {
 		fs.MkdirAll(l.OutputDir, 0750)
 	}
 
-	//Get the lines of the file
-	sourceLines, err := utils.ReadLines(l.Path)
-
-	if err != nil {
-		return errors.New("Unable to read the contents of " + l.Path)
-	}
-
-	//We'll use stats for setting the mode of the target file to make sure perms are the same
 	stats, err := fs.Stat(l.Path)
-
 	if err != nil {
 		return err
 	}
 
-	//If set to modify, let's look for a $DATA line and replace it
 	if modifyPath {
+		// this is going to break the hashing so it doesn't matter anyway, but this implementation will strip
+		// trailing newlines, so for a file that doesn't modify the path, it will unnecessarily invalidate a hash check
+		// hence we'll use an alternate implementation of ioutils to make sure hashes match if no modification is needed
+		sourceLines, err := utils.ReadLines(l.Path)
+
+		if err != nil {
+			return errors.New("Unable to read the contents of " + l.Path)
+		}
+
+		//We'll use stats for setting the mode of the target file to make sure perms are the same
+
+
 		for k, line := range sourceLines {
 			if strings.Contains(line, "$DATA") {
 				sourceLines[k] = parser.AddPathLevelToData(line)
 			}
 		}
+
+		//Write the file contents
+		fileContents := strings.Join(sourceLines, "\n")
+		afero.WriteFile(fs, path.Join(l.OutputDir, filename), []byte(fileContents), stats.Mode())
+
+	} else {
+		input, err := ioutil.ReadFile(l.Path)
+		if err != nil {
+			return errors.New("Unable to read the contents of " + l.Path)
+		}
+
+		err = ioutil.WriteFile(path.Join(l.OutputDir, filename), input, stats.Mode())
+		if err != nil {
+			return errors.New("Unable to write to new dir the contents " + l.Path)
+		}
 	}
-
-	//Write the file contents
-	fileContents := strings.Join(sourceLines, "\n")
-
-	afero.WriteFile(fs, path.Join(l.OutputDir, filename), []byte(fileContents), stats.Mode())
 
 	return nil
 }
 
-//processes any template (inlcuding the const one here) to create a byte slice of the entire file
+//processes any template (including the const one here) to create a byte slice of the entire file
 func generateScript(fileTemplate string, l *NonMemModel) ([]byte, error) {
 	log.Debugf("%s beginning script command generation. NMQual is set to %t", l.LogIdentifier(), l.Configuration.NMQual)
 	t, err := template.New("file").Parse(fileTemplate)
