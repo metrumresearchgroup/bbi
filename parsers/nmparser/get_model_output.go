@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"github.com/thoas/go-funk"
 	"os"
 	"path/filepath"
 	"strings"
@@ -27,7 +28,15 @@ func GetModelOutput(filePath string, verbose, noExt, noGrd, noCov, noCor, noShk 
 	fileLines, _ := utils.ReadLinesFS(AppFs, outputFilePath)
 	results := ParseLstEstimationFile(fileLines)
 	results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, filepath.Base(outputFilePath))
-	isBayesian := results.RunDetails.EstimationMethods[0] == "MCMC Bayesian Analysis"
+	// if bayesian, not aware of any times people ever do a prelim estimation with a different method
+	isNotGradientBased := funk.Contains([]string{"MCMC Bayesian Analysis",
+		"Stochastic Approximation Expectation-Maximization",
+		"Importance Sampling assisted by MAP Estimation",
+		"Importance Sampling",
+		"NUTS Bayesian Analysis",
+	} , results.RunDetails.EstimationMethods[len(results.RunDetails.EstimationMethods) - 1])
+
+	log.Printf("gradient method?: %s, method detected: %s \n", isNotGradientBased, results.RunDetails.EstimationMethods[len(results.RunDetails.EstimationMethods) - 1])
 
 	if !noExt {
 		extFilePath := strings.Join([]string{filepath.Join(dir, runNum), ".ext"}, "")
@@ -43,7 +52,7 @@ func GetModelOutput(filePath string, verbose, noExt, noGrd, noCov, noCor, noShk 
 		results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, filepath.Base(extFilePath))
 	}
 
-	if !noGrd && !isBayesian {
+	if !noGrd && !isNotGradientBased {
 		grdFilePath := strings.Join([]string{filepath.Join(dir, runNum), ".grd"}, "")
 		grdLines, err := utils.ReadLinesFS(AppFs, grdFilePath)
 		if err != nil {
@@ -78,7 +87,7 @@ func GetModelOutput(filePath string, verbose, noExt, noGrd, noCov, noCor, noShk 
 	etaCount := lowerDiagonalLengthToDimension[len(results.ParametersData[len(results.ParametersData)-1].Estimates.Omega)]
 	epsCount := lowerDiagonalLengthToDimension[len(results.ParametersData[len(results.ParametersData)-1].Estimates.Sigma)]
 	// bayesian model runs will never have shrinkage files
-	if !noShk && !isBayesian {
+	if !noShk && !isNotGradientBased {
 		shkFilePath := strings.Join([]string{filepath.Join(dir, runNum), ".shk"}, "")
 		shkLines, err := utils.ReadLines(shkFilePath)
 		if err != nil {
