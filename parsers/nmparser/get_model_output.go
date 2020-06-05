@@ -34,6 +34,7 @@ func GetModelOutput(filePath string, verbose, noExt, noGrd, noCov, noCor, noShk 
 		"Importance Sampling assisted by MAP Estimation",
 		"Importance Sampling",
 		"NUTS Bayesian Analysis",
+		"Objective Function Evaluation by Importance Sampling",
 	} , results.RunDetails.EstimationMethods[len(results.RunDetails.EstimationMethods) - 1])
 
 
