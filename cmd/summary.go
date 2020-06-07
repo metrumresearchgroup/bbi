@@ -17,14 +17,25 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
-
 	parser "github.com/metrumresearchgroup/babylon/parsers/nmparser"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-var summaryTree bool
+var (
+	summaryTree bool
+	noExt       bool
+	noGrd       bool
+	noCov       bool
+	noCor       bool
+	noShk       bool
+	extFile     string
+	grdFile     string
+	covFile     string
+	corFile     string
+	shkFile     string
+)
 
 // runCmd represents the run command
 var summaryCmd = &cobra.Command{
@@ -41,7 +52,13 @@ func summary(cmd *cobra.Command, args []string) {
 		viper.Debug()
 	}
 
-	results := parser.GetModelOutput(args[0], verbose, noExt, noGrd, noCov, noCor, noShk)
+	results := parser.GetModelOutput(args[0],
+		parser.NewModelOutputFile(extFile, noExt),
+		parser.NewModelOutputFile(grdFile, noGrd),
+		parser.NewModelOutputFile(covFile, noCov),
+		parser.NewModelOutputFile(corFile, noCor),
+		parser.NewModelOutputFile(shkFile, noShk),
+	)
 
 	if Json {
 		jsonRes, _ := json.MarshalIndent(results, "", "\t")
@@ -53,4 +70,15 @@ func summary(cmd *cobra.Command, args []string) {
 }
 func init() {
 	nonmemCmd.AddCommand(summaryCmd)
+	//Used for Summary
+	summaryCmd.PersistentFlags().BoolVar(&noExt, "no-ext-file", false, "do not use ext file")
+	summaryCmd.PersistentFlags().BoolVar(&noGrd, "no-grd-file", false, "do not use grd file")
+	summaryCmd.PersistentFlags().BoolVar(&noCov, "no-cov-file", false, "do not use cov file")
+	summaryCmd.PersistentFlags().BoolVar(&noCor, "no-cor-file", false, "do not use cor file")
+	summaryCmd.PersistentFlags().BoolVar(&noShk, "no-shk-file", false, "do not use shk file")
+	summaryCmd.PersistentFlags().StringVar(&extFile, "ext-file", "", "name of custom ext-file")
+	summaryCmd.PersistentFlags().StringVar(&grdFile, "grd-file", "", "name of custom ext-file")
+	summaryCmd.PersistentFlags().StringVar(&covFile, "cov-file", "", "name of custom ext-file")
+	summaryCmd.PersistentFlags().StringVar(&corFile, "cor-file", "", "name of custom ext-file")
+	summaryCmd.PersistentFlags().StringVar(&shkFile, "shk-file", "", "name of custom ext-file")
 }

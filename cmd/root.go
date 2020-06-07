@@ -48,11 +48,6 @@ var (
 	//Json indicates whether we should have a JSON tree of output
 	Json               bool
 	preview            bool
-	noExt              bool
-	noGrd              bool
-	noCov              bool
-	noCor              bool
-	noShk              bool
 	executionWaitGroup sync.WaitGroup
 )
 
@@ -98,12 +93,6 @@ func init() {
 	RootCmd.PersistentFlags().BoolVar(&Json, "json", false, "json tree of output, if possible")
 	viper.BindPFlag("json", RootCmd.PersistentFlags().Lookup("json")) //Bind to viper
 	RootCmd.PersistentFlags().BoolVarP(&preview, "preview", "p", false, "preview action, but don't actually run command")
-	//Used for Summary
-	RootCmd.PersistentFlags().BoolVarP(&noExt, "no-ext-file", "", false, "do not use ext file")
-	RootCmd.PersistentFlags().BoolVarP(&noGrd, "no-grd-file", "", false, "do not use grd file")
-	RootCmd.PersistentFlags().BoolVarP(&noCov, "no-cov-file", "", false, "do not use cov file")
-	RootCmd.PersistentFlags().BoolVarP(&noCor, "no-cor-file", "", false, "do not use cor file")
-	RootCmd.PersistentFlags().BoolVarP(&noShk, "no-shk-file", "", false, "do not use shk file")
 }
 
 // initConfig reads in config file and ENV variables if set.
