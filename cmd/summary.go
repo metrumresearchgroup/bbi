@@ -54,10 +54,10 @@ func summary(cmd *cobra.Command, args []string) {
 
 	results := parser.GetModelOutput(args[0],
 		parser.NewModelOutputFile(extFile, noExt),
-		parser.NewModelOutputFile(grdFile, noGrd),
-		parser.NewModelOutputFile(covFile, noCov),
-		parser.NewModelOutputFile(corFile, noCor),
-		parser.NewModelOutputFile(shkFile, noShk),
+		!noGrd,
+		!noCov,
+		!noCor,
+		!noShk,
 	)
 
 	if Json {

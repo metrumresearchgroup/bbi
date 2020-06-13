@@ -9,7 +9,7 @@ type FlatArray struct {
 	Dim    int       `json:"dim,omitempty"`
 }
 
-// ParameterNames containst the names of model parameters
+// ParameterNames contains the names of model parameters
 type ParameterNames struct {
 	Theta []string `json:"theta,omitempty"`
 	Omega []string `json:"omega,omitempty"`
@@ -62,6 +62,7 @@ type RunDetails struct {
 	RunEnd              string   `json:"run_end,omitempty"`
 	EstimationTime      float64  `json:"estimation_time,omitempty"`
 	CovarianceTime      float64  `json:"covariance_time,omitempty"`
+	CpuTime             float64  `json:"cpu_time,omitempty"`
 	FunctionEvaluations int64    `json:"function_evaluations,omitempty"`
 	SignificantDigits   float64  `json:"significant_digits,omitempty"`
 	ProblemText         string   `json:"problem_text,omitempty"`
@@ -71,7 +72,7 @@ type RunDetails struct {
 	NumberOfPatients    int64    `json:"number_of_patients,omitempty"`
 	NumberOfObs         int64    `json:"number_of_obs,omitempty"`
 	NumberOfDataRecords int64    `json:"number_of_data_records,omitempty"`
-	OutputTable         string   `json:"output_table,omitempty"`
+	OutputTables         []string   `json:"output_tables,omitempty"`
 	OutputFilesUsed     []string `json:"output_files_used,omitempty"`
 }
 
@@ -187,7 +188,7 @@ func NewRunDetails() RunDetails {
 		NumberOfPatients:    DefaultInt64,
 		NumberOfObs:         DefaultInt64,
 		NumberOfDataRecords: DefaultInt64,
-		OutputTable:         DefaultString,
+		OutputTables:         []string{},
 		OutputFilesUsed:     []string{},
 	}
 	return runDetails
