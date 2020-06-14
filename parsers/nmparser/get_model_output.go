@@ -4,8 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/thoas/go-funk"
-	"math"
-	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -32,14 +30,21 @@ func NewModelOutputFile(name string, exclude bool) ModelOutputFile {
 
 // GetModelOutput populates and returns a ModelOutput object by parsing files
 // if ext file is excluded, will attempt to parse the lst file for additional information traditionally available there
-func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, cov bool, cor bool, shk bool) ModelOutput {
+func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, cov bool, cor bool, shk bool) (ModelOutput, error) {
 
 	AppFs := afero.NewOsFs()
-	runNum, _ := utils.FileAndExt(lstPath)
+	runNum, extension := utils.FileAndExt(lstPath)
+	if extension == "" {
+		// though lst is vastly more used, some examples from ICON use .res
+		extension = ".lst"
+	}
 	dir, _ := filepath.Abs(filepath.Dir(lstPath))
-	outputFilePath := strings.Join([]string{filepath.Join(dir, runNum), ".lst"}, "")
+	outputFilePath := strings.Join([]string{filepath.Join(dir, runNum), extension}, "")
 
-	fileLines, _ := utils.ReadLinesFS(AppFs, outputFilePath)
+	fileLines, err := utils.ReadLinesFS(AppFs, outputFilePath)
+	if err != nil {
+		return ModelOutput{}, err
+	}
 	results := ParseLstEstimationFile(fileLines)
 	results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, filepath.Base(outputFilePath))
 	// if bayesian, not aware of any times people ever do a prelim estimation with a different method
@@ -59,24 +64,27 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, cov bool, cor
 		log.Trace("error reading cpu file: %v", err)
 	} else {
 		results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, filepath.Base(cpuFilePath))
+		cpuTime, err := strconv.ParseFloat(strings.TrimSpace(cpuLines[0]), 64)
+		if err != nil {
+			// this is set to trace as don't want it to log normally as could screw up json output that
+			log.Trace("error parsing cpu time: %v", err)
+			results.RunDetails.CpuTime = DefaultFloat64
+		}
+		results.RunDetails.CpuTime = cpuTime
 	}
-	cpuTime, err := strconv.ParseFloat(strings.TrimSpace(cpuLines[0]), 64)
-	if err != nil {
-		// this is set to trace as don't want it to log normally as could screw up json output that
-		log.Trace("error parsing cpu time: %v", err)
-		cpuTime = math.Inf(-1)
-	}
-	results.RunDetails.CpuTime = cpuTime
 
 	if !ext.Exclude {
 		if ext.Name == "" {
 			ext.Name = runNum + ".ext"
 		}
 		extFilePath := filepath.Join(dir, ext.Name)
-		errorIfNotExists(AppFs, extFilePath, "--no-ext-file")
+		err := errorIfNotExists(AppFs, extFilePath, "--no-ext-file")
+		if err != nil {
+			return ModelOutput{}, err
+		}
 		extLines, err := utils.ReadParamsAndOutputFromExt(extFilePath)
 		if err != nil {
-			log.Fatalf("error reading outputs from ext file: %s \n", err)
+			return ModelOutput{}, err
 		}
 		extData, parameterNames := ParseExtData(ParseExtLines(extLines))
 		results.ParametersData = extData
@@ -89,14 +97,13 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, cov bool, cor
 	if grd && !isNotGradientBased {
 		name := runNum + ".grd"
 		grdFilePath := filepath.Join(dir, name)
-		errorIfNotExists(AppFs, grdFilePath, "--no-grd-file")
+		err := errorIfNotExists(AppFs, grdFilePath, "--no-grd-file")
+		if err != nil {
+			return ModelOutput{}, err
+		}
 		grdLines, err := utils.ReadLinesFS(AppFs, grdFilePath)
 		if err != nil {
-			if os.IsNotExist(err) {
-				log.Error("no gradient file exists at: " + grdFilePath)
-			} else {
-				panic(err)
-			}
+			return ModelOutput{}, err
 		}
 		parametersData, _ := ParseGrdData(ParseGrdLines(grdLines))
 		results.RunHeuristics.HasFinalZeroGradient = HasZeroGradient(parametersData[len(parametersData)-1].Fixed.Theta)
@@ -106,10 +113,13 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, cov bool, cor
 	if cov {
 		name := runNum + ".cov"
 		covFilePath := filepath.Join(dir, name)
-		errorIfNotExists(AppFs, covFilePath, "--no-cov-file")
+		err := errorIfNotExists(AppFs, covFilePath, "--no-cov-file")
+		if err != nil {
+			return ModelOutput{}, err
+		}
 		covLines, err := utils.ReadLines(covFilePath)
 		if err != nil {
-			log.Fatalf("error reading outputs from cov file: %s \n", err)
+			return ModelOutput{}, err
 		}
 		results.CovarianceTheta = GetThetaValues(covLines)
 		results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, filepath.Base(covFilePath))
@@ -118,10 +128,13 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, cov bool, cor
 	if cor {
 		name := runNum + ".cor"
 		corFilePath := filepath.Join(dir, name)
-		errorIfNotExists(AppFs, corFilePath, "--no-cor-file")
+		err := errorIfNotExists(AppFs, corFilePath, "--no-cor-file")
+		if err != nil {
+			return ModelOutput{}, err
+		}
 		corLines, err := utils.ReadLines(corFilePath)
 		if err != nil {
-			log.Fatalf("error reading outputs from cov file: %s \n", err)
+			return ModelOutput{}, err
 		}
 		results.CorrelationTheta = GetThetaValues(corLines)
 		results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, filepath.Base(corFilePath))
@@ -133,23 +146,22 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, cov bool, cor
 	if shk {
 		name := runNum + ".shk"
 		shkFilePath := filepath.Join(dir, name)
-		errorIfNotExists(AppFs, shkFilePath, "--no-shk-file")
+		err := errorIfNotExists(AppFs, shkFilePath, "--no-shk-file")
+		if err != nil {
+			return ModelOutput{}, err
+		}
 		shkLines, err := utils.ReadLines(shkFilePath)
 		if err != nil {
-			if errors.Is(err, os.ErrNotExist) {
-				log.Error("no shrinkage file exists at: " + shkFilePath)
-			} else {
-				panic(err)
-			}
+			return ModelOutput{}, err
 		}
 		results.ShrinkageDetails = ParseShkData(ParseShkLines(shkLines), etaCount, epsCount)
 	}
 
 	setMissingValuesToDefault(&results, etaCount, epsCount)
-	return results
+	return results, nil
 }
 
-func errorIfNotExists(fs afero.Fs, path string, sFlag string) {
+func errorIfNotExists(fs afero.Fs, path string, sFlag string) error {
 	exists, err := utils.Exists(path, fs)
 	if err != nil {
 		panic(fmt.Sprintf("unknown error checking file existence %s\n", err))
@@ -159,7 +171,7 @@ func errorIfNotExists(fs afero.Fs, path string, sFlag string) {
 		if sFlag != "" {
 			suppressionFlagMsg = fmt.Sprintf("\nyou can suppress bbi searching for the file using %s\n", sFlag)
 		}
-		log.Fatalf("No file present at %s%s ", path, suppressionFlagMsg)
+		return errors.New(fmt.Sprintf("No file present at %s%s ", path, suppressionFlagMsg))
 	}
-	return
+	return nil
 }
