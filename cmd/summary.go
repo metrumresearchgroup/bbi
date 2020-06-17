@@ -67,13 +67,13 @@ func summary(cmd *cobra.Command, args []string) {
 			!noCor,
 			!noShk,
 		)
+		if err != nil {
+			log.Fatal(err)
+		}
 		if Json {
 			jsonRes, _ := json.MarshalIndent(results, "", "\t")
 			fmt.Printf("%s\n", jsonRes)
 		} else {
-			if err != nil {
-				log.Fatal(err)
-			}
 			results.Summary()
 		}
 		return
