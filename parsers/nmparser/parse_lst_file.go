@@ -69,7 +69,7 @@ func parseOFV(line string, ofvDetails OfvDetails) OfvDetails {
 	return ofvDetails
 }
 
-func getLargeConditionNumberStatus(lines []string, start int, largeNumberLimit float64) bool {
+func getConditionNumber(lines []string, start int) float64 {
 
 	// go until line of ints
 	for i, line := range lines[start:] {
@@ -106,15 +106,13 @@ func getLargeConditionNumberStatus(lines []string, start int, largeNumberLimit f
 		}
 	}
 
+	ratio := 1.0 // If only 1 eigenvalue, the Condition Number is 1.0
 	if len(eigenvalues) >= 2 {
 		sort.Float64s(eigenvalues)
-		ratio := eigenvalues[len(eigenvalues)-1] / eigenvalues[0]
-		if ratio > largeNumberLimit {
-			return true
-		}
+		ratio = eigenvalues[len(eigenvalues)-1] / eigenvalues[0]
 	}
 
-	return false
+	return ratio
 }
 
 func getMatrixData(lines []string, start int) MatrixData {
@@ -330,6 +328,7 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 	var startThetaIndex int
 	var endSigmaIndex int
 	var gradientLines []string
+	var conditionNumber float64
 
 	for i, line := range lines {
 		switch {
@@ -375,7 +374,8 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 		case strings.Contains(line, "EIGENVALUES OF COR MATRIX OF ESTIMATE"):
 			// TODO: get largeNumberLimit from config
 			// or derive. something like (number of parameters) * 10
-			runHeuristics.LargeConditionNumber = getLargeConditionNumberStatus(lines, i, 1000.0)
+			conditionNumber = getConditionNumber(lines, i)
+			runHeuristics.LargeConditionNumber = conditionNumber > 1000.0
 		default:
 			continue
 		}
@@ -420,6 +420,8 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 		ParameterNames: NewDefaultParameterNames(len(finalParameterEst.Theta), len(finalParameterEst.Omega), len(finalParameterEst.Sigma)),
 
 		OFV: ofvDetails,
+
+		ConditionNumber: conditionNumber,
 	}
 	return result
 }
