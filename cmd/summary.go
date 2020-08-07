@@ -51,7 +51,7 @@ nmu summarize run001.lst
 }
 
 type jsonResults struct {
-	Results []parser.ModelOutput
+	Results []parser.SummaryOutput
 	Errors  []error
 }
 
@@ -60,13 +60,7 @@ func summary(cmd *cobra.Command, args []string) {
 		viper.Debug()
 	}
 	if len(args) == 1 {
-		results, err := parser.GetModelOutput(args[0],
-			parser.NewModelOutputFile(extFile, noExt),
-			!noGrd,
-			!noCov,
-			!noCor,
-			!noShk,
-		)
+		results, err := parser.GetModelOutput(args[0], parser.NewModelOutputFile(extFile, noExt), !noGrd, !noShk, )
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -91,7 +85,7 @@ func summary(cmd *cobra.Command, args []string) {
 		Index   int
 		Outcome result
 		Err     error
-		Result  parser.ModelOutput
+		Result  parser.SummaryOutput
 	}
 
 	workers := runtime.NumCPU()
@@ -111,13 +105,7 @@ func summary(cmd *cobra.Command, args []string) {
 	for w := 1; w <= workers; w++ {
 		go func(w int, modIndex <-chan int, results chan<- modelResult) {
 			for i := range modIndex {
-				r, err := parser.GetModelOutput(args[i],
-					parser.NewModelOutputFile(extFile, noExt),
-					!noGrd,
-					!noCov,
-					!noCor,
-					!noShk,
-				)
+				r, err := parser.GetModelOutput(args[i], parser.NewModelOutputFile(extFile, noExt), !noGrd, !noShk, )
 				if err != nil {
 					results <- modelResult{
 						Index:   i,

@@ -11,7 +11,7 @@ import (
 )
 
 // Summary prints all results from the parsed LstData
-func (results ModelOutput) Summary() bool {
+func (results SummaryOutput) Summary() bool {
 	thetaTable := tablewriter.NewWriter(os.Stdout)
 	thetaTable.SetAlignment(tablewriter.ALIGN_LEFT)
 	thetaTable.SetColWidth(100)
