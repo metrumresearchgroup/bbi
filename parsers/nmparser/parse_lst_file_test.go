@@ -173,10 +173,11 @@ func TestParseGradient(t *testing.T) {
 	}
 }
 
-func TestSetLargeConditionNumber(t *testing.T) {
+func TestConditionNumber(t *testing.T) {
 	var tests = []struct {
 		lines                []string
 		n                    int
+		conditionNumber      float64
 		largeConditionNumber bool
 		context              string
 	}{
@@ -197,7 +198,7 @@ func TestSetLargeConditionNumber(t *testing.T) {
 				" Elapsed finaloutput time in seconds:     0.16                                                                           ",
 			},
 			n:                    3,
-			largeConditionNumber: false,
+			conditionNumber:      10.316,
 			context:              "not large",
 		},
 		{
@@ -217,7 +218,7 @@ func TestSetLargeConditionNumber(t *testing.T) {
 				" Elapsed finaloutput time in seconds:     0.16                                                                           ",
 			},
 			n:                    3,
-			largeConditionNumber: true,
+			conditionNumber:      10316.206,
 			context:              "large",
 		},
 		// {
@@ -230,8 +231,9 @@ func TestSetLargeConditionNumber(t *testing.T) {
 
 	for _, tt := range tests {
 
-		largeConditionNumber := getLargeConditionNumberStatus(tt.lines, tt.n, 1000.0)
-		assert.Equal(t, tt.largeConditionNumber, largeConditionNumber, "Fail :"+tt.context)
+		conditionNumber, _ := getConditionNumber(tt.lines, tt.n)
+		// compare to three decimal places
+		assert.Equal(t, tt.conditionNumber, math.Round(conditionNumber*1000)/1000, "Fail :"+tt.context)
 	}
 }
 

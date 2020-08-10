@@ -136,6 +136,7 @@ type ModelOutput struct {
 	ParameterNames   ParameterNames       `json:"parameter_names,omitempty"`
 	OFV              OfvDetails           `json:"ofv,omitempty"`
 	ConditionNumber  float64              `json:"condition_number,omitempty"`
+	Eigenvalues  []float64              `json:"eigenvalues,omitempty"`
 	ShrinkageDetails [][]ShrinkageDetails `json:"shrinkage_details,omitempty"`
 	CovarianceTheta  []FlatArray          `json:"covariance_theta,omitempty"`
 	CorrelationTheta []FlatArray          `json:"correlation_theta,omitempty"`

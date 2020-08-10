@@ -69,7 +69,7 @@ func parseOFV(line string, ofvDetails OfvDetails) OfvDetails {
 	return ofvDetails
 }
 
-func getConditionNumber(lines []string, start int) float64 {
+func getConditionNumber(lines []string, start int) (float64, []float64) {
 
 	// go until line of ints
 	for i, line := range lines[start:] {
@@ -112,7 +112,7 @@ func getConditionNumber(lines []string, start int) float64 {
 		ratio = eigenvalues[len(eigenvalues)-1] / eigenvalues[0]
 	}
 
-	return ratio
+	return ratio, eigenvalues
 }
 
 func getMatrixData(lines []string, start int) MatrixData {
@@ -329,6 +329,7 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 	var endSigmaIndex int
 	var gradientLines []string
 	var conditionNumber float64
+	var eigenvalues []float64
 
 	for i, line := range lines {
 		switch {
@@ -372,10 +373,11 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 		case strings.Contains(line, "COVARIANCE STEP ABORTED"):
 			runHeuristics.CovarianceStepAborted = true
 		case strings.Contains(line, "EIGENVALUES OF COR MATRIX OF ESTIMATE"):
+			conditionNumber, eigenvalues = getConditionNumber(lines, i)
 			// TODO: get largeNumberLimit from config
 			// or derive. something like (number of parameters) * 10
-			conditionNumber = getConditionNumber(lines, i)
-			runHeuristics.LargeConditionNumber = conditionNumber > 1000.0
+			largeNumberLimit := 1000.0
+			runHeuristics.LargeConditionNumber = conditionNumber > largeNumberLimit
 		default:
 			continue
 		}
@@ -422,6 +424,7 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 		OFV: ofvDetails,
 
 		ConditionNumber: conditionNumber,
+		Eigenvalues: eigenvalues,
 	}
 	return result
 }
