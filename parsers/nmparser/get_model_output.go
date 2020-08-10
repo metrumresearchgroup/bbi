@@ -61,13 +61,13 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (Su
 	if err != nil {
 		// this is set to trace as don't want it to log normally as could screw up json output that
 		// requests results from this such as summary --json
-		log.Trace("error reading cpu file: %v", err)
+		log.Trace("error reading cpu file: ", err)
 	} else {
 		results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, filepath.Base(cpuFilePath))
 		cpuTime, err := strconv.ParseFloat(strings.TrimSpace(cpuLines[0]), 64)
 		if err != nil {
 			// this is set to trace as don't want it to log normally as could screw up json output that
-			log.Trace("error parsing cpu time: %v", err)
+			log.Trace("error parsing cpu time: ", err)
 			results.RunDetails.CpuTime = DefaultFloat64
 		}
 		results.RunDetails.CpuTime = cpuTime
