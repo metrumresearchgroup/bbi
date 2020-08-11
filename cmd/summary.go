@@ -44,8 +44,8 @@ var (
 var summaryCmd = &cobra.Command{
 	Use:   "summary",
 	Short: "summarize the output of model(s)",
-	Long: `run model(s), for example: 
-nmu summarize run001.lst
+	Long: `summarize model(s), for example: 
+bbi nonmem summary run001/run001.lst
  `,
 	Run: summary,
 }
