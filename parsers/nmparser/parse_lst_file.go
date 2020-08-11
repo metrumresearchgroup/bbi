@@ -98,11 +98,20 @@ func getConditionNumber(lines []string, start int) float64 {
 		}
 	}
 
+	// go until another blank line and build eigenvalues vector
 	var eigenvalues []float64
-	for _, s := range strings.Fields(lines[start]) {
-		eigenvalue, err := strconv.ParseFloat(s, 64)
-		if err == nil {
-			eigenvalues = append(eigenvalues, eigenvalue)
+	for i, line := range lines[start:] {
+		for _, s := range strings.Fields(line) {
+			eigenvalue, err := strconv.ParseFloat(s, 64)
+			if err == nil {
+				eigenvalues = append(eigenvalues, eigenvalue)
+			}
+		}
+
+		sub := strings.TrimSpace(line)
+		if len(sub) == 0 {
+			start = start + i + 1
+			break
 		}
 	}
 
@@ -372,10 +381,11 @@ func ParseLstEstimationFile(lines []string) SummaryOutput {
 		case strings.Contains(line, "COVARIANCE STEP ABORTED"):
 			runHeuristics.CovarianceStepAborted = true
 		case strings.Contains(line, "EIGENVALUES OF COR MATRIX OF ESTIMATE"):
+			conditionNumber = getConditionNumber(lines, i)
 			// TODO: get largeNumberLimit from config
 			// or derive. something like (number of parameters) * 10
-			conditionNumber = getConditionNumber(lines, i)
-			runHeuristics.LargeConditionNumber = conditionNumber > 1000.0
+			largeNumberLimit := 1000.0
+			runHeuristics.LargeConditionNumber = conditionNumber > largeNumberLimit
 		default:
 			continue
 		}
