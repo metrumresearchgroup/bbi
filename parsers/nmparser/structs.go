@@ -125,8 +125,9 @@ type CovarianceStep struct {
 
 // OfvDetails ...
 type OfvDetails struct {
-	OFV             float64 `json:"ofv,omitempty"`
+	EstMethod		string  `json:"method,omitempty"`
 	OFVNoConstant   float64 `json:"ofv_no_constant,omitempty"`
+	ConstantToOFV   float64 `json:"constant_to_ofv,omitempty"`
 	OFVWithConstant float64 `json:"ofv_with_constant,omitempty"`
 }
 
@@ -136,7 +137,7 @@ type SummaryOutput struct {
 	RunHeuristics    RunHeuristics        `json:"run_heuristics,omitempty"`
 	ParametersData   []ParametersData     `json:"parameters_data,omitempty"`
 	ParameterNames   ParameterNames       `json:"parameter_names,omitempty"`
-	OFV              OfvDetails           `json:"ofv,omitempty"`
+	OFV              []OfvDetails          `json:"ofv,omitempty"`
 	ConditionNumber  float64              `json:"condition_number,omitempty"`
 	ShrinkageDetails [][]ShrinkageDetails `json:"shrinkage_details,omitempty"`
 }
@@ -203,10 +204,12 @@ func NewRunDetails() RunDetails {
 }
 
 // NewOfvDetails ...
-func NewOfvDetails() OfvDetails {
+func NewOfvDetails(method string) OfvDetails {
+
 	ofvDetails := OfvDetails{
-		OFV:             DefaultFloat64,
+		EstMethod: 		 method,
 		OFVNoConstant:   DefaultFloat64,
+		ConstantToOFV:   DefaultFloat64,
 		OFVWithConstant: DefaultFloat64,
 	}
 	return ofvDetails

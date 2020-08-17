@@ -125,13 +125,12 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (Su
 			return SummaryOutput{}, err
 		}
 		results.ShrinkageDetails = ParseShkData(ParseShkLines(shkLines), etaCount, epsCount)
+		results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, filepath.Base(shkFilePath))
 
 		// check Eta Pval heuristic
-		var finalShrinkage ShrinkageDetails
-		finalShrinkage = results.ShrinkageDetails[len(results.ShrinkageDetails) - 1]
-		if (len(finalShrinkage) == 1) {
-			// if multiple subpops then there is no p-value test
-			finalShrinkage = finalShrinkage[0]
+		// note, if multiple subpops then there is no p-value test
+		if (len(results.ShrinkageDetails[len(results.ShrinkageDetails) - 1]) == 1) {
+			finalShrinkage := results.ShrinkageDetails[len(results.ShrinkageDetails) - 1][0]
 			b := make([]bool, len(finalShrinkage.Pval))
 			for i, n := range(finalShrinkage.Pval) {
 				b[i] = n < 0.05

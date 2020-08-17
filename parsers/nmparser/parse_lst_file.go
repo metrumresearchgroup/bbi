@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"math"
 	"sort"
 	"strconv"
@@ -45,83 +46,6 @@ func parseFloats(line, name string) []float64 {
 		floats = append(floats, fvalue)
 	}
 	return floats
-}
-
-func parseOFV(line string, ofvDetails OfvDetails) OfvDetails {
-	if strings.Contains(line, "#OBJV:") {
-		result := strings.Replace(line, "*", "", -1)
-		ofvDetails.OFVNoConstant, _ = strconv.ParseFloat(
-			strings.TrimSpace(strings.Replace(result, "#OBJV:", "", -1)),
-			64)
-	} else if strings.Contains(line, "CONSTANT TO OBJECTIVE FUNCTION") {
-		ofvDetails.OFV, _ = strconv.ParseFloat(
-			strings.TrimSpace(strings.Replace(line, "N*LOG(2PI) CONSTANT TO OBJECTIVE FUNCTION:", "", -1)),
-			64)
-	} else if strings.Contains(line, "OBJECTIVE FUNCTION VALUE WITHOUT CONSTANT") {
-		ofvDetails.OFVNoConstant, _ = strconv.ParseFloat(
-			strings.TrimSpace(strings.Replace(line, "OBJECTIVE FUNCTION VALUE WITHOUT CONSTANT:", "", -1)),
-			64)
-	} else if strings.Contains(line, "OBJECTIVE FUNCTION VALUE WITH CONSTANT") {
-		ofvDetails.OFVWithConstant, _ = strconv.ParseFloat(
-			strings.TrimSpace(strings.Replace(line, "OBJECTIVE FUNCTION VALUE WITH CONSTANT:", "", -1)),
-			64)
-	}
-	return ofvDetails
-}
-
-func getConditionNumber(lines []string, start int) float64 {
-
-	// go until line of ints
-	for i, line := range lines[start:] {
-		sub := strings.TrimSpace(line)
-		if len(sub) > 0 {
-			vals := strings.Fields(sub)
-			if len(vals) > 1 {
-				one, err := strconv.Atoi(vals[0])
-				if err == nil && one == 1 {
-					two, err := strconv.Atoi(vals[1])
-					if err == nil && two == 2 {
-						start = start + i
-						break
-					}
-				}
-			}
-		}
-	}
-
-	// go until blank line
-	for i, line := range lines[start:] {
-		sub := strings.TrimSpace(line)
-		if len(sub) == 0 {
-			start = start + i + 1
-			break
-		}
-	}
-
-	// go until another blank line and build eigenvalues vector
-	var eigenvalues []float64
-	for i, line := range lines[start:] {
-		for _, s := range strings.Fields(line) {
-			eigenvalue, err := strconv.ParseFloat(s, 64)
-			if err == nil {
-				eigenvalues = append(eigenvalues, eigenvalue)
-			}
-		}
-
-		sub := strings.TrimSpace(line)
-		if len(sub) == 0 {
-			start = start + i + 1
-			break
-		}
-	}
-
-	ratio := 1.0 // If only 1 eigenvalue, the Condition Number is 1.0
-	if len(eigenvalues) >= 2 {
-		sort.Float64s(eigenvalues)
-		ratio = eigenvalues[len(eigenvalues)-1] / eigenvalues[0]
-	}
-
-	return ratio
 }
 
 func getMatrixData(lines []string, start int) MatrixData {
@@ -329,8 +253,8 @@ func getGradientLine(lines []string, start int) string {
 
 // ParseLstEstimationFile parses the lst file
 func ParseLstEstimationFile(lines []string) SummaryOutput {
-	ofvDetails := NewOfvDetails()
 	runHeuristics := NewRunHeuristics()
+	var allOfvDetails []OfvDetails
 	var finalParameterEstimatesIndex int
 	var standardErrorEstimateIndex int
 	var covarianceMatrixEstimateIndex int
@@ -351,14 +275,19 @@ func ParseLstEstimationFile(lines []string) SummaryOutput {
 			}
 		case strings.Contains(line, "$EST") && endSigmaIndex == 0:
 			endSigmaIndex = i
+		case strings.Contains(line, "#METH"):
+			// starting new estimation method, make new objective function details object
+			method := strings.TrimSpace(strings.Replace(line, "#METH:", "", -1))
+			newOfv := NewOfvDetails(method)
+			allOfvDetails = append(allOfvDetails, newOfv)
 		case strings.Contains(line, "#OBJV"):
-			ofvDetails = parseOFV(line, ofvDetails)
+			allOfvDetails = parseOFV(line, allOfvDetails)
 		case strings.Contains(line, "CONSTANT TO OBJECTIVE FUNCTION"):
-			ofvDetails = parseOFV(line, ofvDetails)
+			allOfvDetails = parseOFV(line, allOfvDetails)
 		case strings.Contains(line, "OBJECTIVE FUNCTION VALUE WITHOUT CONSTANT"):
-			ofvDetails = parseOFV(line, ofvDetails)
+			allOfvDetails = parseOFV(line, allOfvDetails)
 		case strings.Contains(line, "OBJECTIVE FUNCTION VALUE WITH CONSTANT"):
-			ofvDetails = parseOFV(line, ofvDetails)
+			allOfvDetails = parseOFV(line, allOfvDetails)
 		case strings.Contains(line, "FINAL PARAMETER ESTIMATE"):
 			// want to go 3 more lines to get into text not labelled block
 			finalParameterEstimatesIndex = i + 3
@@ -429,9 +358,91 @@ func ParseLstEstimationFile(lines []string) SummaryOutput {
 		},
 		ParameterNames: NewDefaultParameterNames(len(finalParameterEst.Theta), len(finalParameterEst.Omega), len(finalParameterEst.Sigma)),
 
-		OFV: ofvDetails,
+		OFV: allOfvDetails,
 
 		ConditionNumber: conditionNumber,
 	}
 	return result
+}
+
+func parseOFV(line string, allOfvDetails []OfvDetails) []OfvDetails {
+	fmt.Printf("%d -- %v", len(allOfvDetails), allOfvDetails)
+	// always modify the most recently created OfvDetails
+	ofvDetails := &allOfvDetails[len(allOfvDetails) - 1]
+
+	if strings.Contains(line, "#OBJV:") {
+		result := strings.Replace(line, "*", "", -1)
+		ofvDetails.OFVNoConstant, _ = strconv.ParseFloat(
+			strings.TrimSpace(strings.Replace(result, "#OBJV:", "", -1)),
+			64)
+	} else if strings.Contains(line, "CONSTANT TO OBJECTIVE FUNCTION") {
+		constantString := strings.TrimSpace(strings.Replace(line, "CONSTANT TO OBJECTIVE FUNCTION:", "", -1))
+		constantString = strings.TrimSpace(strings.Replace(constantString, "N*LOG(2PI)", "", -1))
+		constantString = strings.TrimSpace(strings.Replace(constantString, "NIND*NETA*LOG(2PI)", "", -1))
+		ofvDetails.ConstantToOFV, _ = strconv.ParseFloat(constantString, 64)
+	} else if strings.Contains(line, "OBJECTIVE FUNCTION VALUE WITHOUT CONSTANT") {
+		ofvDetails.OFVNoConstant, _ = strconv.ParseFloat(
+			strings.TrimSpace(strings.Replace(line, "OBJECTIVE FUNCTION VALUE WITHOUT CONSTANT:", "", -1)),
+			64)
+	} else if strings.Contains(line, "OBJECTIVE FUNCTION VALUE WITH CONSTANT") {
+		ofvDetails.OFVWithConstant, _ = strconv.ParseFloat(
+			strings.TrimSpace(strings.Replace(line, "OBJECTIVE FUNCTION VALUE WITH CONSTANT:", "", -1)),
+			64)
+	}
+	return allOfvDetails
+}
+
+func getConditionNumber(lines []string, start int) float64 {
+
+	// go until line of ints
+	for i, line := range lines[start:] {
+		sub := strings.TrimSpace(line)
+		if len(sub) > 0 {
+			vals := strings.Fields(sub)
+			if len(vals) > 1 {
+				one, err := strconv.Atoi(vals[0])
+				if err == nil && one == 1 {
+					two, err := strconv.Atoi(vals[1])
+					if err == nil && two == 2 {
+						start = start + i
+						break
+					}
+				}
+			}
+		}
+	}
+
+	// go until blank line
+	for i, line := range lines[start:] {
+		sub := strings.TrimSpace(line)
+		if len(sub) == 0 {
+			start = start + i + 1
+			break
+		}
+	}
+
+	// go until another blank line and build eigenvalues vector
+	var eigenvalues []float64
+	for i, line := range lines[start:] {
+		for _, s := range strings.Fields(line) {
+			eigenvalue, err := strconv.ParseFloat(s, 64)
+			if err == nil {
+				eigenvalues = append(eigenvalues, eigenvalue)
+			}
+		}
+
+		sub := strings.TrimSpace(line)
+		if len(sub) == 0 {
+			start = start + i + 1
+			break
+		}
+	}
+
+	ratio := 1.0 // If only 1 eigenvalue, the Condition Number is 1.0
+	if len(eigenvalues) >= 2 {
+		sort.Float64s(eigenvalues)
+		ratio = eigenvalues[len(eigenvalues)-1] / eigenvalues[0]
+	}
+
+	return ratio
 }
