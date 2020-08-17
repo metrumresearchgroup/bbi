@@ -240,3 +240,14 @@ func ListFiles(fd []os.FileInfo) []string {
 	}
 	return files
 }
+
+// Takes a boolean slice and returns a boolean for whether
+// any elements of the slice are true
+func AnyTrue(bools []bool) bool {
+	for _, v := range bools {
+		if v {
+			return true
+		}
+	}
+	return false
+}

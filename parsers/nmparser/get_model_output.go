@@ -127,16 +127,21 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (Su
 		results.ShrinkageDetails = ParseShkData(ParseShkLines(shkLines), etaCount, epsCount)
 
 		// check Eta Pval heuristic
-
-		var shrinkDet ShrinkageDetails
-		shrinkDet = results.ShrinkageDetails[len(results.ShrinkageDetails) - 1][0] // gotta look into this structure
-
-		b := make([]bool, len(shrinkDet.Pval))
-		for i, n := range(shrinkDet.Pval) {
-			b[i] = n < 0.05
+		var finalShrinkage ShrinkageDetails
+		finalShrinkage = results.ShrinkageDetails[len(results.ShrinkageDetails) - 1]
+		if (len(finalShrinkage) == 1) {
+			// if multiple subpops then there is no p-value test
+			finalShrinkage = finalShrinkage[0]
+			b := make([]bool, len(finalShrinkage.Pval))
+			for i, n := range(finalShrinkage.Pval) {
+				b[i] = n < 0.05
+			}
+			results.RunHeuristics.EtaPvalSignificant = utils.AnyTrue(b)
 		}
-		results.RunHeuristics.EtaPvalSignificant = AnyTrue(b)
 	}
+
+	// Extra heuristics
+	results.RunHeuristics.PRDERR, _ = utils.Exists(filepath.Join(dir, "PRDERR"), AppFs)
 
 	setMissingValuesToDefault(&results, etaCount, epsCount)
 	return results, nil

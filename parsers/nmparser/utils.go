@@ -15,11 +15,3 @@ func createDiagonalBlock(num int) []int {
 	return iArr
 }
 
-func AnyTrue(bools []bool) bool {
-	for _, v := range bools {
-		if v {
-			return true
-		}
-	}
-	return false
-}
