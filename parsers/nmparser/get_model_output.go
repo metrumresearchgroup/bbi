@@ -125,6 +125,17 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (Su
 			return SummaryOutput{}, err
 		}
 		results.ShrinkageDetails = ParseShkData(ParseShkLines(shkLines), etaCount, epsCount)
+
+		// check Eta Pval heuristic
+
+		var shrinkDet ShrinkageDetails
+		shrinkDet = results.ShrinkageDetails[len(results.ShrinkageDetails) - 1][0] // gotta look into this structure
+
+		b := make([]bool, len(shrinkDet.Pval))
+		for i, n := range(shrinkDet.Pval) {
+			b[i] = n < 0.05
+		}
+		results.RunHeuristics.EtaPvalSignificant = AnyTrue(b)
 	}
 
 	setMissingValuesToDefault(&results, etaCount, epsCount)
