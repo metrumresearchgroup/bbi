@@ -47,13 +47,21 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (Su
 	}
 	results := ParseLstEstimationFile(fileLines)
 	results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, filepath.Base(outputFilePath))
-	// if bayesian, not aware of any times people ever do a prelim estimation with a different method
-	isNotGradientBased := funk.Contains([]string{"MCMC Bayesian Analysis",
+
+	// if the final method is one of these, don't look for .grd file
+	isNotGradientBased := funk.Contains([]string{
+		"MCMC Bayesian Analysis",
 		"Stochastic Approximation Expectation-Maximization",
 		"Importance Sampling assisted by MAP Estimation",
 		"Importance Sampling",
 		"NUTS Bayesian Analysis",
 		"Objective Function Evaluation by Importance Sampling",
+	}, results.RunDetails.EstimationMethods[len(results.RunDetails.EstimationMethods)-1])
+
+	// if the final method is one of these, don't look for .shk file
+	isBayesian := funk.Contains([]string{
+		"MCMC Bayesian Analysis",
+		"NUTS Bayesian Analysis",
 	}, results.RunDetails.EstimationMethods[len(results.RunDetails.EstimationMethods)-1])
 
 	cpuFilePath := filepath.Join(dir, runNum+".cpu")
@@ -113,7 +121,7 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (Su
 	etaCount := lowerDiagonalLengthToDimension[len(results.ParametersData[len(results.ParametersData)-1].Estimates.Omega)]
 	epsCount := lowerDiagonalLengthToDimension[len(results.ParametersData[len(results.ParametersData)-1].Estimates.Sigma)]
 	// bayesian model runs will never have shrinkage files
-	if shk {
+	if shk && !isBayesian {
 		name := runNum + ".shk"
 		shkFilePath := filepath.Join(dir, name)
 		err := errorIfNotExists(AppFs, shkFilePath, "--no-shk-file")
