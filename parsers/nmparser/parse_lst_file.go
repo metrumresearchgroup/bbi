@@ -1,7 +1,7 @@
 package parser
 
 import (
-	"fmt"
+	"github.com/metrumresearchgroup/babylon/utils"
 	"math"
 	"sort"
 	"strconv"
@@ -255,13 +255,13 @@ func getGradientLine(lines []string, start int) string {
 func ParseLstEstimationFile(lines []string) SummaryOutput {
 	runHeuristics := NewRunHeuristics()
 	var allOfvDetails []OfvDetails
+	var allCondDetails []ConditionNumDetails
 	var finalParameterEstimatesIndex int
 	var standardErrorEstimateIndex int
 	var covarianceMatrixEstimateIndex int
 	var startThetaIndex int
 	var endSigmaIndex int
 	var gradientLines []string
-	var conditionNumber float64
 
 	for i, line := range lines {
 		switch {
@@ -276,10 +276,10 @@ func ParseLstEstimationFile(lines []string) SummaryOutput {
 		case strings.Contains(line, "$EST") && endSigmaIndex == 0:
 			endSigmaIndex = i
 		case strings.Contains(line, "#METH"):
-			// starting new estimation method, make new objective function details object
+			// starting new estimation method, make new details objects
 			method := strings.TrimSpace(strings.Replace(line, "#METH:", "", -1))
-			newOfv := NewOfvDetails(method)
-			allOfvDetails = append(allOfvDetails, newOfv)
+			allOfvDetails = append(allOfvDetails, NewOfvDetails(method))
+			allCondDetails = append(allCondDetails, NewConditionNumDetails(method))
 		case strings.Contains(line, "#OBJV"):
 			allOfvDetails = parseOFV(line, allOfvDetails)
 		case strings.Contains(line, "CONSTANT TO OBJECTIVE FUNCTION"):
@@ -310,17 +310,22 @@ func ParseLstEstimationFile(lines []string) SummaryOutput {
 		case strings.Contains(line, "COVARIANCE STEP ABORTED"):
 			runHeuristics.CovarianceStepAborted = true
 		case strings.Contains(line, "EIGENVALUES OF COR MATRIX OF ESTIMATE"):
-			conditionNumber = getConditionNumber(lines, i)
-			// TODO: get largeNumberLimit from config
-			// or derive. something like (number of parameters) * 10
-			largeNumberLimit := 1000.0
-			runHeuristics.LargeConditionNumber = conditionNumber > largeNumberLimit
+			allCondDetails = parseConditionNum(lines, i, allCondDetails)
 		default:
 			continue
 		}
 	}
 
 	runHeuristics.HasFinalZeroGradient = parseGradient(gradientLines)
+
+	// TODO: get largeNumberLimit from config
+	// or derive. something like (number of parameters) * 10
+	largeNumberLimit := 1000.0
+	cb := make([]bool, len(allCondDetails))
+	for i, cn := range(allCondDetails) {
+		cb[i] = cn.ConditionNumber > largeNumberLimit
+	}
+	runHeuristics.LargeConditionNumber = utils.AnyTrue(cb)
 
 	var finalParameterEst ParametersResult
 	var finalParameterStdErr ParametersResult
@@ -360,13 +365,12 @@ func ParseLstEstimationFile(lines []string) SummaryOutput {
 
 		OFV: allOfvDetails,
 
-		ConditionNumber: conditionNumber,
+		ConditionNumber: allCondDetails,
 	}
 	return result
 }
 
 func parseOFV(line string, allOfvDetails []OfvDetails) []OfvDetails {
-	fmt.Printf("%d -- %v", len(allOfvDetails), allOfvDetails)
 	// always modify the most recently created OfvDetails
 	ofvDetails := &allOfvDetails[len(allOfvDetails) - 1]
 
@@ -392,7 +396,16 @@ func parseOFV(line string, allOfvDetails []OfvDetails) []OfvDetails {
 	return allOfvDetails
 }
 
-func getConditionNumber(lines []string, start int) float64 {
+func parseConditionNum(lines []string, start int, allCondDetails []ConditionNumDetails, ) []ConditionNumDetails {
+	// always modify the most recently created ConditionNumDetails
+	condDetails := &allCondDetails[len(allCondDetails) - 1]
+
+	condDetails.ConditionNumber = calculateConditionNumber(lines, start)
+
+	return allCondDetails
+}
+
+func calculateConditionNumber(lines []string, start int) float64 {
 
 	// go until line of ints
 	for i, line := range lines[start:] {

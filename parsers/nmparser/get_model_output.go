@@ -141,7 +141,7 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (Su
 			finalShrinkage := results.ShrinkageDetails[len(results.ShrinkageDetails) - 1][0]
 			b := make([]bool, len(finalShrinkage.Pval))
 			for i, n := range(finalShrinkage.Pval) {
-				b[i] = n < 0.05
+				b[i] = n < 0.05 && n > 0.0
 			}
 			results.RunHeuristics.EtaPvalSignificant = utils.AnyTrue(b)
 		}

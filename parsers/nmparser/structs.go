@@ -131,15 +131,21 @@ type OfvDetails struct {
 	OFVWithConstant float64 `json:"ofv_with_constant,omitempty"`
 }
 
+// OfvDetails ...
+type ConditionNumDetails struct {
+	EstMethod		 string  `json:"method,omitempty"`
+	ConditionNumber  float64 `json:"condition_number,omitempty"`
+}
+
 // SummaryOutput is the output struct from a lst file
 type SummaryOutput struct {
-	RunDetails       RunDetails           `json:"run_details,omitempty"`
-	RunHeuristics    RunHeuristics        `json:"run_heuristics,omitempty"`
-	ParametersData   []ParametersData     `json:"parameters_data,omitempty"`
-	ParameterNames   ParameterNames       `json:"parameter_names,omitempty"`
-	OFV              []OfvDetails          `json:"ofv,omitempty"`
-	ConditionNumber  float64              `json:"condition_number,omitempty"`
-	ShrinkageDetails [][]ShrinkageDetails `json:"shrinkage_details,omitempty"`
+	RunDetails       RunDetails             `json:"run_details,omitempty"`
+	RunHeuristics    RunHeuristics          `json:"run_heuristics,omitempty"`
+	ParametersData   []ParametersData       `json:"parameters_data,omitempty"`
+	ParameterNames   ParameterNames         `json:"parameter_names,omitempty"`
+	OFV              []OfvDetails           `json:"ofv,omitempty"`
+	ConditionNumber  []ConditionNumDetails  `json:"condition_number,omitempty"`
+	ShrinkageDetails [][]ShrinkageDetails   `json:"shrinkage_details,omitempty"`
 }
 
 // CovCorOutput is the output from parsing the .cov and .cor file
@@ -214,6 +220,16 @@ func NewOfvDetails(method string) OfvDetails {
 	}
 	return ofvDetails
 }
+
+func NewConditionNumDetails(method string) ConditionNumDetails {
+
+	conditionNumDetails := ConditionNumDetails{
+		EstMethod: 		 method,
+		ConditionNumber: DefaultFloat64,
+	}
+	return conditionNumDetails
+}
+
 
 // NewRunHeuristics provides a new run heuristics struct
 // at the moment it just returns all defaults, however
