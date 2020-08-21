@@ -140,7 +140,6 @@ type SummaryOutput struct {
 }
 
 // CovCorOutput is the output from parsing the .cov and .cor file
-// TODO: We haven't collected a lot of feedback on this, may get refactored later
 type CovCorOutput struct {
 	CovarianceTheta  []FlatArray          `json:"covariance_theta,omitempty"`
 	CorrelationTheta []FlatArray          `json:"correlation_theta,omitempty"`
