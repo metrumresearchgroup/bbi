@@ -54,10 +54,10 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (Su
 		"Stochastic Approximation Expectation-Maximization",
 		"Importance Sampling assisted by MAP Estimation",
 		"Importance Sampling",
+		"Importance Sampling (No Prior)",
 		"NUTS Bayesian Analysis",
 		"Objective Function Evaluation by Importance Sampling",
 	}, results.RunDetails.EstimationMethods[len(results.RunDetails.EstimationMethods)-1])
-	fmt.Println(results.RunDetails.EstimationMethods)
 
 	// if the final method is one of these, don't look for .shk file
 	isBayesian := funk.Contains([]string{
