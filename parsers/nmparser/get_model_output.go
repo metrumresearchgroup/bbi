@@ -3,7 +3,6 @@ package parser
 import (
 	"errors"
 	"fmt"
-	"github.com/thoas/go-funk"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -49,21 +48,10 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (Su
 	results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, filepath.Base(outputFilePath))
 
 	// if the final method is one of these, don't look for .grd file
-	isNotGradientBased := funk.Contains([]string{
-		"MCMC Bayesian Analysis",
-		"Stochastic Approximation Expectation-Maximization",
-		"Importance Sampling assisted by MAP Estimation",
-		"Importance Sampling",
-		"Importance Sampling (No Prior)",
-		"NUTS Bayesian Analysis",
-		"Objective Function Evaluation by Importance Sampling",
-	}, results.RunDetails.EstimationMethods[len(results.RunDetails.EstimationMethods)-1])
+	isNotGradientBased := CheckIfNotGradientBased(results)
 
 	// if the final method is one of these, don't look for .shk file
-	isBayesian := funk.Contains([]string{
-		"MCMC Bayesian Analysis",
-		"NUTS Bayesian Analysis",
-	}, results.RunDetails.EstimationMethods[len(results.RunDetails.EstimationMethods)-1])
+	isBayesian := CheckIfBayesian(results)
 
 	cpuFilePath := filepath.Join(dir, runNum+".cpu")
 	cpuLines, err := utils.ReadLines(cpuFilePath)
