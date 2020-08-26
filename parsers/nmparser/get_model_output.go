@@ -34,9 +34,15 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (Su
 	AppFs := afero.NewOsFs()
 	runNum, extension := utils.FileAndExt(lstPath)
 	if extension == "" {
-		// though lst is vastly more used, some examples from ICON use .res
 		extension = ".lst"
 	}
+	// though lst is vastly more used, some examples from ICON use .res
+	if extension != ".lst" && extension != ".res" {
+		err_msg := fmt.Sprintf("Must provide path to .lst (or .res) file for summary but provided '%s'", lstPath)
+		err_msg += "\nCan also pass no extension and summary will infer .lst extension."
+		return SummaryOutput{}, errors.New(err_msg)
+	}
+
 	dir, _ := filepath.Abs(filepath.Dir(lstPath))
 	outputFilePath := strings.Join([]string{filepath.Join(dir, runNum), extension}, "")
 
