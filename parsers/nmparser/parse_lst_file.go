@@ -381,8 +381,14 @@ func parseOFV(line string, allOfvDetails []OfvDetails) []OfvDetails {
 			64)
 	} else if strings.Contains(line, "CONSTANT TO OBJECTIVE FUNCTION") {
 		constantString := strings.TrimSpace(strings.Replace(line, "CONSTANT TO OBJECTIVE FUNCTION:", "", -1))
-		constantString = strings.TrimSpace(strings.Replace(constantString, "N*LOG(2PI)", "", -1))
-		constantString = strings.TrimSpace(strings.Replace(constantString, "NIND*NETA*LOG(2PI)", "", -1))
+		constantPrefixes := []string{
+			"N*LOG(2PI)",
+			"NIND*NETA*LOG(2PI)",
+			"PRIOR",
+		}
+		for _, cp := range(constantPrefixes) {
+			constantString = strings.TrimSpace(strings.Replace(constantString, cp, "", -1))
+		}
 		ofvDetails.ConstantToOFV, _ = strconv.ParseFloat(constantString, 64)
 	} else if strings.Contains(line, "OBJECTIVE FUNCTION VALUE WITHOUT CONSTANT") {
 		ofvDetails.OFVNoConstant, _ = strconv.ParseFloat(

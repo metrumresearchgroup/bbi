@@ -67,7 +67,7 @@ func summary(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	// if we are going to parse mutiple models, we need to reasonably handle failures. The objective
+	// if we are going to parse multiple models, we need to reasonably handle failures. The objective
 	// will be to always return a json object if its json, and if not, error as soon as it hits a printed issue.
 	// As such, the idea will be to store results such they can be filtered
 	type result int
