@@ -167,21 +167,18 @@ type NonMemModel struct {
 	Error error `json:"error"`
 }
 
+var nonmemLongDescription string = fmt.Sprintf("\n%s\n\n%s\n\n%s\n", runLongDescription, summaryLongDescription, covcorLongDescription)
+
 // RunCmd represents the run command
 var nonmemCmd = &cobra.Command{
 	Use:   "nonmem",
 	Short: "nonmem a (set of) models locally or on the grid",
-	Long: `run nonmem model(s), for example: 
-bbi nonmem <local|sge> run001.mod
-bbi nonmem  --clean_lvl=1 <local|sge> run001.mod run002.mod
-bbi nonmem run <local|sge> [001:006].mod // expand to run001.mod run002.mod ... run006.mod local
-bbi nonmem run <local|sge> .// run all models in directory
- `,
+	Long: nonmemLongDescription,
 	Run: nonmem,
 }
 
 func nonmem(cmd *cobra.Command, args []string) {
-	println(runLongDescription)
+	println(nonmemLongDescription)
 }
 
 func init() {

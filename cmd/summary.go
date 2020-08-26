@@ -33,14 +33,17 @@ var (
 	noShk       bool
 	extFile     string
 )
+const summaryLongDescription string = `summarize model(s), for example: 
+bbi nonmem summary run001/run001
+bbi nonmem summary run001/run001.lst
+bbi nonmem summary run001/run001.res
+ `
 
 // runCmd represents the run command
 var summaryCmd = &cobra.Command{
 	Use:   "summary",
 	Short: "summarize the output of model(s)",
-	Long: `summarize model(s), for example: 
-bbi nonmem summary run001/run001.lst
- `,
+	Long: summaryLongDescription,
 	Run: summary,
 }
 

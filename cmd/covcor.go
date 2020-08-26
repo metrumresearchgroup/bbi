@@ -24,13 +24,15 @@ import (
 	"github.com/spf13/viper"
 )
 
+const covcorLongDescription string = `load .cov and .cor output from model(s), for example: 
+bbi nonmem covcor run001/run001
+bbi nonmem covcor run001/run001.cov
+ `
 // runCmd represents the run command
 var covcorCmd = &cobra.Command{
 	Use:   "covcor",
 	Short: "load .cov and .cor output from a model run",
-	Long: `load .cov and .cor output from model(s), for example: 
-bbi nonmem covcor run001/run001
- `,
+	Long: covcorLongDescription,
 	Run: covcor,
 }
 
