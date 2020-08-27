@@ -28,9 +28,9 @@ func NewModelOutputFile(name string, exclude bool) ModelOutputFile {
 	return ModelOutputFile{Name: name, Exclude: exclude}
 }
 
-// GetModelOutput populates and returns a ModelOutput object by parsing files
+// GetModelOutput populates and returns a SummaryOutput object by parsing files
 // if ext file is excluded, will attempt to parse the lst file for additional information traditionally available there
-func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, cov bool, cor bool, shk bool) (ModelOutput, error) {
+func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (SummaryOutput, error) {
 
 	AppFs := afero.NewOsFs()
 	runNum, extension := utils.FileAndExt(lstPath)
@@ -43,7 +43,7 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, cov bool, cor
 
 	fileLines, err := utils.ReadLinesFS(AppFs, outputFilePath)
 	if err != nil {
-		return ModelOutput{}, err
+		return SummaryOutput{}, err
 	}
 	results := ParseLstEstimationFile(fileLines)
 	results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, filepath.Base(outputFilePath))
@@ -80,11 +80,11 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, cov bool, cor
 		extFilePath := filepath.Join(dir, ext.Name)
 		err := errorIfNotExists(AppFs, extFilePath, "--no-ext-file")
 		if err != nil {
-			return ModelOutput{}, err
+			return SummaryOutput{}, err
 		}
 		extLines, err := utils.ReadParamsAndOutputFromExt(extFilePath)
 		if err != nil {
-			return ModelOutput{}, err
+			return SummaryOutput{}, err
 		}
 		extData, parameterNames := ParseExtData(ParseExtLines(extLines))
 		results.ParametersData = extData
@@ -99,45 +99,15 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, cov bool, cor
 		grdFilePath := filepath.Join(dir, name)
 		err := errorIfNotExists(AppFs, grdFilePath, "--no-grd-file")
 		if err != nil {
-			return ModelOutput{}, err
+			return SummaryOutput{}, err
 		}
 		grdLines, err := utils.ReadLinesFS(AppFs, grdFilePath)
 		if err != nil {
-			return ModelOutput{}, err
+			return SummaryOutput{}, err
 		}
 		parametersData, _ := ParseGrdData(ParseGrdLines(grdLines))
 		results.RunHeuristics.HasFinalZeroGradient = HasZeroGradient(parametersData[len(parametersData)-1].Fixed.Theta)
 		results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, filepath.Base(grdFilePath))
-	}
-
-	if cov {
-		name := runNum + ".cov"
-		covFilePath := filepath.Join(dir, name)
-		err := errorIfNotExists(AppFs, covFilePath, "--no-cov-file")
-		if err != nil {
-			return ModelOutput{}, err
-		}
-		covLines, err := utils.ReadLines(covFilePath)
-		if err != nil {
-			return ModelOutput{}, err
-		}
-		results.CovarianceTheta = GetThetaValues(covLines)
-		results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, filepath.Base(covFilePath))
-	}
-
-	if cor {
-		name := runNum + ".cor"
-		corFilePath := filepath.Join(dir, name)
-		err := errorIfNotExists(AppFs, corFilePath, "--no-cor-file")
-		if err != nil {
-			return ModelOutput{}, err
-		}
-		corLines, err := utils.ReadLines(corFilePath)
-		if err != nil {
-			return ModelOutput{}, err
-		}
-		results.CorrelationTheta = GetThetaValues(corLines)
-		results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, filepath.Base(corFilePath))
 	}
 
 	etaCount := lowerDiagonalLengthToDimension[len(results.ParametersData[len(results.ParametersData)-1].Estimates.Omega)]
@@ -148,11 +118,11 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, cov bool, cor
 		shkFilePath := filepath.Join(dir, name)
 		err := errorIfNotExists(AppFs, shkFilePath, "--no-shk-file")
 		if err != nil {
-			return ModelOutput{}, err
+			return SummaryOutput{}, err
 		}
 		shkLines, err := utils.ReadLines(shkFilePath)
 		if err != nil {
-			return ModelOutput{}, err
+			return SummaryOutput{}, err
 		}
 		results.ShrinkageDetails = ParseShkData(ParseShkLines(shkLines), etaCount, epsCount)
 	}
@@ -174,4 +144,41 @@ func errorIfNotExists(fs afero.Fs, path string, sFlag string) error {
 		return errors.New(fmt.Sprintf("No file present at %s%s ", path, suppressionFlagMsg))
 	}
 	return nil
+}
+
+// GetCovCorOutput
+// STILL UNDER CONSTRUCTION
+func GetCovCorOutput(lstPath string) (CovCorOutput, error) {
+
+	AppFs := afero.NewOsFs()
+	runNum, _ := utils.FileAndExt(lstPath)
+	dir, _ := filepath.Abs(filepath.Dir(lstPath))
+
+	covFilePath := filepath.Join(dir, runNum + ".cov")
+	err := errorIfNotExists(AppFs, covFilePath, "")
+	if err != nil {
+		return CovCorOutput{}, err
+	}
+	covLines, err := utils.ReadLines(covFilePath)
+	if err != nil {
+		return CovCorOutput{}, err
+	}
+	covarianceTheta := GetThetaValues(covLines)
+
+	corFilePath := filepath.Join(dir, runNum + ".cor")
+	err = errorIfNotExists(AppFs, corFilePath, "")
+	if err != nil {
+		return CovCorOutput{}, err
+	}
+	corLines, err := utils.ReadLines(corFilePath)
+	if err != nil {
+		return CovCorOutput{}, err
+	}
+	correlationTheta := GetThetaValues(corLines)
+
+	results := CovCorOutput{
+		CovarianceTheta: covarianceTheta,
+		CorrelationTheta: correlationTheta,
+	}
+	return results, nil
 }

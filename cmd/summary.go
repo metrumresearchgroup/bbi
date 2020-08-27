@@ -30,28 +30,22 @@ var (
 	summaryTree bool
 	noExt       bool
 	noGrd       bool
-	noCov       bool
-	noCor       bool
 	noShk       bool
 	extFile     string
-	grdFile     string
-	covFile     string
-	corFile     string
-	shkFile     string
 )
 
 // runCmd represents the run command
 var summaryCmd = &cobra.Command{
 	Use:   "summary",
 	Short: "summarize the output of model(s)",
-	Long: `run model(s), for example: 
-nmu summarize run001.lst
+	Long: `summarize model(s), for example: 
+bbi nonmem summary run001/run001.lst
  `,
 	Run: summary,
 }
 
 type jsonResults struct {
-	Results []parser.ModelOutput
+	Results []parser.SummaryOutput
 	Errors  []error
 }
 
@@ -60,13 +54,7 @@ func summary(cmd *cobra.Command, args []string) {
 		viper.Debug()
 	}
 	if len(args) == 1 {
-		results, err := parser.GetModelOutput(args[0],
-			parser.NewModelOutputFile(extFile, noExt),
-			!noGrd,
-			!noCov,
-			!noCor,
-			!noShk,
-		)
+		results, err := parser.GetModelOutput(args[0], parser.NewModelOutputFile(extFile, noExt), !noGrd, !noShk, )
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -91,7 +79,7 @@ func summary(cmd *cobra.Command, args []string) {
 		Index   int
 		Outcome result
 		Err     error
-		Result  parser.ModelOutput
+		Result  parser.SummaryOutput
 	}
 
 	workers := runtime.NumCPU()
@@ -111,13 +99,7 @@ func summary(cmd *cobra.Command, args []string) {
 	for w := 1; w <= workers; w++ {
 		go func(w int, modIndex <-chan int, results chan<- modelResult) {
 			for i := range modIndex {
-				r, err := parser.GetModelOutput(args[i],
-					parser.NewModelOutputFile(extFile, noExt),
-					!noGrd,
-					!noCov,
-					!noCor,
-					!noShk,
-				)
+				r, err := parser.GetModelOutput(args[i], parser.NewModelOutputFile(extFile, noExt), !noGrd, !noShk, )
 				if err != nil {
 					results <- modelResult{
 						Index:   i,
@@ -179,8 +161,6 @@ func init() {
 	//Used for Summary
 	summaryCmd.PersistentFlags().BoolVar(&noExt, "no-ext-file", false, "do not use ext file")
 	summaryCmd.PersistentFlags().BoolVar(&noGrd, "no-grd-file", false, "do not use grd file")
-	summaryCmd.PersistentFlags().BoolVar(&noCov, "no-cov-file", false, "do not use cov file")
-	summaryCmd.PersistentFlags().BoolVar(&noCor, "no-cor-file", false, "do not use cor file")
 	summaryCmd.PersistentFlags().BoolVar(&noShk, "no-shk-file", false, "do not use shk file")
 	summaryCmd.PersistentFlags().StringVar(&extFile, "ext-file", "", "name of custom ext-file")
 }

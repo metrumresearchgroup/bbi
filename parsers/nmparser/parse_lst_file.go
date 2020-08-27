@@ -328,7 +328,7 @@ func getGradientLine(lines []string, start int) string {
 }
 
 // ParseLstEstimationFile parses the lst file
-func ParseLstEstimationFile(lines []string) ModelOutput {
+func ParseLstEstimationFile(lines []string) SummaryOutput {
 	ofvDetails := NewOfvDetails()
 	runHeuristics := NewRunHeuristics()
 	var finalParameterEstimatesIndex int
@@ -418,7 +418,7 @@ func ParseLstEstimationFile(lines []string) ModelOutput {
 	// 	parameterNames = ParseParameterNames(lines[startThetaIndex:endSigmaIndex])
 	// }
 	// TODO re-replace parameter data from lst
-	result := ModelOutput{
+	result := SummaryOutput{
 		RunHeuristics: runHeuristics,
 		RunDetails:    ParseRunDetails(lines),
 		ParametersData: []ParametersData{
