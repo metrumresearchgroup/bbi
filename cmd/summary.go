@@ -33,14 +33,17 @@ var (
 	noShk       bool
 	extFile     string
 )
+const summaryLongDescription string = `summarize model(s), for example: 
+bbi nonmem summary run001/run001
+bbi nonmem summary run001/run001.lst
+bbi nonmem summary run001/run001.res
+ `
 
 // runCmd represents the run command
 var summaryCmd = &cobra.Command{
 	Use:   "summary",
 	Short: "summarize the output of model(s)",
-	Long: `summarize model(s), for example: 
-bbi nonmem summary run001/run001.lst
- `,
+	Long: summaryLongDescription,
 	Run: summary,
 }
 
@@ -67,7 +70,7 @@ func summary(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	// if we are going to parse mutiple models, we need to reasonably handle failures. The objective
+	// if we are going to parse multiple models, we need to reasonably handle failures. The objective
 	// will be to always return a json object if its json, and if not, error as soon as it hits a printed issue.
 	// As such, the idea will be to store results such they can be filtered
 	type result int

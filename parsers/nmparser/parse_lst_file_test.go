@@ -256,7 +256,7 @@ func TestConditionNumber(t *testing.T) {
 
 	for _, tt := range tests {
 
-		conditionNumber := getConditionNumber(tt.lines, tt.n)
+		conditionNumber := calculateConditionNumber(tt.lines, tt.n)
 		// compare to three decimal places
 		assert.Equal(t, tt.conditionNumber, math.Round(conditionNumber*1000)/1000, "Fail :"+tt.context)
 	}
