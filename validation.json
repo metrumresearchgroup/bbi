@@ -107,7 +107,7 @@
       "risk" : "medium",
       "markdown" : [
         {
-          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/master/markdown/stories/bbi_summary.md"
+          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/validation-2.3.0/markdown/stories/bbi_summary.md"
         }
       ]
     },
@@ -121,7 +121,7 @@
       "risk" : "low",
       "markdown" : [
         {
-          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/master/markdown/stories/bbi_covcor.md"
+          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/validation-2.3.0/markdown/stories/bbi_covcor.md"
         }
       ]
     }
