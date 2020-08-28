@@ -94,6 +94,36 @@
           "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/master/markdown/stories/nmqual_execution.md"
         }
       ]
+    },
+    {
+      "name" : "Babylon should allow users to parse the model output folder",
+      "tags" : [
+        "TestSummaryHappyPath",
+        "TestSummaryArgs",
+        "TestSummaryErrors",
+        "TestSummaryHappyPathNoExtension"
+
+      ],
+      "risk" : "medium",
+      "markdown" : [
+        {
+          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/master/markdown/stories/bbi_summary.md"
+        }
+      ]
+    },
+    {
+      "name" : "Babylon should allow users to parse the .cov and .cor files",
+      "tags" : [
+        "TestCovCorHappyPath",
+        "TestCovCorErrors"
+
+      ],
+      "risk" : "low",
+      "markdown" : [
+        {
+          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/master/markdown/stories/bbi_covcor.md"
+        }
+      ]
     }
   ]
 }
