@@ -58,7 +58,7 @@ steps:
       - export ROOT_EXECUTION_DIR=/data/${DRONE_BUILD_NUMBER}
       - export BABYLON_GRID_NAME_PREFIX="drone_${DRONE_BUILD_NUMBER}"
       - bbi init --dir /opt/NONMEM
-      - go test ./... -v --json --timeout 30m | tee test_output.json
+      - go test ./... -v --json -timeout 30m | tee test_output.json
       - aws s3 cp test_output.json s3://mrg-validation/babylon/${DRONE_BUILD_NUMBER}/results.json
       - chmod +x failure_detector.sh
       - ./failure_detector.sh test_output.json
