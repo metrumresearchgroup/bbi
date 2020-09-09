@@ -116,7 +116,7 @@ steps:
       - mkdir testoutput
       - mkdir rendered
       - aws s3 cp s3://mrg-validation/babylon/${DRONE_BUILD_NUMBER}/results.json testoutput/results.json
-      - aws s3 cp s3://mrg-validation/babylon/${DRONE_BUILD_NUMBER}/commits.json testoutput/commits.json
+      - aws s3 cp s3://mrg-validation/babylon/${DRONE_BUILD_NUMBER}/commits.json commits.json
       - ./gpv --scenarioFile validation.json --commitsFile commits.json --testsDirectory testoutput --outputDirectory rendered
       - aws s3 cp rendered/specification.md s3://mrg-validation/babylon/${DRONE_TAG}/specification.md
       - aws s3 cp rendered/testing_and_validation.md s3://mrg-validation/babylon/${DRONE_TAG}/testing_and_validation.md
