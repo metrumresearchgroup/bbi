@@ -36,8 +36,8 @@ steps:
   - name: Copy commit hashes to s3
     commands:
       - printf "[\n" > /tmp/${DRONE_BUILD_NUMBER}/commits.json
-      - printf "  {\"repo\": \"metrumresearchgroup/babylon\", \"commit\": \"$(cat /tmp/${DRONE_BUILD_NUMBER}/bbi_hash)\"},\n" >> /tmp/${DRONE_BUILD_NUMBER}/commits.json
-      - printf "  {\"repo\": \"metrumresearchgroup/babylontest\", \"commit\": \"$(cat /tmp/${DRONE_BUILD_NUMBER}/babylontest_hash)\"}\n" >> /tmp/${DRONE_BUILD_NUMBER}/commits.json
+      - printf "  {\"repo\":\"metrumresearchgroup/babylon\", \"commit\":\"$(cat /tmp/${DRONE_BUILD_NUMBER}/bbi_hash)\"},\n" >> /tmp/${DRONE_BUILD_NUMBER}/commits.json
+      - printf "  {\"repo\":\"metrumresearchgroup/babylontest\", \"commit\":\"$(cat /tmp/${DRONE_BUILD_NUMBER}/babylontest_hash)\"}\n" >> /tmp/${DRONE_BUILD_NUMBER}/commits.json
       - printf "]\n" >> /tmp/${DRONE_BUILD_NUMBER}/commits.json
       - aws s3 cp /tmp/${DRONE_BUILD_NUMBER}/commits.json s3://mrg-validation/babylon/${DRONE_BUILD_NUMBER}/commits.json
   - name: Test
