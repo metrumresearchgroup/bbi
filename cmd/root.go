@@ -35,7 +35,7 @@ import (
 
 // VERSION is the current bbi version
 var (
-	VERSION string = "2.3.0"
+	VERSION string = "develop"
 )
 
 var (
