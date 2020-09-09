@@ -27,7 +27,7 @@ steps:
       - ./bbi version
   - name: Get BabylonTest
     environment:
-      BABYLONTEST_BRANCH: user-stories-230
+      BABYLONTEST_BRANCH: user-stories-230 # CHANGE BACK TO MASTER!!!!
     commands:
       - git clone https://github.com/metrumresearchgroup/babylontest.git /tmp/${DRONE_BUILD_NUMBER}/babylontest
       - cd /tmp/${DRONE_BUILD_NUMBER}/babylontest
@@ -108,14 +108,16 @@ steps:
   - name: GoProjectValidator
     commands:
       - git clone https://github.com/metrumresearchgroup/goProjectValidator.git
-      - cd goProjectValidator/cmd/pvgo
+      #- cd goProjectValidator/cmd/pvgo
+      - cd goProjectValidator ; git checkout updates-for-bbi-230 ; cd cmd/pvgo # DELETE AND UNCOMMENT ^ !!!!
       - go build -o gpv main.go
       - cp ../../../validation.json .
       - ls -larth
       - mkdir testoutput
       - mkdir rendered
       - aws s3 cp s3://mrg-validation/babylon/${DRONE_BUILD_NUMBER}/results.json testoutput/results.json
-      - ./gpv --scenarioFile validation.json --testsDirectory testoutput --outputDirectory rendered
+      - aws s3 cp s3://mrg-validation/babylon/${DRONE_BUILD_NUMBER}/commits.json testoutput/commits.json
+      - ./gpv --scenarioFile validation.json --commitsFile commits.json --testsDirectory testoutput --outputDirectory rendered
       - aws s3 cp rendered/specification.md s3://mrg-validation/babylon/${DRONE_TAG}/specification.md
       - aws s3 cp rendered/testing_and_validation.md s3://mrg-validation/babylon/${DRONE_TAG}/testing_and_validation.md
       - aws s3 cp rendered/traceability_matrix.md s3://mrg-validation/babylon/${DRONE_TAG}/traceability_matrix.md
