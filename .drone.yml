@@ -22,7 +22,7 @@ steps:
       - if [ -d /tmp/${DRONE_BUILD_NUMBER}/babylontest ] ; then rm -rf /tmp/${DRONE_BUILD_NUMBER}/babylontest; fi
   - name: Build Babylon
     commands:
-      - git rev-parse HEAD > /tmp/${DRONE_BUILD_NUMBER}/bbi_hash
+      - mkdir -p /tmp/${DRONE_BUILD_NUMBER} ; git rev-parse HEAD > /tmp/${DRONE_BUILD_NUMBER}/bbi_hash
       - go build -o bbi cmd/bbi/main.go
       - ./bbi version
   - name: Get BabylonTest
@@ -31,7 +31,7 @@ steps:
     commands:
       - git clone https://github.com/metrumresearchgroup/babylontest.git /tmp/${DRONE_BUILD_NUMBER}/babylontest
       - cd /tmp/${DRONE_BUILD_NUMBER}/babylontest
-      - git rev-parse HEAD > /tmp/${DRONE_BUILD_NUMBER}/babylontest_hash
+      - mkdir -p /tmp/${DRONE_BUILD_NUMBER} ; git rev-parse HEAD > /tmp/${DRONE_BUILD_NUMBER}/babylontest_hash
       - if [ ! -z $BABYLONTEST_BRANCH ]; then git checkout $BABYLONTEST_BRANCH; fi
   - name: Copy commit hashes to s3
     commands:
