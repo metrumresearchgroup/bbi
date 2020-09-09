@@ -8,7 +8,7 @@
   ],
   "stories" : [
     {
-      "name" : "Babylon should allow users to run NonMem locally",
+      "name" : "Run NonMem jobs locally",
       "tags" : [
         "TestBabylonCompletesLocalExecution",
         "TestBabylonParallelExecution"
@@ -21,7 +21,7 @@
       ]
     },
     {
-      "name" : "Babylon should allow users to run NonMem jobs on the Grid",
+      "name" : "Run NonMem jobs on the Grid",
       "tags" : [
         "TestBabylonCompletesSGEExecution",
         "TestBabylonCompletesParallelSGEExecution"
@@ -34,7 +34,7 @@
       ]
     },
     {
-      "name" : "Babylon should notify users of issues with the data referenced in the control stream",
+      "name" : "Notify about issues with the data referenced in the control stream",
       "tags" : [
         "TestHasValidPathForCTL",
         "TestHasInvalidDataPath",
@@ -48,7 +48,7 @@
       ]
     },
     {
-      "name" : "Babylon should be able to initialize a project with minimum configs required for execution",
+      "name" : "Initialize a project with minimum configs required for execution",
       "tags" : [
         "TestInitialization"
       ],
@@ -60,7 +60,7 @@
       ]
     },
     {
-      "name" : "Babylon should allow passage of some NMFE options directly to NonMem",
+      "name" : "Pass NMFE options directly to NonMem",
       "tags" : [
         "TestNMFEOptionsEndInScript"
       ],
@@ -72,11 +72,11 @@
       ]
     },
     {
-      "name" : "Babylon should capture all configurations and render them into a file that can be stored in version control",
+      "name" : "Capture all configurations and write to a file",
       "tags" : [
         "TestBBIConfigJSONCreated"
       ],
-      "risk" : "low",
+      "risk" : "high",
       "markdown" : [
         {
           "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/master/markdown/stories/store_configuration.md"
@@ -84,11 +84,11 @@
       ]
     },
     {
-      "name" : "Babylon should allow for NonMem execution via NMQual",
+      "name" : "NonMem Execution via NMQual",
       "tags" : [
         "TestNMQUALExecutionSucceeds"
       ],
-      "risk" : "medium",
+      "risk" : "low",
       "markdown" : [
         {
           "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/master/markdown/stories/nmqual_execution.md"
@@ -96,7 +96,7 @@
       ]
     },
     {
-      "name" : "Babylon should allow users to parse the model output folder",
+      "name" : "Parse model output folder",
       "tags" : [
         "TestSummaryHappyPath",
         "TestSummaryArgs",
@@ -112,7 +112,7 @@
       ]
     },
     {
-      "name" : "Babylon should allow users to parse the .cov and .cor files",
+      "name" : "Parse .cov and .cor files",
       "tags" : [
         "TestCovCorHappyPath",
         "TestCovCorErrors"
