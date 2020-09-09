@@ -27,7 +27,7 @@ steps:
       - ./bbi version
   - name: Get BabylonTest
     environment:
-      BABYLONTEST_BRANCH: master
+      BABYLONTEST_BRANCH: user-stories-230
     commands:
       - git clone https://github.com/metrumresearchgroup/babylontest.git /tmp/${DRONE_BUILD_NUMBER}/babylontest
       - cd /tmp/${DRONE_BUILD_NUMBER}/babylontest
