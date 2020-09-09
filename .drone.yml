@@ -22,6 +22,7 @@ steps:
       - if [ -d /tmp/${DRONE_BUILD_NUMBER}/babylontest ] ; then rm -rf /tmp/${DRONE_BUILD_NUMBER}/babylontest; fi
   - name: Build Babylon
     commands:
+      - git rev-parse HEAD > /tmp/${DRONE_BUILD_NUMBER}/bbi_hash
       - go build -o bbi cmd/bbi/main.go
       - ./bbi version
   - name: Get BabylonTest
@@ -30,7 +31,15 @@ steps:
     commands:
       - git clone https://github.com/metrumresearchgroup/babylontest.git /tmp/${DRONE_BUILD_NUMBER}/babylontest
       - cd /tmp/${DRONE_BUILD_NUMBER}/babylontest
+      - git rev-parse HEAD > /tmp/${DRONE_BUILD_NUMBER}/babylontest_hash
       - if [ ! -z $BABYLONTEST_BRANCH ]; then git checkout $BABYLONTEST_BRANCH; fi
+  - name: Copy commit hashes to s3
+    commands:
+      - printf "[\n" > /tmp/${DRONE_BUILD_NUMBER}/commits.json
+      - printf "  {\"repo\": \"metrumresearchgroup/babylon\", \"commit\": \"$(cat /tmp/${DRONE_BUILD_NUMBER}/bbi_hash)\"},\n" >> /tmp/${DRONE_BUILD_NUMBER}/commits.json
+      - printf "  {\"repo\": \"metrumresearchgroup/babylontest\", \"commit\": \"$(cat /tmp/${DRONE_BUILD_NUMBER}/babylontest_hash)\"}\n" >> /tmp/${DRONE_BUILD_NUMBER}/commits.json
+      - printf "]\n" >> /tmp/${DRONE_BUILD_NUMBER}/commits.json
+      - aws s3 cp /tmp/${DRONE_BUILD_NUMBER}/commits.json s3://mrg-validation/babylon/${DRONE_BUILD_NUMBER}/commits.json
   - name: Test
     environment:
       <<: *sge_environment
@@ -57,9 +66,11 @@ steps:
       - cd /tmp/${DRONE_BUILD_NUMBER}/babylontest
       - export ROOT_EXECUTION_DIR=/data/${DRONE_BUILD_NUMBER}
       - export BABYLON_GRID_NAME_PREFIX="drone_${DRONE_BUILD_NUMBER}"
+      #Run test suite and copy results to s3
       - bbi init --dir /opt/NONMEM
       - go test ./... -v --json -timeout 30m | tee test_output.json
       - aws s3 cp test_output.json s3://mrg-validation/babylon/${DRONE_BUILD_NUMBER}/results.json
+      #Check for test failures and clean up
       - chmod +x failure_detector.sh
       - ./failure_detector.sh test_output.json
       - rm -rf /data/${DRONE_BUILD_NUMBER}
