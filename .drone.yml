@@ -27,7 +27,7 @@ steps:
       - ./bbi version
   - name: Get BabylonTest
     environment:
-      BABYLONTEST_BRANCH: user-stories-230 # CHANGE BACK TO MASTER!!!!
+      BABYLONTEST_BRANCH: master
     commands:
       - git clone https://github.com/metrumresearchgroup/babylontest.git /tmp/${DRONE_BUILD_NUMBER}/babylontest
       - cd /tmp/${DRONE_BUILD_NUMBER}/babylontest
@@ -108,8 +108,7 @@ steps:
   - name: GoProjectValidator
     commands:
       - git clone https://github.com/metrumresearchgroup/goProjectValidator.git
-      #- cd goProjectValidator/cmd/pvgo
-      - cd goProjectValidator ; git checkout updates-for-bbi-230 ; cd cmd/pvgo # DELETE AND UNCOMMENT ^ !!!!
+      - cd goProjectValidator/cmd/pvgo
       - go build -o gpv main.go
       - cp ../../../validation.json .
       - ls -larth
