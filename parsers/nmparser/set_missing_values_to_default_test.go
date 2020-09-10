@@ -9,19 +9,19 @@ import (
 
 func TestSetMissingValuesToDefaultParameterDataMethod(t *testing.T) {
 	var tests = []struct {
-		modelOutput ModelOutput
+		modelOutput SummaryOutput
 		etaCount    int
 		epsCount    int
 		expected    string
 	}{
 		{
-			modelOutput: ModelOutput{
+			modelOutput: SummaryOutput{
 				ParametersData: []ParametersData{ParametersData{}},
 			},
 			expected: "METHOD NOT DETECTED",
 		},
 		{
-			modelOutput: ModelOutput{
+			modelOutput: SummaryOutput{
 				ParametersData: []ParametersData{ParametersData{
 					Method: "Test Method",
 				}},
@@ -37,14 +37,14 @@ func TestSetMissingValuesToDefaultParameterDataMethod(t *testing.T) {
 
 func TestSetMissingValuesToDefaultParameterDataStdErrDimension(t *testing.T) {
 	var tests = []struct {
-		modelOutput ModelOutput
+		modelOutput SummaryOutput
 		etaCount    int
 		epsCount    int
 		expected    int
 		context     string
 	}{
 		{
-			modelOutput: ModelOutput{
+			modelOutput: SummaryOutput{
 				ParametersData: []ParametersData{ParametersData{
 					Estimates: ParametersResult{
 						Theta: []float64{1, 2, 4},
@@ -65,14 +65,14 @@ func TestSetMissingValuesToDefaultParameterDataStdErrDimension(t *testing.T) {
 
 func TestSetMissingValuesToDefaultParameterDataRESDDimension(t *testing.T) {
 	var tests = []struct {
-		modelOutput ModelOutput
+		modelOutput SummaryOutput
 		etaCount    int
 		epsCount    int
 		expected    int
 		context     string
 	}{
 		{
-			modelOutput: ModelOutput{
+			modelOutput: SummaryOutput{
 				ParametersData: []ParametersData{ParametersData{
 					Estimates: ParametersResult{
 						Omega: []float64{1, 2, 4},
@@ -93,14 +93,14 @@ func TestSetMissingValuesToDefaultParameterDataRESDDimension(t *testing.T) {
 
 func TestSetMissingValuesToDefaultParameterDataValues(t *testing.T) {
 	var tests = []struct {
-		modelOutput ModelOutput
+		modelOutput SummaryOutput
 		etaCount    int
 		epsCount    int
 		expected    int
 		context     string
 	}{
 		{
-			modelOutput: ModelOutput{
+			modelOutput: SummaryOutput{
 				ParametersData: []ParametersData{ParametersData{
 					Estimates: ParametersResult{
 						Omega: []float64{1, 2, 4},
@@ -127,14 +127,14 @@ func TestSetMissingValuesToDefaultParameterDataValues(t *testing.T) {
 
 func TestSetMissingValuesToDefaultParameterNameValues(t *testing.T) {
 	var tests = []struct {
-		modelOutput ModelOutput
+		modelOutput SummaryOutput
 		etaCount    int
 		epsCount    int
 		expected    int
 		context     string
 	}{
 		{
-			modelOutput: ModelOutput{
+			modelOutput: SummaryOutput{
 				ParametersData: []ParametersData{ParametersData{
 					Estimates: ParametersResult{
 						Theta: []float64{1, 2, 4},
@@ -156,14 +156,14 @@ func TestSetMissingValuesToDefaultParameterNameValues(t *testing.T) {
 
 func TestSetMissingValuesToDefaultShrinkageEta(t *testing.T) {
 	var tests = []struct {
-		modelOutput ModelOutput
+		modelOutput SummaryOutput
 		etaCount    int
 		epsCount    int
 		expected    int
 		context     string
 	}{
 		{
-			modelOutput: ModelOutput{
+			modelOutput: SummaryOutput{
 				ParametersData: []ParametersData{ParametersData{
 					Estimates: ParametersResult{},
 				}},
@@ -182,14 +182,14 @@ func TestSetMissingValuesToDefaultShrinkageEta(t *testing.T) {
 
 func TestSetMissingValuesToDefaultShrinkageEps(t *testing.T) {
 	var tests = []struct {
-		modelOutput ModelOutput
+		modelOutput SummaryOutput
 		etaCount    int
 		epsCount    int
 		expected    int
 		context     string
 	}{
 		{
-			modelOutput: ModelOutput{
+			modelOutput: SummaryOutput{
 				ParametersData: []ParametersData{ParametersData{
 					Estimates: ParametersResult{},
 				}},

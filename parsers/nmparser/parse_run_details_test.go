@@ -37,6 +37,7 @@ var RunDetails01Results = RunDetails{
 	"Tue Dec 17 18:11:32 2013",
 	6.84,
 	3.34,
+	10.5, // this is made up, not for an actual run output
 	352,
 	3.4,
 	"3.mod, double inital estimates",
@@ -46,7 +47,7 @@ var RunDetails01Results = RunDetails{
 	50,
 	442,
 	492,
-	"-999999999",
+	[]string{"-999999999"},
 	[]string{""},
 }
 
@@ -58,6 +59,7 @@ var RunDetails02Results = RunDetails{
 	"Fri Jul 12 09:27:20 EDT 2019",
 	0.68,
 	0.02,
+	10.5, // this is made up, not for an actual run output
 	178,
 	3.1,
 	"1 model, 1 comp",
@@ -67,7 +69,7 @@ var RunDetails02Results = RunDetails{
 	50,
 	442,
 	492,
-	"",
+	[]string{""},
 	[]string{""},
 }
 

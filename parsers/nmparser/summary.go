@@ -11,14 +11,15 @@ import (
 )
 
 // Summary prints all results from the parsed LstData
-func (results ModelOutput) Summary() bool {
+func (results SummaryOutput) Summary() bool {
 	thetaTable := tablewriter.NewWriter(os.Stdout)
 	thetaTable.SetAlignment(tablewriter.ALIGN_LEFT)
 	thetaTable.SetColWidth(100)
 	thetaTable.SetHeader([]string{"Theta", "Name", "Estimate", "StdErr (RSE)"})
 	// required for color, prevents newline in row
 	thetaTable.SetAutoWrapText(false)
-	isBayesian := results.RunDetails.EstimationMethods[0] == "MCMC Bayesian Analysis"
+	//isBayesian := CheckIfBayesian(results)
+	shk := results.ShrinkageDetails != nil
 	finalEstimationMethodIndex := len(results.ParametersData) - 1
 	for i := range results.ParametersData[finalEstimationMethodIndex].Estimates.Theta {
 		numResult := results.ParametersData[finalEstimationMethodIndex].Estimates.Theta[i]
@@ -51,7 +52,7 @@ func (results ModelOutput) Summary() bool {
 	omegaTable.SetAlignment(tablewriter.ALIGN_LEFT)
 	omegaTable.SetColWidth(100)
 	omegaHeaders := []string{"Omega", "Eta", "Estimate"}
-	if !isBayesian {
+	if shk {
 		// bayesian methods have no concept of shrinkage
 		nSubPopsForMixtureModels := len(results.ShrinkageDetails[len(results.RunDetails.EstimationMethods)-1])
 		if nSubPopsForMixtureModels > 1 {
@@ -78,7 +79,7 @@ func (results ModelOutput) Summary() bool {
 		val := results.ParametersData[finalEstimationMethodIndex].Estimates.Omega[n]
 		if isDiag {
 			etaName = fmt.Sprintf("ETA%v", diagIndex)
-			if !isBayesian {
+			if shk {
 				for sp := range results.ShrinkageDetails[methodIndex] {
 					if len(results.ShrinkageDetails[methodIndex]) > 0 {
 						// get the data for the last method

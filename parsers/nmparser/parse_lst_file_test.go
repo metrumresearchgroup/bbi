@@ -173,10 +173,11 @@ func TestParseGradient(t *testing.T) {
 	}
 }
 
-func TestSetLargeConditionNumber(t *testing.T) {
+func TestConditionNumber(t *testing.T) {
 	var tests = []struct {
 		lines                []string
 		n                    int
+		conditionNumber      float64
 		largeConditionNumber bool
 		context              string
 	}{
@@ -197,7 +198,7 @@ func TestSetLargeConditionNumber(t *testing.T) {
 				" Elapsed finaloutput time in seconds:     0.16                                                                           ",
 			},
 			n:                    3,
-			largeConditionNumber: false,
+			conditionNumber:      10.316,
 			context:              "not large",
 		},
 		{
@@ -217,7 +218,7 @@ func TestSetLargeConditionNumber(t *testing.T) {
 				" Elapsed finaloutput time in seconds:     0.16                                                                           ",
 			},
 			n:                    3,
-			largeConditionNumber: true,
+			conditionNumber:      10316.206,
 			context:              "large",
 		},
 		// {
@@ -226,12 +227,38 @@ func TestSetLargeConditionNumber(t *testing.T) {
 		// 	largeConditionNumber: Undefined,
 		// 	context:              "not set",
 		// },
+
+		{
+			lines: []string{
+				"                                                                                                                                   ",
+				" ************************************************************************************************************************          ",
+				" ********************                                                                                ********************          ",
+				" ********************               OBJECTIVE FUNCTION EVALUATION BY IMPORTANCE SAMPLING             ********************          ",
+				" ********************                   EIGENVALUES OF COR MATRIX OF ESTIMATE (RSR)                  ********************          ",
+				" ********************                                                                                ********************          ",
+				" ************************************************************************************************************************          ",
+				"                                                                                                                                   ",
+				"                                                                                                                                   ",
+				"             1         2         3         4         5         6         7         8         9        10        11        12       ",
+				"             13        14        15        16        17        18        19                                                        ",
+				"                                                                                                                                   ",
+				"         7.19E-11  1.01E-08  1.87E-07  9.06E-07  1.63E-06  3.50E-06  2.87E-05  3.76E-04  1.14E-03  1.47E-02  1.95E-02  2.31E-02    ",
+				"          3.21E-02  7.21E-02  3.80E-01  5.27E-01  1.11E+00  1.19E+00  1.56E+01                                                     ",
+				"                                                                                                                                   ",
+				"                                                                                                                                   ",
+				"Elapsed postprocess time in seconds:     7.30                                                                                      ",
+			},
+			n:                    5,
+			conditionNumber:      2.16968011126565e+11,
+			context:              "two lines",
+		},
 	}
 
 	for _, tt := range tests {
 
-		largeConditionNumber := getLargeConditionNumberStatus(tt.lines, tt.n, 1000.0)
-		assert.Equal(t, tt.largeConditionNumber, largeConditionNumber, "Fail :"+tt.context)
+		conditionNumber := calculateConditionNumber(tt.lines, tt.n)
+		// compare to three decimal places
+		assert.Equal(t, tt.conditionNumber, math.Round(conditionNumber*1000)/1000, "Fail :"+tt.context)
 	}
 }
 

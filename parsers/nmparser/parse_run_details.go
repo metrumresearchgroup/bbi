@@ -61,6 +61,8 @@ func ParseRunDetails(lines []string) RunDetails {
 			runDetails.CovarianceTime = parseFinalTime(line)
 		case strings.Contains(line, "Elapsed postprocess time in seconds:"):
 			runDetails.CovarianceTime = parseFinalTime(line)
+		case strings.Contains(line, " #CPUT: Total CPU Time in Seconds,"):
+			runDetails.CpuTime, _ = strconv.ParseFloat(replaceTrim(line, " #CPUT: Total CPU Time in Seconds,"), 64)
 		case strings.Contains(line, "Started"):
 			runDetails.RunStart = replaceTrim(line, "Started")
 		case strings.Contains(line, "Finished"):

@@ -9,7 +9,7 @@ type FlatArray struct {
 	Dim    int       `json:"dim,omitempty"`
 }
 
-// ParameterNames containst the names of model parameters
+// ParameterNames contains the names of model parameters
 type ParameterNames struct {
 	Theta []string `json:"theta,omitempty"`
 	Omega []string `json:"omega,omitempty"`
@@ -53,6 +53,8 @@ type RunHeuristics struct {
 	HessianReset           bool `json:"hessian_reset"`
 	HasFinalZeroGradient   bool `json:"has_final_zero_gradient"`
 	MinimizationTerminated bool `json:"minimization_terminated"`
+	EtaPvalSignificant     bool `json:"eta_pval_significant"`
+	PRDERR				   bool `json:"prderr"`
 }
 
 // RunDetails contains key information about logistics of the model run
@@ -62,6 +64,7 @@ type RunDetails struct {
 	RunEnd              string   `json:"run_end,omitempty"`
 	EstimationTime      float64  `json:"estimation_time,omitempty"`
 	CovarianceTime      float64  `json:"covariance_time,omitempty"`
+	CpuTime             float64  `json:"cpu_time,omitempty"`
 	FunctionEvaluations int64    `json:"function_evaluations,omitempty"`
 	SignificantDigits   float64  `json:"significant_digits,omitempty"`
 	ProblemText         string   `json:"problem_text,omitempty"`
@@ -71,7 +74,7 @@ type RunDetails struct {
 	NumberOfPatients    int64    `json:"number_of_patients,omitempty"`
 	NumberOfObs         int64    `json:"number_of_obs,omitempty"`
 	NumberOfDataRecords int64    `json:"number_of_data_records,omitempty"`
-	OutputTable         string   `json:"output_table,omitempty"`
+	OutputTables         []string   `json:"output_tables,omitempty"`
 	OutputFilesUsed     []string `json:"output_files_used,omitempty"`
 }
 
@@ -122,19 +125,31 @@ type CovarianceStep struct {
 
 // OfvDetails ...
 type OfvDetails struct {
-	OFV             float64 `json:"ofv,omitempty"`
+	EstMethod		string  `json:"method,omitempty"`
 	OFVNoConstant   float64 `json:"ofv_no_constant,omitempty"`
+	ConstantToOFV   float64 `json:"constant_to_ofv,omitempty"`
 	OFVWithConstant float64 `json:"ofv_with_constant,omitempty"`
 }
 
-// ModelOutput is the output struct from a lst file
-type ModelOutput struct {
-	RunDetails       RunDetails           `json:"run_details,omitempty"`
-	RunHeuristics    RunHeuristics        `json:"run_heuristics,omitempty"`
-	ParametersData   []ParametersData     `json:"parameters_data,omitempty"`
-	ParameterNames   ParameterNames       `json:"parameter_names,omitempty"`
-	OFV              OfvDetails           `json:"ofv,omitempty"`
-	ShrinkageDetails [][]ShrinkageDetails `json:"shrinkage_details,omitempty"`
+// OfvDetails ...
+type ConditionNumDetails struct {
+	EstMethod		 string  `json:"method,omitempty"`
+	ConditionNumber  float64 `json:"condition_number,omitempty"`
+}
+
+// SummaryOutput is the output struct from a lst file
+type SummaryOutput struct {
+	RunDetails       RunDetails             `json:"run_details,omitempty"`
+	RunHeuristics    RunHeuristics          `json:"run_heuristics,omitempty"`
+	ParametersData   []ParametersData       `json:"parameters_data,omitempty"`
+	ParameterNames   ParameterNames         `json:"parameter_names,omitempty"`
+	OFV              []OfvDetails           `json:"ofv,omitempty"`
+	ConditionNumber  []ConditionNumDetails  `json:"condition_number,omitempty"`
+	ShrinkageDetails [][]ShrinkageDetails   `json:"shrinkage_details,omitempty"`
+}
+
+// CovCorOutput is the output from parsing the .cov and .cor file
+type CovCorOutput struct {
 	CovarianceTheta  []FlatArray          `json:"covariance_theta,omitempty"`
 	CorrelationTheta []FlatArray          `json:"correlation_theta,omitempty"`
 }
@@ -187,21 +202,33 @@ func NewRunDetails() RunDetails {
 		NumberOfPatients:    DefaultInt64,
 		NumberOfObs:         DefaultInt64,
 		NumberOfDataRecords: DefaultInt64,
-		OutputTable:         DefaultString,
+		OutputTables:         []string{},
 		OutputFilesUsed:     []string{},
 	}
 	return runDetails
 }
 
 // NewOfvDetails ...
-func NewOfvDetails() OfvDetails {
+func NewOfvDetails(method string) OfvDetails {
+
 	ofvDetails := OfvDetails{
-		OFV:             DefaultFloat64,
+		EstMethod: 		 method,
 		OFVNoConstant:   DefaultFloat64,
+		ConstantToOFV:   DefaultFloat64,
 		OFVWithConstant: DefaultFloat64,
 	}
 	return ofvDetails
 }
+
+func NewConditionNumDetails(method string) ConditionNumDetails {
+
+	conditionNumDetails := ConditionNumDetails{
+		EstMethod: 		 method,
+		ConditionNumber: DefaultFloat64,
+	}
+	return conditionNumDetails
+}
+
 
 // NewRunHeuristics provides a new run heuristics struct
 // at the moment it just returns all defaults, however
