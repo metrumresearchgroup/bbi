@@ -54,7 +54,7 @@ type RunHeuristics struct {
 	HasFinalZeroGradient   bool `json:"has_final_zero_gradient"`
 	MinimizationTerminated bool `json:"minimization_terminated"`
 	EtaPvalSignificant     bool `json:"eta_pval_significant"`
-	PRDERR				   bool `json:"prederr"`
+	PRDERR				   bool `json:"prderr"`
 }
 
 // RunDetails contains key information about logistics of the model run
