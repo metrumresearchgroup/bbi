@@ -5,16 +5,42 @@ import (
 	"math"
 )
 
+// lowerDiagonalLengthToDimension takes l which is
+// the number of total elements in the lower diagonal
+//  matrix, and calculates the dimension (aka number of
+// diagonal elements) for the matrix.
+// Additionally, this function can be used to pass
+// a specific index from the array of lower diagonal
+// elements (as l). In that case, it will return one
+// of the following:
+// * If the index is a diagonal element:
+//   * The number of that diagonal element
+//   * true
+// * If the index is not a diagonal element:
+//   * 0
+//   * false
+// For example, ther are 6 elements in the lower
+// diagonal of a 3x3 matrix, the 1st, 3rd, and 6th
+// being diagonals. Calling this function on 1-6
+// would return the following:
+// lowerDiagonalLengthToDimension(1) => 1, true
+// lowerDiagonalLengthToDimension(2) => 0, false
+// lowerDiagonalLengthToDimension(3) => 2, true
+// lowerDiagonalLengthToDimension(4) => 0, false
+// lowerDiagonalLengthToDimension(5) => 0, false
+// lowerDiagonalLengthToDimension(6) => 3, true
 func lowerDiagonalLengthToDimension(l int) (int, bool) {
-
-	// estimate the dimension
+	​
+	// calculate the dimension
 	dim := int(math.Floor(math.Sqrt(2.0 * float64(l))))
-
+	​
 	// if not equal going back the other way then it's not a diagonal
 	check := (dim * (dim + 1)) / 2
-	is_diag := l == check
-
-	return dim, is_diag
+	if l != check {
+		return 0, false
+	}
+	​
+	return dim, true
 }
 
 func IndexAndIsDiag(i int) (int, bool) {
