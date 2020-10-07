@@ -20,6 +20,11 @@ func ReadParamsAndOutputFromExt(path string) ([]string, error) {
 	}
 	defer inFile.Close()
 	scanner := bufio.NewScanner(inFile)
+
+	// increase the max buffer size to accommodate very wide tables (lots of params)
+	buf := make([]byte, 0, 16*1024)
+	scanner.Buffer(buf, 256*1024)
+
 	scanner.Split(bufio.ScanLines)
 	var lines []string
 	for scanner.Scan() {
@@ -34,6 +39,16 @@ func ReadParamsAndOutputFromExt(path string) ([]string, error) {
 		default:
 			continue
 		}
+	}
+
+	// explicitly handle line that's too long
+	if scanner.Err() == bufio.ErrTooLong {
+		err_msg := fmt.Sprintf(
+			"ReadParamsAndOutputFromExt() failed on %s with `%s`",
+			path,
+			scanner.Err(),
+		)
+		panic(err_msg)
 	}
 
 	// if file was empty prompt about renamed .ext file
