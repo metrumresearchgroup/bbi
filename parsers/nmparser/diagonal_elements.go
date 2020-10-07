@@ -19,7 +19,7 @@ import (
 // * If the index is not a diagonal element:
 //   * 0
 //   * false
-// For example, ther are 6 elements in the lower
+// For example, there are 6 elements in the lower
 // diagonal of a 3x3 matrix, the 1st, 3rd, and 6th
 // being diagonals. Calling this function on 1-6
 // would return the following:
@@ -30,16 +30,16 @@ import (
 // lowerDiagonalLengthToDimension(5) => 0, false
 // lowerDiagonalLengthToDimension(6) => 3, true
 func lowerDiagonalLengthToDimension(l int) (int, bool) {
-	​
+
 	// calculate the dimension
 	dim := int(math.Floor(math.Sqrt(2.0 * float64(l))))
-	​
+
 	// if not equal going back the other way then it's not a diagonal
 	check := (dim * (dim + 1)) / 2
 	if l != check {
 		return 0, false
 	}
-	​
+
 	return dim, true
 }
 

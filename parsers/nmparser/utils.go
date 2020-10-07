@@ -1,6 +1,9 @@
 package parser
 
-import "github.com/thoas/go-funk"
+import (
+	"github.com/metrumresearchgroup/babylon/utils"
+	"strings"
+)
 
 // createDiagonalBlock creates a slice of ints that would form a diagonal matrix with value 1 for diagonal and 0 for off diagonal elements
 func createDiagonalBlock(num int) []int {
@@ -20,25 +23,29 @@ func createDiagonalBlock(num int) []int {
 // Checks the final estimation method against a list of non-gradient based methods.
 // Primarily used for deciding whether to look for a .grd file to parse
 func CheckIfNotGradientBased(results SummaryOutput) bool {
-	isNotGradientBased := funk.Contains([]string{
-		"MCMC Bayesian Analysis",
-		"Stochastic Approximation Expectation-Maximization",
-		"Importance Sampling assisted by MAP Estimation",
-		"Importance Sampling",
-		"Importance Sampling (No Prior)",
-		"NUTS Bayesian Analysis",
-		"Objective Function Evaluation by Importance Sampling",
-	}, results.RunDetails.EstimationMethods[len(results.RunDetails.EstimationMethods)-1])
+		finalMethod := results.RunDetails.EstimationMethods[len(results.RunDetails.EstimationMethods)-1]
 
-	return isNotGradientBased
+		notGradientMethods := []string{
+		"Bayesian Analysis",
+		"Stochastic Approximation Expectation-Maximization",
+		"Importance Sampling",
+	}
+
+	checkMethods := make([]bool, 0)
+	for _, m := range notGradientMethods {
+		checkMethods = append(checkMethods, strings.Contains(finalMethod, m))
+	}
+
+	return utils.AnyTrue(checkMethods)
 }
 
-// Checks the final estimation method against a list of Bayesian methods.
+// Checks the final estimation method for the string "Bayesian Analysis"
+// which is present in all Bayesian methods (MCMC, NUTS, etc.)
 func CheckIfBayesian(results SummaryOutput) bool {
-	isBayesian := funk.Contains([]string{
-		"MCMC Bayesian Analysis",
-		"NUTS Bayesian Analysis",
-	}, results.RunDetails.EstimationMethods[len(results.RunDetails.EstimationMethods)-1])
+	isBayesian := strings.Contains(
+		results.RunDetails.EstimationMethods[len(results.RunDetails.EstimationMethods)-1],
+		"Bayesian Analysis",
+		)
 
 	return isBayesian
 }
