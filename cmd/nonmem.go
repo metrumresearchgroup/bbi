@@ -578,9 +578,7 @@ func getCopiableFileList(file string, level int, filepath string) []string {
 	files := make(map[int][]string)
 
 	//Get the files from the model
-	modelPieces := strings.Split(file, ".")
-	//Save as even if there's nothing to delimit, the initial value will be the first component
-	filename := modelPieces[0]
+	filename, _ := utils.FileAndExt(file)
 	if viper.GetBool("debug") {
 		log.Infof("%s Attempting to locate copiable files. Provided path is %s", "["+filename+"]", filepath)
 	}
@@ -726,16 +724,9 @@ func NewNonMemModel(modelname string, config configlib.Config) (NonMemModel, err
 	lm.Model = fi.Name()
 	lm.OriginalModel = lm.Model
 
-	modelPieces := strings.Split(lm.Model, ".")
-
-	//Don't assume the extension will be there. Prep for invalid
-	if len(modelPieces) > 1 {
-		lm.FileName = modelPieces[0]
-		lm.Extension = modelPieces[1]
-	} else {
-		lm.FileName = lm.Model
-		//Leave Extension to default
-	}
+	f, e := utils.FileAndExt(lm.Model)
+	lm.FileName  = f
+	lm.Extension = e
 
 	//Get the raw path of the original by stripping the actual file from it
 	lm.OriginalPath = strings.Replace(lm.Path, "/"+lm.Model, "", 1)
