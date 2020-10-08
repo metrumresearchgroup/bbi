@@ -42,13 +42,9 @@ func ReadParamsAndOutputFromExt(path string) ([]string, error) {
 	}
 
 	// explicitly handle line that's too long
-	if scanner.Err() == bufio.ErrTooLong {
-		err_msg := fmt.Sprintf(
-			"ReadParamsAndOutputFromExt() failed on %s with `%s`",
-			path,
-			scanner.Err(),
-		)
-		panic(err_msg)
+	if errors.Is(scanner.Err(), bufio.ErrTooLong) {
+		err = fmt.Errorf("Attempting to parse %s with ReadParamsAndOutputFromExt(): %w", path, scanner.Err())
+		return nil, err
 	}
 
 	// if file was empty prompt about renamed .ext file

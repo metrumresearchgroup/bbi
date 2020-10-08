@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"github.com/metrumresearchgroup/babylon/utils"
 	"strings"
 )
 
@@ -31,12 +30,13 @@ func CheckIfNotGradientBased(results SummaryOutput) bool {
 		"Importance Sampling",
 	}
 
-	checkMethods := make([]bool, 0)
 	for _, m := range notGradientMethods {
-		checkMethods = append(checkMethods, strings.Contains(finalMethod, m))
+		if strings.Contains(finalMethod, m) {
+			return true
+		}
 	}
 
-	return utils.AnyTrue(checkMethods)
+	return false
 }
 
 // Checks the final estimation method for the string "Bayesian Analysis"
