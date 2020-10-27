@@ -726,7 +726,7 @@ func NewNonMemModel(modelname string, config configlib.Config) (NonMemModel, err
 
 	f, e := utils.FileAndExt(lm.Model)
 	lm.FileName  = f
-	lm.Extension = e
+	lm.Extension = strings.TrimPrefix(e, ".")
 
 	//Get the raw path of the original by stripping the actual file from it
 	lm.OriginalPath = strings.Replace(lm.Path, "/"+lm.Model, "", 1)
