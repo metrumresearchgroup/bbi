@@ -113,8 +113,8 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (Su
 		results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, filepath.Base(grdFilePath))
 	}
 
-	etaCount := lowerDiagonalLengthToDimension[len(results.ParametersData[len(results.ParametersData)-1].Estimates.Omega)]
-	epsCount := lowerDiagonalLengthToDimension[len(results.ParametersData[len(results.ParametersData)-1].Estimates.Sigma)]
+	etaCount, _ := lowerDiagonalLengthToDimension(len(results.ParametersData[len(results.ParametersData)-1].Estimates.Omega))
+	epsCount, _ := lowerDiagonalLengthToDimension(len(results.ParametersData[len(results.ParametersData)-1].Estimates.Sigma))
 	// bayesian model runs will never have shrinkage files
 	if shk && !isBayesian {
 		name := runNum + ".shk"

@@ -70,7 +70,7 @@ func (results SummaryOutput) Summary() bool {
 
 	methodIndex := len(results.RunDetails.EstimationMethods) - 1
 	for n := range results.ParametersData[finalEstimationMethodIndex].Estimates.Omega {
-		diagIndex, isDiag := diagonalIndices[n]
+		diagIndex, isDiag := IndexAndIsDiag(n)
 		if !isDiag {
 			continue
 		}

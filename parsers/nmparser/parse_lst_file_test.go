@@ -9,8 +9,8 @@ import (
 )
 
 func TestParseOBJV(t *testing.T) {
-	var ofvDetails OfvDetails
-	var expected OfvDetails
+	var ofvDetails []OfvDetails
+	var expected  OfvDetails
 
 	expected.OFVNoConstant = 821.705
 	ofvDetails = parseOFV("OBJECTIVE FUNCTION VALUE WITHOUT CONSTANT: 821.705", ofvDetails)
@@ -20,7 +20,7 @@ func TestParseOBJV(t *testing.T) {
 	ofvDetails = parseOFV("OBJECTIVE FUNCTION VALUE WITH CONSTANT:       1639.561", ofvDetails)
 	assert.Equal(t, expected, ofvDetails)
 
-	expected.OFV = 817.855
+	expected.ConstantToOFV = 817.855
 	ofvDetails = parseOFV("N*LOG(2PI) CONSTANT TO OBJECTIVE FUNCTION:    817.855", ofvDetails)
 	assert.Equal(t, expected, ofvDetails)
 
@@ -37,7 +37,7 @@ func TestParTestParseOBJV2(t *testing.T) {
 		"#OBJV:********************************************    -7913.528       **************************************************",
 	}
 	expected := OfvDetails{
-		OFV:             817.855,
+		ConstantToOFV:             817.855,
 		OFVWithConstant: 1639.561,
 		OFVNoConstant:   -7913.528,
 	}
@@ -53,7 +53,7 @@ func TestParTestParseOBJV3(t *testing.T) {
 		"N*LOG(2PI) CONSTANT TO OBJECTIVE FUNCTION:    817.855",
 	}
 	expected := OfvDetails{
-		OFV:             817.855,
+		ConstantToOFV:             817.855,
 		OFVWithConstant: 1639.561,
 		OFVNoConstant:   821.705,
 	}
