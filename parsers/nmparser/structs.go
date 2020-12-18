@@ -89,23 +89,26 @@ type RunDetails struct {
 // Type 8=%Eta shrinkage variance version
 // Type 9=%EPS shrinkage variance version
 // Type 10=%Eta shrinkage based on empirical Bayes Variance (variance version)
+// Type 11=%Relative information
 
 // Types 1-7 are supported in NOMMEM 73
-// All types are supported in NONMEM 74
+// Types 8-10 added in NONMEM 74
+// Type 11 added in NONMEM 75
 
 // ShrinkageDetails ...
 type ShrinkageDetails struct {
-	SubPop      int64     `json:"sub_pop,omitempty"`
-	EtaBar      []float64 `json:"eta_bar,omitempty"`
-	EtaBarSE    []float64 `json:"ebv_bar_se,omitempty"`
-	Pval        []float64 `json:"pval,omitempty"`
-	EtaSD       []float64 `json:"eta_sd,omitempty"`
-	EpsSD       []float64 `json:"eps_sd,omitempty"`
-	EbvSD       []float64 `json:"ebv_sd,omitempty"`
-	NumSubjects []float64 `json:"num_subjects,omitempty"`
-	EtaVR       []float64 `json:"eta_vr,omitempty"`
-	EpsVR       []float64 `json:"eps_vr,omitempty"`
-	EbvVR       []float64 `json:"ebv_vr,omitempty"`
+	SubPop              int64     `json:"sub_pop,omitempty"`
+	EtaBar              []float64 `json:"eta_bar,omitempty"`
+	EtaBarSE            []float64 `json:"ebv_bar_se,omitempty"`
+	Pval                []float64 `json:"pval,omitempty"`
+	EtaSD               []float64 `json:"eta_sd,omitempty"`
+	EpsSD               []float64 `json:"eps_sd,omitempty"`
+	EbvSD               []float64 `json:"ebv_sd,omitempty"`
+	NumSubjects         []float64 `json:"num_subjects,omitempty"`
+	EtaVR               []float64 `json:"eta_vr,omitempty"`
+	EpsVR               []float64 `json:"eps_vr,omitempty"`
+	EbvVR               []float64 `json:"ebv_vr,omitempty"`
+	RelativeInformation []float64 `json:"relative_information,omitempty"`
 }
 
 // GradientDetails ...
