@@ -18,6 +18,7 @@ require (
 	github.com/mitchellh/mapstructure v1.4.0 // indirect
 	github.com/olekukonko/tablewriter v0.0.4
 	github.com/pelletier/go-toml v1.8.1 // indirect
+	github.com/scylladb/go-set v1.0.2
 	github.com/sirupsen/logrus v1.7.0
 	github.com/spf13/afero v1.5.1
 	github.com/spf13/cast v1.3.1 // indirect
