@@ -48,6 +48,7 @@ var (
 	Json               bool
 	preview            bool
 	executionWaitGroup sync.WaitGroup
+	output             string
 )
 
 // RootCmd represents the base command when called without any subcommands
@@ -92,6 +93,9 @@ func init() {
 	RootCmd.PersistentFlags().BoolVar(&Json, "json", false, "json tree of output, if possible")
 	viper.BindPFlag("json", RootCmd.PersistentFlags().Lookup("json")) //Bind to viper
 	RootCmd.PersistentFlags().BoolVarP(&preview, "preview", "p", false, "preview action, but don't actually run command")
+
+	viper.BindPFlag("output", RootCmd.PersistentFlags().Lookup("output")) //Bind to viper
+	RootCmd.PersistentFlags().StringVarP(&output, "output", "o", "", "output file")
 }
 
 // initConfig reads in config file and ENV variables if set.
