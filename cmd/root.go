@@ -47,6 +47,7 @@ var (
 	Json               bool
 	preview            bool
 	executionWaitGroup sync.WaitGroup
+	output             string
 )
 
 // Execute adds all child commands to the root command sets flags appropriately.
@@ -91,6 +92,9 @@ func NewRootCmd() *cobra.Command {
 	cmd.PersistentFlags().BoolVar(&Json, "json", false, "json tree of output, if possible")
 	errpanic(viper.BindPFlag("json", cmd.PersistentFlags().Lookup("json"))) // Bind to viper
 	cmd.PersistentFlags().BoolVarP(&preview, "preview", "p", false, "preview action, but don't actually run command")
+
+	viper.BindPFlag("output", cmd.PersistentFlags().Lookup("output")) //Bind to viper
+	cmd.PersistentFlags().StringVarP(&output, "output", "o", "", "output file")
 
 	cmd.AddCommand(NewInitCmd())
 	cmd.AddCommand(NewNonmemCmd())
