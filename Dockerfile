@@ -6,7 +6,7 @@ RUN     GOOS=linux GOARCH=amd64 go build -o bbi main.go && \
         cp bbi /usr/local/bin
 
 WORKDIR /tmp
-RUN     git clone https://github.com/metrumresearchgroup/bbitest.git
-WORKDIR /tmp/bbitest
+RUN     git clone https://github.com/metrumresearchgroup/babylontest.git
+WORKDIR /tmp/babylontest
 ENTRYPOINT ""
 CMD ["go","test","./...", "--json"]
