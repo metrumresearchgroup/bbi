@@ -11,10 +11,10 @@ import (
 
 	flag "github.com/spf13/pflag"
 
-	"github.com/metrumresearchgroup/bbi/runner"
-	"github.com/metrumresearchgroup/bbi/server"
-	"github.com/metrumresearchgroup/bbi/server/db"
-	"github.com/metrumresearchgroup/bbi/server/httpserver"
+	"bbi/runner"
+	"bbi/server"
+	"bbi/server/db"
+	"bbi/server/httpserver"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/spf13/afero"

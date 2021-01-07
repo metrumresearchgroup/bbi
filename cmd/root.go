@@ -26,7 +26,7 @@ import (
 	"path/filepath"
 	"sync"
 	"time"
-	"github.com/metrumresearchgroup/bbi/configlib"
+	"bbi/configlib"
 	"github.com/spf13/cobra"
 	flag "github.com/spf13/pflag"
 	"github.com/spf13/viper"

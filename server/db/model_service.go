@@ -4,8 +4,8 @@ import (
 	"encoding/binary"
 
 	"github.com/coreos/bbolt"
-	"github.com/metrumresearchgroup/bbi/server"
-	"github.com/metrumresearchgroup/bbi/server/db/internal"
+	"bbi/server"
+	"bbi/server/db/internal"
 )
 
 // make sure ModelService implements server.ModelService

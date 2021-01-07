@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/coreos/bbolt"
-	"github.com/metrumresearchgroup/bbi/server"
+	"bbi/server"
 )
 
 // Client represents a client to the underlying BoltDB instance

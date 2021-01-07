@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/metrumresearchgroup/bbi/utils"
+	"bbi/utils"
 )
 
 // ParseGrdLines parses out the ext lines into a data structure for final parameter processing.

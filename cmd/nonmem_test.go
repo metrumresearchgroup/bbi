@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/metrumresearchgroup/bbi/configlib"
+	"bbi/configlib"
 	"github.com/spf13/afero"
 )
 

@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/metrumresearchgroup/bbi/utils"
+	"bbi/utils"
 )
 
 func main() {

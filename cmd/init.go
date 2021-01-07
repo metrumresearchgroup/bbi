@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/ghodss/yaml"
-	"github.com/metrumresearchgroup/bbi/configlib"
+	"bbi/configlib"
 
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"

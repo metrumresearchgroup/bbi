@@ -1,7 +1,7 @@
 package parser
 
 import (
-	"github.com/metrumresearchgroup/bbi/utils"
+	"bbi/utils"
 	"math"
 	"sort"
 	"strconv"

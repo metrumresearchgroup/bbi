@@ -3,7 +3,7 @@ package cmd
 import (
 	"bytes"
 	"errors"
-	"github.com/metrumresearchgroup/bbi/utils"
+	"bbi/utils"
 	log "github.com/sirupsen/logrus"
 	"os/exec"
 	"path"
@@ -15,7 +15,7 @@ import (
 
 	"os"
 
-	"github.com/metrumresearchgroup/bbi/configlib"
+	"bbi/configlib"
 	"github.com/metrumresearchgroup/turnstile"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"

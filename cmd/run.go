@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"bytes"
-	"github.com/metrumresearchgroup/bbi/configlib"
+	"bbi/configlib"
 	"github.com/metrumresearchgroup/turnstile"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"

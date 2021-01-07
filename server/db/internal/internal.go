@@ -3,8 +3,8 @@ package internal
 import (
 	"fmt"
 
-	"github.com/metrumresearchgroup/bbi/runner"
-	"github.com/metrumresearchgroup/bbi/server"
+	"bbi/runner"
+	"bbi/server"
 	"github.com/gogo/protobuf/proto"
 )
 

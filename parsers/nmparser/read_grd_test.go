@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/metrumresearchgroup/bbi/utils"
+	"bbi/utils"
 	"github.com/stretchr/testify/assert"
 )
 

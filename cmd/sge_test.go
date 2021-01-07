@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/metrumresearchgroup/bbi/configlib"
+	"bbi/configlib"
 	"testing"
 )
 
