@@ -3,7 +3,7 @@ package cmd
 import (
 	"bytes"
 	"errors"
-	"github.com/metrumresearchgroup/babylon/utils"
+	"github.com/metrumresearchgroup/bbi/utils"
 	log "github.com/sirupsen/logrus"
 	"os/exec"
 	"path"
@@ -15,7 +15,7 @@ import (
 
 	"os"
 
-	"github.com/metrumresearchgroup/babylon/configlib"
+	"github.com/metrumresearchgroup/bbi/configlib"
 	"github.com/metrumresearchgroup/turnstile"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
@@ -92,7 +92,7 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 	}
 
 	//Create Execution Script
-	scriptContents, err := generateBabylonScript(nonMemExecutionTemplate, *l.Nonmem)
+	scriptContents, err := generateBbiScript(nonMemExecutionTemplate, *l.Nonmem)
 
 	if err != nil {
 		p := &l
@@ -142,7 +142,7 @@ func (l SGEModel) Cleanup(channels *turnstile.ChannelMap) {
 	//err := configlib.WriteViperConfig(l.Nonmem.OutputDir, true)
 	//
 	//if err != nil {
-	//	log.Errorf("Errors were experienced while trying to update the config at %s. Error is: %s", filepath.Join(l.Nonmem.OriginalPath, "babylon.yaml"), err)
+	//	log.Errorf("Errors were experienced while trying to update the config at %s. Error is: %s", filepath.Join(l.Nonmem.OriginalPath, "bbi.yaml"), err)
 	//}
 }
 
@@ -159,15 +159,15 @@ var sgeCMD = &cobra.Command{
 func init() {
 	runCmd.AddCommand(sgeCMD)
 
-	babylon, err := os.Executable()
+	bbi, err := os.Executable()
 
 	if err != nil {
 		log.Errorf("Unable to get the path to the executed binary for some reason: %s", err)
 	}
 
 	//String Variables
-	sgeCMD.PersistentFlags().String("babylon_binary", babylon, "directory path for babylon to be called in goroutines (SGE Execution)")
-	viper.BindPFlag("babylon_binary", sgeCMD.PersistentFlags().Lookup("babylon_binary"))
+	sgeCMD.PersistentFlags().String("bbi_binary", bbi, "directory path for bbi to be called in goroutines (SGE Execution)")
+	viper.BindPFlag("bbi_binary", sgeCMD.PersistentFlags().Lookup("bbi_binary"))
 
 	const gridNamePrefixIdentifier string = "grid_name_prefix"
 	sgeCMD.PersistentFlags().String(gridNamePrefixIdentifier, "", "Any prefix you wish to add to the name of jobs being submitted to the grid")
@@ -347,8 +347,8 @@ func sgeModelsFromArguments(args []string, config configlib.Config) ([]SGEModel,
 	return output, nil
 }
 
-//Generate the command line script to execute babylon on the grid.
-func generateBabylonScript(fileTemplate string, l NonMemModel) ([]byte, error) {
+//Generate the command line script to execute bbi on the grid.
+func generateBbiScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 
 	t, err := template.New("file").Parse(fileTemplate)
 	buf := new(bytes.Buffer)
@@ -368,7 +368,7 @@ func generateBabylonScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 	}
 
 	commandComponents := []string{
-		l.Configuration.BabylonBinary,
+		l.Configuration.BbiBinary,
 		"nonmem",
 		"run",
 	}

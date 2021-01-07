@@ -23,7 +23,7 @@ modes and not have to have constant override logic for `overwrite`
 ```
 $ ./bbi nonmem run local 240/[001:009].mod
 2019/12/23 18:12:46 expanding model pattern: 240/[001:009].mod
-2019/12/23 18:12:46 Configuration file successfully loaded from 240/babylon.yml
+2019/12/23 18:12:46 Configuration file successfully loaded from 240/bbi.yaml
 2019/12/23 18:12:46 A total of 9 models have been located for work
 2019/12/23 18:12:46 9 models successfully completed initial setup phase.
 2019/12/23 18:12:46 Beginning local work phase for 001

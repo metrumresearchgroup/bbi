@@ -26,8 +26,7 @@ import (
 	"path/filepath"
 	"sync"
 	"time"
-
-	"github.com/metrumresearchgroup/babylon/configlib"
+	"github.com/metrumresearchgroup/bbi/configlib"
 	"github.com/spf13/cobra"
 	flag "github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -55,7 +54,7 @@ var (
 var RootCmd = &cobra.Command{
 	Use:   "bbi",
 	Short: "manage and execute models",
-	Long:  fmt.Sprintf("babylon cli version %s", VERSION),
+	Long:  fmt.Sprintf("bbi CLI version %s", VERSION),
 }
 
 // Execute adds all child commands to the root command sets flags appropriately.
@@ -79,7 +78,7 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	//Removed "." To avoid IDEs not displaying or typical ignore patterns dropping it.
-	viper.SetConfigName("babylon")
+	viper.SetConfigName("bbi")
 	viper.SetConfigType("yaml")
 
 	// Here you will define your flags and configuration settings.
@@ -97,7 +96,7 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	err := configlib.LoadGlobalConfig("babylon")
+	err := configlib.LoadGlobalConfig("bbi")
 	if err != nil {
 		fmt.Println(fmt.Errorf("err initializing config %s", err))
 	}

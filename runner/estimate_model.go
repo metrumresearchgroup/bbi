@@ -8,7 +8,7 @@ import (
 
 	"errors"
 
-	"github.com/metrumresearchgroup/babylon/utils"
+	"github.com/metrumresearchgroup/bbi/utils"
 	"github.com/spf13/afero"
 )
 

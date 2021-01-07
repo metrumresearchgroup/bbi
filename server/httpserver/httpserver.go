@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/metrumresearchgroup/babylon/server"
+	"github.com/metrumresearchgroup/bbi/server"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
 )

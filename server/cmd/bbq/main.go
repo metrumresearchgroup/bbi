@@ -11,10 +11,10 @@ import (
 
 	flag "github.com/spf13/pflag"
 
-	"github.com/metrumresearchgroup/babylon/runner"
-	"github.com/metrumresearchgroup/babylon/server"
-	"github.com/metrumresearchgroup/babylon/server/db"
-	"github.com/metrumresearchgroup/babylon/server/httpserver"
+	"github.com/metrumresearchgroup/bbi/runner"
+	"github.com/metrumresearchgroup/bbi/server"
+	"github.com/metrumresearchgroup/bbi/server/db"
+	"github.com/metrumresearchgroup/bbi/server/httpserver"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/spf13/afero"
@@ -47,7 +47,7 @@ func main() {
 		fmt.Print(Version)
 		os.Exit(0)
 	}
-	log.Printf("babylon queue version: %s", Version)
+	log.Printf("bbi queue version: %s", Version)
 	if reset {
 		_, existsErr := os.Stat(database)
 

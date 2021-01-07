@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/metrumresearchgroup/babylon/utils"
+	"github.com/metrumresearchgroup/bbi/utils"
 	"github.com/spf13/afero"
 )
 

@@ -17,7 +17,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/metrumresearchgroup/babylon/runner"
+	"github.com/metrumresearchgroup/bbi/runner"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

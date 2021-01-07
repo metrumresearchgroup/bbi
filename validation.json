@@ -1,36 +1,36 @@
 {
-  "project" : "Babylon",
-  "release" : "v2.3.0",
-  "scope" : "A next-generation modeling tool that allows for local and grid-based execution of NonMem jobs. Supports legacy functionality such as NMQual execution mode and the ability to pass raw options to NMFE. Self-bootstrapping, Babylon can evaluate your environment to locate Nonmem locations and codify them into configuration",
+  "project" : "bbi",
+  "release" : "v3.0.0",
+  "scope" : "A next-generation modeling tool that allows for local and grid-based execution of NonMem jobs. Supports legacy functionality such as NMQual execution mode and the ability to pass raw options to NMFE. Self-bootstrapping, bbi can evaluate your environment to locate Nonmem locations and codify them into configuration",
   "markdown" : [
     {
-      "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/master/markdown/expectations.md"
+      "source" : "https://raw.githubusercontent.com/metrumresearchgroup/bbitest/master/markdown/expectations.md"
     }
   ],
   "stories" : [
     {
       "name" : "Run NonMem jobs locally",
       "tags" : [
-        "TestBabylonCompletesLocalExecution",
-        "TestBabylonParallelExecution"
+        "TestBbiCompletesLocalExecution",
+        "TestBbiParallelExecution"
       ],
       "risk" : "high",
       "markdown" : [
         {
-          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/master/markdown/stories/run_jobs_locally.md"
+          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/bbitest/master/markdown/stories/run_jobs_locally.md"
         }
       ]
     },
     {
       "name" : "Run NonMem jobs on the Grid",
       "tags" : [
-        "TestBabylonCompletesSGEExecution",
-        "TestBabylonCompletesParallelSGEExecution"
+        "TestBbiCompletesSGEExecution",
+        "TestBbiCompletesParallelSGEExecution"
       ],
       "risk" : "high",
       "markdown" : [
         {
-          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/master/markdown/stories/run_jobs_on_grid.md"
+          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/bbitest/master/markdown/stories/run_jobs_on_grid.md"
         }
       ]
     },
@@ -44,7 +44,7 @@
       "risk" : "low",
       "markdown" : [
         {
-          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/master/markdown/stories/invalid_data.md"
+          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/bbitest/master/markdown/stories/invalid_data.md"
         }
       ]
     },
@@ -56,7 +56,7 @@
       "risk" : "medium",
       "markdown" : [
         {
-          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/master/markdown/stories/project_initialization.md"
+          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/bbitest/master/markdown/stories/project_initialization.md"
         }
       ]
     },
@@ -68,7 +68,7 @@
       "risk" : "low",
       "markdown" : [
         {
-          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/master/markdown/stories/nmfe_options.md"
+          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/bbitest/master/markdown/stories/nmfe_options.md"
         }
       ]
     },
@@ -80,7 +80,7 @@
       "risk" : "high",
       "markdown" : [
         {
-          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/master/markdown/stories/store_configuration.md"
+          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/bbitest/master/markdown/stories/store_configuration.md"
         }
       ]
     },
@@ -92,7 +92,7 @@
       "risk" : "low",
       "markdown" : [
         {
-          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/master/markdown/stories/nmqual_execution.md"
+          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/bbitest/master/markdown/stories/nmqual_execution.md"
         }
       ]
     },
@@ -108,7 +108,7 @@
       "risk" : "medium",
       "markdown" : [
         {
-          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/master/markdown/stories/bbi_summary.md"
+          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/bbitest/master/markdown/stories/bbi_summary.md"
         }
       ]
     },
@@ -122,7 +122,7 @@
       "risk" : "low",
       "markdown" : [
         {
-          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/babylontest/master/markdown/stories/bbi_covcor.md"
+          "source" : "https://raw.githubusercontent.com/metrumresearchgroup/bbitest/master/markdown/stories/bbi_covcor.md"
         }
       ]
     }

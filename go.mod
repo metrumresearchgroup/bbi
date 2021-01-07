@@ -1,4 +1,4 @@
-module github.com/metrumresearchgroup/babylon
+module github.com/metrumresearchgroup/bbi
 
 go 1.13
 

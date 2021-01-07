@@ -29,10 +29,10 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/metrumresearchgroup/babylon/configlib"
-	parser "github.com/metrumresearchgroup/babylon/parsers/nmparser"
-	"github.com/metrumresearchgroup/babylon/runner"
-	"github.com/metrumresearchgroup/babylon/utils"
+	"github.com/metrumresearchgroup/bbi/configlib"
+	parser "github.com/metrumresearchgroup/bbi/parsers/nmparser"
+	"github.com/metrumresearchgroup/bbi/runner"
+	"github.com/metrumresearchgroup/bbi/utils"
 	"github.com/metrumresearchgroup/turnstile"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
@@ -409,7 +409,7 @@ func buildNonMemCommandString(l *NonMemModel) string {
 			nmBinary = val.Executable
 		} else {
 			//Not a valid option!
-			log.Fatalf("nmVersion of %s was provided but has no configurations in babylon.yaml!", viper.GetString("nmVersion"))
+			log.Fatalf("nmVersion of %s was provided but has no configurations in bbi.yaml!", viper.GetString("nmVersion"))
 		}
 	}
 

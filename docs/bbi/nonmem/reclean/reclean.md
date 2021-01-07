@@ -23,7 +23,7 @@ bbi reclean [flags]
 ### Options inherited from parent commands
 
 ```
-      --config string   config file (default is $HOME/babylonconfig.toml)
+      --config string   config file (default is bbi.yaml is directory where command is run)
   -d, --debug           debug mode
   -p, --preview         preview action, but don't actually run command
       --threads int     number of threads to execute with

@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/metrumresearchgroup/babylon/utils"
+	"github.com/metrumresearchgroup/bbi/utils"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 )
