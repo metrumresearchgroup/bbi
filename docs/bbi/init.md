@@ -1,13 +1,13 @@
 ## bbi init
 
 ### Synopsis
-Run bbi init to create a babylon.yaml configuration file in the current directory. This will create a `babylon.yaml` file in the current directory containing all the defaults necessary to get started. 
+Run bbi init to create a bbi.yaml configuration file in the current directory. This will create a `bbi.yaml` file in the current directory containing all the defaults necessary to get started. 
 
 ### Options
 
 ```
   -h, --help   help for init
-      --config string   config file (default is $HOME/babylon.yaml)
+      --config string   config file (default is bbi.yaml is directory where command is run)
   -d, --debug           debug mode
       --json            json tree of output, if possible
       --no-cor-file     do not use cor file

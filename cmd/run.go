@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"bytes"
-	"github.com/metrumresearchgroup/babylon/configlib"
+	"bbi/configlib"
 	"github.com/metrumresearchgroup/turnstile"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -27,14 +27,14 @@ const postProcessingScriptTemplate string = `#!/bin/bash
 
 ###################
 #
-# Babylon post-processing script
+# bbi post-processing script
 # 
 # Please note that the environment variables written here
 # do not represent all used during execution. Private variables,
 # such as additional environments provided for external systems authentication
 # are not written into this file for security reasons.
 #
-# Only environment values prefixed with BABYLON_ are written into this file at
+# Only environment values prefixed with BBI_ are written into this file at
 # execution time.
 #
 ###################
@@ -104,7 +104,7 @@ func init() {
 	viper.SetDefault("overwrite", false)
 
 	const configIdentifier string = "config"
-	runCmd.PersistentFlags().String(configIdentifier, "", "Path (relative or absolute) to another babylon.yaml to load")
+	runCmd.PersistentFlags().String(configIdentifier, "", "Path (relative or absolute) to another bbi.yaml to load")
 	viper.BindPFlag(configIdentifier, runCmd.PersistentFlags().Lookup(configIdentifier))
 
 	const saveconfig string = "save_config"
@@ -116,7 +116,7 @@ func init() {
 	viper.BindPFlag(delayIdentifier, runCmd.PersistentFlags().Lookup(delayIdentifier))
 
 	const logFileIdentifier string = "log_file"
-	runCmd.PersistentFlags().String(logFileIdentifier, "", "If populated, specifies the file into which to store the output / logging details from Babylon")
+	runCmd.PersistentFlags().String(logFileIdentifier, "", "If populated, specifies the file into which to store the output / logging details from bbi")
 	viper.BindPFlag(logFileIdentifier, runCmd.PersistentFlags().Lookup(logFileIdentifier))
 
 	const postExecutionHookIdentifier string = "post_work_executable"
@@ -151,7 +151,7 @@ type PostExecutionHookEnvironment struct {
 }
 
 func PostExecutionEnvironment(directive *PostExecutionHookEnvironment, additional []string) ([]string, error) {
-	environmentalPrefix := "BABYLON_"
+	environmentalPrefix := "BBI_"
 
 	pathEnvironment := environmentalPrefix + "MODEL_PATH"
 	modelEnvironment := environmentalPrefix + "MODEL"
@@ -248,7 +248,7 @@ func ExecutePostWorkDirectivesWithEnvironment(worker PostWorkExecutor) (string, 
 		"environment": environment,
 	}).Debug("Environment prepared")
 
-	environmentToPersist := onlyBabylonVariables(environment)
+	environmentToPersist := onlyBbiVariables(environment)
 
 	if err != nil {
 		return "", err
@@ -325,10 +325,10 @@ func ExecutePostWorkDirectivesWithEnvironment(worker PostWorkExecutor) (string, 
 	return string(outputBytes), err
 }
 
-func onlyBabylonVariables(provided []string) []string {
+func onlyBbiVariables(provided []string) []string {
 	var matched []string
 	for _, v := range provided {
-		if strings.HasPrefix(v, "BABYLON_") {
+		if strings.HasPrefix(v, "BBI_") {
 			matched = append(matched, v)
 		}
 	}

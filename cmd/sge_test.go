@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/metrumresearchgroup/babylon/configlib"
+	"bbi/configlib"
 	"testing"
 )
 

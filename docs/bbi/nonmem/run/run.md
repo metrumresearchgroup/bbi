@@ -30,12 +30,12 @@ The run command collects a series of flags necessary to define the behavior for:
 
 ```
       --clean_lvl int       clean level used for file output from a given (set of) runs (default 1)
-      --config string       Path (relative or absolute) to another babylon.yaml to load
+      --config string       Path (relative or absolute) to another bbi.yaml to load
       --copy_lvl int        copy level used for file output from a given (set of) runs
       --delay int           Selects a random number of seconds between 1 and this value to stagger / jitter job execution. Assists in dealing with large volumes of work dealing with the same data set. May avoid NMTRAN issues about not being able read / close files
       --git                 whether git is used
   -h, --help                help for run
-      --log_file string     If populated, specifies the file into which to store the output / logging details from Babylon
+      --log_file string     If populated, specifies the file into which to store the output / logging details from bbi
       --output_dir string   Go template for the output directory to use for storging details of each executed model (default "{{ .Name }}")
       --overwrite           Whether or not to remove existing output directories if they are present
       --save_config         Whether or not to save the existing configuration to a file with the model (default true)

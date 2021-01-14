@@ -18,7 +18,7 @@ type Config struct {
 	CleanLvl           int                     `mapstructure:"clean_lvl" yaml:"clean_lvl" json:"clean_lvl,omitempty"`
 	CopyLvl            int                     `mapstructure:"copy_lvl" yaml:"copy_lvl" json:"copy_lvl,omitempty"`
 	Git                bool                    `mapstructure:"git" yaml:"git" json:"git,omitempty"`
-	BabylonBinary      string                  `mapstructure:"babylon_binary" yaml:"babylon_binary" json:"babylon_binary,omitempty"`
+	BbiBinary          string                  `mapstructure:"bbi_binary" yaml:"bbi_binary" json:"bbi_binary,omitempty"`
 	SaveConfig         bool                    `mapstructure:"save_config" yaml:"save_config" json:"save_config,omitempty"`
 	OutputDir          string                  `mapstructure:"output_dir" yaml:"output_dir" json:"output_dir,omitempty"`
 	Threads            int                     `mapstructure:"threads" yaml:"threads" json:"threads,omitempty"`
@@ -79,7 +79,7 @@ func (c Config) RenderYamlToFile(path string) error {
 		return err
 	}
 
-	targetFile := filepath.Join(path, "babylon.yaml")
+	targetFile := filepath.Join(path, "bbi.yaml")
 
 	err = afero.WriteFile(fs, targetFile, yamlBytes, 0755)
 
@@ -95,7 +95,7 @@ func LoadGlobalConfig(configFilename string) error {
 	viper.SetConfigName(configFilename)
 	viper.SetConfigType("yaml")
 	viper.AutomaticEnv()
-	viper.SetEnvPrefix("babylon")
+	viper.SetEnvPrefix("bbi")
 	err := viper.ReadInConfig()
 	if err != nil {
 		if _, ok := err.(viper.ConfigParseError); ok {
@@ -119,7 +119,7 @@ func loadDefaultSettings() {
 //SaveConfig takes the viper settings and writes them to a file in the original path
 func SaveConfig(configpath string) {
 	if viper.GetBool("saveConfig") {
-		viper.WriteConfigAs(path.Join(configpath, "babylon.yaml"))
+		viper.WriteConfigAs(path.Join(configpath, "bbi.yaml"))
 	}
 }
 
@@ -128,7 +128,7 @@ func WriteViperConfig(path string, sge bool, config Config) error {
 
 		//Set the config to overwrite false and re-write config. This ensures that the local phase will not deal with io contention
 		//around the SGE output streams
-		log.Debug("Updating babylon config to overwrite=false. This avoids IO contention with the grid engine for the next execution round")
+		log.Debug("Updating bbi config to overwrite=false. This avoids IO contention with the grid engine for the next execution round")
 		config.Overwrite = false
 		config.SaveConfig = false
 		config.Local.CreateChildDirs = false
@@ -183,13 +183,13 @@ func LocateAndReadConfigFile() (Config, error) {
 			log.Fatalf("No specific config file provided, and we couldn't get the current working directory for some reason: %s", err)
 		}
 
-		config, err = ReadSpecifiedFileIntoConfigStruct(filepath.Join(currentDir, "babylon.yaml"))
+		config, err = ReadSpecifiedFileIntoConfigStruct(filepath.Join(currentDir, "bbi.yaml"))
 
 		if err != nil {
 			log.Fatalf("We couldn't open and read the details from the default configuration file location: %s", err)
 		}
 
-		log.Infof("Successfully loaded default configuration from %s", filepath.Join(currentDir, "babylon.yaml"))
+		log.Infof("Successfully loaded default configuration from %s", filepath.Join(currentDir, "bbi.yaml"))
 	}
 
 	//Config provided

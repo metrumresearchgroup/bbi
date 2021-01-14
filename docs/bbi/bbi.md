@@ -4,12 +4,12 @@ manage and execute models
 
 ### Synopsis
 
-babylon cli version 1.0.0
+bbi CLI version 1.0.0
 
 ### Options
 
 ```
-      --config string   config file (default is $HOME/babylon.yaml)
+      --config string   config file (default is bbi.yaml is directory where command is run)
   -d, --debug           debug mode
   -h, --help            help for bbi
       --json            json tree of output, if possible

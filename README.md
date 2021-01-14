@@ -1,8 +1,8 @@
-[![Go Report Card](https://goreportcard.com/badge/github.com/metrumresearchgroup/babylon)](https://goreportcard.com/report/github.com/metrumresearchgroup/babylon)
+[![Go Report Card](https://goreportcard.com/badge/github.com/metrumresearchgroup/bbi)](https://goreportcard.com/report/github.com/metrumresearchgroup/bbi)
 
-# babylon
+# bbi
 
-Babylon is (will be) a complete solution for managing projects involving modeling and simulation with a number 
+bbi is (will be) a complete solution for managing projects involving modeling and simulation with a number 
 of software solutions used in pharmaceutical sciences. 
 This is a fork of the [nonmemutils project](https://github.com/dpastoor/nonmemutils) that is broader in scope.
 
@@ -15,9 +15,9 @@ Most components are written in Go, a language championed by google. By using go,
 being a statically typed language and simple in it's structures, 
 makes it _reasonably_ easy to look at the raw source to get a feel for what is going on.
 
-Babylon is broken up into a couple core components:
+bbi is broken up into a couple core components:
 
-### babylon-cli
+### bbi CLI
 
 command line interface for executing and managing models and projects. The nomenclature for the command line is relatively simple, following a similar pattern regardless of the modeling software or execution mode. 
 
@@ -33,32 +33,32 @@ For Example:
 
  #### Viper Configuration
 
- While the Babylon cli is extremely configurable via flags on execution, such as: 
+ While the `bbi` CLI is extremely configurable via flags on execution, such as: 
 
  `bbi nonmem run --cleanLvl 2 --copyLvl 1 --overwrite=true --git=true ... /path/to/file.mod`
 
  For automation and reproducability purposes, that can be painful, leading to scripting purely for the purpose of re-executing the job the same was it was originally run. This can be remedied via a `yaml` config file in one of two ways:
 
- * The `--saveConfig` flag will take all the flags you have passed and write it to `babylon.yaml` in the same directory as the model file you provide as an argument
+ * The `--saveConfig` flag will take all the flags you have passed and write it to `bbi.yaml` in the same directory as the model file you provide as an argument
  * You may also use the `bbi init` command in the directory with your models to create a default configuration file. you may alter this as necessary to meet your needs.
 
  Configurations for execution are located (in order of priority)
 
  * In the Model Directory
- * In the directory from which Babylon is executed
+ * In the directory from which `bbi` is executed
  * In the executing user's home (`~`) directory
 
 
  #### Viper and SGE
- You may notice that if you issue a job with nonmen targeting SGE that a babylon.yaml file is created for you automatically. This is because SGE execution wraps the Babylon CLI into an executable for the grid to execute. This ensures the following:
+ You may notice that if you issue a job with nonmem targeting SGE that a `bbi.yaml` file is created for you automatically. This is because SGE execution wraps the `bbi` CLI into an executable for the grid to execute. This ensures the following:
 
  * Execution via SGE is done **the exact same way** that local execution for nonmem occurs. 
  * This includes cleanup, copy-up, and git operations
  * Also ensures a single execution path 
 
- To do this sanely, we make sure that the parameters provided on the initial SGE run are captured and stored with the model. This way, each subsequent Babylon call made from the grid is made with the *exact same parameters*.
+ To do this sanely, we make sure that the parameters provided on the initial SGE run are captured and stored with the model. This way, each subsequent `bbi` call made from the grid is made with the *exact same parameters*.
 
-### babylon-server
+### bbi Server
 
 a server component that can help provide an entry-point for non-cli applications, or hook into the 
 cli to allow for more managed and/or asyncronous execution patterns. For example, queueing models

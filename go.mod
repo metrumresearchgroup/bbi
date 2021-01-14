@@ -1,4 +1,4 @@
-module github.com/metrumresearchgroup/babylon
+module bbi
 
 go 1.13
 
@@ -16,7 +16,6 @@ require (
 	github.com/logrusorgru/aurora v0.0.0-20191116043053-66b7ad493a23
 	github.com/metrumresearchgroup/turnstile v0.1.0
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/mitchellh/mapstructure v1.1.2
 	github.com/olekukonko/tablewriter v0.0.3
 	github.com/pelletier/go-toml v1.4.0 // indirect
 	github.com/sirupsen/logrus v1.4.2
@@ -25,7 +24,6 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.5.0
 	github.com/stretchr/testify v1.4.0
-	github.com/thoas/go-funk v0.6.0
 	golang.org/x/sys v0.0.0-20190626221950-04f50cda93cb // indirect
 	gopkg.in/yaml.v2 v2.2.7
 )

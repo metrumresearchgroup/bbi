@@ -99,7 +99,7 @@ func ParseExtData(ed ExtData) ([]ParametersData, ParameterNames) {
 				if n, err := strconv.ParseFloat(val, 64); err == nil {
 					result[i-1] = n
 				} else {
-					log.Println("Did you use a non-default format parameter? Babylon does not support non-default format parameters.")
+					log.Println("Did you use a non-default format parameter? bbi does not support non-default format parameters.")
 					panic("error converting value in ext file to number: " + val)
 				}
 			}

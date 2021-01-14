@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/metrumresearchgroup/babylon/configlib"
+	"bbi/configlib"
 	"github.com/spf13/afero"
 )
 
@@ -84,7 +84,7 @@ func Test_processNMFEOptions(t *testing.T) {
 					CleanLvl:      0,
 					CopyLvl:       0,
 					Git:           false,
-					BabylonBinary: "",
+					BbiBinary:     "",
 					SaveConfig:    false,
 					OutputDir:     "",
 					Threads:       0,
@@ -121,7 +121,7 @@ func Test_processNMFEOptions(t *testing.T) {
 					CleanLvl:      0,
 					CopyLvl:       0,
 					Git:           false,
-					BabylonBinary: "",
+					BbiBinary:     "",
 					SaveConfig:    false,
 					OutputDir:     "",
 					Threads:       0,
@@ -208,7 +208,7 @@ func Test_modelDataFile(t *testing.T) {
 }
 
 func Test_dataFileIsPresent(t *testing.T) {
-	const testingDir string = "/tmp/testing/babylon"
+	const testingDir string = "/tmp/testing/bbi"
 	const testingFile string = "test.txt"
 	//Temporary working directory
 	fs := afero.NewOsFs()
