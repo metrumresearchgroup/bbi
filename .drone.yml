@@ -19,25 +19,25 @@ global_variables:
 steps:
   - name: Sanity and Cleanup
     commands:
-      - if [ -d /tmp/${DRONE_BUILD_NUMBER}/babylontest ] ; then rm -rf /tmp/${DRONE_BUILD_NUMBER}/babylontest; fi
+      - if [ -d /tmp/${DRONE_BUILD_NUMBER}/bbitest ] ; then rm -rf /tmp/${DRONE_BUILD_NUMBER}/bbitest; fi
   - name: Build bbi
     commands:
       - mkdir -p /tmp/${DRONE_BUILD_NUMBER} ; git rev-parse HEAD > /tmp/${DRONE_BUILD_NUMBER}/bbi_hash
       - go build -o bbi cmd/bbi/main.go
       - ./bbi version
-  - name: Get babylontest
+  - name: Get bbitest
     environment:
-      babylontest_BRANCH: master
+      BBITEST_BRANCH: master
     commands:
-      - git clone https://github.com/metrumresearchgroup/babylontest.git /tmp/${DRONE_BUILD_NUMBER}/babylontest
-      - cd /tmp/${DRONE_BUILD_NUMBER}/babylontest
-      - mkdir -p /tmp/${DRONE_BUILD_NUMBER} ; git rev-parse HEAD > /tmp/${DRONE_BUILD_NUMBER}/babylontest_hash
-      - if [ ! -z $babylontest_BRANCH ]; then git checkout $babylontest_BRANCH; fi
+      - git clone https://github.com/metrumresearchgroup/bbitest.git /tmp/${DRONE_BUILD_NUMBER}/bbitest
+      - cd /tmp/${DRONE_BUILD_NUMBER}/bbitest
+      - mkdir -p /tmp/${DRONE_BUILD_NUMBER} ; git rev-parse HEAD > /tmp/${DRONE_BUILD_NUMBER}/bbitest_hash
+      - if [ ! -z $BBITEST_BRANCH ]; then git checkout $BBITEST_BRANCH; fi
   - name: Copy commit hashes to s3
     commands:
       - printf "[\n" > /tmp/${DRONE_BUILD_NUMBER}/commits.json
       - printf "  {\"repo\":\"metrumresearchgroup/bbi\", \"commit\":\"$(cat /tmp/${DRONE_BUILD_NUMBER}/bbi_hash)\"},\n" >> /tmp/${DRONE_BUILD_NUMBER}/commits.json
-      - printf "  {\"repo\":\"metrumresearchgroup/babylontest\", \"commit\":\"$(cat /tmp/${DRONE_BUILD_NUMBER}/babylontest_hash)\"}\n" >> /tmp/${DRONE_BUILD_NUMBER}/commits.json
+      - printf "  {\"repo\":\"metrumresearchgroup/bbitest\", \"commit\":\"$(cat /tmp/${DRONE_BUILD_NUMBER}/bbitest_hash)\"}\n" >> /tmp/${DRONE_BUILD_NUMBER}/commits.json
       - printf "]\n" >> /tmp/${DRONE_BUILD_NUMBER}/commits.json
       - aws s3 cp /tmp/${DRONE_BUILD_NUMBER}/commits.json s3://mrg-validation/bbi/${DRONE_BUILD_NUMBER}/commits.json
   - name: Test
@@ -63,7 +63,7 @@ steps:
       - if [ ! -d /data/${DRONE_BUILD_NUMBER}/apps ] ; then mkdir -p /data/${DRONE_BUILD_NUMBER}/apps; chmod -R 0755 /data/${DRONE_BUILD_NUMBER}/apps; cp bbi /data/${DRONE_BUILD_NUMBER}/apps; else cp bbi /data/${DRONE_BUILD_NUMBER}/apps; fi
       #Update path to include build root
       - export PATH=$PATH:/data/${DRONE_BUILD_NUMBER}/apps
-      - cd /tmp/${DRONE_BUILD_NUMBER}/babylontest
+      - cd /tmp/${DRONE_BUILD_NUMBER}/bbitest
       - export ROOT_EXECUTION_DIR=/data/${DRONE_BUILD_NUMBER}
       - export BBI_GRID_NAME_PREFIX="drone_${DRONE_BUILD_NUMBER}"
       #Run test suite and copy results to s3
@@ -74,14 +74,14 @@ steps:
       - chmod +x failure_detector.sh
       - ./failure_detector.sh test_output.json
       - rm -rf /data/${DRONE_BUILD_NUMBER}
-      - rm -rf /tmp/${DRONE_BUILD_NUMBER}/babylontest
+      - rm -rf /tmp/${DRONE_BUILD_NUMBER}/bbitest
   - name: Cleanup on failure
     volumes:
       - name: data
         path: /data
     commands:
       - rm -rf /data/${DRONE_BUILD_NUMBER}
-      - rm -rf /tmp/${DRONE_BUILD_NUMBER}/babylontest
+      - rm -rf /tmp/${DRONE_BUILD_NUMBER}/bbitest
     when:
       status: failure
 volumes:

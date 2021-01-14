@@ -5,8 +5,8 @@ echo "$NONMEM_LICENSE"
 echo "$NONMEM_LICENSE" > /opt/NONMEM/nm74gf/license/nonmem.lic
 
 #Clone operations
-git clone https://github.com/metrumresearchgroup/babylontest.git
-cd babylontest
+git clone https://github.com/metrumresearchgroup/bbitest.git
+cd bbitest
 
 go mod download
 
