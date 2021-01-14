@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/ghodss/yaml"
-	"github.com/metrumresearchgroup/babylon/configlib"
+	"bbi/configlib"
 
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
@@ -21,7 +21,7 @@ var startingDirectory string
 var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "Create configuration file with defaults",
-	Long: `Run bbi init to create a babylon.yaml configuration file in the current directory.
+	Long: `Run bbi init to create a bbi.yaml configuration file in the current directory.
  `,
 	Run: initializer,
 }
@@ -86,7 +86,7 @@ func initializer(cmd *cobra.Command, args []string) {
 	}
 
 	//Write the byte array to file
-	afero.WriteFile(fs, "./babylon.yaml", yamlString, 0755)
+	afero.WriteFile(fs, "./bbi.yaml", yamlString, 0755)
 
 }
 

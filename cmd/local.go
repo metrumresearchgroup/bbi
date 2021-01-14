@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/metrumresearchgroup/babylon/configlib"
+	"bbi/configlib"
 	log "github.com/sirupsen/logrus"
 	"io"
 	"os/exec"
@@ -16,8 +16,8 @@ import (
 
 	"os"
 
-	"github.com/metrumresearchgroup/babylon/runner"
-	"github.com/metrumresearchgroup/babylon/utils"
+	"bbi/runner"
+	"bbi/utils"
 	"github.com/metrumresearchgroup/turnstile"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"

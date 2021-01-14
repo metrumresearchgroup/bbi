@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/kr/pretty"
-	parser "github.com/metrumresearchgroup/babylon/parsers/nmparser"
-	"github.com/metrumresearchgroup/babylon/utils"
+	parser "bbi/parsers/nmparser"
+	"bbi/utils"
 	"github.com/mitchellh/go-homedir"
 )
 

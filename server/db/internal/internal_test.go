@@ -6,8 +6,8 @@ import (
 
 	"reflect"
 
-	"github.com/metrumresearchgroup/babylon/runner"
-	"github.com/metrumresearchgroup/babylon/server"
+	"bbi/runner"
+	"bbi/server"
 )
 
 func TestMarshalModel(t *testing.T) {

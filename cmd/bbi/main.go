@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/metrumresearchgroup/babylon/cmd"
+	"bbi/cmd"
 )
 
 // buildTime  can be set from LDFLAGS during development

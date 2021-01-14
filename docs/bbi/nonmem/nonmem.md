@@ -11,7 +11,7 @@ Nonmem and its subcommands are all based around the execution and interpretation
 ```
   -h, --help               help for nonmem
       --nm_version string   Version of nonmem from the configuration list to use
-      --config string   config file (default is $HOME/babylon.yaml)
+      --config string   config file (default is bbi.yaml is directory where command is run)
   -d, --debug           debug mode
       --json            json tree of output, if possible
       --no-cor-file     do not use cor file
@@ -34,7 +34,7 @@ Nonmem and its subcommands are all based around the execution and interpretation
 
 
 ### nmVersion
-The nm_version flag is a string representing a key in the babylon.yml loaded from the model directory. Given the below sample:
+The nm_version flag is a string representing a key in the bbi.yml loaded from the model directory. Given the below sample:
 
 ```yml
 nm_version: nm74gf
@@ -42,7 +42,7 @@ overwrite: false
 clean_lvl: 1
 copy_lvl: 0
 git: true
-babylon_binary: /data/apps/bbi
+bbi_binary: /data/apps/bbi
 save_config: false
 output_dir: '{{ .Name }}'
 threads: 4
