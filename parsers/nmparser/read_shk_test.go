@@ -6,6 +6,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// TODO: did not add a test for nm75 with shrinkage type 11 since these table tests are kind of a mess
+
 func TestReadParseShkLines(t *testing.T) {
 	var tests = []struct {
 		lines     []string
