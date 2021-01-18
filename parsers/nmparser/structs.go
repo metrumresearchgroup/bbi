@@ -54,7 +54,7 @@ type RunHeuristics struct {
 	HasFinalZeroGradient   bool `json:"has_final_zero_gradient"`
 	MinimizationTerminated bool `json:"minimization_terminated"`
 	EtaPvalSignificant     bool `json:"eta_pval_significant"`
-	PRDERR				   bool `json:"prderr"`
+	PRDERR                 bool `json:"prderr"`
 }
 
 // RunDetails contains key information about logistics of the model run
@@ -74,7 +74,7 @@ type RunDetails struct {
 	NumberOfPatients    int64    `json:"number_of_patients,omitempty"`
 	NumberOfObs         int64    `json:"number_of_obs,omitempty"`
 	NumberOfDataRecords int64    `json:"number_of_data_records,omitempty"`
-	OutputTables         []string   `json:"output_tables,omitempty"`
+	OutputTables        []string `json:"output_tables,omitempty"`
 	OutputFilesUsed     []string `json:"output_files_used,omitempty"`
 }
 
@@ -89,23 +89,26 @@ type RunDetails struct {
 // Type 8=%Eta shrinkage variance version
 // Type 9=%EPS shrinkage variance version
 // Type 10=%Eta shrinkage based on empirical Bayes Variance (variance version)
+// Type 11=%Relative information
 
 // Types 1-7 are supported in NOMMEM 73
-// All types are supported in NONMEM 74
+// Types 8-10 added in NONMEM 74
+// Type 11 added in NONMEM 75
 
 // ShrinkageDetails ...
 type ShrinkageDetails struct {
-	SubPop      int64     `json:"sub_pop,omitempty"`
-	EtaBar      []float64 `json:"eta_bar,omitempty"`
-	EtaBarSE    []float64 `json:"ebv_bar_se,omitempty"`
-	Pval        []float64 `json:"pval,omitempty"`
-	EtaSD       []float64 `json:"eta_sd,omitempty"`
-	EpsSD       []float64 `json:"eps_sd,omitempty"`
-	EbvSD       []float64 `json:"ebv_sd,omitempty"`
-	NumSubjects []float64 `json:"num_subjects,omitempty"`
-	EtaVR       []float64 `json:"eta_vr,omitempty"`
-	EpsVR       []float64 `json:"eps_vr,omitempty"`
-	EbvVR       []float64 `json:"ebv_vr,omitempty"`
+	SubPop              int64     `json:"sub_pop,omitempty"`
+	EtaBar              []float64 `json:"eta_bar,omitempty"`
+	EtaBarSE            []float64 `json:"ebv_bar_se,omitempty"`
+	Pval                []float64 `json:"pval,omitempty"`
+	EtaSD               []float64 `json:"eta_sd,omitempty"`
+	EpsSD               []float64 `json:"eps_sd,omitempty"`
+	EbvSD               []float64 `json:"ebv_sd,omitempty"`
+	NumSubjects         []float64 `json:"num_subjects,omitempty"`
+	EtaVR               []float64 `json:"eta_vr,omitempty"`
+	EpsVR               []float64 `json:"eps_vr,omitempty"`
+	EbvVR               []float64 `json:"ebv_vr,omitempty"`
+	RelativeInformation []float64 `json:"relative_information,omitempty"`
 }
 
 // GradientDetails ...
@@ -125,7 +128,7 @@ type CovarianceStep struct {
 
 // OfvDetails ...
 type OfvDetails struct {
-	EstMethod		string  `json:"method,omitempty"`
+	EstMethod       string  `json:"method,omitempty"`
 	OFVNoConstant   float64 `json:"ofv_no_constant,omitempty"`
 	ConstantToOFV   float64 `json:"constant_to_ofv,omitempty"`
 	OFVWithConstant float64 `json:"ofv_with_constant,omitempty"`
@@ -133,25 +136,25 @@ type OfvDetails struct {
 
 // OfvDetails ...
 type ConditionNumDetails struct {
-	EstMethod		 string  `json:"method,omitempty"`
-	ConditionNumber  float64 `json:"condition_number,omitempty"`
+	EstMethod       string  `json:"method,omitempty"`
+	ConditionNumber float64 `json:"condition_number,omitempty"`
 }
 
 // SummaryOutput is the output struct from a lst file
 type SummaryOutput struct {
-	RunDetails       RunDetails             `json:"run_details,omitempty"`
-	RunHeuristics    RunHeuristics          `json:"run_heuristics,omitempty"`
-	ParametersData   []ParametersData       `json:"parameters_data,omitempty"`
-	ParameterNames   ParameterNames         `json:"parameter_names,omitempty"`
-	OFV              []OfvDetails           `json:"ofv,omitempty"`
-	ConditionNumber  []ConditionNumDetails  `json:"condition_number,omitempty"`
-	ShrinkageDetails [][]ShrinkageDetails   `json:"shrinkage_details,omitempty"`
+	RunDetails       RunDetails            `json:"run_details,omitempty"`
+	RunHeuristics    RunHeuristics         `json:"run_heuristics,omitempty"`
+	ParametersData   []ParametersData      `json:"parameters_data,omitempty"`
+	ParameterNames   ParameterNames        `json:"parameter_names,omitempty"`
+	OFV              []OfvDetails          `json:"ofv,omitempty"`
+	ConditionNumber  []ConditionNumDetails `json:"condition_number,omitempty"`
+	ShrinkageDetails [][]ShrinkageDetails  `json:"shrinkage_details,omitempty"`
 }
 
 // CovCorOutput is the output from parsing the .cov and .cor file
 type CovCorOutput struct {
-	CovarianceTheta  []FlatArray          `json:"covariance_theta,omitempty"`
-	CorrelationTheta []FlatArray          `json:"correlation_theta,omitempty"`
+	CovarianceTheta  []FlatArray `json:"covariance_theta,omitempty"`
+	CorrelationTheta []FlatArray `json:"correlation_theta,omitempty"`
 }
 
 // ExtData provides an intermediate representation of the ExtData after iterations have been stripped out
@@ -202,7 +205,7 @@ func NewRunDetails() RunDetails {
 		NumberOfPatients:    DefaultInt64,
 		NumberOfObs:         DefaultInt64,
 		NumberOfDataRecords: DefaultInt64,
-		OutputTables:         []string{},
+		OutputTables:        []string{},
 		OutputFilesUsed:     []string{},
 	}
 	return runDetails
@@ -212,7 +215,7 @@ func NewRunDetails() RunDetails {
 func NewOfvDetails(method string) OfvDetails {
 
 	ofvDetails := OfvDetails{
-		EstMethod: 		 method,
+		EstMethod:       method,
 		OFVNoConstant:   DefaultFloat64,
 		ConstantToOFV:   DefaultFloat64,
 		OFVWithConstant: DefaultFloat64,
@@ -223,12 +226,11 @@ func NewOfvDetails(method string) OfvDetails {
 func NewConditionNumDetails(method string) ConditionNumDetails {
 
 	conditionNumDetails := ConditionNumDetails{
-		EstMethod: 		 method,
+		EstMethod:       method,
 		ConditionNumber: DefaultFloat64,
 	}
 	return conditionNumDetails
 }
-
 
 // NewRunHeuristics provides a new run heuristics struct
 // at the moment it just returns all defaults, however
