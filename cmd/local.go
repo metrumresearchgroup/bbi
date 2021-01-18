@@ -1,11 +1,11 @@
 package cmd
 
 import (
+	"bbi/configlib"
 	"crypto/md5"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"bbi/configlib"
 	log "github.com/sirupsen/logrus"
 	"io"
 	"os/exec"

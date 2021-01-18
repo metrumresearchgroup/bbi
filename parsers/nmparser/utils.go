@@ -22,9 +22,9 @@ func createDiagonalBlock(num int) []int {
 // Checks the final estimation method against a list of non-gradient based methods.
 // Primarily used for deciding whether to look for a .grd file to parse
 func CheckIfNotGradientBased(results SummaryOutput) bool {
-		finalMethod := results.RunDetails.EstimationMethods[len(results.RunDetails.EstimationMethods)-1]
+	finalMethod := results.RunDetails.EstimationMethods[len(results.RunDetails.EstimationMethods)-1]
 
-		notGradientMethods := []string{
+	notGradientMethods := []string{
 		"Bayesian Analysis",
 		"Stochastic Approximation Expectation-Maximization",
 		"Importance Sampling",
@@ -45,7 +45,7 @@ func CheckIfBayesian(results SummaryOutput) bool {
 	isBayesian := strings.Contains(
 		results.RunDetails.EstimationMethods[len(results.RunDetails.EstimationMethods)-1],
 		"Bayesian Analysis",
-		)
+	)
 
 	return isBayesian
 }

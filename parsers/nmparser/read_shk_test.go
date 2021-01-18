@@ -10,11 +10,11 @@ import (
 
 func TestReadParseShkLines(t *testing.T) {
 	var tests = []struct {
-		lines     []string
+		lines          []string
 		expectedTables []string
-		context   string
-		etaCount  int
-		epsCount  int
+		context        string
+		etaCount       int
+		epsCount       int
 	}{
 		{
 			lines: []string{
@@ -60,9 +60,9 @@ func TestReadParseShkLines(t *testing.T) {
 				"TABLE NO.     2: First Order Conditional Estimation with Interaction: Problem=1 Subproblem=0 Superproblem1=0 Iteration1=0 Superproblem2=0 Iteration2=0",
 				"TABLE NO.     3: First Order Conditional Estimation with Interaction: Problem=1 Subproblem=0 Superproblem1=0 Iteration1=0 Superproblem2=0 Iteration2=0",
 			},
-			context:   "3 methods",
-			etaCount:  4,
-			epsCount:  1,
+			context:  "3 methods",
+			etaCount: 4,
+			epsCount: 1,
 		},
 		{
 			lines: []string{
@@ -80,9 +80,9 @@ func TestReadParseShkLines(t *testing.T) {
 				"           10            1  1.57041E+01  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00",
 			},
 			expectedTables: []string{"TABLE NO.     1: First Order Conditional Estimation with Interaction: Problem=1 Subproblem=0 Superproblem1=0 Iteration1=0 Superproblem2=0 Iteration2=0"},
-			context:   "wide",
-			etaCount:  64,
-			epsCount:  1,
+			context:        "wide",
+			etaCount:       64,
+			epsCount:       1,
 		},
 	}
 

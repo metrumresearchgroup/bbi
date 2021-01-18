@@ -57,14 +57,14 @@ func ParseShrinkage(lines []string, etaCount, epsCount int) []ShrinkageDetails {
 		if length > 0 {
 
 			subpop, err := strconv.Atoi(fields[1])
-			if err != nil{
+			if err != nil {
 				panic("Error parsing shrinkage")
 			}
 
 			if len(shrinkageDetails) < subpop {
 				shrinkageDetails = append(shrinkageDetails, ShrinkageDetails{})
 			}
-			i := subpop-1
+			i := subpop - 1
 			shrinkageDetails[i].SubPop = int64(subpop)
 
 			switch fields[0] {

@@ -1,9 +1,9 @@
 package cmd
 
 import (
+	"bbi/utils"
 	"bytes"
 	"errors"
-	"bbi/utils"
 	log "github.com/sirupsen/logrus"
 	"os/exec"
 	"path"
@@ -288,7 +288,7 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 		}...)
 	}
 
-	qsubArguments = append(qsubArguments, filepath.Join(model.OutputDir,scriptName))
+	qsubArguments = append(qsubArguments, filepath.Join(model.OutputDir, scriptName))
 
 	if err != nil {
 		return newConcurrentError(model.Model, "Could not locate qsub binary in path", err)
@@ -305,7 +305,7 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 
 	if len(additionalEnvs) > 0 {
 		log.Debugf("Additional post work envs were provided. Total of %d", len(additionalEnvs))
-		command.Env = append(command.Env,additionalEnvs...)
+		command.Env = append(command.Env, additionalEnvs...)
 	}
 
 	output, err := command.CombinedOutput()

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/kr/pretty"
 	parser "bbi/parsers/nmparser"
 	"bbi/utils"
+	"github.com/kr/pretty"
 	"github.com/mitchellh/go-homedir"
 )
 
