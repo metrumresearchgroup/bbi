@@ -22,7 +22,7 @@ For Example:
 
  * `nonmem` : The modeling software we should be targeting for this run
  * `sge` : The mode of execution. For nonmem this can either be local or sge, with sge indicating submission of jobs to the grid
- * `/abs/path/to/file.mod` : The location of the file to submit for execution. Can be relative or absolute. 
+ * `path/to/file.mod` : The location of the file to submit for execution. Can be relative or absolute. 
 
  #### Configuration
 
@@ -59,13 +59,258 @@ Example output of NONMEM run summary as of Jan 2021
 By controlling the CLI flags, it can either be an object that can be consumed by other programs such as R:
 
 ```
+bbi nonmem summary 103/103 --json
+```
 
+```
+{
+	"run_details": {
+		"version": "7.4.4",
+		"run_start": "-999999999",
+		"run_end": "Tue Jan 19 11:47:45 EST 2021",
+		"estimation_time": 48.01,
+		"covariance_time": 1.47,
+		"cpu_time": 57.706,
+		"function_evaluations": 1048,
+		"significant_digits": 3.3,
+		"problem_text": "LEM From bbr: see 103.yaml for details",
+		"mod_file": "-999999999",
+		"estimation_method": [
+			"First Order Conditional Estimation with Interaction"
+		],
+		"data_set": "../../../data/derived/analysis3.csv",
+		"number_of_patients": 160,
+		"number_of_obs": 3142,
+		"number_of_data_records": 4292,
+		"output_files_used": [
+			"103.lst",
+			"103.cpu",
+			"103.ext",
+			"103.grd",
+			"103.shk"
+		]
+	},
+	"run_heuristics": {
+		"covariance_step_aborted": false,
+		"large_condition_number": false,
+		"correlations_not_ok": false,
+		"parameter_near_boundary": false,
+		"hessian_reset": false,
+		"has_final_zero_gradient": false,
+		"minimization_terminated": false,
+		"eta_pval_significant": false,
+		"prderr": false
+	},
+	"parameters_data": [
+		{
+			"method": "TABLE NO.     1: First Order Conditional Estimation with Interaction: Goal Function=MINIMUM VALUE OF OBJECTIVE FUNCTION: Problem=1 Subproblem=0 Superproblem1=0 Iteration1=0 Superproblem2=0 Iteration2=0",
+			"estimates": {
+				"theta": [
+					-1.94009,
+					1.76696,
+					1.08739,
+					4.57113,
+					1.64519
+				],
+				"omega": [
+					0.0819738,
+					0.0980853,
+					0.268494,
+					-0.00359228,
+					-0.0192407,
+					0.146635
+				],
+				"sigma": [
+					33063.6
+				]
+			},
+			"std_err": {
+				"theta": [
+					0.0727892,
+					0.114614,
+					0.0373194,
+					0.0494494,
+					0.0744255
+				],
+				"omega": [
+					0.0181149,
+					0.0321424,
+					0.067229,
+					0.0188361,
+					0.0392745,
+					0.0226792
+				],
+				"sigma": [
+					4892.95
+				]
+			},
+			"random_effect_sd": {
+				"omega": [
+					0.286311,
+					0.661149,
+					0.518164,
+					-0.0327652,
+					-0.0969695,
+					0.38293
+				],
+				"sigma": [
+					181.834
+				]
+			},
+			"random_effect_sdse": {
+				"omega": [
+					0.031635,
+					0.112879,
+					0.0648724,
+					0.173561,
+					0.199903,
+					0.0296127
+				],
+				"sigma": [
+					13.4544
+				]
+			},
+			"fixed": {
+				"theta": [
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"omega": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"sigma": [
+					0
+				]
+			}
+		}
+	],
+	"parameter_names": {
+		"theta": [
+			"THETA1",
+			"THETA2",
+			"THETA3",
+			"THETA4",
+			"THETA5"
+		],
+		"omega": [
+			"OMEGA(1,1)",
+			"OMEGA(2,1)",
+			"OMEGA(2,2)",
+			"OMEGA(3,1)",
+			"OMEGA(3,2)",
+			"OMEGA(3,3)"
+		],
+		"sigma": [
+			"SIGMA(1,1)"
+		]
+	},
+	"ofv": [
+		{
+			"method": "First Order Conditional Estimation with Interaction",
+			"ofv_no_constant": 36411.268,
+			"constant_to_ofv": 5774.609742658163,
+			"ofv_with_constant": 42185.877707146574
+		}
+	],
+	"condition_number": [
+		{
+			"method": "First Order Conditional Estimation with Interaction",
+			"condition_number": 1
+		}
+	],
+	"shrinkage_details": [
+		[
+			{
+				"sub_pop": 1,
+				"eta_bar": [
+					0.00549081,
+					-0.00128784,
+					-0.00450789
+				],
+				"ebv_bar_se": [
+					0.0142059,
+					0.0208238,
+					0.0250342
+				],
+				"pval": [
+					0.699114,
+					0.950686,
+					0.857098
+				],
+				"eta_sd": [
+					37.0419,
+					49.0066,
+					17.0463
+				],
+				"eps_sd": [
+					3.49867
+				],
+				"ebv_sd": [
+					36.8599,
+					48.6304,
+					16.9266
+				],
+				"num_subjects": [
+					160,
+					160,
+					160
+				],
+				"eta_vr": [
+					60.3627,
+					73.9967,
+					31.1869
+				],
+				"eps_vr": [
+					6.87493
+				],
+				"ebv_vr": [
+					60.1333,
+					73.6116,
+					30.9881
+				]
+			}
+		]
+	]
+}
 ```
 
 or human readable tabular formats such as:
 
 ```
+bbi nonmem summary 103/103 
+```
 
+```
+PROBLEM From bbr: see 103.yaml for details
+Dataset: ../../../data/derived/analysis3.csv
+Records: 4292   Observations: 3142  Patients: 160
+Estimation Method(s):
+ - First Order Conditional Estimation with Interaction
+No Heuristic Problems Detected
++-------+--------+----------+------------------+
+| THETA |  NAME  | ESTIMATE |   STDERR (RSE)   |
++-------+--------+----------+------------------+
+| TH 1  | THETA1 | -1.94009 | 0.0727892 (3.8%) |
+| TH 2  | THETA2 | 1.76696  | 0.114614 (6.5%)  |
+| TH 3  | THETA3 | 1.08739  | 0.0373194 (3.4%) |
+| TH 4  | THETA4 | 4.57113  | 0.0494494 (1.1%) |
+| TH 5  | THETA5 | 1.64519  | 0.0744255 (4.5%) |
++-------+--------+----------+------------------+
++------------+------+----------+---------------+
+|   OMEGA    | ETA  | ESTIMATE | SHRINKAGE (%) |
++------------+------+----------+---------------+
+| OMEGA(1,1) | ETA1 | 0.081974 | 37.041900     |
+| OMEGA(2,2) | ETA2 | 0.268494 | 49.006600     |
+| OMEGA(3,3) | ETA3 | 0.146635 | 17.046300     |
++------------+------+----------+---------------+
 ```
 
 
