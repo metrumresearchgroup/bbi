@@ -60,7 +60,7 @@ func ParseShrinkage(lines []string, etaCount, epsCount int) []ShrinkageDetails {
 			if err != nil{
 				panic("Error parsing shrinkage")
 			}
-			
+
 			if len(shrinkageDetails) < subpop {
 				shrinkageDetails = append(shrinkageDetails, ShrinkageDetails{})
 			}
@@ -129,8 +129,14 @@ func ParseShrinkage(lines []string, etaCount, epsCount int) []ShrinkageDetails {
 						shrinkageDetails[i].EbvVR = append(shrinkageDetails[i].EbvVR, strToFloat(fields[n]))
 					}
 				}
+			case "11":
+				for n := 2; n < (length); n++ {
+					if n-2 < etaCount {
+						shrinkageDetails[i].RelativeInformation = append(shrinkageDetails[i].RelativeInformation, strToFloat(fields[n]))
+					}
+				}
 			default:
-				log.Printf("ParseShrinkage, unknown field type: %s", fields[0])
+				log.Fatalf("ParseShrinkage, unknown field type: %s", fields[0])
 			}
 		}
 	}
