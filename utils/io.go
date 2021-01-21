@@ -51,7 +51,7 @@ func ReadParamsAndOutputFromExt(path string) ([]string, error) {
 	if lines == nil {
 		emptyFileMsg := fmt.Sprintf("A file exists at %s but it is empty.\n", path)
 		renameExtMsg := "If you sent NONMEM output to a different file you can use --ext-file=NEWFILE to specify the new file name.\n"
-		err = errors.New(emptyFileMsg+renameExtMsg)
+		err = errors.New(emptyFileMsg + renameExtMsg)
 		return nil, err
 	}
 	return lines, nil

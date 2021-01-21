@@ -132,10 +132,10 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (Su
 
 		// check Eta Pval heuristic
 		// note, if multiple subpops then there is no p-value test
-		if (len(results.ShrinkageDetails[len(results.ShrinkageDetails) - 1]) == 1) {
-			finalShrinkage := results.ShrinkageDetails[len(results.ShrinkageDetails) - 1][0]
+		if len(results.ShrinkageDetails[len(results.ShrinkageDetails)-1]) == 1 {
+			finalShrinkage := results.ShrinkageDetails[len(results.ShrinkageDetails)-1][0]
 			b := make([]bool, len(finalShrinkage.Pval))
-			for i, n := range(finalShrinkage.Pval) {
+			for i, n := range finalShrinkage.Pval {
 				b[i] = n < 0.05 && n > 0.0
 			}
 			results.RunHeuristics.EtaPvalSignificant = utils.AnyTrue(b)
@@ -172,7 +172,7 @@ func GetCovCorOutput(lstPath string) (CovCorOutput, error) {
 	runNum, _ := utils.FileAndExt(lstPath)
 	dir, _ := filepath.Abs(filepath.Dir(lstPath))
 
-	covFilePath := filepath.Join(dir, runNum + ".cov")
+	covFilePath := filepath.Join(dir, runNum+".cov")
 	err := errorIfNotExists(AppFs, covFilePath, "")
 	if err != nil {
 		return CovCorOutput{}, err
@@ -183,7 +183,7 @@ func GetCovCorOutput(lstPath string) (CovCorOutput, error) {
 	}
 	covarianceTheta := GetThetaValues(covLines)
 
-	corFilePath := filepath.Join(dir, runNum + ".cor")
+	corFilePath := filepath.Join(dir, runNum+".cor")
 	err = errorIfNotExists(AppFs, corFilePath, "")
 	if err != nil {
 		return CovCorOutput{}, err
@@ -195,7 +195,7 @@ func GetCovCorOutput(lstPath string) (CovCorOutput, error) {
 	correlationTheta := GetThetaValues(corLines)
 
 	results := CovCorOutput{
-		CovarianceTheta: covarianceTheta,
+		CovarianceTheta:  covarianceTheta,
 		CorrelationTheta: correlationTheta,
 	}
 	return results, nil

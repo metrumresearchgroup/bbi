@@ -322,7 +322,7 @@ func ParseLstEstimationFile(lines []string) SummaryOutput {
 	// or derive. something like (number of parameters) * 10
 	largeNumberLimit := 1000.0
 	cb := make([]bool, len(allCondDetails))
-	for i, cn := range(allCondDetails) {
+	for i, cn := range allCondDetails {
 		cb[i] = cn.ConditionNumber > largeNumberLimit
 	}
 	runHeuristics.LargeConditionNumber = utils.AnyTrue(cb)
@@ -372,7 +372,7 @@ func ParseLstEstimationFile(lines []string) SummaryOutput {
 
 func parseOFV(line string, allOfvDetails []OfvDetails) []OfvDetails {
 	// always modify the most recently created OfvDetails
-	ofvDetails := &allOfvDetails[len(allOfvDetails) - 1]
+	ofvDetails := &allOfvDetails[len(allOfvDetails)-1]
 
 	if strings.Contains(line, "#OBJV:") {
 		result := strings.Replace(line, "*", "", -1)
@@ -386,7 +386,7 @@ func parseOFV(line string, allOfvDetails []OfvDetails) []OfvDetails {
 			"NIND*NETA*LOG(2PI)",
 			"PRIOR",
 		}
-		for _, cp := range(constantPrefixes) {
+		for _, cp := range constantPrefixes {
 			constantString = strings.TrimSpace(strings.Replace(constantString, cp, "", -1))
 		}
 		ofvDetails.ConstantToOFV, _ = strconv.ParseFloat(constantString, 64)
@@ -402,9 +402,9 @@ func parseOFV(line string, allOfvDetails []OfvDetails) []OfvDetails {
 	return allOfvDetails
 }
 
-func parseConditionNum(lines []string, start int, allCondDetails []ConditionNumDetails, ) []ConditionNumDetails {
+func parseConditionNum(lines []string, start int, allCondDetails []ConditionNumDetails) []ConditionNumDetails {
 	// always modify the most recently created ConditionNumDetails
-	condDetails := &allCondDetails[len(allCondDetails) - 1]
+	condDetails := &allCondDetails[len(allCondDetails)-1]
 
 	condDetails.ConditionNumber = calculateConditionNumber(lines, start)
 

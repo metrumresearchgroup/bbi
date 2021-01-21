@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"bytes"
 	"bbi/configlib"
+	"bytes"
 	"github.com/metrumresearchgroup/turnstile"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -242,7 +242,7 @@ func ExecutePostWorkDirectivesWithEnvironment(worker PostWorkExecutor) (string, 
 
 	environment, err := PostExecutionEnvironment(postworkConfig, postWorkEnv)
 
-	environment = append(environment,os.Environ()...)
+	environment = append(environment, os.Environ()...)
 
 	log.WithFields(log.Fields{
 		"environment": environment,
