@@ -7,8 +7,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/ghodss/yaml"
 	"bbi/configlib"
+	"github.com/ghodss/yaml"
 
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"

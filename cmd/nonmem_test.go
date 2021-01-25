@@ -7,8 +7,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/google/uuid"
 	"bbi/configlib"
+	"github.com/google/uuid"
 	"github.com/spf13/afero"
 )
 
@@ -79,22 +79,22 @@ func Test_processNMFEOptions(t *testing.T) {
 			name: "Normal Operation",
 			args: args{
 				config: configlib.Config{
-					NMVersion:     "",
-					Overwrite:     false,
-					CleanLvl:      0,
-					CopyLvl:       0,
-					Git:           false,
-					BbiBinary:     "",
-					SaveConfig:    false,
-					OutputDir:     "",
-					Threads:       0,
-					Debug:         false,
-					Local:         configlib.LocalDetail{},
-					Nonmem:        nil,
-					Delay:         0,
-					NMQual:        false,
-					JSON:          false,
-					Logfile:       "",
+					NMVersion:  "",
+					Overwrite:  false,
+					CleanLvl:   0,
+					CopyLvl:    0,
+					Git:        false,
+					BbiBinary:  "",
+					SaveConfig: false,
+					OutputDir:  "",
+					Threads:    0,
+					Debug:      false,
+					Local:      configlib.LocalDetail{},
+					Nonmem:     nil,
+					Delay:      0,
+					NMQual:     false,
+					JSON:       false,
+					Logfile:    "",
 					NMFEOptions: configlib.NMFEOptions{
 						LicenseFile: "/tmp/nonmem.lic",
 						PRSame:      false,
@@ -116,22 +116,22 @@ func Test_processNMFEOptions(t *testing.T) {
 			name: "All booleans, no text",
 			args: args{
 				config: configlib.Config{
-					NMVersion:     "",
-					Overwrite:     false,
-					CleanLvl:      0,
-					CopyLvl:       0,
-					Git:           false,
-					BbiBinary:     "",
-					SaveConfig:    false,
-					OutputDir:     "",
-					Threads:       0,
-					Debug:         false,
-					Local:         configlib.LocalDetail{},
-					Nonmem:        nil,
-					Delay:         0,
-					NMQual:        false,
-					JSON:          false,
-					Logfile:       "",
+					NMVersion:  "",
+					Overwrite:  false,
+					CleanLvl:   0,
+					CopyLvl:    0,
+					Git:        false,
+					BbiBinary:  "",
+					SaveConfig: false,
+					OutputDir:  "",
+					Threads:    0,
+					Debug:      false,
+					Local:      configlib.LocalDetail{},
+					Nonmem:     nil,
+					Delay:      0,
+					NMQual:     false,
+					JSON:       false,
+					Logfile:    "",
 					NMFEOptions: configlib.NMFEOptions{
 						LicenseFile: "",
 						PRSame:      true,

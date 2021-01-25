@@ -15,10 +15,14 @@
 package cmd
 
 import (
+	"bbi/configlib"
 	"fmt"
 	"github.com/metrumresearchgroup/turnstile"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
+	"github.com/spf13/cobra"
+	flag "github.com/spf13/pflag"
+	"github.com/spf13/viper"
 	"io"
 	"math/rand"
 	"os"
@@ -26,10 +30,6 @@ import (
 	"path/filepath"
 	"sync"
 	"time"
-	"bbi/configlib"
-	"github.com/spf13/cobra"
-	flag "github.com/spf13/pflag"
-	"github.com/spf13/viper"
 )
 
 // VERSION is the current bbi version

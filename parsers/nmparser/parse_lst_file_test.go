@@ -10,7 +10,7 @@ import (
 
 func TestParseOBJV(t *testing.T) {
 	var ofvDetails []OfvDetails
-	var expected  OfvDetails
+	var expected OfvDetails
 
 	expected.OFVNoConstant = 821.705
 	ofvDetails = parseOFV("OBJECTIVE FUNCTION VALUE WITHOUT CONSTANT: 821.705", ofvDetails)
@@ -37,7 +37,7 @@ func TestParTestParseOBJV2(t *testing.T) {
 		"#OBJV:********************************************    -7913.528       **************************************************",
 	}
 	expected := OfvDetails{
-		ConstantToOFV:             817.855,
+		ConstantToOFV:   817.855,
 		OFVWithConstant: 1639.561,
 		OFVNoConstant:   -7913.528,
 	}
@@ -53,7 +53,7 @@ func TestParTestParseOBJV3(t *testing.T) {
 		"N*LOG(2PI) CONSTANT TO OBJECTIVE FUNCTION:    817.855",
 	}
 	expected := OfvDetails{
-		ConstantToOFV:             817.855,
+		ConstantToOFV:   817.855,
 		OFVWithConstant: 1639.561,
 		OFVNoConstant:   821.705,
 	}
@@ -197,9 +197,9 @@ func TestConditionNumber(t *testing.T) {
 				"                                                                                                                        ",
 				" Elapsed finaloutput time in seconds:     0.16                                                                           ",
 			},
-			n:                    3,
-			conditionNumber:      10.316,
-			context:              "not large",
+			n:               3,
+			conditionNumber: 10.316,
+			context:         "not large",
 		},
 		{
 			lines: []string{
@@ -217,9 +217,9 @@ func TestConditionNumber(t *testing.T) {
 				"                                                                                                                        ",
 				" Elapsed finaloutput time in seconds:     0.16                                                                           ",
 			},
-			n:                    3,
-			conditionNumber:      10316.206,
-			context:              "large",
+			n:               3,
+			conditionNumber: 10316.206,
+			context:         "large",
 		},
 		// {
 		// 	lines:                []string{"", ""},
@@ -248,9 +248,9 @@ func TestConditionNumber(t *testing.T) {
 				"                                                                                                                                   ",
 				"Elapsed postprocess time in seconds:     7.30                                                                                      ",
 			},
-			n:                    5,
-			conditionNumber:      2.16968011126565e+11,
-			context:              "two lines",
+			n:               5,
+			conditionNumber: 2.16968011126565e+11,
+			context:         "two lines",
 		},
 	}
 

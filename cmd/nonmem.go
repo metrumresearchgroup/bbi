@@ -173,8 +173,8 @@ var nonmemLongDescription string = fmt.Sprintf("\n%s\n\n%s\n\n%s\n", runLongDesc
 var nonmemCmd = &cobra.Command{
 	Use:   "nonmem",
 	Short: "nonmem a (set of) models locally or on the grid",
-	Long: nonmemLongDescription,
-	Run: nonmem,
+	Long:  nonmemLongDescription,
+	Run:   nonmem,
 }
 
 func nonmem(cmd *cobra.Command, args []string) {
@@ -271,7 +271,6 @@ func copyFileToDestination(l *NonMemModel, modifyPath bool) error {
 		}
 
 		//We'll use stats for setting the mode of the target file to make sure perms are the same
-
 
 		for k, line := range sourceLines {
 			if strings.Contains(line, "$DATA") {
@@ -725,7 +724,7 @@ func NewNonMemModel(modelname string, config configlib.Config) (NonMemModel, err
 	lm.OriginalModel = lm.Model
 
 	f, e := utils.FileAndExt(lm.Model)
-	lm.FileName  = f
+	lm.FileName = f
 	lm.Extension = strings.TrimPrefix(e, ".")
 
 	//Get the raw path of the original by stripping the actual file from it

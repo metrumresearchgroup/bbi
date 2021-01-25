@@ -44,7 +44,7 @@ func lowerDiagonalLengthToDimension(l int) (int, bool) {
 }
 
 func IndexAndIsDiag(i int) (int, bool) {
-	res, isdiag := lowerDiagonalLengthToDimension(i+1)
+	res, isdiag := lowerDiagonalLengthToDimension(i + 1)
 	return res, isdiag
 }
 
