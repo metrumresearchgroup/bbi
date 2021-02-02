@@ -71,7 +71,7 @@ type RunDetails struct {
 	ModFile             string   `json:"mod_file,omitempty"`
 	EstimationMethods   []string `json:"estimation_method,omitempty"`
 	DataSet             string   `json:"data_set,omitempty"`
-	NumberOfPatients    int64    `json:"number_of_patients,omitempty"`
+	NumberOfSubjects    int64    `json:"number_of_subjects,omitempty"`
 	NumberOfObs         int64    `json:"number_of_obs,omitempty"`
 	NumberOfDataRecords int64    `json:"number_of_data_records,omitempty"`
 	OutputTables        []string `json:"output_tables,omitempty"`
@@ -202,7 +202,7 @@ func NewRunDetails() RunDetails {
 		ModFile:             DefaultString,
 		EstimationMethods:   []string{},
 		DataSet:             DefaultString,
-		NumberOfPatients:    DefaultInt64,
+		NumberOfSubjects:    DefaultInt64,
 		NumberOfObs:         DefaultInt64,
 		NumberOfDataRecords: DefaultInt64,
 		OutputTables:        []string{},
