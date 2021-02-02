@@ -78,7 +78,7 @@ func ParseRunDetails(lines []string) RunDetails {
 		case strings.Contains(line, "$DATA"):
 			runDetails.DataSet = parseLine(line, 1)
 		case strings.Contains(line, "TOT. NO. OF INDIVIDUALS:"):
-			runDetails.NumberOfPatients, _ = strconv.ParseInt(replaceTrim(line, "TOT. NO. OF INDIVIDUALS:"), 10, 64)
+			runDetails.NumberOfSubjects, _ = strconv.ParseInt(replaceTrim(line, "TOT. NO. OF INDIVIDUALS:"), 10, 64)
 		case strings.Contains(line, "TOT. NO. OF OBS RECS:"):
 			runDetails.NumberOfObs, _ = strconv.ParseInt(replaceTrim(line, "TOT. NO. OF OBS RECS:"), 10, 64)
 		case strings.Contains(line, "NO. OF DATA RECS IN DATA SET:"):

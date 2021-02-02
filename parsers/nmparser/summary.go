@@ -99,10 +99,10 @@ func (results SummaryOutput) Summary() bool {
 
 	fmt.Println(results.RunDetails.ProblemText)
 	fmt.Println("Dataset: " + results.RunDetails.DataSet)
-	fmt.Println(fmt.Sprintf("Records: %v   Observations: %v  Patients: %v",
+	fmt.Println(fmt.Sprintf("Records: %v   Observations: %v  Subjects: %v",
 		results.RunDetails.NumberOfDataRecords,
 		results.RunDetails.NumberOfObs,
-		results.RunDetails.NumberOfPatients,
+		results.RunDetails.NumberOfSubjects,
 	))
 	fmt.Println("Estimation Method(s):")
 	for _, em := range results.RunDetails.EstimationMethods {

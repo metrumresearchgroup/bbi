@@ -79,7 +79,7 @@ bbi nonmem summary 103/103 --json
 			"First Order Conditional Estimation with Interaction"
 		],
 		"data_set": "../../../data/derived/analysis3.csv",
-		"number_of_patients": 160,
+		"number_of_subjects": 160,
 		"number_of_obs": 3142,
 		"number_of_data_records": 4292,
 		"output_files_used": [
@@ -291,7 +291,7 @@ bbi nonmem summary 103/103
 ```
 PROBLEM From bbr: see 103.yaml for details
 Dataset: ../../../data/derived/analysis3.csv
-Records: 4292   Observations: 3142  Patients: 160
+Records: 4292   Observations: 3142  Subjects: 160
 Estimation Method(s):
  - First Order Conditional Estimation with Interaction
 No Heuristic Problems Detected
