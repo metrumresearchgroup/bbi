@@ -2,6 +2,7 @@ package parser
 
 import (
 	"bbi/utils"
+	"fmt"
 	"math"
 	"sort"
 	"strconv"
@@ -457,7 +458,7 @@ func calculateConditionNumber(lines []string, start int) float64 {
 		for _, s := range strings.Fields(line) {
 			eigenvalue, err := strconv.ParseFloat(s, 64)
 			if err != nil {
-				panic("Attempting to calculate condition number but could not parse eigenvalues")
+				panic(fmt.Sprintf("Attempting to calculate condition number but could not parse eigenvalues -- %v", err))
 			}
 			eigenvalues = append(eigenvalues, eigenvalue)
 		}
