@@ -440,28 +440,30 @@ func calculateConditionNumber(lines []string, start int) float64 {
 		}
 	}
 
-	// go until another blank line and build eigenvalues vector
+	// go until non-blank line and build eigenvalues vector
 	var eigenvalues []float64
-	for i, line := range lines[start:] {
-		for _, s := range strings.Fields(line) {
-			eigenvalue, err := strconv.ParseFloat(s, 64)
-			if err == nil {
-				eigenvalues = append(eigenvalues, eigenvalue)
+	eigenstarted := false
+	for _, line := range lines[start:] {
+		sub := strings.TrimSpace(line)
+		if len(sub) == 0 {
+			if eigenstarted {
+				break
+			} else {
+				continue
 			}
 		}
 
-		sub := strings.TrimSpace(line)
-		if len(sub) == 0 {
-			start = start + i + 1
-			break
+		eigenstarted = true
+		for _, s := range strings.Fields(line) {
+			eigenvalue, err := strconv.ParseFloat(s, 64)
+			if err != nil {
+				panic("Attempting to calculate condition number but could not parse eigenvalues")
+			}
+			eigenvalues = append(eigenvalues, eigenvalue)
 		}
 	}
 
-	ratio := 1.0 // If only 1 eigenvalue, the Condition Number is 1.0
-	if len(eigenvalues) >= 2 {
-		sort.Float64s(eigenvalues)
-		ratio = eigenvalues[len(eigenvalues)-1] / eigenvalues[0]
-	}
-
+	sort.Float64s(eigenvalues)
+	ratio := eigenvalues[len(eigenvalues)-1] / eigenvalues[0]
 	return ratio
 }

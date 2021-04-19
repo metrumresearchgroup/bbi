@@ -82,7 +82,6 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 	err := createChildDirectories(l.Nonmem, l.Cancel, channels, true)
 
 	//Save the config into the output directory
-
 	if err != nil {
 		//Handles the cancel operation
 		p := &l
