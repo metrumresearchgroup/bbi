@@ -406,12 +406,12 @@ func parseConditionNumberLst(lines []string, start int, allCondDetails []Conditi
 	// always modify the most recently created ConditionNumDetails
 	condDetails := &allCondDetails[len(allCondDetails)-1]
 
-	condDetails.ConditionNumber = calculateConditionNumber(lines, start)
+	condDetails.ConditionNumber = mustCalculateConditionNumber(lines, start)
 
 	return allCondDetails
 }
 
-func calculateConditionNumber(lines []string, start int) float64 {
+func mustCalculateConditionNumber(lines []string, start int) float64 {
 
 	// go until line of ints
 	for i, line := range lines[start:] {
