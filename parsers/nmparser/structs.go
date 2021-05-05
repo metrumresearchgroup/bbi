@@ -48,6 +48,7 @@ type ParametersData struct {
 type RunHeuristics struct {
 	CovarianceStepAborted  bool `json:"covariance_step_aborted"`
 	LargeConditionNumber   bool `json:"large_condition_number"`
+	EigenvalueIssues       bool `json:"eigenvalue_issues"`
 	CorrelationsNotOK      bool `json:"correlations_not_ok"`
 	ParameterNearBoundary  bool `json:"parameter_near_boundary"`
 	HessianReset           bool `json:"hessian_reset"`

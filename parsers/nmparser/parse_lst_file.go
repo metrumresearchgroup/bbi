@@ -310,6 +310,8 @@ func ParseLstEstimationFile(lines []string) SummaryOutput {
 			runHeuristics.ParameterNearBoundary = true
 		case strings.Contains(line, "COVARIANCE STEP ABORTED"):
 			runHeuristics.CovarianceStepAborted = true
+		case strings.Contains(line, "Forcing positive definiteness"):
+			runHeuristics.EigenvalueIssues = true
 		case strings.Contains(line, "EIGENVALUES OF COR MATRIX OF ESTIMATE"):
 			allCondDetails = parseConditionNumberLst(lines, i, allCondDetails)
 		default:
@@ -319,6 +321,11 @@ func ParseLstEstimationFile(lines []string) SummaryOutput {
 
 	runHeuristics.HasFinalZeroGradient = parseGradient(gradientLines)
 	runHeuristics.LargeConditionNumber = getLargeConditionNumber(allCondDetails)
+	for _, cd := range allCondDetails {
+		if (cd.ConditionNumber <= 0) && (cd.ConditionNumber != DefaultFloat64){
+			runHeuristics.EigenvalueIssues = true
+		}
+	}
 
 	var finalParameterEst ParametersResult
 	var finalParameterStdErr ParametersResult
@@ -457,7 +464,10 @@ func calculateConditionNumber(lines []string, start int) float64 {
 	}
 
 	sort.Float64s(eigenvalues)
-	ratio := eigenvalues[len(eigenvalues)-1] / eigenvalues[0]
+	ratio := -1.0 // if eigenvalues contain a zero we return condition number of -1
+	if eigenvalues[0] != 0 {
+		ratio = eigenvalues[len(eigenvalues)-1] / eigenvalues[0]
+	}
 	return ratio
 }
 

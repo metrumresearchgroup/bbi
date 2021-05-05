@@ -27,7 +27,7 @@ steps:
       - ./bbi version
   - name: Get bbitest
     environment:
-      BBITEST_BRANCH: master
+      BBITEST_BRANCH: eigenvalue_fix
     commands:
       - git clone https://github.com/metrumresearchgroup/bbitest.git /tmp/${DRONE_BUILD_NUMBER}/bbitest
       - cd /tmp/${DRONE_BUILD_NUMBER}/bbitest
