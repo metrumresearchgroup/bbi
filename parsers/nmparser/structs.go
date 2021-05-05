@@ -223,11 +223,11 @@ func NewOfvDetails(method string) OfvDetails {
 	return ofvDetails
 }
 
-func NewConditionNumDetails(method string) ConditionNumDetails {
+func NewConditionNumDetails(method string, condNum float64) ConditionNumDetails {
 
 	conditionNumDetails := ConditionNumDetails{
 		EstMethod:       method,
-		ConditionNumber: DefaultFloat64,
+		ConditionNumber: condNum,
 	}
 	return conditionNumDetails
 }

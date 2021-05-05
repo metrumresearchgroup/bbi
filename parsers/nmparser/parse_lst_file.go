@@ -280,7 +280,7 @@ func ParseLstEstimationFile(lines []string) SummaryOutput {
 			// starting new estimation method, make new details objects
 			method := strings.TrimSpace(strings.Replace(line, "#METH:", "", -1))
 			allOfvDetails = append(allOfvDetails, NewOfvDetails(method))
-			allCondDetails = append(allCondDetails, NewConditionNumDetails(method))
+			allCondDetails = append(allCondDetails, NewConditionNumDetails(method, DefaultFloat64))
 		case strings.Contains(line, "#OBJV"):
 			allOfvDetails = parseOFV(line, allOfvDetails)
 		case strings.Contains(line, "CONSTANT TO OBJECTIVE FUNCTION"):
@@ -311,22 +311,14 @@ func ParseLstEstimationFile(lines []string) SummaryOutput {
 		case strings.Contains(line, "COVARIANCE STEP ABORTED"):
 			runHeuristics.CovarianceStepAborted = true
 		case strings.Contains(line, "EIGENVALUES OF COR MATRIX OF ESTIMATE"):
-			allCondDetails = parseConditionNum(lines, i, allCondDetails)
+			allCondDetails = parseConditionNumberLst(lines, i, allCondDetails)
 		default:
 			continue
 		}
 	}
 
 	runHeuristics.HasFinalZeroGradient = parseGradient(gradientLines)
-
-	// TODO: get largeNumberLimit from config
-	// or derive. something like (number of parameters) * 10
-	largeNumberLimit := 1000.0
-	cb := make([]bool, len(allCondDetails))
-	for i, cn := range allCondDetails {
-		cb[i] = cn.ConditionNumber > largeNumberLimit
-	}
-	runHeuristics.LargeConditionNumber = utils.AnyTrue(cb)
+	runHeuristics.LargeConditionNumber = getLargeConditionNumber(allCondDetails)
 
 	var finalParameterEst ParametersResult
 	var finalParameterStdErr ParametersResult
@@ -403,7 +395,7 @@ func parseOFV(line string, allOfvDetails []OfvDetails) []OfvDetails {
 	return allOfvDetails
 }
 
-func parseConditionNum(lines []string, start int, allCondDetails []ConditionNumDetails) []ConditionNumDetails {
+func parseConditionNumberLst(lines []string, start int, allCondDetails []ConditionNumDetails) []ConditionNumDetails {
 	// always modify the most recently created ConditionNumDetails
 	condDetails := &allCondDetails[len(allCondDetails)-1]
 
@@ -467,4 +459,15 @@ func calculateConditionNumber(lines []string, start int) float64 {
 	sort.Float64s(eigenvalues)
 	ratio := eigenvalues[len(eigenvalues)-1] / eigenvalues[0]
 	return ratio
+}
+
+func getLargeConditionNumber(allCondDetails []ConditionNumDetails) bool {
+	// TODO: get largeNumberLimit from config
+	// or derive. something like (number of parameters) * 10
+	largeNumberLimit := 1000.0
+	cb := make([]bool, len(allCondDetails))
+	for i, cn := range allCondDetails {
+		cb[i] = cn.ConditionNumber > largeNumberLimit
+	}
+	return utils.AnyTrue(cb)
 }

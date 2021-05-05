@@ -89,10 +89,17 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (Su
 		if err != nil {
 			return SummaryOutput{}, err
 		}
-		extData, parameterNames := ParseExtData(ParseExtLines(extLines))
+		extLinesParsed := ParseExtLines(extLines)
+
+		// Parse parameters from .ext
+		extData, parameterNames := ParseParamsExt(extLinesParsed)
 		results.ParametersData = extData
 		results.ParameterNames.Omega = parameterNames.Omega
 		results.ParameterNames.Sigma = parameterNames.Sigma
+
+		// Parse condition number
+		results.ConditionNumber = ParseConditionNumberExt(extLinesParsed)
+		results.RunHeuristics.LargeConditionNumber = getLargeConditionNumber(results.ConditionNumber)
 
 		results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, filepath.Base(extFilePath))
 	}

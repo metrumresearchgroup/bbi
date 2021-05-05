@@ -54,7 +54,7 @@ func TestReadExt(t *testing.T) {
 		ext := ParseExtLines(tt.lines)
 		assert.Equal(t, 2, len(ext.EstimationMethods), "Fail :"+tt.context)
 
-		pd, pn := ParseExtData(ext)
+		pd, pn := ParseParamsExt(ext)
 
 		assert.Equal(t, 2, len(pd), "Fail :"+tt.context)
 		assert.Equal(t, tt.lines[0], pd[0].Method, "Fail :"+tt.context)
