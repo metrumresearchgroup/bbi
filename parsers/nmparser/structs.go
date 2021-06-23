@@ -169,6 +169,7 @@ type ExtFastData struct {
 	EstimationMethods []string
 	ParameterNames    []string
 	EstimationLines   [][]string
+	TerminationCodes   [][]string
 }
 
 // MatrixData ...
