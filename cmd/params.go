@@ -48,6 +48,16 @@ var (
 	dir string
 )
 
+// helpers for making a set
+func index(slice []string, item string) int {
+	for i := range slice {
+		if slice[i] == item {
+			return i
+		}
+	}
+	return -1
+}
+
 func printParamHeader(results parser.ExtFastData) {
 	for i, s := range results.ParameterNames {
 		results.ParameterNames[i] = strings.ReplaceAll(s, ",", "_")
@@ -55,6 +65,18 @@ func printParamHeader(results parser.ExtFastData) {
 	fmt.Println("dir," + strings.Join(results.ParameterNames, ","))
 }
 
+func removeDuplicateValues(stringSlice []string) []string {
+	keys := make(map[string]bool)
+	list := []string{}
+
+	for _, entry := range stringSlice {
+		if _, value := keys[entry]; !value {
+			keys[entry] = true
+			list = append(list, entry)
+		}
+	}
+	return list
+}
 
 func params(cmd *cobra.Command, args []string) {
 	if debug {
@@ -87,12 +109,14 @@ func params(cmd *cobra.Command, args []string) {
 			log.Fatal("no subdirectories with corresponding ctl files found")
 		}
 	}
+
 	if len(args) == 1 {
 		dir := args[0]
 		if extFile == "" {
 			extFile = strings.Join([]string{filepath.Base(dir), "ext"},".")
 		}
 		results, err := parser.ParseEstimatesFromExt(filepath.Join(dir, extFile))
+
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -153,6 +177,7 @@ func params(cmd *cobra.Command, args []string) {
 					extFileName = strings.Join([]string{filepath.Base(dir), "ext"}, ".")
 				}
 				r, err := parser.ParseEstimatesFromExt(filepath.Join(dir, extFileName))
+
 				if err != nil {
 					results <- paramResult{
 						Index:   i,
@@ -171,6 +196,7 @@ func params(cmd *cobra.Command, args []string) {
 			}
 		}(w, models, results)
 	}
+
 	for m := 0; m < numModels; m++ {
 		models <- m
 	}
@@ -179,19 +205,46 @@ func params(cmd *cobra.Command, args []string) {
 		res := <-results
 		orderedResults[res.Index] = res
 	}
+
 	if !Json {
-		// will only know the proper header once we have a successful run
-		headerPrinted := false
+
+		paramSet := []string{}
 		for _, res := range orderedResults {
+			results := res.Result
+			paramSet = append(paramSet, results.ParameterNames...)
+		}
+
+		paramSet = removeDuplicateValues(paramSet)
+		for i, s := range paramSet {
+			paramSet[i] = strings.ReplaceAll(s, ",", "_")
+		}
+
+		fmt.Println("dir,error,termination," + strings.Join(paramSet, ","))
+		for _, res := range orderedResults {
+			s := make([]string, len(paramSet))
+			for i, _ := range s {
+				s[i] = ""
+			}
+
+			absolutePath := dir + "/" + modelDirs[res.Index]
 			if res.Outcome == SUCCESS {
 				results := res.Result
-				if !noParamNames && !headerPrinted {
-					printParamHeader(results)
-					headerPrinted = true
+				for i, name := range results.ParameterNames {
+					idx := index(paramSet, strings.ReplaceAll(name, ",", "_"))
+					values := results.EstimationLines
+					s[idx] = values[0][i]
 				}
-				fmt.Println(modelDirs[res.Index]+ "," + strings.Join(results.EstimationLines[len(results.EstimationLines) - 1], ","))
+
+				// first code is the termination status
+				terminationCode := results.TerminationCodes[0][0]
+				fmt.Println(absolutePath + ",," + terminationCode + "," + strings.Join(s, ","))
+
+			} else if res.Outcome == ERROR {
+				errorMessage :=  res.Err.Error()
+				fmt.Println(absolutePath + "," + errorMessage + ",," + strings.Join(s, ","))
 			}
 		}
+
 		return
 	}
 
