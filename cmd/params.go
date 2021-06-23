@@ -157,12 +157,9 @@ func params(cmd *cobra.Command, args []string) {
 	results := make(chan paramResult, numModels)
 	orderedResults := make([]paramResult, numModels)
 	var paramResults jsonParamResults
-	// paramSet := NewSet()
 
 	for w := 1; w <= workers; w++ {
 		go func(w int, modIndex <-chan int, results chan<- paramResult) {
-			// paramSet := make(map[string]struct{})
-			// var exists = struct{}{}
 			for i := range modIndex {
 				dir := filepath.Join(dir, modelDirs[i])
 				var extFileName string
@@ -173,9 +170,6 @@ func params(cmd *cobra.Command, args []string) {
 				}
 				r, err := parser.ParseEstimatesFromExt(filepath.Join(dir, extFileName))
 
-				// for _, s := range r.ParameterNames{
-				//	paramSet[s] = exists
-				// }
 				if err != nil {
 					results <- paramResult{
 						Index:   i,
@@ -195,10 +189,6 @@ func params(cmd *cobra.Command, args []string) {
 		}(w, models, results)
 	}
 
-
-
-
-
 	for m := 0; m < numModels; m++ {
 		models <- m
 	}
@@ -208,41 +198,45 @@ func params(cmd *cobra.Command, args []string) {
 		orderedResults[res.Index] = res
 	}
 
-	paramSet := []string{}
-	for _, res := range orderedResults{
-		results := res.Result
-		paramSet = append(paramSet, results.ParameterNames...)
-	}
-
-	paramSet = removeDuplicateValues(paramSet)
-	fmt.Println("dir," + strings.Join(paramSet, ", "))
-	for _, res := range orderedResults{
-		s := make([]string, len(paramSet))
-		for i, _ := range s {
-			s[i] = ""
-		}
-		results := res.Result
-		for i, name := range results.ParameterNames{
-			idx := index(paramSet, name)
-			values := results.EstimationLines
-			s[idx] = values[0][i]
-		}
-		fmt.Println(modelDirs[res.Index] + "," + strings.Join(s, ","))
-	}
-
 	if !Json {
-		// will only know the proper header once we have a successful run
-		headerPrinted := false
+
+		paramSet := []string{}
 		for _, res := range orderedResults {
+			results := res.Result
+			paramSet = append(paramSet, results.ParameterNames...)
+		}
+
+		paramSet = removeDuplicateValues(paramSet)
+		for i, s := range paramSet {
+			paramSet[i] = strings.ReplaceAll(s, ",", "_")
+		}
+
+		fmt.Println("dir,error,termination," + strings.Join(paramSet, ","))
+		for _, res := range orderedResults {
+			s := make([]string, len(paramSet))
+			for i, _ := range s {
+				s[i] = ""
+			}
+
+			absolutePath := dir + "/" + modelDirs[res.Index]
 			if res.Outcome == SUCCESS {
 				results := res.Result
-				if !noParamNames && !headerPrinted {
-					printParamHeader(results)
-					headerPrinted = true
+				for i, name := range results.ParameterNames {
+					idx := index(paramSet, strings.ReplaceAll(name, ",", "_"))
+					values := results.EstimationLines
+					s[idx] = values[0][i]
 				}
-				fmt.Println(modelDirs[res.Index]+ "," + strings.Join(results.EstimationLines[len(results.EstimationLines) - 1], ","))
+
+				// first code is the termination status
+				terminationCode := results.TerminationCodes[0][0]
+				fmt.Println(absolutePath + ",," + terminationCode + "," + strings.Join(s, ","))
+
+			} else if res.Outcome == ERROR {
+				errorMessage :=  res.Err.Error()
+				fmt.Println(absolutePath + "," + errorMessage + ",," + strings.Join(s, ","))
 			}
 		}
+
 		return
 	}
 
