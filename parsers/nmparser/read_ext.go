@@ -39,7 +39,7 @@ func ParseExtLines(lines []string) ExtData {
 	}
 }
 
-//ParseExtData returns the ExtData in the structure of final parameter estimates
+//ParseParamsExt returns the ExtData in the structure of final parameter estimates
 // the parameter names correspond to the names per the ext file (THETA1, THETA2, etc)
 // per nonmem 7.4 the following information will be grabbed
 // 1) Theburn-in iterations of the MCMCBayesian analysis are given negative values,starting at –NBURN, the number of burn-in iterations requested by the user. These are followed by positive iterations of the stationary phase.
@@ -59,7 +59,7 @@ func ParseExtLines(lines []string) ExtData {
 // NONMEM Users Guide: Introduction to NONMEM 7.4.1
 // 11) Iteration -1000000008 lists the partial derivative of the likelihood (-1/2 OFV) with respect to each estimated parameter. This may be useful for using tests like the Lagrange multiplier test.
 // 12) Additional special iteration number lines may be added in future versions of NONMEM.
-func ParseExtData(ed ExtData) ([]ParametersData, ParameterNames) {
+func ParseParamsExt(ed ExtData) ([]ParametersData, ParameterNames) {
 	var allParametersData []ParametersData
 	// order in ext is theta/sigma/omega
 	var thetas []string
@@ -144,4 +144,29 @@ func ParseExtData(ed ExtData) ([]ParametersData, ParameterNames) {
 		Omega: omegas,
 		Sigma: sigmas,
 	}
+}
+
+//ParseConditionNumberExt returns the condition number for each estimation method from ExtData
+// per nonmem 7.4 the following information will be grabbed
+// Iteration -1000000003 indicates that this line contains the condition number , lowest, highest, Eigenvalues of the correlation matrix of the variances of the final parameters.
+// NONMEM Users Guide: Introduction to NONMEM 7.4.1
+func ParseConditionNumberExt(ed ExtData) []ConditionNumDetails {
+	var allCondDetails []ConditionNumDetails
+
+	for estIndex, method := range ed.EstimationMethods {
+		method = strings.TrimSpace(strings.Split(method, ":")[1])
+		condNum := DefaultFloat64
+		for _, line := range ed.EstimationLines[estIndex] {
+			fields := strings.Fields(line)
+			step, _ := strconv.Atoi(fields[0])
+			if step == -1000000003 {
+				condNum, _ = strconv.ParseFloat(fields[1], 64)
+				break
+			} else {
+				continue
+			}
+		}
+		allCondDetails = append(allCondDetails, NewConditionNumDetails(method, condNum))
+	}
+	return allCondDetails
 }

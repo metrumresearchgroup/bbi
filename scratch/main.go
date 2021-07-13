@@ -20,7 +20,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	extData, pn := parser.ParseExtData(parser.ParseExtLines(res))
+	extData, pn := parser.ParseParamsExt(parser.ParseExtLines(res))
 	fmt.Println(time.Since(start))
 	pretty.Print(extData[len(extData)-1])
 	pretty.Print(pn)

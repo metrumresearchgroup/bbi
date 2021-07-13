@@ -2,6 +2,7 @@ package parser
 
 import (
 	"bbi/utils"
+	"fmt"
 	"math"
 	"sort"
 	"strconv"
@@ -279,7 +280,7 @@ func ParseLstEstimationFile(lines []string) SummaryOutput {
 			// starting new estimation method, make new details objects
 			method := strings.TrimSpace(strings.Replace(line, "#METH:", "", -1))
 			allOfvDetails = append(allOfvDetails, NewOfvDetails(method))
-			allCondDetails = append(allCondDetails, NewConditionNumDetails(method))
+			allCondDetails = append(allCondDetails, NewConditionNumDetails(method, DefaultFloat64))
 		case strings.Contains(line, "#OBJV"):
 			allOfvDetails = parseOFV(line, allOfvDetails)
 		case strings.Contains(line, "CONSTANT TO OBJECTIVE FUNCTION"):
@@ -309,23 +310,22 @@ func ParseLstEstimationFile(lines []string) SummaryOutput {
 			runHeuristics.ParameterNearBoundary = true
 		case strings.Contains(line, "COVARIANCE STEP ABORTED"):
 			runHeuristics.CovarianceStepAborted = true
+		case strings.Contains(line, "Forcing positive definiteness"):
+			runHeuristics.EigenvalueIssues = true
 		case strings.Contains(line, "EIGENVALUES OF COR MATRIX OF ESTIMATE"):
-			allCondDetails = parseConditionNum(lines, i, allCondDetails)
+			allCondDetails = parseConditionNumberLst(lines, i, allCondDetails)
 		default:
 			continue
 		}
 	}
 
 	runHeuristics.HasFinalZeroGradient = parseGradient(gradientLines)
-
-	// TODO: get largeNumberLimit from config
-	// or derive. something like (number of parameters) * 10
-	largeNumberLimit := 1000.0
-	cb := make([]bool, len(allCondDetails))
-	for i, cn := range allCondDetails {
-		cb[i] = cn.ConditionNumber > largeNumberLimit
+	runHeuristics.LargeConditionNumber = getLargeConditionNumber(allCondDetails)
+	for _, cd := range allCondDetails {
+		if (cd.ConditionNumber <= 0) && (cd.ConditionNumber != DefaultFloat64){
+			runHeuristics.EigenvalueIssues = true
+		}
 	}
-	runHeuristics.LargeConditionNumber = utils.AnyTrue(cb)
 
 	var finalParameterEst ParametersResult
 	var finalParameterStdErr ParametersResult
@@ -402,16 +402,16 @@ func parseOFV(line string, allOfvDetails []OfvDetails) []OfvDetails {
 	return allOfvDetails
 }
 
-func parseConditionNum(lines []string, start int, allCondDetails []ConditionNumDetails) []ConditionNumDetails {
+func parseConditionNumberLst(lines []string, start int, allCondDetails []ConditionNumDetails) []ConditionNumDetails {
 	// always modify the most recently created ConditionNumDetails
 	condDetails := &allCondDetails[len(allCondDetails)-1]
 
-	condDetails.ConditionNumber = calculateConditionNumber(lines, start)
+	condDetails.ConditionNumber = mustCalculateConditionNumber(lines, start)
 
 	return allCondDetails
 }
 
-func calculateConditionNumber(lines []string, start int) float64 {
+func mustCalculateConditionNumber(lines []string, start int) float64 {
 
 	// go until line of ints
 	for i, line := range lines[start:] {
@@ -440,28 +440,44 @@ func calculateConditionNumber(lines []string, start int) float64 {
 		}
 	}
 
-	// go until another blank line and build eigenvalues vector
+	// go until non-blank line and build eigenvalues vector
 	var eigenvalues []float64
-	for i, line := range lines[start:] {
-		for _, s := range strings.Fields(line) {
-			eigenvalue, err := strconv.ParseFloat(s, 64)
-			if err == nil {
-				eigenvalues = append(eigenvalues, eigenvalue)
+	eigenstarted := false
+	for _, line := range lines[start:] {
+		sub := strings.TrimSpace(line)
+		if len(sub) == 0 {
+			if eigenstarted {
+				break
+			} else {
+				continue
 			}
 		}
 
-		sub := strings.TrimSpace(line)
-		if len(sub) == 0 {
-			start = start + i + 1
-			break
+		eigenstarted = true
+		for _, s := range strings.Fields(line) {
+			eigenvalue, err := strconv.ParseFloat(s, 64)
+			if err != nil {
+				panic(fmt.Sprintf("Attempting to calculate condition number but could not parse eigenvalues -- %v", err))
+			}
+			eigenvalues = append(eigenvalues, eigenvalue)
 		}
 	}
 
-	ratio := 1.0 // If only 1 eigenvalue, the Condition Number is 1.0
-	if len(eigenvalues) >= 2 {
-		sort.Float64s(eigenvalues)
+	sort.Float64s(eigenvalues)
+	ratio := -1.0 // if eigenvalues contain a zero we return condition number of -1
+	if eigenvalues[0] != 0 {
 		ratio = eigenvalues[len(eigenvalues)-1] / eigenvalues[0]
 	}
-
 	return ratio
+}
+
+func getLargeConditionNumber(allCondDetails []ConditionNumDetails) bool {
+	// TODO: get largeNumberLimit from config
+	// or derive. something like (number of parameters) * 10
+	largeNumberLimit := 1000.0
+	cb := make([]bool, len(allCondDetails))
+	for i, cn := range allCondDetails {
+		cb[i] = cn.ConditionNumber > largeNumberLimit
+	}
+	return utils.AnyTrue(cb)
 }
