@@ -89,9 +89,11 @@ func params(cmd *cobra.Command, args []string) {
 			log.Fatal(err)
 		}
 		potentialModelDirs := utils.ListDirNames(fi)
-		md := utils.ListFilesByExt(utils.ListFiles(fi), "ctl")
-		modelsInDir := strset.New()
+		ctlModels := utils.ListFilesByExt(utils.ListFiles(fi), "ctl")
+		modModels := utils.ListFilesByExt(utils.ListFiles(fi), "mod")
+		md := append(ctlModels, modModels...)
 
+		modelsInDir := strset.New()
 		for _, f := range md {
 			fileName, _ := utils.FileAndExt(f)
 			modelsInDir.Add(fileName)
@@ -106,7 +108,7 @@ func params(cmd *cobra.Command, args []string) {
 		if len(modelDirs) == 0 {
 			log.Infof("found %s subdirectories", len(potentialModelDirs))
 			log.Infof("found %s models", len(modelsInDir.List()))
-			log.Fatal("no subdirectories with corresponding ctl files found")
+			log.Fatal("no subdirectories with corresponding ctl or mod files found")
 		}
 	}
 
@@ -226,7 +228,13 @@ func params(cmd *cobra.Command, args []string) {
 				s[i] = ""
 			}
 
-			absolutePath := dir + "/" + modelDirs[res.Index]
+			var absolutePath string
+			if strings.HasSuffix(dir, "/"){
+				absolutePath = dir + modelDirs[res.Index]
+			} else {
+				absolutePath = dir + "/" + modelDirs[res.Index]
+			}
+
 			if res.Outcome == SUCCESS {
 				results := res.Result
 				for i, name := range results.ParameterNames {
