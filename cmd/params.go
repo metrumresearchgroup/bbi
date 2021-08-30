@@ -17,8 +17,8 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
-	parser "github.com/metrumresearchgroup/babylon/parsers/nmparser"
-	"github.com/metrumresearchgroup/babylon/utils"
+	parser "bbi/parsers/nmparser"
+	"bbi/utils"
 	"github.com/scylladb/go-set/strset"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
