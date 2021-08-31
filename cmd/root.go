@@ -86,16 +86,22 @@ func init() {
 	// Cobra supports Persistent Flags, which, if defined here,
 	// will be global for your application.
 	RootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
+
 	RootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "debug mode")
 	viper.BindPFlag("debug", RootCmd.PersistentFlags().Lookup("debug")) //Bind Debug to viper
+
 	RootCmd.PersistentFlags().IntVar(&threads, "threads", 4, "number of threads to execute with locally or nodes to execute on in parallel")
 	viper.BindPFlag("threads", RootCmd.PersistentFlags().Lookup("threads")) //Update to make sure viper binds to the flag
+
 	RootCmd.PersistentFlags().BoolVar(&Json, "json", false, "json tree of output, if possible")
 	viper.BindPFlag("json", RootCmd.PersistentFlags().Lookup("json")) //Bind to viper
-	RootCmd.PersistentFlags().BoolVarP(&preview, "preview", "p", false, "preview action, but don't actually run command")
 
-	viper.BindPFlag("output", RootCmd.PersistentFlags().Lookup("output")) //Bind to viper
+	RootCmd.PersistentFlags().BoolVarP(&preview, "preview", "p", false, "preview action, but don't actually run command")
+	viper.BindPFlag("preview", RootCmd.PersistentFlags().Lookup("preview")) //Bind to viper
+
 	RootCmd.PersistentFlags().StringVarP(&output, "output", "o", "", "output file")
+	viper.BindPFlag("output", RootCmd.PersistentFlags().Lookup("output")) //Bind to viper
+
 }
 
 // initConfig reads in config file and ENV variables if set.
