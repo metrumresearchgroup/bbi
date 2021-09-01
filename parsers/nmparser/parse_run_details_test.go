@@ -37,7 +37,7 @@ var RunDetails01Results = RunDetails{
 	"Tue Dec 17 18:11:32 2013",
 	6.84,
 	3.34,
-	10.5, // this is made up, not for an actual run output
+	DefaultFloat64, // not specified in test RunDetails01
 	352,
 	3.4,
 	"3.mod, double inital estimates",
@@ -47,8 +47,8 @@ var RunDetails01Results = RunDetails{
 	50,
 	442,
 	492,
-	[]string{"-999999999"},
-	[]string{""},
+	[]string{},
+	[]string{},
 }
 
 var RunDetails02 = "../../testdata/2.lst"
@@ -73,9 +73,45 @@ var RunDetails02Results = RunDetails{
 	[]string{""},
 }
 
+var RunDetailsInfn = []string{
+	"Days until program expires : 122",
+	"1NONLINEAR MIXED EFFECTS MODEL PROGRAM (NONMEM) VERSION 7.2.0",
+	" ORIGINALLY DEVELOPED BY STUART BEAL, LEWIS SHEINER, AND ALISON BOECKMANN",
+	" #TERM:",
+	"0MINIMIZATION SUCCESSFUL",
+	" NO. OF FUNCTION EVALUATIONS USED:      352",
+	" NO. OF SIG. DIGITS IN FINAL EST.:  3.4",
+	"",
+	"#TERE:",
+	"Elapsed estimation time in seconds:     6.84",
+	"Elapsed covariance time in seconds:     3.34",
+	"This file was created using /opt/NONMEM/nm72g/run/nmfe72",
+	"Started  Tue Dec 17 18:10:55 2013",
+	"Finished Tue Dec 17 18:11:32 2013",
+	"$PROB 3.mod, double inital estimates",
+	"", // TODO, pass full path control stream file name into ParseRunDetails
+	// 3.mod; initial estimate of inter-subject variability (matrix). also ETA
+	"#METH: First Order Conditional Estimation with Interaction",
+	"$DATA ../../derived/mock1.csv IGNORE=C",
+	"TOT. NO. OF INDIVIDUALS:       50",
+	"TOT. NO. OF OBS RECS:      442",
+	// Difference with RunDetails01Results: Drop "NO. OF DATA RECS
+	// IN DATA SET:" line and add the one below to mimic $INFN
+	// output.
+	"TOT. NO. OF DATA RECS:      492",
+	"$TABLE NOPRINT ONEHEADER FILE=./1.tab",
+}
+
 func TestParseRunDetails(t *testing.T) {
 	parsedData := ParseRunDetails(RunDetails01)
-	parsedData.OutputFilesUsed = []string{""}
+	if !reflect.DeepEqual(parsedData, RunDetails01Results) {
+		t.Log("\nGOT: ", parsedData, "\n Expected: ", RunDetails01Results)
+		t.Fail()
+	}
+}
+
+func TestParseRunDetailsInfn(t *testing.T) {
+	parsedData := ParseRunDetails(RunDetailsInfn)
 	if !reflect.DeepEqual(parsedData, RunDetails01Results) {
 		t.Log("\nGOT: ", parsedData, "\n Expected: ", RunDetails01Results)
 		t.Fail()

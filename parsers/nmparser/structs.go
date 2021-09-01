@@ -197,6 +197,7 @@ func NewRunDetails() RunDetails {
 		RunEnd:              DefaultString,
 		EstimationTime:      DefaultFloat64,
 		CovarianceTime:      DefaultFloat64,
+		CpuTime:             DefaultFloat64,
 		FunctionEvaluations: DefaultInt64,
 		SignificantDigits:   DefaultFloat64,
 		ProblemText:         DefaultString,
