@@ -37,7 +37,7 @@ var RunDetails01Results = RunDetails{
 	"Tue Dec 17 18:11:32 2013",
 	6.84,
 	3.34,
-	10.5, // this is made up, not for an actual run output
+	0, // not specified in test RunDetails01
 	352,
 	3.4,
 	"3.mod, double inital estimates",
@@ -47,8 +47,8 @@ var RunDetails01Results = RunDetails{
 	50,
 	442,
 	492,
-	[]string{"-999999999"},
-	[]string{""},
+	[]string{},
+	[]string{},
 }
 
 var RunDetails02 = "../../testdata/2.lst"
@@ -75,7 +75,6 @@ var RunDetails02Results = RunDetails{
 
 func TestParseRunDetails(t *testing.T) {
 	parsedData := ParseRunDetails(RunDetails01)
-	parsedData.OutputFilesUsed = []string{""}
 	if !reflect.DeepEqual(parsedData, RunDetails01Results) {
 		t.Log("\nGOT: ", parsedData, "\n Expected: ", RunDetails01Results)
 		t.Fail()
