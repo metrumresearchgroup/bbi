@@ -83,6 +83,9 @@ func ParseRunDetails(lines []string) RunDetails {
 			runDetails.NumberOfObs, _ = strconv.ParseInt(replaceTrim(line, "TOT. NO. OF OBS RECS:"), 10, 64)
 		case strings.Contains(line, "NO. OF DATA RECS IN DATA SET:"):
 			runDetails.NumberOfDataRecords, _ = strconv.ParseInt(replaceTrim(line, "NO. OF DATA RECS IN DATA SET:"), 10, 64)
+		// When using $INFN, the above line isn't present (see gh-227).
+		case strings.Contains(line, "TOT. NO. OF DATA RECS:") && runDetails.NumberOfDataRecords == DefaultInt64:
+			runDetails.NumberOfDataRecords, _ = strconv.ParseInt(replaceTrim(line, "TOT. NO. OF DATA RECS:"), 10, 64)
 		// This is not reliable because TABLE statements can span multiple lines
 		// TODO: support using multi-line feature, when available
 		// case strings.Contains(line, "$TABLE NOPRINT ONEHEADER FILE="):
