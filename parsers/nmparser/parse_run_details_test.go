@@ -37,7 +37,7 @@ var RunDetails01Results = RunDetails{
 	"Tue Dec 17 18:11:32 2013",
 	6.84,
 	3.34,
-	0, // not specified in test RunDetails01
+	DefaultFloat64, // not specified in test RunDetails01
 	352,
 	3.4,
 	"3.mod, double inital estimates",
