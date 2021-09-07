@@ -27,7 +27,8 @@ import (
 	"github.com/spf13/viper"
 )
 
-var arguments []string
+// TODO: remove arguments if we find no use
+var _ /*arguments*/ []string
 
 type localOperation struct {
 	Models []LocalModel `json:"models"`

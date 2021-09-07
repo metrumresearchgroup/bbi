@@ -27,7 +27,8 @@ func replaceTrim(line string, replacement string) string {
 	return strings.TrimSpace(strings.Replace(line, replacement, "", -1))
 }
 
-func parseValue(line string, value string) string {
+// TODO: remove parseValue if we find no use
+/* func parseValue(line string, value string) string {
 	tokens := strings.Fields(line)
 	for _, s := range tokens {
 		if strings.Contains(s, value) {
@@ -36,7 +37,7 @@ func parseValue(line string, value string) string {
 	}
 
 	return ""
-}
+} */
 
 func parseLine(line string, n int) string {
 	tokens := strings.Fields(line)

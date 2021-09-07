@@ -30,7 +30,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
-	flag "github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
 
@@ -41,7 +40,8 @@ var (
 
 var (
 	// name of config file.
-	cfgFile string
+	// TODO: remove cfgFile if we find no use
+	_ /*cfgFile*/ string
 	// verbose is whether to give verbose output.
 	verbose bool
 	debug   bool
@@ -102,14 +102,15 @@ func initConfig() {
 	}
 }
 
-func flagChanged(flags *flag.FlagSet, key string) bool {
+// TODO: remove flagChanged if we find no use
+/* func flagChanged(flags *flag.FlagSet, key string) bool {
 	flag := flags.Lookup(key)
 	if flag == nil {
 		return false
 	}
 
 	return flag.Changed
-}
+}*/
 
 // Assumes random has been set previously and seeded to avoid reproducible data sets
 // Here random is set during root.go setup.

@@ -29,7 +29,8 @@ import (
 )
 
 var (
-	summaryTree bool
+	// TODO: remove summaryTree if we find no use
+	_ /*summaryTree*/ bool
 	noExt       bool
 	noGrd       bool
 	noShk       bool

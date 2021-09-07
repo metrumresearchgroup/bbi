@@ -70,7 +70,8 @@ type nonmemParallelDirective struct {
 	WorkerNodes       int
 }
 
-var controlStreamExtensions []string = []string{
+// TODO: remove controlStreamExtensions if we find no use
+var _ /*controlStreamExtensions*/ []string = []string{
 	".mod", // PSN Style
 	".ctl", // Metrum Style
 }

@@ -5,7 +5,8 @@ import (
 	"testing"
 )
 
-func initResults() map[string]int {
+// TODO: remove initResults if we find no use
+/* func initResults() map[string]int {
 	var results01 = make(map[string]int)
 	results01["run001.clt"] = 1
 	results01["run001.coi"] = 1
@@ -21,7 +22,7 @@ func initResults() map[string]int {
 	results01["run001.xml"] = 1
 
 	return results01
-}
+} */
 
 func initFilenameKeys() []string {
 	return []string{

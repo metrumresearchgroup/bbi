@@ -17,7 +17,8 @@ import (
 	"github.com/spf13/viper"
 )
 
-var startingDirectory string
+// TODO: remove startingDirectory if we find no use
+// var startingDirectory string
 
 // RunCmd represents the run command.
 var initCmd = &cobra.Command{
