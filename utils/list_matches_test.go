@@ -1,6 +1,11 @@
 package utils
 
-import "testing"
+import (
+	"regexp"
+	"testing"
+
+	"github.com/gobwas/glob"
+)
 
 func TestListMatchesByRegex(t *testing.T) {
 	type input struct {
@@ -52,7 +57,11 @@ func TestListMatchesByRegex(t *testing.T) {
 	}
 
 	for i, d := range data {
-		res, _ := ListMatchesByRegex(d.input.Names, d.input.Regex)
+		glb, err := regexp.Compile(d.input.Regex)
+		if err != nil{
+			t.Fatalf("error in regex")
+		}
+		res := ListMatchesByRegex(d.input.Names, glb)
 		for j, expected := range res {
 			if d.expected[j] != expected {
 				t.Errorf("Test %d failed. Expected %s got %s", i, d.expected[j], expected)
@@ -111,7 +120,11 @@ func TestListMatchesByGlob(t *testing.T) {
 	}
 
 	for i, d := range data {
-		res, _ := ListMatchesByGlob(d.input.Names, d.input.Glob)
+		glb, err := glob.Compile(d.input.Glob)
+		if err != nil {
+			t.Fatalf("glob compile failed")
+		}
+		res := ListMatchesByGlob(d.input.Names, glb)
 		for j, expected := range res {
 			if d.expected[j] != expected {
 				t.Errorf("Test %d failed. Expected %s got %s", i, d.expected[j], expected)
