@@ -30,7 +30,8 @@ func EstimateModel(
 	fileName, _ := utils.FileAndExt(modelPath)
 	dir, _ := filepath.Abs(filepath.Dir(modelPath))
 
-	outputDirectoryName, err := processDirectoryTemplate(fileName, runSettings)
+	// TODO: solve ineffassign of err
+	outputDirectoryName, _ := processDirectoryTemplate(fileName, runSettings) // nolint:staticcheck
 
 	// Need to get the absolute path for the directory
 	outputDirectoryPath := filepath.Join(dir, outputDirectoryName)

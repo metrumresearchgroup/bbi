@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	"crypto/md5"
+	// TODO: use a better md5.
+	"crypto/md5" // nolint:gosec
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -512,7 +513,8 @@ func HashFileOnChannel(ch chan string, file string, identifier string) {
 	}
 	defer f.Close()
 
-	h := md5.New()
+	// TODO: find a better md5
+	h := md5.New() // nolint:gosec
 	if _, err := io.Copy(h, f); err != nil {
 		log.Errorf("%s error hashing data: %s", identifier, err)
 		ch <- ""

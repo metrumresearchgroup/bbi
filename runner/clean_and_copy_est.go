@@ -138,7 +138,7 @@ func CleanEstFolderAndCopyToParent(
 			} else {
 				_, err = copyInfoFile.Write(b)
 				if err != nil {
-					log.Println("couldn't write info file: %s", err)
+					log.Printf("couldn't write info file: %s\n", err)
 				}
 			}
 		}

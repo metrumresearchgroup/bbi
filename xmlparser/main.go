@@ -71,7 +71,8 @@ func getValue(m *mxj.Map, key string) string {
 		fmt.Println("err parsing: ", err)
 	}
 	for _, val := range value {
-		results = val.(string)
+		// TODO: fix val !ok
+		results, _ = val.(string)
 	}
 
 	return results
@@ -87,21 +88,18 @@ func getBlockValues(m *mxj.Map, key string) []blockValue {
 		return results
 	}
 	for _, val := range value {
-		omegaRows := val.(map[string]interface{})
+		// TODO: solve val !ok
+		omegaRows, _ := val.(map[string]interface{})
 		for _, omegaRow := range omegaRows {
-			vals, ok := omegaRow.([]interface{})
-			if !ok {
-				// TODO: solve omegaRow !ok
-			}
+			// TODO: solve omegaRow !ok
+			vals, _ := omegaRow.([]interface{})
 			for _, omegaVal := range vals {
-				rowVals, ok := omegaVal.(map[string]interface{})
-				if !ok {
-					// TODO: solve omegaVal !ok
-				}
+				// TODO: solve omegaVal !ok
+				rowVals, _ := omegaVal.(map[string]interface{})
 				colMap := rowVals["col"]
 				if rowVals["-rname"] == "1" || rowVals["-rname"] == "THETA1" {
-					colVals, ok := colMap.(map[string]interface{})
 					// TODO: solve colMap !ok
+					colVals, _ := colMap.(map[string]interface{})
 					results = append(results, blockValue{
 						Value: colVals["#text"].(string),
 						Row:   rowVals["-rname"].(string),
@@ -109,10 +107,8 @@ func getBlockValues(m *mxj.Map, key string) []blockValue {
 					})
 				} else {
 					for _, m := range colMap.([]interface{}) {
-						colVals, ok := m.(map[string]interface{})
-						if !ok {
-							// TODO: solve m !ok
-						}
+						// TODO: solve m !ok
+						colVals, _ := m.(map[string]interface{})
 						results = append(results, blockValue{
 							Value: colVals["#text"].(string),
 							Row:   rowVals["-rname"].(string),
@@ -141,15 +137,11 @@ func getThetas(m *mxj.Map, key string) []string {
 		for _, v := range val.(map[string]interface{}) {
 			// You'd probably want to process the value, as appropriate.
 			// Here we just print it out.
-			thetaVals, ok := v.([]interface{})
-			if !ok {
-				// TODO: solve thetaVals !ok
-			}
+			// TODO: solve thetaVals !ok
+			thetaVals, _ := v.([]interface{})
 			for _, tv := range thetaVals {
-				vals, ok := tv.(map[string]interface{})
-				if !ok {
-					// TODO: solve tv !ok
-				}
+				// TODO: solve tv !ok
+				vals, _ := tv.(map[string]interface{})
 				output = append(output, vals["#text"].(string))
 			}
 		}

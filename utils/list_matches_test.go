@@ -58,7 +58,7 @@ func TestListMatchesByRegex(t *testing.T) {
 
 	for i, d := range data {
 		glb, err := regexp.Compile(d.input.Regex)
-		if err != nil{
+		if err != nil {
 			t.Fatalf("error in regex")
 		}
 		res := ListMatchesByRegex(d.input.Names, glb)

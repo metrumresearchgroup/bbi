@@ -115,7 +115,8 @@ func initConfig() {
 // Assumes random has been set previously and seeded to avoid reproducible data sets
 // Here random is set during root.go setup.
 func randomFloat(min int, max int) float64 {
-	return float64(float64(min) + rand.Float64()*(float64(max)-float64(min)))
+	// TODO: explain purpose of this use of rand if it's cryptographic.
+	return float64(min) + rand.Float64()*(float64(max)-float64(min)) // nolint:gosec
 }
 
 func logSetup(config configlib.Config) {

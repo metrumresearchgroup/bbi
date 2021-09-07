@@ -279,7 +279,8 @@ func ExecutePostWorkDirectivesWithEnvironment(worker PostWorkExecutor) (string, 
 		"rendered": string(processedBytes),
 	}).Debug("Writing contents to file in output directory")
 
-	err = ioutil.WriteFile(filepath.Join(worker.GetWorkingPath(), "post_processing.sh"), processedBytes, 0755)
+	// TODO: use more secure permission of 0600 or less
+	err = ioutil.WriteFile(filepath.Join(worker.GetWorkingPath(), "post_processing.sh"), processedBytes, 0755) // nolint:gosec
 
 	if err != nil {
 		return "", err
