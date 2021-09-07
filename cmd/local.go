@@ -160,7 +160,7 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 	log.Debugf("%s Writing script to file", l.Nonmem.LogIdentifier())
 
 	//rwxr-x---
-	afero.WriteFile(fs, path.Join(l.Nonmem.OutputDir, l.Nonmem.FileName+".sh"), scriptContents, 0750) //TODO: Handle this error
+	errpanic(afero.WriteFile(fs, path.Join(l.Nonmem.OutputDir, l.Nonmem.FileName+".sh"), scriptContents, 0750)) //TODO: Handle this error
 
 	if l.Nonmem.Configuration.Parallel {
 		err = writeParaFile(l.Nonmem)
@@ -262,7 +262,7 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 		//Write to File in original path indicating what all was copied
 		copiedJSON, _ := json.MarshalIndent(copied, "", "    ")
 
-		afero.WriteFile(fs, path.Join(l.Nonmem.OriginalPath, l.Nonmem.FileName+"_copied.json"), copiedJSON, 0750)
+		errpanic(afero.WriteFile(fs, path.Join(l.Nonmem.OriginalPath, l.Nonmem.FileName+"_copied.json"), copiedJSON, 0750))
 	}
 
 	//Clean Up
@@ -286,7 +286,7 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 	}
 
 	//Gitignore operations
-	createNewGitIgnoreFile(l.Nonmem)
+	errpanic(createNewGitIgnoreFile(l.Nonmem))
 
 	// this should have been either completed well before, or must at least wait now to complete the hash
 	// before writing out the config
@@ -337,7 +337,7 @@ func init() {
 	childDirIdentifier := "create_child_dirs"
 	localCmd.PersistentFlags().Bool(childDirIdentifier, true, "Indicates whether or not local branch execution"+
 		"should create a new subdirectory with the output_dir variable as its name and execute in that directory")
-	viper.BindPFlag("local."+childDirIdentifier, localCmd.PersistentFlags().Lookup(childDirIdentifier))
+	errpanic(viper.BindPFlag("local."+childDirIdentifier, localCmd.PersistentFlags().Lookup(childDirIdentifier)))
 }
 
 func local(cmd *cobra.Command, args []string) {
@@ -409,7 +409,7 @@ func local(cmd *cobra.Command, args []string) {
 
 //WriteGitIgnoreFile takes a provided path and does best attempt work to write a "Exclude all" gitignore file in the location.
 func WriteGitIgnoreFile(filepath string) {
-	utils.WriteLines([]string{"*"}, path.Join(filepath, ".gitignore"))
+	errpanic(utils.WriteLines([]string{"*"}, path.Join(filepath, ".gitignore")))
 }
 
 func executeLocalJob(model *NonMemModel) turnstile.ConcurrentError {
@@ -419,7 +419,7 @@ func executeLocalJob(model *NonMemModel) turnstile.ConcurrentError {
 	log.Debugf("Output directory is currently set to %s", model.OutputDir)
 
 	scriptLocation := path.Join(model.OutputDir, model.FileName+".sh")
-	os.Chdir(model.OutputDir)
+	errpanic(os.Chdir(model.OutputDir))
 
 	log.Debugf("Script location is pegged at %s", scriptLocation)
 
@@ -445,7 +445,7 @@ func executeLocalJob(model *NonMemModel) turnstile.ConcurrentError {
 		return newConcurrentError(model.Model, "Running the programmatic shell script caused an error", err)
 	}
 
-	afero.WriteFile(fs, path.Join(model.OutputDir, model.Model+".out"), output, 0750)
+	errpanic(afero.WriteFile(fs, path.Join(model.OutputDir, model.Model+".out"), output, 0750))
 
 	return turnstile.ConcurrentError{}
 }
@@ -477,7 +477,7 @@ func createNewGitIgnoreFile(m *NonMemModel) error {
 	fs := afero.NewOsFs()
 	if ok, _ := afero.Exists(fs, path.Join(m.OutputDir, ".gitignore")); ok {
 		//If the gitignore file exists let's remove it
-		fs.Remove(path.Join(m.OutputDir, ".gitignore"))
+		errpanic(fs.Remove(path.Join(m.OutputDir, ".gitignore")))
 	}
 
 	//Force level one per initial discussions

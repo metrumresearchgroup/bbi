@@ -80,7 +80,7 @@ func initializer(cmd *cobra.Command, args []string) {
 	}
 
 	c := configlib.Config{}
-	viper.Unmarshal(&c)
+	errpanic(viper.Unmarshal(&c))
 
 	yamlString, err := yaml.Marshal(c)
 
@@ -89,7 +89,7 @@ func initializer(cmd *cobra.Command, args []string) {
 	}
 
 	// Write the byte array to file
-	afero.WriteFile(fs, "./bbi.yaml", yamlString, 0755)
+	errpanic(afero.WriteFile(fs, "./bbi.yaml", yamlString, 0755))
 }
 
 func init() {

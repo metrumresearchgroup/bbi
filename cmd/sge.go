@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"bbi/utils"
 	"bytes"
 	"errors"
 	"os/exec"
@@ -11,6 +10,8 @@ import (
 	"strings"
 	"text/template"
 	"time"
+
+	"bbi/utils"
 
 	log "github.com/sirupsen/logrus"
 
@@ -161,6 +162,11 @@ var sgeCMD = &cobra.Command{
 	Run:   sge,
 }
 
+func errpanic(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
 func init() {
 	runCmd.AddCommand(sgeCMD)
 
@@ -172,11 +178,11 @@ func init() {
 
 	//String Variables
 	sgeCMD.PersistentFlags().String("bbi_binary", bbi, "directory path for bbi to be called in goroutines (SGE Execution)")
-	viper.BindPFlag("bbi_binary", sgeCMD.PersistentFlags().Lookup("bbi_binary"))
+	errpanic(viper.BindPFlag("bbi_binary", sgeCMD.PersistentFlags().Lookup("bbi_binary")))
 
 	const gridNamePrefixIdentifier string = "grid_name_prefix"
 	sgeCMD.PersistentFlags().String(gridNamePrefixIdentifier, "", "Any prefix you wish to add to the name of jobs being submitted to the grid")
-	viper.BindPFlag(gridNamePrefixIdentifier, sgeCMD.PersistentFlags().Lookup(gridNamePrefixIdentifier))
+	errpanic(viper.BindPFlag(gridNamePrefixIdentifier, sgeCMD.PersistentFlags().Lookup(gridNamePrefixIdentifier)))
 }
 
 func sge(cmd *cobra.Command, args []string) {

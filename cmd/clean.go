@@ -143,12 +143,12 @@ func clean(cmd *cobra.Command, args []string) error {
 	}
 	if !filesOnly {
 		for _, f := range matchedFolders {
-			AppFs.RemoveAll(filepath.Join(dir, f))
+			errpanic(AppFs.RemoveAll(filepath.Join(dir, f)))
 		}
 	}
 	if !dirsOnly {
 		for _, f := range matchedFiles {
-			AppFs.Remove(filepath.Join(dir, f))
+			errpanic(AppFs.Remove(filepath.Join(dir, f)))
 		}
 	}
 

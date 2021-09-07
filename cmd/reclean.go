@@ -50,5 +50,5 @@ func init() {
 	nonmemCmd.AddCommand(recleanCmd)
 
 	recleanCmd.Flags().Int("recleanLvl", 0, "clean level to apply")
-	viper.BindPFlag("recleanLvl", recleanCmd.Flags().Lookup("recleanLvl"))
+	errpanic(viper.BindPFlag("recleanLvl", recleanCmd.Flags().Lookup("recleanLvl")))
 }
