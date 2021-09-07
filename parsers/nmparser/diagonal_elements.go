@@ -34,8 +34,8 @@ func lowerDiagonalLengthToDimension(l int) (int, bool) {
 	dim := int(math.Floor(math.Sqrt(2.0 * float64(l))))
 
 	// if not equal going back the other way then it's not a diagonal
-	check := (dim * (dim + 1)) / 2
-	if l != check {
+
+	if l != (dim * (dim + 1)) / 2 {
 		return 0, false
 	}
 

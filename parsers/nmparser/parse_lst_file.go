@@ -1,12 +1,13 @@
 package parser
 
 import (
-	"bbi/utils"
 	"fmt"
 	"math"
 	"sort"
 	"strconv"
 	"strings"
+
+	"bbi/utils"
 )
 
 func parseShrinkage(line string, shrinkageDetails ShrinkageDetails) ShrinkageDetails {
@@ -104,8 +105,7 @@ func getMatrixData(lines []string, start int) MatrixData {
 		}
 	}
 
-	dim := len(columns)
-	if dim > 0 {
+	if dim := len(columns); dim > 0 {
 		matrix = make([][]float64, dim)
 		for i := range matrix {
 			matrix[i] = make([]float64, dim)
@@ -336,7 +336,7 @@ func ParseLstEstimationFile(lines []string) SummaryOutput {
 
 	var finalParameterEst ParametersResult
 	var finalParameterStdErr ParametersResult
-	//var parameterNames ParameterNames
+	// var parameterNames ParameterNames
 
 	if standardErrorEstimateIndex > finalParameterEstimatesIndex {
 		finalParameterEst = ParseFinalParameterEstimatesFromLst(lines[finalParameterEstimatesIndex:standardErrorEstimateIndex])

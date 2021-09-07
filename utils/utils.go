@@ -158,8 +158,7 @@ func GetRealPath(fs afero.Fs, path string) (string, error) {
 // Code copied from Afero's path.go
 // if the filesystem is OsFs use Lstat, else use fs.Stat.
 func lstatIfOs(fs afero.Fs, path string) (info os.FileInfo, err error) {
-	_, ok := fs.(*afero.OsFs)
-	if ok {
+	if _, ok := fs.(*afero.OsFs); ok {
 		info, err = os.Lstat(path)
 	} else {
 		info, err = fs.Stat(path)

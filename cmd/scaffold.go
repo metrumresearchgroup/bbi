@@ -43,8 +43,6 @@ func scaffold(cmd *cobra.Command, args []string) error {
 		viper.Debug()
 	}
 
-	AppFs := afero.NewOsFs()
-
 	dir, _ := filepath.Abs(".")
 
 	if viper.GetString("cacheDir") != "" {
@@ -54,6 +52,8 @@ func scaffold(cmd *cobra.Command, args []string) error {
 
 			return nil
 		}
+
+		AppFs := afero.NewOsFs()
 
 		exists, err := afero.Exists(AppFs, cache)
 		if err != nil {
