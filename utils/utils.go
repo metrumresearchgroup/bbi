@@ -28,10 +28,10 @@ func ReplaceExtension(path string, newExt string) string {
 
 // Filename takes a path, strips out the extension,
 // and returns the name of the file.
-func Filename(in string) (name string) {
-	name, _ = FileAndExt(in)
+func Filename(in string) (string) {
+	name, _ := FileAndExt(in)
 
-	return
+	return name
 }
 
 // FileAndExt returns the filename and any extension of a file path as
@@ -65,17 +65,15 @@ func extractFilename(in, ext, base, pathSeparator string) (name string) {
 	// 4. any "base" consisting of just the current directory i.e. "."
 	// 5. any "base" consisting of just the parent directory i.e. ".."
 	if (strings.LastIndex(in, pathSeparator) == len(in)-1) || base == "" || base == "." || base == ".." || base == pathSeparator {
-		name = "" // there is NO filename
+		return "" // there is NO filename
 	} else if ext != "" { // there was an Extension
 		// return the filename minus the extension (and the ".")
-		name = base[:strings.LastIndex(base, ".")]
+		return base[:strings.LastIndex(base, ".")]
 	} else {
 		// no extension case so just return base, which willi
 		// be the filename
-		name = base
+		return base
 	}
-
-	return
 }
 
 // GetRelativePath returns the relative path of a given path.
@@ -159,12 +157,10 @@ func GetRealPath(fs afero.Fs, path string) (string, error) {
 // if the filesystem is OsFs use Lstat, else use fs.Stat.
 func lstatIfOs(fs afero.Fs, path string) (info os.FileInfo, err error) {
 	if _, ok := fs.(*afero.OsFs); ok {
-		info, err = os.Lstat(path)
+		return os.Lstat(path)
 	} else {
-		info, err = fs.Stat(path)
+		return fs.Stat(path)
 	}
-
-	return
 }
 
 // SafeWriteToDisk is the same as WriteToDisk
