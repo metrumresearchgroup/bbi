@@ -68,7 +68,7 @@ func run(cmd *cobra.Command, args []string) {
 }
 
 func init() {
-	//String Variables
+	// String Variables
 	// runCmd.PersistentFlags().String("cacheDir", "", "directory path for cache of nonmem executables for NM7.4+")
 	// viper.BindPFlag("cacheDir", runCmd.PersistentFlags().Lookup("cacheDir"))
 
@@ -82,7 +82,7 @@ func init() {
 	viper.BindPFlag("output_dir", runCmd.PersistentFlags().Lookup("output_dir"))
 	viper.SetDefault("output_dir", "{{ .Name }}")
 
-	//Int Variables
+	// Int Variables
 	runCmd.PersistentFlags().Int("clean_lvl", 1, "clean level used for file output from a given (set of) runs")
 	viper.BindPFlag("clean_lvl", runCmd.PersistentFlags().Lookup("clean_lvl"))
 	// TODO: these are likely not meangingful as should be set in configlib, but want to configm
@@ -96,7 +96,7 @@ func init() {
 	// viper.BindPFlag("gitignoreLvl", runCmd.PersistentFlags().Lookup("gitignoreLvl"))
 	// viper.SetDefault("gitignoreLvl", 1)
 
-	//Bool Variables
+	// Bool Variables
 	runCmd.PersistentFlags().Bool("git", false, "whether git is used")
 	viper.BindPFlag("git", runCmd.PersistentFlags().Lookup("git"))
 	viper.SetDefault("git", true)
@@ -133,7 +133,7 @@ func init() {
 }
 
 type PostWorkExecutor interface {
-	BuildExecutionEnvironment(completed bool, err error) //Sets the Struct content for the PostExecutionHookEnvironment
+	BuildExecutionEnvironment(completed bool, err error) // Sets the Struct content for the PostExecutionHookEnvironment
 	GetPostWorkConfig() *PostExecutionHookEnvironment
 	GetPostWorkExecutablePath() string
 	GetGlobalConfig() configlib.Config
@@ -180,7 +180,7 @@ func PostExecutionEnvironment(directive *PostExecutionHookEnvironment, additiona
 
 	executionEnvironment = append(executionEnvironment, errorEnvironment+"="+`"`+errorText+`"`)
 
-	//Add user provided values
+	// Add user provided values
 	executionEnvironment = append(executionEnvironment, additional...)
 
 	return executionEnvironment, nil
@@ -201,19 +201,11 @@ func PostWorkExecution(job PostWorkExecutor, filename string, channels *turnstil
 		executionChannel := make(chan executionStatus, 1)
 
 		go func() {
-			for {
-				select {
-				//Failure processing
-				case status := <-executionChannel:
-					if status.err != nil {
-						job.BuildExecutionEnvironment(false, status.err)
-					}
-
-					executionWaitGroup.Done()
-				default:
-					//
-				}
+			status := <-executionChannel
+			if status.err != nil {
+				job.BuildExecutionEnvironment(false, status.err)
 			}
+			executionWaitGroup.Done()
 		}()
 
 		go func() {
@@ -297,10 +289,10 @@ func ExecutePostWorkDirectivesWithEnvironment(worker PostWorkExecutor) (string, 
 		return "", err
 	}
 
-	//Needs to be the processed value, not the config template.
+	// Needs to be the processed value, not the config template.
 	cmd := exec.Command(filepath.Join(worker.GetWorkingPath(), "post_processing.sh"))
 
-	//Set the environment for the binary.
+	// Set the environment for the binary.
 	cmd.Env = environment
 
 	log.WithFields(log.Fields{

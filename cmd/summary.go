@@ -15,11 +15,12 @@
 package cmd
 
 import (
-	parser "bbi/parsers/nmparser"
 	"encoding/json"
 	"fmt"
 	"os"
 	"runtime"
+
+	parser "bbi/parsers/nmparser"
 
 	log "github.com/sirupsen/logrus"
 
@@ -78,8 +79,8 @@ func summary(cmd *cobra.Command, args []string) {
 	// As such, the idea will be to store results such they can be filtered
 	type result int
 	const (
-		SUCCESS result = 1
-		ERROR          = 2
+		SUCCESS result = iota + 1
+		ERROR
 	)
 	type modelResult struct {
 		Index   int
@@ -164,7 +165,7 @@ func summary(cmd *cobra.Command, args []string) {
 }
 func init() {
 	nonmemCmd.AddCommand(summaryCmd)
-	//Used for Summary
+	// Used for Summary
 	summaryCmd.PersistentFlags().BoolVar(&noExt, "no-ext-file", false, "do not use ext file")
 	summaryCmd.PersistentFlags().BoolVar(&noGrd, "no-grd-file", false, "do not use grd file")
 	summaryCmd.PersistentFlags().BoolVar(&noShk, "no-shk-file", false, "do not use shk file")
