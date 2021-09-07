@@ -30,6 +30,7 @@ linters-settings:
     excludes:
       - G204
 
+
 run:
   skip-dirs-use-default: true
   skip-dirs:
@@ -54,7 +55,6 @@ linters:
     - dupl
     - errorlint
     - exhaustive
-    - gochecknoinits
     - goimports
     - nlreturn
     - whitespace
