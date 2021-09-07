@@ -29,7 +29,7 @@ import (
 )
 
 var (
-	// TODO: remove summaryTree if we find no use
+	// TODO: remove summaryTree if we find no use.
 	_/*summaryTree*/ bool
 	noExt   bool
 	noGrd   bool

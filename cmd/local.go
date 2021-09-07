@@ -27,7 +27,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-// TODO: remove arguments if we find no use
+// TODO: remove arguments if we find no use.
 var _ /*arguments*/ []string
 
 type localOperation struct {

@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-// TODO: remove uglyString if we find no use
+// TODO: remove uglyString if we find no use...
 var _ = /*uglyString*/ []string{
 	"$THETA (0,2720) ; CL",
 	"$THETA(0,2650) ; V2",
@@ -16,7 +16,7 @@ var _ = /*uglyString*/ []string{
 	" 0.75 FIX ; allo-WT",
 }
 
-// TODO: remove ratThetaBlock02 if we find no use
+// TODO: remove ratThetaBlock02 if we find no use...
 var _ = /*rawThetaBlock02*/ []string{
 	"$THETA  (0,5) ; CL",
 	"(0,97.2) ; V",
@@ -29,7 +29,7 @@ var _ = /*rawThetaBlock02*/ []string{
 	"(-0.038,0.00231,1000000) ; CLCRCL2",
 }
 
-// TODO: remove rawThetaBlock02Cleaned if we find no use
+// TODO: remove rawThetaBlock02Cleaned if we find no use...
 var _ = /*rawThetaBlock02Cleaned*/ []string{
 	"(0,5) ; CL",
 	"(0,97.2) ; V",
