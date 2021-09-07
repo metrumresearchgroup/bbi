@@ -93,7 +93,7 @@ func SetupCacheForRun(
 
 	_, err = io.Copy(newFile, fileToCopy)
 	if err != nil {
-		return fmt.Errorf("error copying to new file: (%s)", err)
+		return fmt.Errorf("copying to new file: %w", err)
 	}
 	if debug {
 		log.Println("changing executable privileges for nonmem executable")

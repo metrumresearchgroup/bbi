@@ -1,6 +1,7 @@
 package configlib
 
 import (
+	"errors"
 	"os"
 	"path"
 	"path/filepath"
@@ -100,8 +101,9 @@ func LoadGlobalConfig(configFilename string) error {
 	viper.SetEnvPrefix("bbi")
 	err := viper.ReadInConfig()
 	if err != nil {
-		if _, ok := err.(viper.ConfigParseError); ok {
-			return err
+		var cpe viper.ConfigParseError
+		if errors.As(err, &cpe) {
+			return cpe
 		}
 		loadDefaultSettings() // still load default settings as don't need a config file
 

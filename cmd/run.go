@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"bbi/configlib"
 	"bytes"
+	"errors"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 	"text/template"
+
+	"bbi/configlib"
 
 	"github.com/metrumresearchgroup/turnstile"
 	log "github.com/sirupsen/logrus"
@@ -312,7 +314,8 @@ func ExecutePostWorkDirectivesWithEnvironment(worker PostWorkExecutor) (string, 
 	log.Debugf("Output from command was %s", string(outputBytes))
 
 	if err != nil {
-		if exitError, ok := err.(*exec.ExitError); ok {
+		var exitError *exec.ExitError
+		if errors.As(err, &exitError) {
 			code := exitError.ExitCode()
 			details := exitError.String()
 

@@ -29,14 +29,14 @@ func PrepareEstRun(fs afero.Fs, dir string, runName string, runDir string) (ModF
 	}
 	err := fs.MkdirAll(runDir, 0755)
 	if err != nil {
-		return ModFileInfo{}, fmt.Errorf("Error creating new subdir to execute, with err: %s", err)
+		return ModFileInfo{}, fmt.Errorf("creating new subdir to execute: %w", err)
 	}
 	fileLines, err := utils.ReadLinesFS(fs, filepath.Join(
 		dir,
 		runName,
 	))
 	if err != nil {
-		return ModFileInfo{}, fmt.Errorf("Error reading in model file, with err: %s", err)
+		return ModFileInfo{}, fmt.Errorf("reading in model file: %w", err)
 	}
 	mfi := ModFileInfo{parser.FindOutputFiles(fileLines)}
 	err = utils.WriteLinesFS(
@@ -48,7 +48,7 @@ func PrepareEstRun(fs afero.Fs, dir string, runName string, runDir string) (ModF
 		),
 	)
 	if err != nil {
-		return mfi, fmt.Errorf("Error copying file to new run dir, with err: %s", err)
+		return mfi, fmt.Errorf("copying file to new run dir: %w", err)
 	}
 
 	return mfi, nil

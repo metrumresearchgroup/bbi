@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"bbi/configlib"
 	"crypto/md5"
 	"encoding/json"
 	"errors"
@@ -12,6 +11,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"bbi/configlib"
 
 	log "github.com/sirupsen/logrus"
 
@@ -432,7 +433,9 @@ func executeLocalJob(model *NonMemModel) turnstile.ConcurrentError {
 
 	if err != nil && !strings.Contains(string(output), "not well-formed (invalid token)") {
 		log.Debug(err)
-		if exitError, ok := err.(*exec.ExitError); ok {
+
+		var exitError *exec.ExitError
+		if errors.As(err, &exitError) {
 			code := exitError.ExitCode()
 			details := exitError.String()
 

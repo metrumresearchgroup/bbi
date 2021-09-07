@@ -15,7 +15,6 @@
 package cmd
 
 import (
-	"bbi/configlib"
 	"fmt"
 	"io"
 	"math/rand"
@@ -24,6 +23,8 @@ import (
 	"path/filepath"
 	"sync"
 	"time"
+
+	"bbi/configlib"
 
 	"github.com/metrumresearchgroup/turnstile"
 	log "github.com/sirupsen/logrus"
@@ -96,9 +97,8 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	err := configlib.LoadGlobalConfig("bbi")
-	if err != nil {
-		fmt.Println(fmt.Errorf("err initializing config %s", err))
+	if err := configlib.LoadGlobalConfig("bbi"); err != nil {
+		log.Fatalf("initializing config %s", err.Error())
 	}
 }
 

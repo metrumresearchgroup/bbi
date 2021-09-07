@@ -92,7 +92,7 @@ func CleanEstFolderAndCopyToParent(
 			"temp_dir",
 		))
 		if err != nil {
-			return fmt.Errorf("could not remove temp_dir, %s", err)
+			return fmt.Errorf("removing temp dir: %w", err)
 		}
 	}
 
@@ -106,7 +106,7 @@ func CleanEstFolderAndCopyToParent(
 			)
 			fileToCopy, err := fs.Open(fileToCopyLocation)
 			if err != nil {
-				return fmt.Errorf("error copying file: (%s)", err)
+				return fmt.Errorf("copying file: %w", err)
 			}
 
 			newFileLocation := filepath.Join(
@@ -115,12 +115,12 @@ func CleanEstFolderAndCopyToParent(
 			)
 			newFile, err := fs.Create(newFileLocation)
 			if err != nil {
-				return fmt.Errorf("error creating new file: (%s)", err)
+				return fmt.Errorf("creating new file: %w", err)
 			}
 
 			_, err = io.Copy(newFile, fileToCopy)
 			if err != nil {
-				return fmt.Errorf("error copying to new file: (%s)", err)
+				return fmt.Errorf("copying to new file: %w", err)
 			}
 			fileToCopy.Close()
 			newFile.Close()
@@ -205,7 +205,7 @@ func CleanEstFolder(
 			"temp_dir",
 		))
 		if err != nil {
-			return fmt.Errorf("could not remove temp_dir, %s", err)
+			return fmt.Errorf("removing temp_dir, %w", err)
 		}
 	}
 
