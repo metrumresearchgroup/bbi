@@ -808,7 +808,7 @@ func nonmemModelsFromArguments(args []string, config configlib.Config) ([]NonMem
 	// regex for filename expansion check
 	var output []NonMemModel
 	AppFs := afero.NewOsFs()
-	r := regexp.MustCompile("(.*)?\\[(.*)\\](.*)?")
+	r := regexp.MustCompile(`(.*)?\[(.*)](.*)?`)
 
 	//Let's process our args into models
 	for _, arg := range args {

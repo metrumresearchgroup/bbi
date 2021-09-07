@@ -48,7 +48,7 @@ func scaffold(cmd *cobra.Command, args []string) error {
 	if viper.GetString("cacheDir") != "" {
 		cache := filepath.Clean(filepath.Join(dir, viper.GetString("cacheDir")))
 		if preview {
-			fmt.Println(fmt.Sprintf("would create cache dir at: %s", cache))
+			fmt.Printf("would create cache dir at: %s\n", cache)
 
 			return nil
 		}

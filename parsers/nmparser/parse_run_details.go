@@ -7,7 +7,7 @@ import (
 )
 
 func parseFinalTime(line string) float64 {
-	re := regexp.MustCompile("[-+]?([0-9]*\\.[0-9]+|[0-9]+)$")
+	re := regexp.MustCompile(`[-+]?([\d]*\.[\d]+|[\d]+)$`)
 	res, err := strconv.ParseFloat(re.FindString(line), 64)
 	if err != nil {
 		res = DefaultFloat64
@@ -17,7 +17,7 @@ func parseFinalTime(line string) float64 {
 }
 
 func parseNMVersion(line string) string {
-	re := regexp.MustCompile("[^\\s]+$")
+	re := regexp.MustCompile(`[^\s]+$`)
 	res := re.FindString(line)
 
 	return res

@@ -6,7 +6,7 @@ import "regexp"
 // in the lines provided.
 func FindOutputFiles(lines []string) []string {
 	files := []string{}
-	r, _ := regexp.Compile("FILE\\s?=\\s?(\\S+)")
+	r, _ := regexp.Compile(`FILE\s?=\s?(\S+)`)
 	for _, line := range lines {
 		match := r.FindStringSubmatch(line)
 		if len(match) > 0 {

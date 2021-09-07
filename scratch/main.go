@@ -25,6 +25,4 @@ func main() {
 	fmt.Println(time.Since(start))
 	pretty.Print(extData[len(extData)-1])
 	pretty.Print(pn)
-
-	return
 }

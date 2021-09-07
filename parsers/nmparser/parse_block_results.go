@@ -13,7 +13,7 @@ func ParseBlockResults(lines []string) []float64 {
 	}
 	var omegaLine string
 	var blockValues []float64
-	r := regexp.MustCompile("E[\\+|\\-]")
+	r := regexp.MustCompile(`E[+-]`)
 	for _, line := range lines {
 		if r.MatchString(line) || strings.Contains(line, ".........") {
 			// slice off the leading + from each line

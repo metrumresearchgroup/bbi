@@ -85,7 +85,7 @@ func CleanEstFolderAndCopyToParent(
 		keyOutputFiles[f] = copyLvl + 1
 	}
 	// handle temp_dir specially
-	lvl, _ := outputFiles["temp_dir"]
+	lvl := outputFiles["temp_dir"]
 	if cleanLvl >= lvl {
 		err := fs.RemoveAll(filepath.Join(
 			dirToClean,
@@ -142,7 +142,7 @@ func CleanEstFolderAndCopyToParent(
 		// handle cleaning
 		lvl, ok = outputFiles[file]
 		if debug {
-			fmt.Println(fmt.Sprintf("%v: %s --> lvl:  %v ok: %v", i, file, lvl, ok))
+			fmt.Printf("%v: %s --> lvl:  %v ok: %v\n", i, file, lvl, ok)
 		}
 		if ok && cleanLvl >= lvl {
 			err := fs.Remove(filepath.Join(
@@ -189,7 +189,7 @@ func CleanEstFolder(
 		log.Fatalf("could not get absolute path %s", dirPath)
 	}
 	if debug {
-		fmt.Println(fmt.Sprintf("cleaning folder for run: %v", runName))
+		fmt.Printf("cleaning folder for run: %v\n", runName)
 	}
 	for _, f := range keepFiles {
 		// make sure will be kept
@@ -197,7 +197,7 @@ func CleanEstFolder(
 	}
 
 	// handle temp_dir specially
-	lvl, _ := outputFiles["temp_dir"]
+	lvl := outputFiles["temp_dir"]
 
 	if cleanLvl >= lvl {
 		err := fs.RemoveAll(filepath.Join(
@@ -216,12 +216,12 @@ func CleanEstFolder(
 		// handle cleaning
 		lvl, ok := outputFiles[file]
 		if debug {
-			fmt.Println(fmt.Sprintf("%v: %s --> lvl:  %v ok: %v", i, file, lvl, ok))
+			fmt.Printf("%v: %s --> lvl:  %v ok: %v\n", i, file, lvl, ok)
 		}
 		if ok && cleanLvl >= lvl {
 			deletedFiles++
 			if preview {
-				fmt.Println(fmt.Sprintf("would delete: %s", file))
+				fmt.Printf("would delete: %s\n", file)
 			} else {
 				err := fs.Remove(filepath.Join(
 					dirPath,

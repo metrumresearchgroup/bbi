@@ -147,11 +147,7 @@ func isPathNonMemmy(path string) bool {
 	}
 
 	//If none of the located files are executable, this isn't a nonmem folder
-	if fails == len(located) {
-		return false
-	}
-
-	return true
+	return fails != len(located)
 }
 
 func findNonMemBinary(path string) (string, error) {

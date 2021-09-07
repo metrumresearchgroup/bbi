@@ -161,7 +161,7 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (Su
 func errorIfNotExists(fs afero.Fs, path string, sFlag string) error {
 	exists, err := utils.Exists(path, fs)
 	if err != nil {
-		panic(fmt.Sprintf("unknown error checking file existence %s\n", err))
+		panic(fmt.Sprintf("unknown error checking file existence: %s\n", err.Error()))
 	}
 	if !exists {
 		suppressionFlagMsg := "\n"
@@ -169,7 +169,7 @@ func errorIfNotExists(fs afero.Fs, path string, sFlag string) error {
 			suppressionFlagMsg = fmt.Sprintf("\nyou can suppress bbi searching for the file using %s\n", sFlag)
 		}
 
-		return errors.New(fmt.Sprintf("No file present at %s%s ", path, suppressionFlagMsg))
+		return fmt.Errorf("no file present at %s %s", path, suppressionFlagMsg)
 	}
 
 	return nil
