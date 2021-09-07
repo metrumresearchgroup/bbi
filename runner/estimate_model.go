@@ -2,6 +2,7 @@ package runner
 
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"path/filepath"
 	"text/template"
@@ -25,26 +26,28 @@ func EstimateModel(
 ) ReturnStatus {
 
 	modelFile := filepath.Base(modelPath)
-	//Renaming to fileName to be a bit more explicit
+	// Renaming to fileName to be a bit more explicit
 	fileName, _ := utils.FileAndExt(modelPath)
 	dir, _ := filepath.Abs(filepath.Dir(modelPath))
 
 	outputDirectoryName, err := processDirectoryTemplate(fileName, runSettings)
 
-	//Need to get the absolute path for the directory
+	// Need to get the absolute path for the directory
 	outputDirectoryPath := filepath.Join(dir, outputDirectoryName)
 
 	isDirectory, _ := afero.IsDir(fs, outputDirectoryPath)
 	isEmpty, _ := afero.IsEmpty(fs, outputDirectoryPath)
 
-	//The desired directory is present, but not empty.
+	// The desired directory is present, but not empty.
 	if isDirectory && !isEmpty {
 		if runSettings.Overwrite {
-			//Let's remove the entire friggin dir and its contents
+			// Let's remove the entire friggin dir and its contents
 			log.Print("Settings are configured to over write. Removing existing directory")
-			fs.RemoveAll(outputDirectoryPath)
+			if err := fs.RemoveAll(outputDirectoryPath); err != nil {
+				fmt.Printf("error calling removeAll: %s", err)
+			}
 		} else {
-			//Generate an error and bubble it up to the user
+			// Generate an error and bubble it up to the user
 			return ReturnStatus{
 				RunDir: outputDirectoryPath,
 				DidRun: false,
@@ -82,7 +85,9 @@ func EstimateModel(
 
 	if runSettings.Git {
 		// for now just add a gitignore to add everything in run output by default
-		utils.WriteLinesFS(fs, []string{"*"}, filepath.Join(dir, outputDirectoryPath, ".gitignore"))
+		if err = utils.WriteLinesFS(fs, []string{"*"}, filepath.Join(dir, outputDirectoryPath, ".gitignore")); err != nil {
+			fmt.Printf("error writing lines: %s", err)
+		}
 	}
 	// deal with cache maybe
 	noBuild := false
@@ -154,7 +159,7 @@ func EstimateModel(
 	}
 }
 
-//Processes the go template for the output directory and returns the processed string and any relative errors
+// Processes the go template for the output directory and returns the processed string and any relative errors
 // name: The name of the model from which the template will be derived.
 // r: The RunSettings struct containing the configurations from the run.
 func processDirectoryTemplate(name string, r RunSettings) (string, error) {

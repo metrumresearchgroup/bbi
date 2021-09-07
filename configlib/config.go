@@ -125,7 +125,10 @@ func loadDefaultSettings() {
 // SaveConfig takes the viper settings and writes them to a file in the original path.
 func SaveConfig(configpath string) {
 	if viper.GetBool("saveConfig") {
-		viper.WriteConfigAs(path.Join(configpath, "bbi.yaml"))
+		err := viper.WriteConfigAs(path.Join(configpath, "bbi.yaml"))
+		if err != nil {
+			log.Fatalf("got error writing config: %s", err)
+		}
 	}
 }
 

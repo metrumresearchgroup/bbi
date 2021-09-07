@@ -19,27 +19,27 @@ type TargetedFile struct {
 	Level int    `json:"level,omitempty"`
 }
 
-//PostWorkInstructions contains all hte details for whether any cleanup or copy actions should occur during the post work phase of the operation.
+// PostWorkInstructions contains all hte details for whether any cleanup or copy actions should occur during the post work phase of the operation.
 type PostWorkInstructions struct {
 	FilesToCopy  FileCopyInstruction
 	FilesToClean FileCleanInstruction
 }
 
-//FileCopyInstruction includes everything necessary to copy files back to the source directory.
+// FileCopyInstruction includes everything necessary to copy files back to the source directory.
 type FileCopyInstruction struct {
-	//The target directory where files will be copied into
+	// The target directory where files will be copied into
 	CopyTo string
-	//The source directory from which files will be copied
+	// The source directory from which files will be copied
 	CopyFrom string
-	//Slice of strings identifying files to be copied. Should be processed from clean level + any overrides
+	// Slice of strings identifying files to be copied. Should be processed from clean level + any overrides
 	FilesToCopy []TargetedFile
 }
 
-//FileCleanInstruction includes everything necessary to remove files for a designated model run.
+// FileCleanInstruction includes everything necessary to remove files for a designated model run.
 type FileCleanInstruction struct {
-	//Directory in which the files we will remove exist. Should correlate to template output for outputDir
+	// Directory in which the files we will remove exist. Should correlate to template output for outputDir
 	Location string
-	//Slice of strings representing filenames to be purged. Should correlate to clean level contents
+	// Slice of strings representing filenames to be purged. Should correlate to clean level contents
 	FilesToRemove []TargetedFile
 }
 
@@ -75,7 +75,7 @@ func CleanEstFolderAndCopyToParent(
 		dirToClean = filepath.Join(parentDir, dirToClean)
 	}
 
-	//We're literally forcably incrementing the cleanlvl / keep level to make sure they're not operated on?
+	// We're literally forcably incrementing the cleanlvl / keep level to make sure they're not operated on?
 	for _, f := range keepFiles {
 		// make sure will be kept
 		outputFiles[f] = cleanLvl + 1
@@ -136,7 +136,10 @@ func CleanEstFolderAndCopyToParent(
 			if err != nil {
 				log.Printf("error copying to new file: (%s)", err)
 			} else {
-				copyInfoFile.Write(b)
+				_, err = copyInfoFile.Write(b)
+				if err != nil {
+					log.Println("couldn't write info file: %s", err)
+				}
 			}
 		}
 		// handle cleaning
