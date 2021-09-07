@@ -601,7 +601,7 @@ func getCopiableFileList(file string, level int, filepath string) []string {
 }
 
 // Extrapolate extensions into string representations of filenames.
-func extrapolateCopyFilesFromExtensions(filename string, level int, filepath string) []string {
+func extrapolateCopyFilesFromExtensions(filename string, level int, _ /*filepath*/ string) []string {
 	var output []string
 	extensions := make(map[int][]string)
 
@@ -921,7 +921,7 @@ func (n NonMemModel) LogIdentifier() string {
 	return fmt.Sprintf("[%s]", n.FileName)
 }
 
-func createChildDirectories(l *NonMemModel, cancel chan bool, channels *turnstile.ChannelMap, sge bool) error {
+func createChildDirectories(l *NonMemModel, _ /*cancel*/ chan bool, channels *turnstile.ChannelMap, sge bool) error {
 	fs := afero.NewOsFs()
 	log.Debugf("%s Overwrite is currently set to %t", l.LogIdentifier(), viper.GetBool("debug"))
 	// Does output directory exist?

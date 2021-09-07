@@ -23,8 +23,10 @@ type IERandomEffect struct {
 	Fixed bool
 }
 
-func parseInitialThetas(lines []string) []IETheta {
-	// skip Lower Initial Upper bound deliniation line
+// TODO: this function appears to deliver a result of zero despite
+// its input.
+func parseInitialThetas(_ /*lines*/ []string) []IETheta {
+	// skip Lower Initial Upper bound delineation line
 
 	// strip any annotations
 	return []IETheta{IETheta{"0", "0", "0", true}}

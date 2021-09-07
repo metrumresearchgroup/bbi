@@ -96,7 +96,7 @@ type runSummary struct {
 	Summary parser.ModelInfo
 }
 
-func modSummaries(AppFs afero.Fs, files []string, dir string) []runSummary {
+func modSummaries(AppFs afero.Fs, files []string, _ /*dir*/ string) []runSummary {
 	var summaries []runSummary
 	for _, file := range files {
 		var rs runSummary

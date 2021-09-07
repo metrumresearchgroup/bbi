@@ -151,7 +151,7 @@ type PostExecutionHookEnvironment struct {
 	Error           error  `yaml:"error" json:"error,omitempty"`
 }
 
-func PostExecutionEnvironment(directive *PostExecutionHookEnvironment, additional []string) ([]string, error) {
+func PostExecutionEnvironment(directive *PostExecutionHookEnvironment, additional []string) []string {
 	environmentalPrefix := "BBI_"
 
 	pathEnvironment := environmentalPrefix + "MODEL_PATH"
@@ -183,10 +183,10 @@ func PostExecutionEnvironment(directive *PostExecutionHookEnvironment, additiona
 	// Add user provided values
 	executionEnvironment = append(executionEnvironment, additional...)
 
-	return executionEnvironment, nil
+	return executionEnvironment
 }
 
-func PostWorkExecution(job PostWorkExecutor, filename string, channels *turnstile.ChannelMap, cancel chan bool, successful bool, err error) {
+func PostWorkExecution(job PostWorkExecutor, _ /*filename*/ string, _ /*channels*/ *turnstile.ChannelMap, _ /*cancel*/ chan bool, successful bool, err error) {
 	config := job.GetGlobalConfig()
 	if config.PostWorkExecutable != "" {
 		log.Debug("Beginning execution of post work hooks")
@@ -233,7 +233,7 @@ func ExecutePostWorkDirectivesWithEnvironment(worker PostWorkExecutor) (string, 
 		"postWorkEnv":    postWorkEnv,
 	}).Debug("Collected details. Preparing to set environment")
 
-	environment, err := PostExecutionEnvironment(postworkConfig, postWorkEnv)
+	environment := PostExecutionEnvironment(postworkConfig, postWorkEnv)
 
 	environment = append(environment, os.Environ()...)
 
@@ -242,10 +242,6 @@ func ExecutePostWorkDirectivesWithEnvironment(worker PostWorkExecutor) (string, 
 	}).Debug("Environment prepared")
 
 	environmentToPersist := onlyBbiVariables(environment)
-
-	if err != nil {
-		return "", err
-	}
 
 	log.Debug("Beginning template operations")
 

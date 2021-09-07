@@ -64,7 +64,7 @@ func CleanEstFolderAndCopyToParent(
 	copyFiles []string,
 	cleanLvl int,
 	copyLvl int,
-	verbose bool,
+	_ /*verbose*/ bool,
 	debug bool,
 ) error {
 

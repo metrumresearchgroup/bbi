@@ -104,7 +104,7 @@ func summary(cmd *cobra.Command, args []string) {
 	var modelResults jsonResults
 
 	for w := 1; w <= workers; w++ {
-		go func(w int, modIndex <-chan int, results chan<- modelResult) {
+		go func(_ int, modIndex <-chan int, results chan<- modelResult) {
 			for i := range modIndex {
 				r, err := parser.GetModelOutput(args[i], parser.NewModelOutputFile(extFile, noExt), !noGrd, !noShk)
 				if err != nil {
