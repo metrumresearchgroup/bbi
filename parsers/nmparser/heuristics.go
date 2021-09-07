@@ -24,6 +24,7 @@ func (hs RunHeuristics) AnyTrue() bool {
 	if hs.MinimizationTerminated == true {
 		return true
 	}
+
 	return false
 }
 
@@ -50,5 +51,6 @@ func (hs RunHeuristics) ErrorStrings() []string {
 	if hs.MinimizationTerminated == true {
 		errors = append(errors, "Minimization Terminated")
 	}
+
 	return errors
 }

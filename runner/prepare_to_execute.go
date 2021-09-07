@@ -13,5 +13,6 @@ func PrepareForExecution(s []string) []string {
 			break
 		}
 	}
+
 	return s
 }

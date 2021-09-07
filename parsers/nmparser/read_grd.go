@@ -26,6 +26,7 @@ func ParseGrdLines(lines []string) ExtData {
 				if len(paramNames) == 0 {
 					paramNames = strings.Fields(line)
 				}
+
 				continue
 			}
 			estimationStep = append(estimationStep, strings.TrimSpace(line))
@@ -78,6 +79,7 @@ func ParseGrdData(ed ExtData) ([]ParametersData, ParameterNames) {
 		}
 		allParametersData = append(allParametersData, parametersData)
 	}
+
 	return allParametersData, ParameterNames{
 		Theta: thetas,
 	}
@@ -88,5 +90,6 @@ func HasZeroGradient(floats []float64) bool {
 	if utils.HasZero(floats) == true {
 		return true
 	}
+
 	return false
 }

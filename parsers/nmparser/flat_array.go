@@ -15,6 +15,7 @@ func MakeFlatArray(matrix [][]float64, length int) FlatArray {
 			k++
 		}
 	}
+
 	return FlatArray{
 		Values: values,
 		Dim:    length,

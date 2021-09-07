@@ -24,12 +24,14 @@ func CopyExeToCache(
 	ok, err := DirExists(fullCacheDirPath, fs)
 	if !ok || err != nil {
 		log.Printf("issue with cache directory at: %s, will not save executable to cache. ERR: %s, ok: %v", cacheDir, err, ok)
+
 		return err
 	}
 	//check that modelDir exists to copy nonmem executable into
 	ok, err = DirExists(fullModelDirPath, fs)
 	if !ok || err != nil {
 		log.Printf("issue with model directory at: %s, will not save executable to cache. ERR: %s, ok: %v", cacheDir, err, ok)
+
 		return err
 	}
 	// check nmNameInCache is in in cache
@@ -65,5 +67,6 @@ func CopyExeToCache(
 	if err != nil {
 		return fmt.Errorf("error copying to new file: (%s)", err)
 	}
+
 	return nil
 }

@@ -18,5 +18,6 @@ func ParseBlockStructure(lines []string) []int {
 		i, _ = strconv.Atoi(str)
 		iArr = append(iArr, i)
 	}
+
 	return iArr
 }

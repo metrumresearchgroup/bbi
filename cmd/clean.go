@@ -134,6 +134,7 @@ func clean(cmd *cobra.Command, args []string) error {
 	if preview {
 		fmt.Println("would clean files: ", matchedFiles)
 		fmt.Println("would clean folders: ", matchedFolders)
+
 		return nil
 	}
 	if !filesOnly {
@@ -146,6 +147,7 @@ func clean(cmd *cobra.Command, args []string) error {
 			AppFs.Remove(filepath.Join(dir, f))
 		}
 	}
+
 	return nil
 }
 
@@ -171,6 +173,7 @@ func getMatches(s []string, expr string, regex bool) ([]string, error) {
 			return nil, fmt.Errorf("error with glob (%s), err: (%s)", expr, err)
 		}
 	}
+
 	return matches, nil
 }
 

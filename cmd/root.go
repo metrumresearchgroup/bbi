@@ -107,6 +107,7 @@ func flagChanged(flags *flag.FlagSet, key string) bool {
 	if flag == nil {
 		return false
 	}
+
 	return flag.Changed
 }
 

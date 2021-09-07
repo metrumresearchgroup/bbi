@@ -22,6 +22,7 @@ func ListMatchesByRegex(names []string, regex string) (matches []string, err err
 			matches = append(matches, n)
 		}
 	}
+
 	return
 }
 
@@ -40,6 +41,7 @@ func ListNonMatchesByRegex(names []string, regex string) (nonmatches []string, e
 			nonmatches = append(nonmatches, n)
 		}
 	}
+
 	return
 }
 
@@ -58,6 +60,7 @@ func ListMatchesByGlob(names []string, gb string) (matches []string, err error) 
 			matches = append(matches, n)
 		}
 	}
+
 	return
 }
 
@@ -76,5 +79,6 @@ func ListNonMatchesByGlob(names []string, gb string) (nonmatches []string, err e
 			nonmatches = append(nonmatches, n)
 		}
 	}
+
 	return
 }

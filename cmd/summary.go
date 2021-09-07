@@ -68,6 +68,7 @@ func summary(cmd *cobra.Command, args []string) {
 		} else {
 			results.Summary()
 		}
+
 		return
 	}
 
@@ -140,6 +141,7 @@ func summary(cmd *cobra.Command, args []string) {
 	if Json {
 		jsonRes, _ := json.MarshalIndent(modelResults, "", "\t")
 		fmt.Printf("%s\n", jsonRes)
+
 		return
 	}
 

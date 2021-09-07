@@ -198,6 +198,7 @@ func Test_modelDataFile(t *testing.T) {
 			got, err := modelDataFile(tt.args.modelLines)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("modelDataFile() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
 			if got != tt.want {

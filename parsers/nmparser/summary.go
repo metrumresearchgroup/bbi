@@ -120,5 +120,6 @@ func (results SummaryOutput) Summary() bool {
 
 	thetaTable.Render()
 	omegaTable.Render()
+
 	return true
 }

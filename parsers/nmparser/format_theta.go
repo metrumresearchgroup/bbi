@@ -32,5 +32,6 @@ func FormatThetaBlock(lines []string) []string {
 		}
 		result = append(result, theta+comment)
 	}
+
 	return result
 }

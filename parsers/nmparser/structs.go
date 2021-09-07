@@ -210,6 +210,7 @@ func NewRunDetails() RunDetails {
 		OutputTables:        []string{},
 		OutputFilesUsed:     []string{},
 	}
+
 	return runDetails
 }
 
@@ -222,6 +223,7 @@ func NewOfvDetails(method string) OfvDetails {
 		ConstantToOFV:   DefaultFloat64,
 		OFVWithConstant: DefaultFloat64,
 	}
+
 	return ofvDetails
 }
 
@@ -231,6 +233,7 @@ func NewConditionNumDetails(method string, condNum float64) ConditionNumDetails 
 		EstMethod:       method,
 		ConditionNumber: condNum,
 	}
+
 	return conditionNumDetails
 }
 

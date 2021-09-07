@@ -16,6 +16,7 @@ func createDiagonalBlock(num int) []int {
 			}
 		}
 	}
+
 	return iArr
 }
 

@@ -44,6 +44,7 @@ func ReadParamsAndOutputFromExt(path string) ([]string, error) {
 	// explicitly handle line that's too long
 	if errors.Is(scanner.Err(), bufio.ErrTooLong) {
 		err = fmt.Errorf("Attempting to parse %s with ReadParamsAndOutputFromExt(): %w", path, scanner.Err())
+
 		return nil, err
 	}
 
@@ -52,8 +53,10 @@ func ReadParamsAndOutputFromExt(path string) ([]string, error) {
 		emptyFileMsg := fmt.Sprintf("A file exists at %s but it is empty.\n", path)
 		renameExtMsg := "If you sent NONMEM output to a different file you can use --ext-file=NEWFILE to specify the new file name.\n"
 		err = errors.New(emptyFileMsg + renameExtMsg)
+
 		return nil, err
 	}
+
 	return lines, nil
 }
 
@@ -70,6 +73,7 @@ func ReadLines(path string) ([]string, error) {
 	for scanner.Scan() {
 		lines = append(lines, scanner.Text())
 	}
+
 	return lines, nil
 }
 
@@ -86,6 +90,7 @@ func ReadLinesFS(fs afero.Fs, path string) ([]string, error) {
 	for scanner.Scan() {
 		lines = append(lines, scanner.Text())
 	}
+
 	return lines, nil
 }
 
@@ -101,6 +106,7 @@ func WriteLines(lines []string, path string) error {
 	for _, line := range lines {
 		fmt.Fprintln(w, line)
 	}
+
 	return w.Flush()
 }
 
@@ -116,6 +122,7 @@ func WriteLinesFS(fs afero.Fs, lines []string, path string) error {
 	for _, line := range lines {
 		fmt.Fprintln(w, line)
 	}
+
 	return w.Flush()
 }
 
@@ -126,5 +133,6 @@ func HasZero(floats []float64) bool {
 			return true
 		}
 	}
+
 	return false
 }

@@ -72,6 +72,7 @@ func EstimateModel(
 	extraFiles, err := PrepareEstRun(fs, dir, modelFile, outputDirectoryPath)
 	if err != nil {
 		log.Printf("error preparing estimation run: %s", err)
+
 		return ReturnStatus{
 			RunDir: outputDirectoryPath,
 			DidRun: false,
@@ -102,6 +103,7 @@ func EstimateModel(
 
 	if err != nil {
 		log.Printf("error during estimation run: %s", err)
+
 		return ReturnStatus{
 			RunDir: outputDirectoryPath,
 			DidRun: true,
@@ -136,6 +138,7 @@ func EstimateModel(
 	)
 	if err != nil {
 		log.Printf("error cleaning estimation run: %s", err)
+
 		return ReturnStatus{
 			RunDir: outputDirectoryPath,
 			DidRun: true,
@@ -145,6 +148,7 @@ func EstimateModel(
 	if verbose {
 		log.Println("done cleaning up!")
 	}
+
 	return ReturnStatus{
 		RunDir: outputDirectoryPath,
 		DidRun: true,

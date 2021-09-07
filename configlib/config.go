@@ -76,6 +76,7 @@ func (c Config) RenderYamlToFile(path string) error {
 
 	if err != nil {
 		log.Error("An error occurred serializing the config down to yaml")
+
 		return err
 	}
 
@@ -85,8 +86,10 @@ func (c Config) RenderYamlToFile(path string) error {
 
 	if err != nil {
 		log.Error("An error occurred trying to write the serialized config yaml to file")
+
 		return err
 	}
+
 	return nil
 }
 
@@ -102,10 +105,12 @@ func LoadGlobalConfig(configFilename string) error {
 			return err
 		}
 		loadDefaultSettings() // still load default settings as don't need a config file
+
 		return nil
 	}
 
 	loadDefaultSettings()
+
 	return nil
 }
 
@@ -158,6 +163,7 @@ func ReadSpecifiedFileIntoConfigStruct(config string) (Config, error) {
 
 	if err != nil {
 		log.Errorf("An error occurred trying to read the file %s into viper", config)
+
 		return returnConfig, err
 	}
 
@@ -165,6 +171,7 @@ func ReadSpecifiedFileIntoConfigStruct(config string) (Config, error) {
 
 	if err != nil {
 		log.Errorf("Unable to read file %s into viper!", config)
+
 		return returnConfig, err
 	}
 

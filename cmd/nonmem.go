@@ -832,12 +832,14 @@ func nonmemModelsFromArguments(args []string, config configlib.Config) ([]NonMem
 			isDir, err := utils.IsDir(arg, AppFs)
 			if err != nil || !isDir {
 				log.Errorf("issue handling %s, if this is a run please add the extension. Err: (%s)", arg, err)
+
 				continue
 			}
 			modelsInDir, err := utils.ListModels(arg, ".mod", AppFs)
 
 			if err != nil {
 				log.Errorf("issue getting models in dir %s, if this is a run please add the extension. Err: (%s)", arg, err)
+
 				continue
 			}
 
@@ -846,6 +848,7 @@ func nonmemModelsFromArguments(args []string, config configlib.Config) ([]NonMem
 
 			if err != nil {
 				log.Errorf("issue getting models in dir %s, if this is a run please add the extension. Err: (%s)", arg, err)
+
 				continue
 			}
 
@@ -951,6 +954,7 @@ func createChildDirectories(l *NonMemModel, cancel chan bool, channels *turnstil
 			} else {
 				//Or panic because we're in a scenario where we shouldn't purge, but there's content in the directory from previous runs
 				log.Debugf("%s Configuration for overwrite was %t, but %s had Nonmem outputs. As such, we will hault operations", l.LogIdentifier(), viper.GetBool("debug"), l.OutputDir)
+
 				return fmt.Errorf("The target directory, %s already exist, but we are configured not to overwrite. Invalid configuration / run state", l.OutputDir)
 			}
 		}

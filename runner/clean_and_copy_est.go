@@ -157,6 +157,7 @@ func CleanEstFolderAndCopyToParent(
 		}
 
 	}
+
 	return nil
 }
 
@@ -241,5 +242,6 @@ func CleanEstFolder(
 	if verbose {
 		log.Printf("number of files cleaned: %v", deletedFiles)
 	}
+
 	return nil
 }

@@ -94,6 +94,7 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 				p := &l
 				p.BuildExecutionEnvironment(false, reportedError)
 				RecordConcurrentError(p.Nonmem.FileName, "Invalid nonmem / nmqual configuration", reportedError, channels, p.Cancel, p)
+
 				return
 			}
 		}
@@ -127,6 +128,7 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 			p := &l //Use the pointer from here to manage value manipulations
 			p.BuildExecutionEnvironment(false, err)
 			RecordConcurrentError(p.Nonmem.FileName, err.Error(), err, channels, p.Cancel, p)
+
 			return
 		}
 	}
@@ -150,6 +152,7 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 			Error:         err,
 			Notes:         "An error occurred during the creation of the executable script for this model",
 		}
+
 		return
 	}
 
@@ -246,6 +249,7 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 
 		if err != nil {
 			log.Errorf("%s An error occurred while attempting to copy the files: File is %s", l.Nonmem.LogIdentifier(), v.File)
+
 			continue
 		}
 
@@ -300,6 +304,7 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 		p := &l
 		p.BuildExecutionEnvironment(false, err)
 		RecordConcurrentError(p.Nonmem.FileName, "An error occurred trying to write the config file to the directory", err, channels, p.Cancel, p)
+
 		return
 	}
 
@@ -438,6 +443,7 @@ func executeLocalJob(model *NonMemModel) turnstile.ConcurrentError {
 			log.Errorf("%s Exit code was %d, details were %s", model.LogIdentifier(), code, details)
 			log.Errorf("%s output details were: %s", model.LogIdentifier(), string(output))
 		}
+
 		return newConcurrentError(model.Model, "Running the programmatic shell script caused an error", err)
 
 	}

@@ -23,6 +23,7 @@ func parseCovLines(lines []string) ExtData {
 				if len(paramNames) == 0 {
 					paramNames = strings.Fields(line)
 				}
+
 				continue
 			}
 
@@ -75,5 +76,6 @@ func GetThetaValues(lines []string) []FlatArray {
 		thetas := MakeFlatArray(m, len(m))
 		result = append(result, thetas)
 	}
+
 	return result
 }

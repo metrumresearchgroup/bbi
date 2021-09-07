@@ -64,5 +64,6 @@ func ExpandSequence(seq string) ([]string, error) {
 			output = append(output, PadNum(i, padding))
 		}
 	}
+
 	return output, nil
 }

@@ -56,6 +56,7 @@ func probs(cmd *cobra.Command, args []string) error {
 		dirPath = args[0]
 	default:
 		fmt.Println("currently only supports scanning one directory")
+
 		return errors.New("project only supports specifying one directory")
 	}
 
@@ -81,6 +82,7 @@ func probs(cmd *cobra.Command, args []string) error {
 		}
 		probSummary(probSummaries)
 	}
+
 	return nil
 }
 func init() {
@@ -108,6 +110,7 @@ func modSummaries(AppFs afero.Fs, files []string, dir string) []runSummary {
 		}
 		summaries = append(summaries, rs)
 	}
+
 	return summaries
 }
 

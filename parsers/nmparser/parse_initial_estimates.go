@@ -44,6 +44,7 @@ func parseSimpleBlockStructure(lines []string) []IERandomEffect {
 	for i, val := range values {
 		results[i] = IERandomEffect{val, false}
 	}
+
 	return results
 }
 
@@ -80,5 +81,6 @@ func ParseInitialEstimates(lines []string) InitialEstimates {
 		parseInitialOmegas(lines[(initialOmegaIndex + 1):initialSigmaIndex]),
 		parseInitialSigmas(lines[(initialSigmaIndex + 1):]),
 	}
+
 	return result
 }

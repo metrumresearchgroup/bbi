@@ -45,6 +45,7 @@ func lowerDiagonalLengthToDimension(l int) (int, bool) {
 
 func IndexAndIsDiag(i int) (int, bool) {
 	res, isdiag := lowerDiagonalLengthToDimension(i + 1)
+
 	return res, isdiag
 }
 
@@ -71,6 +72,7 @@ func GetDiagonalIndices(el []int) []int {
 			diagElements = append(diagElements, index)
 		}
 	}
+
 	return diagElements
 }
 
@@ -88,5 +90,6 @@ func GetBlockParameterNames(name string, len int) []string {
 			}
 		}
 	}
+
 	return ret
 }

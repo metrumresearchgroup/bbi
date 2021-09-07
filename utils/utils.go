@@ -22,6 +22,7 @@ const FilePathSeparator = string(filepath.Separator)
 // and returns the path with the new extension.
 func ReplaceExtension(path string, newExt string) string {
 	f, _ := FileAndExt(path)
+
 	return f + "." + newExt
 }
 
@@ -29,6 +30,7 @@ func ReplaceExtension(path string, newExt string) string {
 // and returns the name of the file.
 func Filename(in string) (name string) {
 	name, _ = FileAndExt(in)
+
 	return
 }
 
@@ -73,6 +75,7 @@ func extractFilename(in, ext, base, pathSeparator string) (name string) {
 		// be the filename
 		name = base
 	}
+
 	return
 
 }
@@ -93,6 +96,7 @@ func GetRelativePath(path, base string) (final string, err error) {
 	if strings.HasSuffix(filepath.FromSlash(path), FilePathSeparator) && !strings.HasSuffix(name, FilePathSeparator) {
 		name += FilePathSeparator
 	}
+
 	return name, nil
 }
 
@@ -108,11 +112,13 @@ func ExtractRootPaths(paths []string) []string {
 		for _, section := range sections {
 			if section != "" {
 				root = section
+
 				break
 			}
 		}
 		r[i] = root
 	}
+
 	return r
 
 }
@@ -136,6 +142,7 @@ func getRealFileInfo(fs afero.Fs, path string) (os.FileInfo, string, error) {
 		}
 		realPath = link
 	}
+
 	return fileInfo, realPath, nil
 }
 
@@ -160,6 +167,7 @@ func lstatIfOs(fs afero.Fs, path string) (info os.FileInfo, err error) {
 	} else {
 		info, err = fs.Stat(path)
 	}
+
 	return
 }
 
@@ -222,6 +230,7 @@ func ListDirNames(fd []os.FileInfo) []string {
 			dirs = append(dirs, pDir.Name())
 		}
 	}
+
 	return dirs
 }
 
@@ -238,6 +247,7 @@ func ListFiles(fd []os.FileInfo) []string {
 			files = append(files, pFile.Name())
 		}
 	}
+
 	return files
 }
 
@@ -249,5 +259,6 @@ func AnyTrue(bools []bool) bool {
 			return true
 		}
 	}
+
 	return false
 }

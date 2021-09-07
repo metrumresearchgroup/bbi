@@ -28,8 +28,10 @@ type ParameterStructures struct {
 func parseParameterStructure(lines []string) []int {
 	if strings.Contains(lines[0], "SIMPLE") {
 		omegaLength, _ := strconv.Atoi(strings.TrimSpace(strings.SplitAfter(lines[0], ":")[1]))
+
 		return createDiagonalBlock(omegaLength)
 	}
+
 	return ParseBlockStructure(lines[1:])
 }
 
@@ -58,5 +60,6 @@ func ParseParameterStructures(lines []string) ParameterStructures {
 	}
 	omegaStructure := parseParameterStructure(lines[omegaFormStart:omegaFormEnd])
 	sigmaStructure := parseParameterStructure(lines[sigmaFormStart:sigmaFormEnd])
+
 	return ParameterStructures{thetaLength, omegaStructure, sigmaStructure}
 }

@@ -19,6 +19,7 @@ func ReadCopiedFiles(fs afero.Fs, run string) ([]TargetedFile, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return copiedFiles, nil
 
 }
@@ -34,6 +35,7 @@ func GetCopiedFilenames(fs afero.Fs, run string) ([]string, error) {
 	for _, file := range files {
 		fileStrings = append(fileStrings, file.File)
 	}
+
 	return fileStrings, nil
 
 }

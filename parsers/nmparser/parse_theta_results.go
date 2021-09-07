@@ -24,5 +24,6 @@ func ParseThetaResults(lines []string) []float64 {
 		}
 		thetaValues = append(thetaValues, parsedVal)
 	}
+
 	return thetaValues
 }

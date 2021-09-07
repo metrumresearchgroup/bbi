@@ -49,5 +49,6 @@ func PrepareEstRun(fs afero.Fs, dir string, runName string, runDir string) (ModF
 	if err != nil {
 		return mfi, fmt.Errorf("Error copying file to new run dir, with err: %s", err)
 	}
+
 	return mfi, nil
 }

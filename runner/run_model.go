@@ -28,6 +28,7 @@ func RunEstModel(fs afero.Fs,
 	ok, err := utils.DirExists(modelDir, fs)
 	if !ok || err != nil {
 		log.Printf("could not find directory to run model %s, ERR: %s, ok: %v", modelDir, err, ok)
+
 		return err
 	}
 	runNum, fileExt := utils.FileAndExt(runName)
@@ -96,13 +97,16 @@ func RunEstModel(fs afero.Fs,
 	err = cmd.Start()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Error starting Cmd", err)
+
 		return err
 	}
 
 	err = cmd.Wait()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Error attempting to run model, check the lst file in the run directory for more details", err)
+
 		return err
 	}
+
 	return nil
 }

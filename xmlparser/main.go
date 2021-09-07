@@ -73,6 +73,7 @@ func getValue(m *mxj.Map, key string) string {
 	for _, val := range value {
 		results = val.(string)
 	}
+
 	return results
 }
 func getBlockValues(m *mxj.Map, key string) []blockValue {
@@ -82,6 +83,7 @@ func getBlockValues(m *mxj.Map, key string) []blockValue {
 	// this could be different if multiple estimation steps run
 	if err != nil {
 		fmt.Println("error extracting values: ", err)
+
 		return results
 	}
 	for _, val := range value {
@@ -113,6 +115,7 @@ func getBlockValues(m *mxj.Map, key string) []blockValue {
 			}
 		}
 	}
+
 	return results
 }
 func getThetas(m *mxj.Map, key string) []string {
@@ -122,6 +125,7 @@ func getThetas(m *mxj.Map, key string) []string {
 	// this could be different if multiple estimation steps run
 	if err != nil {
 		fmt.Println("error extracting values: ", err)
+
 		return output
 	}
 	for _, val := range values {
@@ -135,6 +139,7 @@ func getThetas(m *mxj.Map, key string) []string {
 			}
 		}
 	}
+
 	return output
 
 }

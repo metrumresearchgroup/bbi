@@ -16,6 +16,7 @@ func ListFilesByExt(files []string, modExt string) []string {
 			matchFiles = append(matchFiles, file)
 		}
 	}
+
 	return matchFiles
 }
 
@@ -27,5 +28,6 @@ func ListModels(dirName string, modExt string, fs afero.Fs) ([]string, error) {
 	}
 	filesInDir := ListFiles(dirInfo)
 	modelFiles := ListFilesByExt(filesInDir, modExt)
+
 	return modelFiles, nil
 }

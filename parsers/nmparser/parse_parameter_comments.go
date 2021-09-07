@@ -11,6 +11,7 @@ func ParseThetaComments(lines []string) []string {
 	for i, line := range parsedLines {
 		result[i] = strings.TrimSpace(strings.Split(line, ";")[1])
 	}
+
 	return result
 }
 
@@ -38,6 +39,7 @@ func ParseParameterNames(lines []string) ParameterNames {
 			startSigmaIndex = i
 		}
 	}
+
 	return ParameterNames{
 		ParseThetaComments(lines[:startOmegaIndex]),
 		ParseOmegaComments(lines[startOmegaIndex:startSigmaIndex]),

@@ -546,6 +546,7 @@ func checkMatrix(matrix [][]float64, limit float64) bool {
 			}
 		}
 	}
+
 	return true
 }
 
@@ -561,6 +562,7 @@ func checkMatrix2(matrix [][]float64, limit float64) bool {
 			}
 		}
 	}
+
 	return true
 }
 

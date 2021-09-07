@@ -13,5 +13,6 @@ func CleanThetaBlock(lines []string) []string {
 		}
 		result = append(result, cleaned)
 	}
+
 	return result
 }

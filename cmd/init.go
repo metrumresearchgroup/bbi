@@ -63,6 +63,7 @@ func initializer(cmd *cobra.Command, args []string) {
 			nm, err := findNonMemBinary(v)
 			if err != nil {
 				log.Print(err)
+
 				continue
 			}
 

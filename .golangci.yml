@@ -1,0 +1,64 @@
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - gocyclo
+        - errcheck
+        - dupl
+        - gosec
+        - nlreturn
+
+linters-settings:
+  errcheck:
+    check-type-assertions: true
+  govet:
+    check-shadowing: true
+  unparam:
+    check-exported: true
+  unused:
+    check-exported: true
+  whitespace:
+    multi-if: true
+    multi-func: true
+  errorlint:
+    errorf: true
+  nakedret:
+    max-func-lines: 0
+  gosec:
+    excludes:
+      - G204
+
+run:
+  skip-dirs-use-default: true
+  skip-dirs:
+    - (^|/)mock($|/)
+  timeout: 3m
+
+linters:
+  enable:
+    - deadcode
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - structcheck
+    - typecheck
+    - unused
+    - varcheck
+    - gosec
+    - unparam
+    - unconvert
+    - dupl
+    - errorlint
+    - exhaustive
+    - gochecknoinits
+    - goimports
+    - nlreturn
+    - whitespace
+    - rowserrcheck
+    - godot
+    - ifshort
+    - nakedret

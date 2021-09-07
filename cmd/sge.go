@@ -88,6 +88,7 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 		p := &l
 		p.BuildExecutionEnvironment(false, err)
 		RecordConcurrentError(p.Nonmem.FileName, err.Error(), err, channels, p.Cancel, p)
+
 		return
 	}
 
@@ -98,6 +99,7 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 		p := &l
 		p.BuildExecutionEnvironment(false, err)
 		RecordConcurrentError(p.Nonmem.Model, "An error occurred during the creation of the executable script for this model", err, channels, p.Cancel, p)
+
 		return
 	}
 
@@ -124,6 +126,7 @@ func (l SGEModel) Work(channels *turnstile.ChannelMap) {
 		p := &l
 		p.BuildExecutionEnvironment(false, cerr.Error)
 		RecordConcurrentError(p.Nonmem.Model, cerr.Notes, cerr.Error, channels, p.Cancel, p)
+
 		return
 	}
 

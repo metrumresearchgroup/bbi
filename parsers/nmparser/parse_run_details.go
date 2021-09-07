@@ -12,12 +12,14 @@ func parseFinalTime(line string) float64 {
 	if err != nil {
 		res = DefaultFloat64
 	}
+
 	return res
 }
 
 func parseNMVersion(line string) string {
 	re := regexp.MustCompile("[^\\s]+$")
 	res := re.FindString(line)
+
 	return res
 }
 
@@ -32,6 +34,7 @@ func parseValue(line string, value string) string {
 			return replaceTrim(s, value)
 		}
 	}
+
 	return ""
 }
 
@@ -40,6 +43,7 @@ func parseLine(line string, n int) string {
 	if len(tokens) >= n {
 		return tokens[n]
 	}
+
 	return ""
 }
 

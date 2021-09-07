@@ -13,5 +13,6 @@ func FindOutputFiles(lines []string) []string {
 			files = append(files, match[1])
 		}
 	}
+
 	return files
 }

@@ -40,6 +40,7 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (Su
 	if extension != ".lst" && extension != ".res" {
 		err_msg := fmt.Sprintf("Must provide path to .lst (or .res) file for summary but provided '%s'", lstPath)
 		err_msg += "\nCan also pass no extension and summary will infer .lst extension."
+
 		return SummaryOutput{}, errors.New(err_msg)
 	}
 
@@ -153,6 +154,7 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (Su
 	results.RunHeuristics.PRDERR, _ = utils.Exists(filepath.Join(dir, "PRDERR"), AppFs)
 
 	setMissingValuesToDefault(&results, etaCount, epsCount)
+
 	return results, nil
 }
 
@@ -166,8 +168,10 @@ func errorIfNotExists(fs afero.Fs, path string, sFlag string) error {
 		if sFlag != "" {
 			suppressionFlagMsg = fmt.Sprintf("\nyou can suppress bbi searching for the file using %s\n", sFlag)
 		}
+
 		return errors.New(fmt.Sprintf("No file present at %s%s ", path, suppressionFlagMsg))
 	}
+
 	return nil
 }
 
@@ -205,5 +209,6 @@ func GetCovCorOutput(lstPath string) (CovCorOutput, error) {
 		CovarianceTheta:  covarianceTheta,
 		CorrelationTheta: correlationTheta,
 	}
+
 	return results, nil
 }

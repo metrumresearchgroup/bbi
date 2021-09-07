@@ -144,6 +144,7 @@ func EstOutputFilesByRun(r string) map[string]int {
 	for _, f := range fileExtsLvl3 {
 		EstOutputFiles[fmt.Sprintf("%s%s", r, f)] = 3
 	}
+
 	return EstOutputFiles
 }
 

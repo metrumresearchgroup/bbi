@@ -42,6 +42,7 @@ func reclean(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		fmt.Printf("err: %v", err)
 	}
+
 	return nil
 }
 func init() {

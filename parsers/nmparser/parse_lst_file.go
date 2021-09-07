@@ -46,6 +46,7 @@ func parseFloats(line, name string) []float64 {
 		}
 		floats = append(floats, fvalue)
 	}
+
 	return floats
 }
 
@@ -61,6 +62,7 @@ func getMatrixData(lines []string, start int) MatrixData {
 		sub := strings.TrimSpace(line)
 		if len(sub) == 0 {
 			start = start + i
+
 			break
 		}
 	}
@@ -70,6 +72,7 @@ func getMatrixData(lines []string, start int) MatrixData {
 		sub := strings.TrimSpace(line)
 		if len(sub) > 0 {
 			start = start + i
+
 			break
 		}
 	}
@@ -87,6 +90,7 @@ func getMatrixData(lines []string, start int) MatrixData {
 			start = start + i
 		} else {
 			start = start + 1
+
 			break
 		}
 	}
@@ -192,6 +196,7 @@ func getCorrelationStatus(lines []string, start int, correlationLimit float64) b
 func getThetaValues(lines []string, start int) FlatArray {
 	matrixData := getMatrixData(lines, start)
 	thetas := MakeFlatArray(matrixData.Values, matrixData.ThetaCount)
+
 	return thetas
 }
 
@@ -207,6 +212,7 @@ func transpose(slice [][]float64) [][]float64 {
 			result[i][j] = slice[j][i]
 		}
 	}
+
 	return result
 }
 
@@ -216,6 +222,7 @@ func contains(a []string, value string) bool {
 			return true
 		}
 	}
+
 	return false
 }
 
@@ -234,8 +241,10 @@ func parseGradient(lines []string) bool {
 			}
 			result[i] = n
 		}
+
 		return HasZeroGradient(result)
 	}
+
 	return false
 }
 
@@ -249,6 +258,7 @@ func getGradientLine(lines []string, start int) string {
 		}
 		sb.WriteString(line)
 	}
+
 	return sb.String()
 }
 
@@ -322,7 +332,7 @@ func ParseLstEstimationFile(lines []string) SummaryOutput {
 	runHeuristics.HasFinalZeroGradient = parseGradient(gradientLines)
 	runHeuristics.LargeConditionNumber = getLargeConditionNumber(allCondDetails)
 	for _, cd := range allCondDetails {
-		if (cd.ConditionNumber <= 0) && (cd.ConditionNumber != DefaultFloat64){
+		if (cd.ConditionNumber <= 0) && (cd.ConditionNumber != DefaultFloat64) {
 			runHeuristics.EigenvalueIssues = true
 		}
 	}
@@ -367,6 +377,7 @@ func ParseLstEstimationFile(lines []string) SummaryOutput {
 
 		ConditionNumber: allCondDetails,
 	}
+
 	return result
 }
 
@@ -399,6 +410,7 @@ func parseOFV(line string, allOfvDetails []OfvDetails) []OfvDetails {
 			strings.TrimSpace(strings.Replace(line, "OBJECTIVE FUNCTION VALUE WITH CONSTANT:", "", -1)),
 			64)
 	}
+
 	return allOfvDetails
 }
 
@@ -424,6 +436,7 @@ func mustCalculateConditionNumber(lines []string, start int) float64 {
 					two, err := strconv.Atoi(vals[1])
 					if err == nil && two == 2 {
 						start = start + i
+
 						break
 					}
 				}
@@ -436,6 +449,7 @@ func mustCalculateConditionNumber(lines []string, start int) float64 {
 		sub := strings.TrimSpace(line)
 		if len(sub) == 0 {
 			start = start + i + 1
+
 			break
 		}
 	}
@@ -468,6 +482,7 @@ func mustCalculateConditionNumber(lines []string, start int) float64 {
 	if eigenvalues[0] != 0 {
 		ratio = eigenvalues[len(eigenvalues)-1] / eigenvalues[0]
 	}
+
 	return ratio
 }
 
@@ -479,5 +494,6 @@ func getLargeConditionNumber(allCondDetails []ConditionNumDetails) bool {
 	for i, cn := range allCondDetails {
 		cb[i] = cn.ConditionNumber > largeNumberLimit
 	}
+
 	return utils.AnyTrue(cb)
 }

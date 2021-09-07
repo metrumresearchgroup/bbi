@@ -27,6 +27,7 @@ func AddPathLevelToData(s string) string {
 			strings.Join(dataComponents[2:], " "),
 		)
 	}
+
 	return strings.Join([]string{
 		"$DATA",
 		newPath,

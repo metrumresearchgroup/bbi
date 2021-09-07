@@ -41,5 +41,6 @@ func buildVersionString(version string) string {
 	if version == "" {
 		return "develop"
 	}
+
 	return version
 }

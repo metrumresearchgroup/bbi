@@ -27,6 +27,7 @@ func ParseFinalParameterEstimatesFromLst(lines []string) ParametersResult {
 	for n := sigmaStart; n < len(lines); n++ {
 		if strings.HasPrefix(lines[n], "1") {
 			sigmaEnd = n
+
 			break
 		}
 	}

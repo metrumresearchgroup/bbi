@@ -28,5 +28,6 @@ func ParseBlockResults(lines []string) []float64 {
 		}
 		blockValues = append(blockValues, parsedVal)
 	}
+
 	return blockValues
 }

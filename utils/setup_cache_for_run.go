@@ -43,12 +43,14 @@ func SetupCacheForRun(
 	ok, err := DirExists(fullCacheDirPath, fs)
 	if !ok || err != nil {
 		log.Printf("issue with cache directory at: %s, no precompiled model will be used. ERR: %s, ok: %v", cacheDir, err, ok)
+
 		return err
 	}
 	//check that modelDir exists to copy nonmem executable into
 	ok, err = DirExists(fullModelDirPath, fs)
 	if !ok || err != nil {
 		log.Printf("issue with model directory at: %s, no precompiled model will be used. ERR: %s, ok: %v", cacheDir, err, ok)
+
 		return err
 	}
 	// check nmNameInCache is in in cache
@@ -62,6 +64,7 @@ func SetupCacheForRun(
 	ok, err = Exists(fileToCopyLocation, fs)
 	if !ok || err != nil {
 		log.Printf("no cached model detected at: %s, skipping attempt to precompile", fileToCopyLocation)
+
 		return err
 	}
 
@@ -96,7 +99,9 @@ func SetupCacheForRun(
 	}
 	if err := os.Chmod(newFileLocation, 0777); err != nil {
 		log.Println("error changing permissions of executable after copying from cache")
+
 		return (err)
 	}
+
 	return nil
 }

@@ -87,5 +87,6 @@ func ParseModInfo(lines []string) (result ModelInfo, err error) {
 		Sim:     sim,
 		Tables:  tables,
 	}
+
 	return result, nil
 }

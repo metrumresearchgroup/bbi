@@ -19,6 +19,7 @@ func initResults() map[string]int {
 	results01["run001.shk"] = 1
 	results01["run001.shm"] = 1
 	results01["run001.xml"] = 1
+
 	return results01
 }
 

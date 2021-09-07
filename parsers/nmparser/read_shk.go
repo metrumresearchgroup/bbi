@@ -25,12 +25,14 @@ func ParseShkLines(lines []string) ExtData {
 				if len(paramNames) == 0 {
 					paramNames = strings.Fields(line)
 				}
+
 				continue
 			}
 			estimationStep = append(estimationStep, strings.TrimSpace(line))
 		}
 	}
 	estimationSteps = append(estimationSteps, estimationStep)
+
 	return ExtData{
 		EstimationMethods: estimationMethods,
 		ParameterNames:    paramNames,
@@ -45,6 +47,7 @@ func ParseShkData(extData ExtData, etaCount, epsCount int) [][]ShrinkageDetails 
 		shk := ParseShrinkage(lines, etaCount, epsCount)
 		shrinkageDetails = append(shrinkageDetails, shk)
 	}
+
 	return shrinkageDetails
 }
 
@@ -140,6 +143,7 @@ func ParseShrinkage(lines []string, etaCount, epsCount int) []ShrinkageDetails {
 			}
 		}
 	}
+
 	return shrinkageDetails
 }
 
@@ -149,5 +153,6 @@ func strToFloat(s string) float64 {
 	if err != nil {
 		f = DefaultFloat64
 	}
+
 	return f
 }
