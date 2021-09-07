@@ -41,7 +41,7 @@ func ParseGrdLines(lines []string) ExtData {
 	}
 }
 
-//ParseGrdData returns the ExtData in the structure of final parameter estimates
+//ParseGrdData returns the ExtData in the structure of final parameter estimates.
 func ParseGrdData(ed ExtData) ([]ParametersData, ParameterNames) {
 	var allParametersData []ParametersData
 	var thetas []string
@@ -85,7 +85,7 @@ func ParseGrdData(ed ExtData) ([]ParametersData, ParameterNames) {
 	}
 }
 
-// HasZeroGradient returns Status.True if any float in the slice is zero
+// HasZeroGradient returns Status.True if any float in the slice is zero.
 func HasZeroGradient(floats []float64) bool {
 	if utils.HasZero(floats) == true {
 		return true

@@ -70,7 +70,6 @@ type NMFEOptions struct {
 }
 
 func (c Config) RenderYamlToFile(path string) error {
-
 	fs := afero.NewOsFs()
 	yamlBytes, err := yaml.Marshal(c)
 
@@ -93,7 +92,7 @@ func (c Config) RenderYamlToFile(path string) error {
 	return nil
 }
 
-// LoadGlobalConfig loads nonmemutils configuration into the global Viper
+// LoadGlobalConfig loads nonmemutils configuration into the global Viper.
 func LoadGlobalConfig(configFilename string) error {
 	viper.SetConfigName(configFilename)
 	viper.SetConfigType("yaml")
@@ -121,7 +120,7 @@ func loadDefaultSettings() {
 	viper.SetDefault("threads", runtime.NumCPU())
 }
 
-//SaveConfig takes the viper settings and writes them to a file in the original path
+//SaveConfig takes the viper settings and writes them to a file in the original path.
 func SaveConfig(configpath string) {
 	if viper.GetBool("saveConfig") {
 		viper.WriteConfigAs(path.Join(configpath, "bbi.yaml"))
@@ -130,7 +129,6 @@ func SaveConfig(configpath string) {
 
 func WriteViperConfig(path string, sge bool, config Config) error {
 	if sge {
-
 		//Set the config to overwrite false and re-write config. This ensures that the local phase will not deal with io contention
 		//around the SGE output streams
 		log.Debug("Updating bbi config to overwrite=false. This avoids IO contention with the grid engine for the next execution round")
@@ -179,7 +177,6 @@ func ReadSpecifiedFileIntoConfigStruct(config string) (Config, error) {
 }
 
 func LocateAndReadConfigFile() (Config, error) {
-
 	var config Config
 
 	if len(viper.GetString("config")) == 0 {

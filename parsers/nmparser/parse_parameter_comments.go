@@ -4,7 +4,7 @@ import (
 	"strings"
 )
 
-// ParseThetaComments will parse out the names from theta parameters
+// ParseThetaComments will parse out the names from theta parameters.
 func ParseThetaComments(lines []string) []string {
 	parsedLines := FormatThetaBlock(CleanThetaBlock(lines))
 	var result = make([]string, len(parsedLines))
@@ -15,19 +15,19 @@ func ParseThetaComments(lines []string) []string {
 	return result
 }
 
-// ParseOmegaComments will parse out the omega comment names
+// ParseOmegaComments will parse out the omega comment names.
 func ParseOmegaComments(lines []string) []string {
 	// TODO: implement ParseOmegaCommentss
 	return make([]string, 0)
 }
 
-// ParseSigmaComments will parse out the Sigma comment names
+// ParseSigmaComments will parse out the Sigma comment names.
 func ParseSigmaComments(lines []string) []string {
 	// TODO: implement ParseSigmaCommentss
 	return make([]string, 0)
 }
 
-// ParseParameterNames parses the parameter names from the model information in the lst file
+// ParseParameterNames parses the parameter names from the model information in the lst file.
 func ParseParameterNames(lines []string) ParameterNames {
 	var startOmegaIndex int
 	var startSigmaIndex int

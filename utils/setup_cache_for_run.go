@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/afero"
 )
 
-// SetupCacheForRun copies over the cached nonmem executable from the cache to the run directory
+// SetupCacheForRun copies over the cached nonmem executable from the cache to the run directory.
 func SetupCacheForRun(
 	fs afero.Fs,
 	baseDir string,
@@ -20,6 +20,7 @@ func SetupCacheForRun(
 	nmNameInCache string,
 	debug bool,
 ) error {
+
 	var fullCacheDirPath string
 	var fullModelDirPath string
 	if filepath.IsAbs(cacheDir) {

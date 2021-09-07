@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	log "github.com/sirupsen/logrus"
 	"io"
 	"os/exec"
 	"path"
@@ -14,10 +13,13 @@ import (
 	"strings"
 	"time"
 
+	log "github.com/sirupsen/logrus"
+
 	"os"
 
 	"bbi/runner"
 	"bbi/utils"
+
 	"github.com/metrumresearchgroup/turnstile"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
@@ -30,7 +32,7 @@ type localOperation struct {
 	Models []LocalModel `json:"models"`
 }
 
-//LocalModel is the struct used for local operations containing the NonMemModel
+//LocalModel is the struct used for local operations containing the NonMemModel.
 type LocalModel struct {
 	Nonmem               *NonMemModel
 	Cancel               chan bool
@@ -66,7 +68,7 @@ func (l *LocalModel) GetWorkingPath() string {
 	return l.Nonmem.OutputDir
 }
 
-//Begin Scalable method definitions
+//Begin Scalable method definitions.
 func (l LocalModel) CancellationChannel() chan bool {
 	return l.Cancel
 }
@@ -80,7 +82,6 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 
 	//Check for invalid selected versions of Nonmem if NMQual selected
 	if l.Nonmem.Configuration.NMQual {
-
 		//Set parallelism to true
 		l.Nonmem.Configuration.Parallel = true
 		//TODO: What about the other parallel components?
@@ -138,7 +139,6 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 		log.Debugf("%s since we're in nmqual mode operationally, we're going to change the model from "+
 			"%s to %s ", l.Nonmem.LogIdentifier(), l.Nonmem.Model, l.Nonmem.FileName+".ctl")
 		l.Nonmem.Model = l.Nonmem.FileName + ".ctl"
-
 	}
 
 	//Create Execution Script
@@ -167,10 +167,9 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 			log.Fatalf("%s Configuration requires parallel operation, but generation or writing of the parafile has failed: %s", l.Nonmem.LogIdentifier(), err)
 		}
 	}
-
 }
 
-//Work describes the Turnstile execution phase -> IE What heavy lifting should be done
+//Work describes the Turnstile execution phase -> IE What heavy lifting should be done.
 func (l LocalModel) Work(channels *turnstile.ChannelMap) {
 	cerr := executeNonMemJob(executeLocalJob, l.Nonmem)
 
@@ -179,10 +178,9 @@ func (l LocalModel) Work(channels *turnstile.ChannelMap) {
 		p.BuildExecutionEnvironment(false, cerr.Error)
 		RecordConcurrentError(p.Nonmem.Model, cerr.Notes, cerr.Error, channels, p.Cancel, p)
 	}
-
 }
 
-//Monitor is unimplemented here. It's the 3rd phase of Turnstile execution
+//Monitor is unimplemented here. It's the 3rd phase of Turnstile execution.
 func (l LocalModel) Monitor(channels *turnstile.ChannelMap) {
 	//Do nothing for this implementation
 }
@@ -227,7 +225,6 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 
 	log.Debugf("%s Beginning selection of copiable files ", l.Nonmem.LogIdentifier())
 	for _, v := range pwi.FilesToCopy.FilesToCopy {
-
 		source, err := utils.ReadLines(path.Join(pwi.FilesToCopy.CopyFrom, v.File))
 
 		if err != nil {
@@ -326,7 +323,7 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 
 //End Scalable method definitions
 
-// runCmd represents the run command
+// runCmd represents the run command.
 var localCmd = &cobra.Command{
 	Use:   "local",
 	Short: "local specifies to run a (set of) models locally",
@@ -344,7 +341,6 @@ func init() {
 }
 
 func local(cmd *cobra.Command, args []string) {
-
 	config, err := configlib.LocateAndReadConfigFile()
 
 	if err != nil {
@@ -411,7 +407,7 @@ func local(cmd *cobra.Command, args []string) {
 	}
 }
 
-//WriteGitIgnoreFile takes a provided path and does best attempt work to write a "Exclude all" gitignore file in the location
+//WriteGitIgnoreFile takes a provided path and does best attempt work to write a "Exclude all" gitignore file in the location.
 func WriteGitIgnoreFile(filepath string) {
 	utils.WriteLines([]string{"*"}, path.Join(filepath, ".gitignore"))
 }
@@ -445,7 +441,6 @@ func executeLocalJob(model *NonMemModel) turnstile.ConcurrentError {
 		}
 
 		return newConcurrentError(model.Model, "Running the programmatic shell script caused an error", err)
-
 	}
 
 	afero.WriteFile(fs, path.Join(model.OutputDir, model.Model+".out"), output, 0750)

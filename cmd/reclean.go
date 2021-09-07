@@ -18,12 +18,13 @@ import (
 	"fmt"
 
 	"bbi/runner"
+
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-// cleanCmd represents the clean command
+// cleanCmd represents the clean command.
 var recleanCmd = &cobra.Command{
 	Use:   "reclean",
 	Short: "clean files in an estimation directory by clean level",
@@ -50,5 +51,4 @@ func init() {
 
 	recleanCmd.Flags().Int("recleanLvl", 0, "clean level to apply")
 	viper.BindPFlag("recleanLvl", recleanCmd.Flags().Lookup("recleanLvl"))
-
 }

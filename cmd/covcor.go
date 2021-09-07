@@ -18,6 +18,7 @@ import (
 	parser "bbi/parsers/nmparser"
 	"encoding/json"
 	"fmt"
+
 	log "github.com/sirupsen/logrus"
 
 	"github.com/spf13/cobra"
@@ -29,7 +30,7 @@ bbi nonmem covcor run001/run001
 bbi nonmem covcor run001/run001.cov
  `
 
-// runCmd represents the run command
+// runCmd represents the run command.
 var covcorCmd = &cobra.Command{
 	Use:   "covcor",
 	Short: "load .cov and .cor output from a model run",
@@ -49,7 +50,6 @@ func covcor(cmd *cobra.Command, args []string) {
 
 	jsonRes, _ := json.MarshalIndent(results, "", "\t")
 	fmt.Printf("%s\n", jsonRes)
-
 }
 func init() {
 	nonmemCmd.AddCommand(covcorCmd)

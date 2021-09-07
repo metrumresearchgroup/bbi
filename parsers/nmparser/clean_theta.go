@@ -2,7 +2,7 @@ package parser
 
 import "strings"
 
-// CleanThetaBlock will clean information from the theta block to prepare for additional parsingor reformating
+// CleanThetaBlock will clean information from the theta block to prepare for additional parsingor reformating.
 func CleanThetaBlock(lines []string) []string {
 	var result = make([]string, 0)
 	for _, line := range lines {

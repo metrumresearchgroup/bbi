@@ -106,6 +106,5 @@ func TestReadParseCovLines(t *testing.T) {
 			assert.Equal(t, -0.214341, fa.Values[9], "Fail :"+tt.context)
 			assert.Equal(t, 9, fa.Dim, "Fail :"+tt.context)
 		}
-
 	}
 }

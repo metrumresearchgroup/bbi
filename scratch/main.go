@@ -6,6 +6,7 @@ import (
 
 	parser "bbi/parsers/nmparser"
 	"bbi/utils"
+
 	"github.com/kr/pretty"
 	"github.com/mitchellh/go-homedir"
 )

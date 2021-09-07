@@ -43,7 +43,6 @@ var cleanedThetaBlock02Formatted = []string{
 }
 
 func TestFormattingThetaBlock(t *testing.T) {
-
 	formattedData := FormatThetaBlock(thetaSlice01)
 	for i, val := range formattedData {
 		if val != thetaSlice01Formatted[i] {
@@ -54,7 +53,6 @@ func TestFormattingThetaBlock(t *testing.T) {
 }
 
 func TestFormattingThetaBlock02(t *testing.T) {
-
 	formattedData := FormatThetaBlock(cleanedThetaBlock02)
 	for i, val := range formattedData {
 		if val != cleanedThetaBlock02Formatted[i] {

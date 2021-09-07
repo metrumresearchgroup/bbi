@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/afero"
 )
 
-// CopyExeToCache copies over the nonmem executable to the cache from the run directory
+// CopyExeToCache copies over the nonmem executable to the cache from the run directory.
 func CopyExeToCache(
 	fs afero.Fs,
 	modelDir string,

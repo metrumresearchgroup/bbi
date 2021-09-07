@@ -9,7 +9,7 @@ import (
 
 // ListMatchesByRegex returns all matches by a regex
 // as regexp.MustCompile panics if the regex does not compile, the function
-// is designed to recover and return an error immediately
+// is designed to recover and return an error immediately.
 func ListMatchesByRegex(names []string, regex string) (matches []string, err error) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -28,7 +28,7 @@ func ListMatchesByRegex(names []string, regex string) (matches []string, err err
 
 // ListNonMatchesByRegex returns all matches by a regex
 // as regexp.MustCompile panics if the regex does not compile, the function
-// is designed to recover and return an error immediately
+// is designed to recover and return an error immediately.
 func ListNonMatchesByRegex(names []string, regex string) (nonmatches []string, err error) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -47,7 +47,7 @@ func ListNonMatchesByRegex(names []string, regex string) (nonmatches []string, e
 
 // ListMatchesByGlob returns all matches by a glob
 // as glob.MustCompile panics if the glob does not compile, the function
-// is designed to recover and return an error immediately
+// is designed to recover and return an error immediately.
 func ListMatchesByGlob(names []string, gb string) (matches []string, err error) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -66,7 +66,7 @@ func ListMatchesByGlob(names []string, gb string) (matches []string, err error) 
 
 // ListNonMatchesByGlob returns all matches by a glob
 // as glob.MustCompile panics if the glob does not compile, the function
-// is designed to recover and return an error immediately
+// is designed to recover and return an error immediately.
 func ListNonMatchesByGlob(names []string, gb string) (nonmatches []string, err error) {
 	defer func() {
 		if r := recover(); r != nil {

@@ -1,7 +1,10 @@
 package utils
 
-import "testing"
-import "github.com/stretchr/testify/assert"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 func TestExpandSequence(t *testing.T) {
 	type test struct {

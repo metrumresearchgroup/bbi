@@ -7,10 +7,11 @@ import (
 
 	parser "bbi/parsers/nmparser"
 	"bbi/utils"
+
 	"github.com/spf13/afero"
 )
 
-// ModFileInfo stores information parsed from a model file such as declared files for use in other parts of the program
+// ModFileInfo stores information parsed from a model file such as declared files for use in other parts of the program.
 type ModFileInfo struct {
 	Files []string
 }
@@ -18,7 +19,7 @@ type ModFileInfo struct {
 // PrepareEstRun prepares the directories and files needed to execute a run in the correct subdirectory
 // dir is the directory the model file is current in
 // runName is the file name of the model
-// runDir is the name of the new subdirectory to be created
+// runDir is the name of the new subdirectory to be created.
 func PrepareEstRun(fs afero.Fs, dir string, runName string, runDir string) (ModFileInfo, error) {
 	if !filepath.IsAbs(runDir) {
 		runDir = filepath.Join(

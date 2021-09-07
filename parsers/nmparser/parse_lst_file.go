@@ -51,7 +51,6 @@ func parseFloats(line, name string) []float64 {
 }
 
 func getMatrixData(lines []string, start int) MatrixData {
-
 	var matrix [][]float64
 	var thetaCount int
 	var omegaCount int
@@ -115,7 +114,6 @@ func getMatrixData(lines []string, start int) MatrixData {
 		// (row values can span more than one line)
 		var rows []string
 		for _, line := range lines[start:] {
-
 			// skip blank line
 			clean := strings.TrimSpace(line)
 			if clean == "" {
@@ -171,7 +169,6 @@ func getMatrixData(lines []string, start int) MatrixData {
 }
 
 func getCorrelationStatus(lines []string, start int, correlationLimit float64) bool {
-
 	matrix := getMatrixData(lines, start).Values
 
 	if len(matrix) > 0 {
@@ -248,7 +245,7 @@ func parseGradient(lines []string) bool {
 	return false
 }
 
-// get gradient lines until a blank line is reached
+// get gradient lines until a blank line is reached.
 func getGradientLine(lines []string, start int) string {
 	var sb strings.Builder
 	sb.WriteString(lines[start])
@@ -262,7 +259,7 @@ func getGradientLine(lines []string, start int) string {
 	return sb.String()
 }
 
-// ParseLstEstimationFile parses the lst file
+// ParseLstEstimationFile parses the lst file.
 func ParseLstEstimationFile(lines []string) SummaryOutput {
 	runHeuristics := NewRunHeuristics()
 	var allOfvDetails []OfvDetails
@@ -424,7 +421,6 @@ func parseConditionNumberLst(lines []string, start int, allCondDetails []Conditi
 }
 
 func mustCalculateConditionNumber(lines []string, start int) float64 {
-
 	// go until line of ints
 	for i, line := range lines[start:] {
 		sub := strings.TrimSpace(line)

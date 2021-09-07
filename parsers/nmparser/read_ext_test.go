@@ -50,7 +50,6 @@ func TestReadExt(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-
 		ext := ParseExtLines(tt.lines)
 		assert.Equal(t, 2, len(ext.EstimationMethods), "Fail :"+tt.context)
 

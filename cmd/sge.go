@@ -4,7 +4,6 @@ import (
 	"bbi/utils"
 	"bytes"
 	"errors"
-	log "github.com/sirupsen/logrus"
 	"os/exec"
 	"path"
 	"path/filepath"
@@ -13,9 +12,12 @@ import (
 	"text/template"
 	"time"
 
+	log "github.com/sirupsen/logrus"
+
 	"os"
 
 	"bbi/configlib"
+
 	"github.com/metrumresearchgroup/turnstile"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
@@ -26,7 +28,7 @@ type sgeOperation struct {
 	Models []SGEModel `json:"models"`
 }
 
-//SGEModel is the struct used for SGE operations containing the NonMemModel
+//SGEModel is the struct used for SGE operations containing the NonMemModel.
 type SGEModel struct {
 	Nonmem               *NonMemModel
 	Cancel               chan bool
@@ -62,7 +64,7 @@ func (s *SGEModel) GetWorkingPath() string {
 	return s.Nonmem.OutputDir
 }
 
-//Begin Scalable method definitions
+//Begin Scalable method definitions.
 func (l SGEModel) CancellationChannel() chan bool {
 	return l.Cancel
 }
@@ -118,7 +120,7 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 	}
 }
 
-//Work describes the Turnstile execution phase -> IE What heavy lifting should be done
+//Work describes the Turnstile execution phase -> IE What heavy lifting should be done.
 func (l SGEModel) Work(channels *turnstile.ChannelMap) {
 	cerr := executeNonMemJob(executeSGEJob, l.Nonmem)
 
@@ -135,7 +137,7 @@ func (l SGEModel) Work(channels *turnstile.ChannelMap) {
 	channels.Completed <- 1
 }
 
-//Monitor is the 3rd phase of turnstile (not implemented here)
+//Monitor is the 3rd phase of turnstile (not implemented here).
 func (l SGEModel) Monitor(channels *turnstile.ChannelMap) {
 	//Do nothing for this implementation
 }
@@ -151,7 +153,7 @@ func (l SGEModel) Cleanup(channels *turnstile.ChannelMap) {
 
 //End Scalable method definitions
 
-// runCmd represents the run command
+// runCmd represents the run command.
 var sgeCMD = &cobra.Command{
 	Use:   "sge",
 	Short: "sge specifies to run a (set of) models on the Sun Grid Engine",
@@ -178,7 +180,6 @@ func init() {
 }
 
 func sge(cmd *cobra.Command, args []string) {
-
 	config, err := configlib.LocateAndReadConfigFile()
 	if err != nil {
 		log.Fatalf("Failed to process configuration: %s", err)
@@ -314,7 +315,6 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 	output, err := command.CombinedOutput()
 
 	if err != nil {
-
 		//Let's look to see if it's just because of the typical "No queues present" error
 		if !strings.Contains(string(output), "job is not allowed to run in any queue") {
 			//If the error doesn't appear to be the above error, we'll generate the concurrent error and move along
@@ -352,7 +352,6 @@ func sgeModelsFromArguments(args []string, config configlib.Config) ([]SGEModel,
 
 //Generate the command line script to execute bbi on the grid.
 func generateBbiScript(fileTemplate string, l NonMemModel) ([]byte, error) {
-
 	t, err := template.New("file").Parse(fileTemplate)
 	buf := new(bytes.Buffer)
 	if err != nil {

@@ -66,7 +66,7 @@ func getThetaMatrix(lines []string) [][]float64 {
 
 // GetThetaValues extracts the theta values from a file that has
 // thetas, such as cov/cor/ext data and returns the
-// data as a FlatArray
+// data as a FlatArray.
 func GetThetaValues(lines []string) []FlatArray {
 	var result []FlatArray
 	data := parseCovLines(lines)

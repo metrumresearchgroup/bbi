@@ -9,6 +9,7 @@ import (
 	"errors"
 
 	"bbi/utils"
+
 	"github.com/spf13/afero"
 )
 
@@ -16,7 +17,7 @@ import (
 // modelPath is the relative path of the model from where Estimate model is called from
 // cacheDir is the location of the cache dir, relative to the baseDir,
 //		for nonmem executable for version 7.4 for use in precompilation
-// exeNameInCache is the name of the nonmem executable in the cache dir
+// exeNameInCache is the name of the nonmem executable in the cache dir.
 func EstimateModel(
 	fs afero.Fs,
 	modelPath string,
@@ -38,7 +39,6 @@ func EstimateModel(
 
 	//The desired directory is present, but not empty.
 	if isDirectory && !isEmpty {
-
 		if runSettings.Overwrite {
 			//Let's remove the entire friggin dir and its contents
 			log.Print("Settings are configured to over write. Removing existing directory")

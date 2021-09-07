@@ -58,7 +58,6 @@ func ParseShrinkage(lines []string, etaCount, epsCount int) []ShrinkageDetails {
 		fields := strings.Fields(line)
 		length := len(fields)
 		if length > 0 {
-
 			subpop, err := strconv.Atoi(fields[1])
 			if err != nil {
 				panic("Error parsing shrinkage")

@@ -18,7 +18,7 @@ import (
 // would correspond to a lower triangular structure
 // 1
 // 0 2
-// 0 2 2
+// 0 2 2.
 type ParameterStructures struct {
 	Theta int
 	Omega []int
@@ -35,7 +35,7 @@ func parseParameterStructure(lines []string) []int {
 	return ParseBlockStructure(lines[1:])
 }
 
-// ParseParameterStructures parses the final estimates of model parameters from lst file
+// ParseParameterStructures parses the final estimates of model parameters from lst file.
 func ParseParameterStructures(lines []string) ParameterStructures {
 	var thetaLength int
 	var omegaFormStart int

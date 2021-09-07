@@ -17,12 +17,6 @@ package cmd
 import (
 	"bbi/configlib"
 	"fmt"
-	"github.com/metrumresearchgroup/turnstile"
-	log "github.com/sirupsen/logrus"
-	"github.com/spf13/afero"
-	"github.com/spf13/cobra"
-	flag "github.com/spf13/pflag"
-	"github.com/spf13/viper"
 	"io"
 	"math/rand"
 	"os"
@@ -30,27 +24,34 @@ import (
 	"path/filepath"
 	"sync"
 	"time"
+
+	"github.com/metrumresearchgroup/turnstile"
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/afero"
+	"github.com/spf13/cobra"
+	flag "github.com/spf13/pflag"
+	"github.com/spf13/viper"
 )
 
-// VERSION is the current bbi version
+// VERSION is the current bbi version.
 var (
 	VERSION string = "develop"
 )
 
 var (
-	// name of config file
+	// name of config file.
 	cfgFile string
-	// verbose is whether to give verbose output
+	// verbose is whether to give verbose output.
 	verbose bool
 	debug   bool
 	threads int
-	//Json indicates whether we should have a JSON tree of output
+	//Json indicates whether we should have a JSON tree of output.
 	Json               bool
 	preview            bool
 	executionWaitGroup sync.WaitGroup
 )
 
-// RootCmd represents the base command when called without any subcommands
+// RootCmd represents the base command when called without any subcommands.
 var RootCmd = &cobra.Command{
 	Use:   "bbi",
 	Short: "manage and execute models",
@@ -71,7 +72,6 @@ func Execute(build string) {
 }
 
 func init() {
-
 	//Set random for application
 	rand.Seed(time.Now().UnixNano())
 
@@ -112,7 +112,7 @@ func flagChanged(flags *flag.FlagSet, key string) bool {
 }
 
 //Assumes random has been set previously and seeded to avoid reproducible data sets
-//Here random is set during root.go setup
+//Here random is set during root.go setup.
 func randomFloat(min int, max int) float64 {
 	return float64(float64(min) + rand.Float64()*(float64(max)-float64(min)))
 }
@@ -169,7 +169,7 @@ func logSetup(config configlib.Config) {
 	}
 }
 
-//RecordConcurrentError handles the processing of cancellation messages as well placing concurrent errors onto the stack
+//RecordConcurrentError handles the processing of cancellation messages as well placing concurrent errors onto the stack.
 func RecordConcurrentError(model string, notes string, err error, channels *turnstile.ChannelMap, cancel chan bool, executor PostWorkExecutor) {
 	cancel <- true
 	channels.Errors <- newConcurrentError(model, notes, err)

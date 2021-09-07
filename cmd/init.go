@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"bbi/configlib"
+
 	"github.com/ghodss/yaml"
 
 	"github.com/spf13/afero"
@@ -17,7 +18,7 @@ import (
 
 var startingDirectory string
 
-// RunCmd represents the run command
+// RunCmd represents the run command.
 var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "Create configuration file with defaults",
@@ -27,7 +28,6 @@ var initCmd = &cobra.Command{
 }
 
 func initializer(cmd *cobra.Command, args []string) {
-
 	fs := afero.NewOsFs()
 
 	locations := []string{}
@@ -73,7 +73,6 @@ func initializer(cmd *cobra.Command, args []string) {
 			viper.Set("nonmem."+identifier+".executable", nm)
 			viper.Set("nonmem."+identifier+".home", v)
 			viper.Set("nonmem."+identifier+".nmqual", hasNMQual(v))
-
 		}
 	}
 
@@ -88,7 +87,6 @@ func initializer(cmd *cobra.Command, args []string) {
 
 	//Write the byte array to file
 	afero.WriteFile(fs, "./bbi.yaml", yamlString, 0755)
-
 }
 
 func init() {
@@ -96,12 +94,10 @@ func init() {
 
 	const directory string = "dir"
 	initCmd.Flags().StringSlice(directory, []string{}, "A directory in which to look for NonMem Installations")
-
 }
 
-//Evaluates if a specific directory path is nonmem-ish
+//Evaluates if a specific directory path is nonmem-ish.
 func isPathNonMemmy(path string) bool {
-
 	fs := afero.NewOsFs()
 
 	//1 Does it contain the expected directories

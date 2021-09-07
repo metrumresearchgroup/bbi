@@ -33,6 +33,7 @@ import (
 	parser "bbi/parsers/nmparser"
 	"bbi/runner"
 	"bbi/utils"
+
 	"github.com/metrumresearchgroup/turnstile"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
@@ -51,7 +52,7 @@ const nonMemExecutionTemplate string = `#!/bin/bash
 //Parse type 2 refers to evenly load balanced work
 //Transfer Type 1 refers to MPI
 //TIMEOUTI 100 means wait 100 seconds for node to become available
-//TIMEOUT 10 means wait 10 seconds for work to complete -> Should default to 10
+//TIMEOUT 10 means wait 10 seconds for work to complete -> Should default to 10.
 const nonmemParaFiletemplate string = `$GENERAL
 NODES={{ .TotalNodes }} PARSE_TYPE=2 TIMEOUTI=100 TIMEOUT={{ .CompletionTimeout }} PARAPRINT=0 TRANSFER_TYPE=1
 $COMMANDS
@@ -137,7 +138,7 @@ var parallelRegexesToRemove []string = []string{
 	"fort.[0-9]{1,}",
 }
 
-//NonMemModel is the definition of a model for NonMem including its target directories and settings required for execution
+//NonMemModel is the definition of a model for NonMem including its target directories and settings required for execution.
 type NonMemModel struct {
 	// BBIVersion is the bbi version used to execute the model
 	BBIVersion string `json:"bbi_version"`
@@ -169,7 +170,7 @@ type NonMemModel struct {
 
 var nonmemLongDescription string = fmt.Sprintf("\n%s\n\n%s\n\n%s\n", runLongDescription, summaryLongDescription, covcorLongDescription)
 
-// RunCmd represents the run command
+// RunCmd represents the run command.
 var nonmemCmd = &cobra.Command{
 	Use:   "nonmem",
 	Short: "nonmem a (set of) models locally or on the grid",
@@ -235,12 +236,10 @@ func init() {
 	const maxLimIdentifier string = "maxlim"
 	nonmemCmd.PersistentFlags().Int(maxLimIdentifier, 100, "RAW NMFE OPTION - Set the maximum values set for the buffers used by Nonmem")
 	viper.BindPFlag(nmfeGroup+"."+maxLimIdentifier, nonmemCmd.PersistentFlags().Lookup(maxLimIdentifier))
-
 }
 
-// "Copies" a file by reading its content (optionally updating the path)
+// "Copies" a file by reading its content (optionally updating the path).
 func copyFileToDestination(l *NonMemModel, modifyPath bool) error {
-
 	fs := afero.NewOsFs()
 
 	filename := l.Model
@@ -281,7 +280,6 @@ func copyFileToDestination(l *NonMemModel, modifyPath bool) error {
 		//Write the file contents
 		fileContents := strings.Join(sourceLines, "\n")
 		afero.WriteFile(fs, path.Join(l.OutputDir, filename), []byte(fileContents), stats.Mode())
-
 	} else {
 		input, err := ioutil.ReadFile(l.Path)
 		if err != nil {
@@ -297,7 +295,7 @@ func copyFileToDestination(l *NonMemModel, modifyPath bool) error {
 	return nil
 }
 
-//processes any template (including the const one here) to create a byte slice of the entire file
+//processes any template (including the const one here) to create a byte slice of the entire file.
 func generateScript(fileTemplate string, l *NonMemModel) ([]byte, error) {
 	log.Debugf("%s beginning script command generation. NMQual is set to %t", l.LogIdentifier(), l.Configuration.NMQual)
 	t, err := template.New("file").Parse(fileTemplate)
@@ -335,7 +333,6 @@ func generateScript(fileTemplate string, l *NonMemModel) ([]byte, error) {
 }
 
 func writeParaFile(l *NonMemModel) error {
-
 	contentBytes, err := generateParaFile(l)
 
 	log.Debugf("Parafile used has contents of : %s", string(contentBytes))
@@ -358,7 +355,6 @@ func writeParaFile(l *NonMemModel) error {
 	}
 
 	return utils.WriteLines(contentLines, path.Join(l.OutputDir, l.FileName+".pnm"))
-
 }
 
 func generateParaFile(l *NonMemModel) ([]byte, error) {
@@ -389,7 +385,6 @@ func generateParaFile(l *NonMemModel) ([]byte, error) {
 }
 
 func buildNonMemCommandString(l *NonMemModel) string {
-
 	var nmHome string
 	var nmBinary string
 
@@ -463,7 +458,7 @@ func buildAutologCommandString(l *NonMemModel) string {
 //modelName is the full file + ext representation of the model (ie acop.mod)
 //directory is the directory in which we will be performing cleanup
 //exceptions is a variadic input for allowing exceptions / overrides.
-//We're taking a local model because grid engine execution doesn't wait for completion. Nothing to do :)
+//We're taking a local model because grid engine execution doesn't wait for completion. Nothing to do :).
 func filesToCleanup(model *NonMemModel, exceptions ...string) runner.FileCleanInstruction {
 	fci := runner.FileCleanInstruction{
 		Location: model.OutputDir,
@@ -481,7 +476,6 @@ func filesToCleanup(model *NonMemModel, exceptions ...string) runner.FileCleanIn
 	if model.Configuration.Parallel {
 		fs := afero.NewOsFs()
 		for _, variant := range parallelRegexesToRemove {
-
 			r := regexp.MustCompile(variant)
 
 			files, err := afero.ReadDir(fs, model.OutputDir)
@@ -502,7 +496,6 @@ func filesToCleanup(model *NonMemModel, exceptions ...string) runner.FileCleanIn
 }
 
 func isFilenameInExceptions(haystack []string, needle string) bool {
-
 	for _, v := range haystack {
 		if v == needle {
 			return true
@@ -540,7 +533,7 @@ func filesToCopy(model *NonMemModel, mandatoryFiles ...string) runner.FileCopyIn
 	return fci
 }
 
-//Get only te list of files to clean. Separated because of logic requirements
+//Get only te list of files to clean. Separated because of logic requirements.
 func getCleanableFileList(file string, level int) []string {
 	var output []string
 	files := make(map[int][]string)
@@ -658,7 +651,6 @@ func extrapolateCopyFilesFromExtensions(filename string, level int, filepath str
 }
 
 func newPostWorkInstruction(model *NonMemModel, cleanupExclusions []string, mandatoryCopyFiles []string) runner.PostWorkInstructions {
-
 	return runner.PostWorkInstructions{
 		FilesToCopy:  filesToCopy(model, mandatoryCopyFiles...),
 		FilesToClean: filesToCleanup(model, cleanupExclusions...),
@@ -666,7 +658,6 @@ func newPostWorkInstruction(model *NonMemModel, cleanupExclusions []string, mand
 }
 
 func postWorkNotice(m *turnstile.Manager, t time.Time) {
-
 	//Wait for any post execution processes to finish
 	log.Info("Waiting for any post execution hooks to finish")
 	executionWaitGroup.Wait()
@@ -684,9 +675,8 @@ func postWorkNotice(m *turnstile.Manager, t time.Time) {
 	println("")
 }
 
-//NewNonMemModel creates the core nonmem dataset from the passed arguments
+//NewNonMemModel creates the core nonmem dataset from the passed arguments.
 func NewNonMemModel(modelname string, config configlib.Config) (NonMemModel, error) {
-
 	modelLines, err := utils.ReadLines(modelname)
 
 	if err != nil {
@@ -822,7 +812,6 @@ func nonmemModelsFromArguments(args []string, config configlib.Config) ([]NonMem
 
 	//Let's process our args into models
 	for _, arg := range args {
-
 		// check if arg is a file or Dir
 		// dirty check for if doesn't have an extension is a folder
 		_, ext := utils.FileAndExt(arg)
@@ -871,7 +860,6 @@ func nonmemModelsFromArguments(args []string, config configlib.Config) ([]NonMem
 				}
 				output = append(output, model)
 			}
-
 		} else {
 			// figure out if need to do expansion, or run as-is
 			if len(r.FindAllStringSubmatch(arg, 1)) > 0 {

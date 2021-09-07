@@ -22,6 +22,7 @@ import (
 
 	"bbi/runner"
 	"bbi/utils"
+
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -35,7 +36,7 @@ var (
 	regex      bool
 )
 
-// cleanCmd represents the clean command
+// cleanCmd represents the clean command.
 var cleanCmd = &cobra.Command{
 	Use:   "clean",
 	Short: "clean files and folders",

@@ -1,7 +1,7 @@
 package parser
 
 // MakeFlatArray creates a flat array from a matrix-style
-// input of rows and columns
+// input of rows and columns.
 func MakeFlatArray(matrix [][]float64, length int) FlatArray {
 	if length > len(matrix) {
 		panic("error making FlatArray")

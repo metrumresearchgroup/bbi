@@ -1,7 +1,7 @@
 package runner
 
 // RunSettings is a struct that contains settings about run information
-// passed in from config variables or flags
+// passed in from config variables or flags.
 type RunSettings struct {
 	Git                bool   `json:"git,omitempty"`
 	SaveExe            string `json:"save_exe,omitempty"`
@@ -17,7 +17,7 @@ type RunSettings struct {
 	Overwrite          bool   `json:"overwrite,omitempty"`
 }
 
-// ReturnStatus gives information about the result of a model run
+// ReturnStatus gives information about the result of a model run.
 type ReturnStatus struct {
 	RunDir string `json:"run_dir,omitempty"`
 	DidRun bool   `json:"did_run,omitempty"`
@@ -26,7 +26,7 @@ type ReturnStatus struct {
 
 //NextDirSuggestion provides a struct for the recommended next
 // directory name, and whether there should be a project reorganization
-// based on directory modifications, and whether this will be the first dir in the sequence
+// based on directory modifications, and whether this will be the first dir in the sequence.
 type NextDirSuggestion struct {
 	NextDirName string `json:"next_dir_name,omitempty"`
 	Reorg       bool   `json:"reorg,omitempty"`

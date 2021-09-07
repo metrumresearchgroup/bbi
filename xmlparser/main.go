@@ -110,7 +110,6 @@ func getBlockValues(m *mxj.Map, key string) []blockValue {
 						})
 						//fmt.Println(i, m["-cname"], m["#text"])
 					}
-
 				}
 			}
 		}
@@ -141,5 +140,4 @@ func getThetas(m *mxj.Map, key string) []string {
 	}
 
 	return output
-
 }

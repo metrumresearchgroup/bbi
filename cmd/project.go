@@ -27,12 +27,13 @@ import (
 
 	parser "bbi/parsers/nmparser"
 	"bbi/utils"
+
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-// probsCmd represents the command to get information about a given modeling project
+// probsCmd represents the command to get information about a given modeling project.
 var probsCmd = &cobra.Command{
 	Use:   "probs",
 	Short: "summarize information about project",
@@ -119,9 +120,8 @@ type modelSummary struct {
 	Prob      string
 }
 
-// probSummary prints the problem statements from each model
+// probSummary prints the problem statements from each model.
 func probSummary(mp []modelSummary) {
-
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetAlignment(tablewriter.ALIGN_LEFT)
 	table.SetColWidth(100)

@@ -73,7 +73,6 @@ func TestGetDiagonalIndices2(t *testing.T) {
 		},
 	}
 	for _, tst := range tests {
-
 		//	input := make([]int, tst.input)
 		var input []int
 		for i := 1; i <= tst.input; i++ {
@@ -86,7 +85,6 @@ func TestGetDiagonalIndices2(t *testing.T) {
 }
 
 func TestGetBlockParameterNames(t *testing.T) {
-
 	tests := []struct {
 		name     string
 		length   int

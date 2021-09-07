@@ -87,7 +87,6 @@ func TestReadParseShkLines(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-
 		ed := ParseShkLines(tt.lines)
 		assert.Equal(t, tt.expectedTables, ed.EstimationMethods, "Fail :"+tt.context)
 		assert.Equal(t, "TYPE", ed.ParameterNames[0], "Fail :"+tt.context)

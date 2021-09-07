@@ -10,7 +10,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
-// Summary prints all results from the parsed LstData
+// Summary prints all results from the parsed LstData.
 func (results SummaryOutput) Summary() bool {
 	thetaTable := tablewriter.NewWriter(os.Stdout)
 	thetaTable.SetAlignment(tablewriter.ALIGN_LEFT)

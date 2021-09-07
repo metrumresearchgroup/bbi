@@ -152,7 +152,7 @@ func ParseParamsExt(ed ExtData) ([]ParametersData, ParameterNames) {
 //ParseConditionNumberExt returns the condition number for each estimation method from ExtData
 // per nonmem 7.4 the following information will be grabbed
 // Iteration -1000000003 indicates that this line contains the condition number , lowest, highest, Eigenvalues of the correlation matrix of the variances of the final parameters.
-// NONMEM Users Guide: Introduction to NONMEM 7.4.1
+// NONMEM Users Guide: Introduction to NONMEM 7.4.1.
 func ParseConditionNumberExt(ed ExtData) []ConditionNumDetails {
 	var allCondDetails []ConditionNumDetails
 

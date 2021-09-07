@@ -3,10 +3,6 @@ package cmd
 import (
 	"bbi/configlib"
 	"bytes"
-	"github.com/metrumresearchgroup/turnstile"
-	log "github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -14,6 +10,11 @@ import (
 	"strconv"
 	"strings"
 	"text/template"
+
+	"github.com/metrumresearchgroup/turnstile"
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 const runLongDescription string = `run nonmem model(s), for example: 
@@ -52,7 +53,7 @@ const postProcessingScriptTemplate string = `#!/bin/bash
 {{ .Script }}
 `
 
-// RunCmd represents the run command
+// RunCmd represents the run command.
 var runCmd = &cobra.Command{
 	Use:   "run",
 	Short: "run a (set of) models locally or on the grid",
@@ -65,7 +66,6 @@ func run(cmd *cobra.Command, args []string) {
 }
 
 func init() {
-
 	//String Variables
 	// runCmd.PersistentFlags().String("cacheDir", "", "directory path for cache of nonmem executables for NM7.4+")
 	// viper.BindPFlag("cacheDir", runCmd.PersistentFlags().Lookup("cacheDir"))
@@ -128,7 +128,6 @@ func init() {
 	viper.BindPFlag(additionalEnvIdentifier, runCmd.PersistentFlags().Lookup(additionalEnvIdentifier))
 
 	nonmemCmd.AddCommand(runCmd)
-
 }
 
 type PostWorkExecutor interface {

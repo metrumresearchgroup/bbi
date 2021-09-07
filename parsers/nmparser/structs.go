@@ -3,20 +3,20 @@ package parser
 // FlatArray provides a slice of values meant to be coerced to a matrix
 // of the dimensions Dim
 // This allows easy coercion to matrices in languages like R
-// using matrix(Values, nrow = Dim)
+// using matrix(Values, nrow = Dim).
 type FlatArray struct {
 	Values []float64 `json:"values,omitempty"`
 	Dim    int       `json:"dim,omitempty"`
 }
 
-// ParameterNames contains the names of model parameters
+// ParameterNames contains the names of model parameters.
 type ParameterNames struct {
 	Theta []string `json:"theta,omitempty"`
 	Omega []string `json:"omega,omitempty"`
 	Sigma []string `json:"sigma,omitempty"`
 }
 
-// ParametersResult contains data about the parameter values for a model
+// ParametersResult contains data about the parameter values for a model.
 type ParametersResult struct {
 	Theta []float64 `json:"theta,omitempty"`
 	Omega []float64 `json:"omega,omitempty"`
@@ -29,7 +29,7 @@ type RandomEffectResult struct {
 	Sigma []float64 `json:"sigma,omitempty"`
 }
 
-// ParametersData contains data for each method
+// ParametersData contains data for each method.
 type ParametersData struct {
 	Method    string           `json:"method,omitempty"`
 	Estimates ParametersResult `json:"estimates,omitempty"`
@@ -44,7 +44,7 @@ type ParametersData struct {
 }
 
 // RunHeuristics ...
-// some values are defined as pointers to support tri-state: true, false, nil
+// some values are defined as pointers to support tri-state: true, false, nil.
 type RunHeuristics struct {
 	CovarianceStepAborted  bool `json:"covariance_step_aborted"`
 	LargeConditionNumber   bool `json:"large_condition_number"`
@@ -58,7 +58,7 @@ type RunHeuristics struct {
 	PRDERR                 bool `json:"prderr"`
 }
 
-// RunDetails contains key information about logistics of the model run
+// RunDetails contains key information about logistics of the model run.
 type RunDetails struct {
 	Version             string   `json:"version,omitempty"`
 	RunStart            string   `json:"run_start,omitempty"`
@@ -141,7 +141,7 @@ type ConditionNumDetails struct {
 	ConditionNumber float64 `json:"condition_number,omitempty"`
 }
 
-// SummaryOutput is the output struct from a lst file
+// SummaryOutput is the output struct from a lst file.
 type SummaryOutput struct {
 	RunDetails       RunDetails            `json:"run_details,omitempty"`
 	RunHeuristics    RunHeuristics         `json:"run_heuristics,omitempty"`
@@ -152,14 +152,14 @@ type SummaryOutput struct {
 	ShrinkageDetails [][]ShrinkageDetails  `json:"shrinkage_details,omitempty"`
 }
 
-// CovCorOutput is the output from parsing the .cov and .cor file
+// CovCorOutput is the output from parsing the .cov and .cor file.
 type CovCorOutput struct {
 	CovarianceTheta  []FlatArray `json:"covariance_theta,omitempty"`
 	CorrelationTheta []FlatArray `json:"correlation_theta,omitempty"`
 }
 
 // ExtData provides an intermediate representation of the ExtData after iterations have been stripped out
-// and the various tables broken out
+// and the various tables broken out.
 type ExtData struct {
 	EstimationMethods []string
 	ParameterNames    []string
@@ -189,7 +189,7 @@ const DefaultFloat64 = float64(-999999999)
 // DefaultString ...
 const DefaultString = "-999999999"
 
-// NewRunDetails create RunDetails struct with default values
+// NewRunDetails create RunDetails struct with default values.
 func NewRunDetails() RunDetails {
 	runDetails := RunDetails{
 		Version:             DefaultString,
@@ -216,7 +216,6 @@ func NewRunDetails() RunDetails {
 
 // NewOfvDetails ...
 func NewOfvDetails(method string) OfvDetails {
-
 	ofvDetails := OfvDetails{
 		EstMethod:       method,
 		OFVNoConstant:   DefaultFloat64,
@@ -228,7 +227,6 @@ func NewOfvDetails(method string) OfvDetails {
 }
 
 func NewConditionNumDetails(method string, condNum float64) ConditionNumDetails {
-
 	conditionNumDetails := ConditionNumDetails{
 		EstMethod:       method,
 		ConditionNumber: condNum,
@@ -248,7 +246,7 @@ func NewConditionNumDetails(method string, condNum float64) ConditionNumDetails 
 // to test to make sure they were OK, where the implication
 // is that unless otherwise warned, they are.
 // Hence, using the Heuristic CorrelationNotOK allows
-// a reasonable default false, that can be detected true
+// a reasonable default false, that can be detected true.
 func NewRunHeuristics() RunHeuristics {
 	return RunHeuristics{}
 }

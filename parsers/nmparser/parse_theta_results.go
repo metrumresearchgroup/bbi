@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-// ParseThetaResults parses theta results
+// ParseThetaResults parses theta results.
 func ParseThetaResults(lines []string) []float64 {
 	var thetaLine string
 	var thetaValues []float64

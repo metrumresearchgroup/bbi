@@ -9,22 +9,23 @@ import (
 	"strings"
 
 	"bbi/utils"
+
 	"github.com/spf13/afero"
 )
 
-// TargetedFile represents metadata about files copied or cleaned after run
+// TargetedFile represents metadata about files copied or cleaned after run.
 type TargetedFile struct {
 	File  string `json:"file,omitempty"`
 	Level int    `json:"level,omitempty"`
 }
 
-//PostWorkInstructions contains all hte details for whether any cleanup or copy actions should occur during the post work phase of the operation
+//PostWorkInstructions contains all hte details for whether any cleanup or copy actions should occur during the post work phase of the operation.
 type PostWorkInstructions struct {
 	FilesToCopy  FileCopyInstruction
 	FilesToClean FileCleanInstruction
 }
 
-//FileCopyInstruction includes everything necessary to copy files back to the source directory
+//FileCopyInstruction includes everything necessary to copy files back to the source directory.
 type FileCopyInstruction struct {
 	//The target directory where files will be copied into
 	CopyTo string
@@ -34,7 +35,7 @@ type FileCopyInstruction struct {
 	FilesToCopy []TargetedFile
 }
 
-//FileCleanInstruction includes everything necessary to remove files for a designated model run
+//FileCleanInstruction includes everything necessary to remove files for a designated model run.
 type FileCleanInstruction struct {
 	//Directory in which the files we will remove exist. Should correlate to template output for outputDir
 	Location string
@@ -52,7 +53,7 @@ type FileCleanInstruction struct {
 // copyLvl := 2
 // dirInfo, _ := afero.ReadDir(AppFs, filepath.Join(dir, dirToClean))
 // fileList := utils.ListFiles(dirInfo) - Wait if this can be executed, why pass it down stream?
-// runner.CleanEstFolderAndCopyToParent(AppFs, dir, runNum, dirToClean, fileList, cleanLvl, copyLvl, true, true)
+// runner.CleanEstFolderAndCopyToParent(AppFs, dir, runNum, dirToClean, fileList, cleanLvl, copyLvl, true, true).
 func CleanEstFolderAndCopyToParent(
 	fs afero.Fs,
 	parentDir string,
@@ -66,6 +67,7 @@ func CleanEstFolderAndCopyToParent(
 	verbose bool,
 	debug bool,
 ) error {
+
 	outputFiles := EstOutputFileCleanLevels(runNum)
 	keyOutputFiles := EstOutputFilesByRun(runNum)
 	var copiedFiles []TargetedFile
@@ -95,7 +97,6 @@ func CleanEstFolderAndCopyToParent(
 	}
 
 	for i, file := range fileList {
-
 		// Copy files to directory above
 		lvl, ok := keyOutputFiles[file]
 		if ok && lvl >= copyLvl {
@@ -155,7 +156,6 @@ func CleanEstFolderAndCopyToParent(
 				log.Println("deleted file: ", file)
 			}
 		}
-
 	}
 
 	return nil
@@ -170,7 +170,7 @@ func CleanEstFolderAndCopyToParent(
 // copyLvl := 2
 // dirInfo, _ := afero.ReadDir(AppFs, filepath.Join(dir, dirToClean))
 // fileList := utils.ListFiles(dirInfo)
-// runner.CleanEstFolder(AppFs, dirPath, runNum, fileList, cleanLvl, copyLvl, true, true)
+// runner.CleanEstFolder(AppFs, dirPath, runNum, fileList, cleanLvl, copyLvl, true, true).
 func CleanEstFolder(
 	fs afero.Fs,
 	dirPath string,
@@ -180,6 +180,7 @@ func CleanEstFolder(
 	debug bool,
 	preview bool,
 ) error {
+
 	runPath := filepath.Base(dirPath)
 	runName := strings.Split(runPath, "_est_")[0]
 	outputFiles := EstOutputFileCleanLevels(runName)
@@ -199,7 +200,6 @@ func CleanEstFolder(
 	lvl, _ := outputFiles["temp_dir"]
 
 	if cleanLvl >= lvl {
-
 		err := fs.RemoveAll(filepath.Join(
 			dirPath,
 			"temp_dir",
@@ -213,7 +213,6 @@ func CleanEstFolder(
 	fileList := utils.ListFiles(dirInfo)
 	deletedFiles := 0
 	for i, file := range fileList {
-
 		// handle cleaning
 		lvl, ok := outputFiles[file]
 		if debug {
@@ -224,7 +223,6 @@ func CleanEstFolder(
 			if preview {
 				fmt.Println(fmt.Sprintf("would delete: %s", file))
 			} else {
-
 				err := fs.Remove(filepath.Join(
 					dirPath,
 					file,
@@ -237,7 +235,6 @@ func CleanEstFolder(
 				}
 			}
 		}
-
 	}
 	if verbose {
 		log.Printf("number of files cleaned: %v", deletedFiles)

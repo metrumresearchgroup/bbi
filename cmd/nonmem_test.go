@@ -8,12 +8,12 @@ import (
 	"testing"
 
 	"bbi/configlib"
+
 	"github.com/google/uuid"
 	"github.com/spf13/afero"
 )
 
 func Test_doesDirectoryContainOutputFiles(t *testing.T) {
-
 	good := uuid.New().String()
 	bad := uuid.New().String()
 
@@ -66,7 +66,6 @@ func emptyFile(path string) {
 }
 
 func Test_processNMFEOptions(t *testing.T) {
-
 	type args struct {
 		config configlib.Config
 	}

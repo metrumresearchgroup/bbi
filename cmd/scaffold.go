@@ -20,12 +20,13 @@ import (
 	"path/filepath"
 
 	"bbi/utils"
+
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-// scaffoldCmd represents the clean command
+// scaffoldCmd represents the clean command.
 var scaffoldCmd = &cobra.Command{
 	Use:   "scaffold",
 	Short: "scaffold directory structures",

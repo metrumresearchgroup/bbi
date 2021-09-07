@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-// ParseBlockResults parses results stored in a block-line structure
+// ParseBlockResults parses results stored in a block-line structure.
 func ParseBlockResults(lines []string) []float64 {
 	if len(lines) == 0 {
 		return []float64{}

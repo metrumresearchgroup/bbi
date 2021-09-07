@@ -8,12 +8,13 @@ import (
 	"strings"
 
 	"bbi/utils"
+
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 )
 
 // ModelOutputFile gives the name of the summary file and whether to include the data
-// in the model output
+// in the model output.
 type ModelOutputFile struct {
 	Exclude bool
 	Name    string
@@ -22,15 +23,14 @@ type ModelOutputFile struct {
 // NewModelOutputFile returns a ModelOutputFile with a name and exclusion
 // given no name is set, downstream code should expect standard naming conventions following root.extension syntax
 // for example given a model 100 and want to set the ext file
-// if ModelOutputFile.Name is "" should look for 100.ext
+// if ModelOutputFile.Name is "" should look for 100.ext.
 func NewModelOutputFile(name string, exclude bool) ModelOutputFile {
 	return ModelOutputFile{Name: name, Exclude: exclude}
 }
 
 // GetModelOutput populates and returns a SummaryOutput object by parsing files
-// if ext file is excluded, will attempt to parse the lst file for additional information traditionally available there
+// if ext file is excluded, will attempt to parse the lst file for additional information traditionally available there.
 func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (SummaryOutput, error) {
-
 	AppFs := afero.NewOsFs()
 	runNum, extension := utils.FileAndExt(lstPath)
 	if extension == "" {
@@ -176,9 +176,8 @@ func errorIfNotExists(fs afero.Fs, path string, sFlag string) error {
 }
 
 // GetCovCorOutput
-// STILL UNDER CONSTRUCTION
+// STILL UNDER CONSTRUCTION.
 func GetCovCorOutput(lstPath string) (CovCorOutput, error) {
-
 	AppFs := afero.NewOsFs()
 	runNum, _ := utils.FileAndExt(lstPath)
 	dir, _ := filepath.Abs(filepath.Dir(lstPath))

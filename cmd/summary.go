@@ -18,9 +18,10 @@ import (
 	parser "bbi/parsers/nmparser"
 	"encoding/json"
 	"fmt"
-	log "github.com/sirupsen/logrus"
 	"os"
 	"runtime"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -40,7 +41,7 @@ bbi nonmem summary run001/run001.lst
 bbi nonmem summary run001/run001.res
  `
 
-// runCmd represents the run command
+// runCmd represents the run command.
 var summaryCmd = &cobra.Command{
 	Use:   "summary",
 	Short: "summarize the output of model(s)",

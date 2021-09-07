@@ -1,7 +1,7 @@
 package parser
 
 // AnyTrue returns whether any heuristic has a true
-// value
+// value.
 func (hs RunHeuristics) AnyTrue() bool {
 	if hs.CovarianceStepAborted == true {
 		return true

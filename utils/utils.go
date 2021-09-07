@@ -58,7 +58,6 @@ func FileAndExt(in string) (name string, ext string) {
 }
 
 func extractFilename(in, ext, base, pathSeparator string) (name string) {
-
 	// No file name cases. These are defined as:
 	// 1. any "in" path that ends in a pathSeparator
 	// 2. any "base" consisting of just an pathSeparator
@@ -77,7 +76,6 @@ func extractFilename(in, ext, base, pathSeparator string) (name string) {
 	}
 
 	return
-
 }
 
 // GetRelativePath returns the relative path of a given path.
@@ -103,7 +101,7 @@ func GetRelativePath(path, base string) (final string, err error) {
 // ExtractRootPaths extracts the root paths from the supplied list of paths.
 // The resulting root path will not contain any file separators, but there
 // may be duplicates.
-// So "/content/section/" becomes "content"
+// So "/content/section/" becomes "content".
 func ExtractRootPaths(paths []string) []string {
 	r := make([]string, len(paths))
 	for i, p := range paths {
@@ -120,7 +118,6 @@ func ExtractRootPaths(paths []string) []string {
 	}
 
 	return r
-
 }
 
 func getRealFileInfo(fs afero.Fs, path string) (os.FileInfo, string, error) {
@@ -159,7 +156,7 @@ func GetRealPath(fs afero.Fs, path string) (string, error) {
 }
 
 // Code copied from Afero's path.go
-// if the filesystem is OsFs use Lstat, else use fs.Stat
+// if the filesystem is OsFs use Lstat, else use fs.Stat.
 func lstatIfOs(fs afero.Fs, path string) (info os.FileInfo, err error) {
 	_, ok := fs.(*afero.OsFs)
 	if ok {
@@ -221,7 +218,7 @@ func Exists(path string, fs afero.Fs) (bool, error) {
 // AppFs := afero.NewOsFs()
 // dir := filepath.Dir(".")
 // dirInfo, _ := afero.ReadDir(AppFs, dir)
-// ListDirNames(dirInfo)
+// ListDirNames(dirInfo).
 func ListDirNames(fd []os.FileInfo) []string {
 	dirs := []string{}
 	for _, pDir := range fd {
@@ -238,7 +235,7 @@ func ListDirNames(fd []os.FileInfo) []string {
 // AppFs := afero.NewOsFs()
 // dir := filepath.Dir(".")
 // dirInfo, _ := afero.ReadDir(AppFs, dir)
-// ListDirNames(dirInfo)
+// ListDirNames(dirInfo).
 func ListFiles(fd []os.FileInfo) []string {
 	files := []string{}
 	for _, pFile := range fd {
@@ -252,7 +249,7 @@ func ListFiles(fd []os.FileInfo) []string {
 }
 
 // Takes a boolean slice and returns a boolean for whether
-// any elements of the slice are true
+// any elements of the slice are true.
 func AnyTrue(bools []bool) bool {
 	for _, v := range bools {
 		if v {
