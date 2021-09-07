@@ -23,7 +23,6 @@ func TestAddingPathLevel(t *testing.T) {
 			"$DATA ..\\modeling\\data1.csv IGNORE=@ IGNORE=ID.GT.5",
 		}
 	} else {
-
 		newPaths = []string{
 			"$DATA ../modeling/data1.csv",
 			"$DATA /usr/modeling/data1.csv",
