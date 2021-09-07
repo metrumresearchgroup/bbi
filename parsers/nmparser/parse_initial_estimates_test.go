@@ -11,7 +11,7 @@ package parser
 // $OMEGA  BLOCK(1) SAME
 // $OMEGA  BLOCK(1) SAME.
 // TODO: remove omegaBlock01 if we find no use
-var _ /*omegaBlock01*/ = []string{
+var _ = /*omegaBlock01*/ []string{
 	"0INITIAL ESTIMATE OF OMEGA:",
 	" BLOCK SET NO.   BLOCK                                                                    FIXED",
 	"        1                                                                                   NO ",

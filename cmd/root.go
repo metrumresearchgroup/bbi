@@ -41,7 +41,7 @@ var (
 var (
 	// name of config file.
 	// TODO: remove cfgFile if we find no use
-	_ /*cfgFile*/ string
+	_/*cfgFile*/ string
 	// verbose is whether to give verbose output.
 	verbose bool
 	debug   bool

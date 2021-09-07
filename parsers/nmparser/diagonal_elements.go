@@ -35,7 +35,7 @@ func lowerDiagonalLengthToDimension(l int) (int, bool) {
 
 	// if not equal going back the other way then it's not a diagonal
 
-	if l != (dim * (dim + 1)) / 2 {
+	if l != (dim*(dim+1))/2 {
 		return 0, false
 	}
 

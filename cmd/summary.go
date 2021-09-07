@@ -30,11 +30,11 @@ import (
 
 var (
 	// TODO: remove summaryTree if we find no use
-	_ /*summaryTree*/ bool
-	noExt       bool
-	noGrd       bool
-	noShk       bool
-	extFile     string
+	_/*summaryTree*/ bool
+	noExt   bool
+	noGrd   bool
+	noShk   bool
+	extFile string
 )
 
 const summaryLongDescription string = `summarize model(s), for example: 

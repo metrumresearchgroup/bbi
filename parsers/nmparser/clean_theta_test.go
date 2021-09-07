@@ -7,7 +7,7 @@ import (
 )
 
 // TODO: remove uglyString if we find no use
-var _ /*uglyString*/ = []string{
+var _ = /*uglyString*/ []string{
 	"$THETA (0,2720) ; CL",
 	"$THETA(0,2650) ; V2",
 	" $THETA (0,7730) ; V3",
@@ -17,7 +17,7 @@ var _ /*uglyString*/ = []string{
 }
 
 // TODO: remove ratThetaBlock02 if we find no use
-var _ /*rawThetaBlock02*/ = []string{
+var _ = /*rawThetaBlock02*/ []string{
 	"$THETA  (0,5) ; CL",
 	"(0,97.2) ; V",
 	"(0,7.47,100) ; Q",
@@ -30,7 +30,7 @@ var _ /*rawThetaBlock02*/ = []string{
 }
 
 // TODO: remove rawThetaBlock02Cleaned if we find no use
-var _ /*rawThetaBlock02Cleaned*/ = []string{
+var _ = /*rawThetaBlock02Cleaned*/ []string{
 	"(0,5) ; CL",
 	"(0,97.2) ; V",
 	"(0,7.47,100) ; Q",

@@ -28,7 +28,7 @@ func ReplaceExtension(path string, newExt string) string {
 
 // Filename takes a path, strips out the extension,
 // and returns the name of the file.
-func Filename(in string) (string) {
+func Filename(in string) string {
 	name, _ := FileAndExt(in)
 
 	return name
