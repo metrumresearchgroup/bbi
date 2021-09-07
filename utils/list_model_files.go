@@ -24,7 +24,7 @@ func ListFilesByExt(files []string, modExt string) []string {
 func ListModels(dirName string, modExt string, fs afero.Fs) ([]string, error) {
 	dirInfo, err := afero.ReadDir(fs, dirName)
 	if err != nil {
-		return []string{}, fmt.Errorf("error finding model dir (%s)", err)
+		return []string{}, fmt.Errorf("finding model dir %w", err)
 	}
 	filesInDir := ListFiles(dirInfo)
 	modelFiles := ListFilesByExt(filesInDir, modExt)

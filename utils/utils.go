@@ -127,13 +127,14 @@ func getRealFileInfo(fs afero.Fs, path string) (os.FileInfo, string, error) {
 	}
 
 	if fileInfo.Mode()&os.ModeSymlink == os.ModeSymlink {
-		link, err := filepath.EvalSymlinks(path)
+		var link string
+		link, err = filepath.EvalSymlinks(path)
 		if err != nil {
-			return nil, "", fmt.Errorf("Cannot read symbolic link '%s', error was: %s", path, err)
+			return nil, "", fmt.Errorf("read symbolic link '%s': %w", path, err)
 		}
 		fileInfo, err = lstatIfOs(fs, link)
 		if err != nil {
-			return nil, "", fmt.Errorf("Cannot stat '%s', error was: %s", link, err)
+			return nil, "", fmt.Errorf("stat '%s': %w", link, err)
 		}
 		realPath = link
 	}

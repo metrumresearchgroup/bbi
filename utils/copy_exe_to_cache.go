@@ -43,7 +43,7 @@ func CopyExeToCache(
 	)
 	cacheFile, err := fs.Create(newCacheFileLocation)
 	if err != nil {
-		return fmt.Errorf("error copying file: (%s)", err)
+		return fmt.Errorf("copying file: %w", err)
 	}
 	defer cacheFile.Close()
 
@@ -59,13 +59,13 @@ func CopyExeToCache(
 	)
 	exeFile, err := fs.Open(exeLocation)
 	if err != nil {
-		return fmt.Errorf("error with nonmem exe file: (%s)", err)
+		return fmt.Errorf("nonmem exe file: %w", err)
 	}
 	defer exeFile.Close()
 
 	_, err = io.Copy(cacheFile, exeFile)
 	if err != nil {
-		return fmt.Errorf("error copying to new file: (%s)", err)
+		return fmt.Errorf("copying to new file: %w", err)
 	}
 
 	return nil

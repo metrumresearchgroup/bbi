@@ -71,7 +71,7 @@ func SetupCacheForRun(
 
 	fileToCopy, err := fs.Open(fileToCopyLocation)
 	if err != nil {
-		return fmt.Errorf("error copying file: (%s)", err)
+		return fmt.Errorf("copying file: %w", err)
 	}
 	defer fileToCopy.Close()
 
@@ -87,7 +87,7 @@ func SetupCacheForRun(
 	)
 	newFile, err := fs.Create(newFileLocation)
 	if err != nil {
-		return fmt.Errorf("error creating new file: (%s)", err)
+		return fmt.Errorf("creating new file: %w", err)
 	}
 	defer newFile.Close()
 
