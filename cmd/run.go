@@ -141,7 +141,7 @@ type PostWorkExecutor interface {
 }
 
 type PostExecutionHookEnvironment struct {
-	ExecutionBinary string `yaml:"execution_binary" json:"execution_binary, omitempty"`
+	ExecutionBinary string `yaml:"execution_binary" json:"execution_binary,omitempty"`
 	ModelPath       string `yaml:"model_path" json:"model_path,omitempty"`
 	Model           string `yaml:"model" json:"model,omitempty"`
 	Filename        string `yaml:"filename" json:"filename,omitempty"`

@@ -226,7 +226,8 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 
 	log.Debugf("%s Beginning selection of copiable files ", l.Nonmem.LogIdentifier())
 	for _, v := range pwi.FilesToCopy.FilesToCopy {
-		source, err := utils.ReadLines(path.Join(pwi.FilesToCopy.CopyFrom, v.File))
+		var source []string
+		source, err = utils.ReadLines(path.Join(pwi.FilesToCopy.CopyFrom, v.File))
 
 		if err != nil {
 			log.Debugf("%s Unable to read file at %s. Continuing anyway", l.Nonmem.LogIdentifier(), path.Join(pwi.FilesToCopy.CopyFrom, v.File))
@@ -267,8 +268,6 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 	//Clean Up
 	log.Debugf("%s Beginning local cleanup operations", l.Nonmem.LogIdentifier())
 	for _, v := range pwi.FilesToClean.FilesToRemove {
-		var err error
-
 		//Does it even exist?
 		if ok, _ := afero.Exists(fs, path.Join(pwi.FilesToClean.Location, v.File)); ok {
 			//Is it a directory?

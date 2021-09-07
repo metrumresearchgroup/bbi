@@ -697,7 +697,8 @@ func NewNonMemModel(modelname string, config configlib.Config) (NonMemModel, err
 	if filepath.IsAbs(modelname) {
 		lm.Path = modelname
 	} else {
-		current, err := os.Getwd()
+		var current string
+		current, err = os.Getwd()
 		if err != nil {
 			lm.Error = err
 		}
