@@ -42,7 +42,7 @@ func (results SummaryOutput) Summary() bool {
 		}
 
 		thetaTable.Append([]string{
-			string("TH " + strconv.Itoa(i+1)),
+			"TH " + strconv.Itoa(i+1),
 			results.ParameterNames.Theta[i],
 			strconv.FormatFloat(numResult, 'f', -1, 64),
 			s4})
