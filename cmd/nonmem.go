@@ -921,7 +921,7 @@ func (n NonMemModel) LogIdentifier() string {
 	return fmt.Sprintf("[%s]", n.FileName)
 }
 
-func createChildDirectories(l *NonMemModel, _ /*cancel*/ chan bool, channels *turnstile.ChannelMap, sge bool) error {
+func createChildDirectories(l *NonMemModel, _ /*cancel*/ chan bool, _ /*channels*/ *turnstile.ChannelMap, sge bool) error {
 	fs := afero.NewOsFs()
 	log.Debugf("%s Overwrite is currently set to %t", l.LogIdentifier(), viper.GetBool("debug"))
 	// Does output directory exist?
