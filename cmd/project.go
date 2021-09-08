@@ -43,7 +43,7 @@ nmu project
 	RunE: probs,
 }
 
-func probs(cmd *cobra.Command, args []string) error {
+func probs(_ *cobra.Command, args []string) error {
 	if debug {
 		viper.Debug()
 	}
@@ -67,7 +67,7 @@ func probs(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	modelSummaries := modSummaries(AppFs, modelFiles, dir)
+	modelSummaries := modSummaries(AppFs, modelFiles)
 	if Json {
 		jsonRes, _ := json.MarshalIndent(modelSummaries, "", "\t")
 		fmt.Printf("%s\n", jsonRes)
@@ -96,7 +96,7 @@ type runSummary struct {
 	Summary parser.ModelInfo
 }
 
-func modSummaries(AppFs afero.Fs, files []string, _ /*dir*/ string) []runSummary {
+func modSummaries(AppFs afero.Fs, files []string) []runSummary {
 	var summaries []runSummary
 	for _, file := range files {
 		var rs runSummary

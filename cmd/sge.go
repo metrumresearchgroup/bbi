@@ -82,7 +82,7 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 	log.Debugf("%s Overwrite is currrently set to %t", l.Nonmem.LogIdentifier(), l.Nonmem.Configuration.Overwrite)
 	log.Debugf("%s Beginning evaluation of whether or not %s exists", l.Nonmem.LogIdentifier(), l.Nonmem.OutputDir)
 
-	err := createChildDirectories(l.Nonmem, l.Cancel, channels, true)
+	err := createChildDirectories(l.Nonmem, true)
 
 	//Save the config into the output directory
 
@@ -139,12 +139,12 @@ func (l SGEModel) Work(channels *turnstile.ChannelMap) {
 }
 
 //Monitor is the 3rd phase of turnstile (not implemented here).
-func (l SGEModel) Monitor(channels *turnstile.ChannelMap) {
+func (l SGEModel) Monitor(_ *turnstile.ChannelMap) {
 	//Do nothing for this implementation
 }
 
 //Cleanup is the last phase of execution, in which computation / hard work is done and we're cleaning up leftover files, copying results around et all.
-func (l SGEModel) Cleanup(channels *turnstile.ChannelMap) {
+func (l SGEModel) Cleanup(_ *turnstile.ChannelMap) {
 	//err := configlib.WriteViperConfig(l.Nonmem.OutputDir, true)
 	//
 	//if err != nil {
@@ -185,7 +185,7 @@ func init() {
 	errpanic(viper.BindPFlag(gridNamePrefixIdentifier, sgeCMD.PersistentFlags().Lookup(gridNamePrefixIdentifier)))
 }
 
-func sge(cmd *cobra.Command, args []string) {
+func sge(_ *cobra.Command, args []string) {
 	config, err := configlib.LocateAndReadConfigFile()
 	if err != nil {
 		log.Fatalf("Failed to process configuration: %s", err)

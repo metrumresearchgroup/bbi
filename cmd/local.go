@@ -28,9 +28,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-// TODO: remove arguments if we find no use.
-var _ /*arguments*/ []string
-
 type localOperation struct {
 	Models []LocalModel `json:"models"`
 }
@@ -125,7 +122,7 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 	}
 
 	if l.Nonmem.Configuration.Local.CreateChildDirs {
-		err := createChildDirectories(l.Nonmem, l.Cancel, channels, false)
+		err := createChildDirectories(l.Nonmem, false)
 
 		if err != nil {
 			//Handles the cancel operation
@@ -184,7 +181,7 @@ func (l LocalModel) Work(channels *turnstile.ChannelMap) {
 }
 
 //Monitor is unimplemented here. It's the 3rd phase of Turnstile execution.
-func (l LocalModel) Monitor(channels *turnstile.ChannelMap) {
+func (l LocalModel) Monitor(_ *turnstile.ChannelMap) {
 	//Do nothing for this implementation
 }
 
@@ -317,7 +314,7 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 
 	//PostWorkExecution phase if the script value is not empty
 
-	PostWorkExecution(&l, l.Nonmem.FileName, channels, l.Cancel, true, nil)
+	PostWorkExecution(&l, true, nil)
 
 	log.Infof("%s Cleanup completed", l.Nonmem.LogIdentifier())
 	channels.Completed <- 1
@@ -342,7 +339,7 @@ func init() {
 	errpanic(viper.BindPFlag("local."+childDirIdentifier, localCmd.PersistentFlags().Lookup(childDirIdentifier)))
 }
 
-func local(cmd *cobra.Command, args []string) {
+func local(_ *cobra.Command, args []string) {
 	config, err := configlib.LocateAndReadConfigFile()
 
 	if err != nil {

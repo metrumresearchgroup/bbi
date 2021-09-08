@@ -70,12 +70,6 @@ type nonmemParallelDirective struct {
 	WorkerNodes       int
 }
 
-// TODO: remove controlStreamExtensions if we find no use.
-var _ /*controlStreamExtensions*/ []string = []string{
-	".mod", // PSN Style
-	".ctl", // Metrum Style
-}
-
 var nonMemTemporaryFiles []string = []string{
 	"background.set",
 	"compile.lnk",
@@ -179,7 +173,7 @@ var nonmemCmd = &cobra.Command{
 	Run:   nonmem,
 }
 
-func nonmem(cmd *cobra.Command, args []string) {
+func nonmem(_ *cobra.Command, _ []string) {
 	println(nonmemLongDescription)
 }
 
@@ -596,13 +590,13 @@ func getCopiableFileList(file string, level int, filepath string) []string {
 	}
 
 	// Extensions now
-	output = append(output, extrapolateCopyFilesFromExtensions(filename, level, filepath)...)
+	output = append(output, extrapolateCopyFilesFromExtensions(filename, level)...)
 
 	return output
 }
 
 // Extrapolate extensions into string representations of filenames.
-func extrapolateCopyFilesFromExtensions(filename string, level int, _ /*filepath*/ string) []string {
+func extrapolateCopyFilesFromExtensions(filename string, level int) []string {
 	var output []string
 	extensions := make(map[int][]string)
 
@@ -922,7 +916,7 @@ func (n NonMemModel) LogIdentifier() string {
 	return fmt.Sprintf("[%s]", n.FileName)
 }
 
-func createChildDirectories(l *NonMemModel, _ /*cancel*/ chan bool, _ /*channels*/ *turnstile.ChannelMap, sge bool) error {
+func createChildDirectories(l *NonMemModel, sge bool) error {
 	fs := afero.NewOsFs()
 	log.Debugf("%s Overwrite is currently set to %t", l.LogIdentifier(), viper.GetBool("debug"))
 	// Does output directory exist?

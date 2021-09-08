@@ -29,8 +29,6 @@ import (
 )
 
 var (
-	// TODO: remove summaryTree if we find no use.
-	_/*summaryTree*/ bool
 	noExt   bool
 	noGrd   bool
 	noShk   bool
@@ -56,7 +54,7 @@ type jsonResults struct {
 	Errors  []error
 }
 
-func summary(cmd *cobra.Command, args []string) {
+func summary(_ *cobra.Command, args []string) {
 	if debug {
 		viper.Debug()
 	}
@@ -105,7 +103,7 @@ func summary(cmd *cobra.Command, args []string) {
 	var modelResults jsonResults
 
 	for w := 1; w <= workers; w++ {
-		go func(_ int, modIndex <-chan int, results chan<- modelResult) {
+		go func(modIndex <-chan int, results chan<- modelResult) {
 			for i := range modIndex {
 				r, err := parser.GetModelOutput(args[i], parser.NewModelOutputFile(extFile, noExt), !noGrd, !noShk)
 				if err != nil {
@@ -124,7 +122,7 @@ func summary(cmd *cobra.Command, args []string) {
 					}
 				}
 			}
-		}(w, models, results)
+		}(models, results)
 	}
 	for m := 0; m < numModels; m++ {
 		models <- m

@@ -39,9 +39,6 @@ var (
 )
 
 var (
-	// name of config file.
-	// TODO: remove cfgFile if we find no use.
-	_/*cfgFile*/ string
 	// verbose is whether to give verbose output.
 	verbose bool
 	debug   bool
@@ -101,16 +98,6 @@ func initConfig() {
 		log.Fatalf("initializing config %s", err.Error())
 	}
 }
-
-// TODO: remove flagChanged if we find no use
-/* func flagChanged(flags *flag.FlagSet, key string) bool {
-	flag := flags.Lookup(key)
-	if flag == nil {
-		return false
-	}
-
-	return flag.Changed
-}*/
 
 // Assumes random has been set previously and seeded to avoid reproducible data sets
 // Here random is set during root.go setup.
@@ -176,5 +163,5 @@ func RecordConcurrentError(model string, notes string, err error, channels *turn
 	cancel <- true
 	channels.Errors <- newConcurrentError(model, notes, err)
 
-	PostWorkExecution(executor, model, channels, cancel, false, err)
+	PostWorkExecution(executor, false, err)
 }

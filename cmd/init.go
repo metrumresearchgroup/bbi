@@ -17,9 +17,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-// TODO: remove startingDirectory if we find no use
-// var startingDirectory string
-
 // RunCmd represents the run command.
 var initCmd = &cobra.Command{
 	Use:   "init",
@@ -29,7 +26,7 @@ var initCmd = &cobra.Command{
 	Run: initializer,
 }
 
-func initializer(cmd *cobra.Command, args []string) {
+func initializer(cmd *cobra.Command, _ []string) {
 	fs := afero.NewOsFs()
 
 	locations := []string{}

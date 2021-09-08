@@ -13,7 +13,6 @@ import (
 
 	"bbi/configlib"
 
-	"github.com/metrumresearchgroup/turnstile"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -63,7 +62,7 @@ var runCmd = &cobra.Command{
 	Run:   run,
 }
 
-func run(cmd *cobra.Command, args []string) {
+func run(_ *cobra.Command, _ []string) {
 	println(runLongDescription)
 }
 
@@ -186,7 +185,7 @@ func PostExecutionEnvironment(directive *PostExecutionHookEnvironment, additiona
 	return executionEnvironment
 }
 
-func PostWorkExecution(job PostWorkExecutor, _ /*filename*/ string, _ /*channels*/ *turnstile.ChannelMap, _ /*cancel*/ chan bool, successful bool, err error) {
+func PostWorkExecution(job PostWorkExecutor, successful bool, err error) {
 	config := job.GetGlobalConfig()
 	if config.PostWorkExecutable != "" {
 		log.Debug("Beginning execution of post work hooks")
