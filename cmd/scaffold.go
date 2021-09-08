@@ -26,18 +26,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-// scaffoldCmd represents the clean command.
-var scaffoldCmd = &cobra.Command{
-	Use:   "scaffold",
-	Short: "scaffold directory structures",
-	Long: `
-	nmu scaffold --cacheDir=nmcache
-
-	nmu scaffold --cacheDir=../nmcache --preview // show where the cache dir would be created
- `,
-	RunE: scaffold,
-}
-
 func scaffold(cmd *cobra.Command, args []string) error {
 	if debug {
 		viper.Debug()
@@ -80,8 +68,20 @@ func scaffold(cmd *cobra.Command, args []string) error {
 
 	return nil
 }
-func init() {
-	nonmemCmd.AddCommand(scaffoldCmd)
-	scaffoldCmd.Flags().String("cacheDir", "", "create cache directory at path/name")
-	errpanic(viper.BindPFlag("cacheDir", scaffoldCmd.Flags().Lookup("cacheDir")))
+
+func NewScaffoldCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "scaffold",
+		Short: "scaffold directory structures",
+		Long: `
+	nmu scaffold --cacheDir=nmcache
+
+	nmu scaffold --cacheDir=../nmcache --preview // show where the cache dir would be created
+ `,
+		RunE: scaffold,
+	}
+
+	cmd.Flags().String("cacheDir", "", "create cache directory at path/name")
+	errpanic(viper.BindPFlag("cacheDir", cmd.Flags().Lookup("cacheDir")))
+	return cmd
 }

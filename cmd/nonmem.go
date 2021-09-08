@@ -165,72 +165,79 @@ type NonMemModel struct {
 
 var nonmemLongDescription string = fmt.Sprintf("\n%s\n\n%s\n\n%s\n", runLongDescription, summaryLongDescription, covcorLongDescription)
 
-// RunCmd represents the run command.
-var nonmemCmd = &cobra.Command{
-	Use:   "nonmem",
-	Short: "nonmem a (set of) models locally or on the grid",
-	Long:  nonmemLongDescription,
-	Run:   nonmem,
-}
-
 func nonmem(_ *cobra.Command, _ []string) {
 	println(nonmemLongDescription)
 }
 
-func init() {
-	RootCmd.AddCommand(nonmemCmd)
+func NewNonmemCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "nonmem",
+		Short: "nonmem a (set of) models locally or on the grid",
+		Long:  nonmemLongDescription,
+		Run:   nonmem,
+	}
 
 	// NM Selector
 	const nmVersionIdentifier string = "nm_version"
-	nonmemCmd.PersistentFlags().String(nmVersionIdentifier, "", "Version of nonmem from the configuration list to use")
-	errpanic(viper.BindPFlag(nmVersionIdentifier, nonmemCmd.PersistentFlags().Lookup(nmVersionIdentifier)))
+	cmd.PersistentFlags().String(nmVersionIdentifier, "", "Version of nonmem from the configuration list to use")
+	errpanic(viper.BindPFlag(nmVersionIdentifier, cmd.PersistentFlags().Lookup(nmVersionIdentifier)))
 
 	// Parallelization Components
 	const parallelIdentifier string = "parallel"
-	nonmemCmd.PersistentFlags().Bool(parallelIdentifier, false, "Whether or not to run nonmem in parallel mode")
-	errpanic(viper.BindPFlag(parallelIdentifier, nonmemCmd.PersistentFlags().Lookup(parallelIdentifier)))
+	cmd.PersistentFlags().Bool(parallelIdentifier, false, "Whether or not to run nonmem in parallel mode")
+	errpanic(viper.BindPFlag(parallelIdentifier, cmd.PersistentFlags().Lookup(parallelIdentifier)))
 
 	const parallelCompletionTimeoutIdentifier string = "parallel_timeout"
-	nonmemCmd.PersistentFlags().Int(parallelCompletionTimeoutIdentifier, 2147483647, "The amount of time to wait for parallel operations in nonmem before timing out")
-	errpanic(viper.BindPFlag(parallelCompletionTimeoutIdentifier, nonmemCmd.PersistentFlags().Lookup(parallelCompletionTimeoutIdentifier)))
+	cmd.PersistentFlags().Int(parallelCompletionTimeoutIdentifier, 2147483647, "The amount of time to wait for parallel operations in nonmem before timing out")
+	errpanic(viper.BindPFlag(parallelCompletionTimeoutIdentifier, cmd.PersistentFlags().Lookup(parallelCompletionTimeoutIdentifier)))
 
 	const mpiExecPathIdentifier string = "mpi_exec_path"
-	nonmemCmd.PersistentFlags().String(mpiExecPathIdentifier, "/usr/local/mpich3/bin/mpiexec", "The fully qualified path to mpiexec. Used for nonmem parallel operations")
-	errpanic(viper.BindPFlag(mpiExecPathIdentifier, nonmemCmd.PersistentFlags().Lookup(mpiExecPathIdentifier)))
+	cmd.PersistentFlags().String(mpiExecPathIdentifier, "/usr/local/mpich3/bin/mpiexec", "The fully qualified path to mpiexec. Used for nonmem parallel operations")
+	errpanic(viper.BindPFlag(mpiExecPathIdentifier, cmd.PersistentFlags().Lookup(mpiExecPathIdentifier)))
 
 	const parafileIdentifier string = "parafile"
-	nonmemCmd.PersistentFlags().String(parafileIdentifier, "", "Location of a user-provided parafile to use for parallel execution")
-	errpanic(viper.BindPFlag(parafileIdentifier, nonmemCmd.PersistentFlags().Lookup(parafileIdentifier)))
+	cmd.PersistentFlags().String(parafileIdentifier, "", "Location of a user-provided parafile to use for parallel execution")
+	errpanic(viper.BindPFlag(parafileIdentifier, cmd.PersistentFlags().Lookup(parafileIdentifier)))
 
 	const nmQualIdentifier string = "nmqual"
-	nonmemCmd.PersistentFlags().Bool(nmQualIdentifier, false, "Whether or not to execute with nmqual (autolog.pl")
-	errpanic(viper.BindPFlag(nmQualIdentifier, nonmemCmd.PersistentFlags().Lookup(nmQualIdentifier)))
+	cmd.PersistentFlags().Bool(nmQualIdentifier, false, "Whether or not to execute with nmqual (autolog.pl")
+	errpanic(viper.BindPFlag(nmQualIdentifier, cmd.PersistentFlags().Lookup(nmQualIdentifier)))
 
 	// NMFE Options
 	const nmfeGroup string = "nmfe_options"
 	const licFileIdentifier string = "licfile"
-	nonmemCmd.PersistentFlags().String(licFileIdentifier, "", "RAW NMFE OPTION - Specify a license file to use with NMFE (Nonmem)")
-	errpanic(viper.BindPFlag(nmfeGroup+"."+licFileIdentifier, nonmemCmd.PersistentFlags().Lookup(licFileIdentifier)))
+	cmd.PersistentFlags().String(licFileIdentifier, "", "RAW NMFE OPTION - Specify a license file to use with NMFE (Nonmem)")
+	errpanic(viper.BindPFlag(nmfeGroup+"."+licFileIdentifier, cmd.PersistentFlags().Lookup(licFileIdentifier)))
 
 	const prSameIdentifier string = "prsame"
-	nonmemCmd.PersistentFlags().Bool(prSameIdentifier, false, "RAW NMFE OPTION - Indicates to nonmem that the PREDPP compilation step should be skipped")
-	errpanic(viper.BindPFlag(nmfeGroup+"."+prSameIdentifier, nonmemCmd.PersistentFlags().Lookup(prSameIdentifier)))
+	cmd.PersistentFlags().Bool(prSameIdentifier, false, "RAW NMFE OPTION - Indicates to nonmem that the PREDPP compilation step should be skipped")
+	errpanic(viper.BindPFlag(nmfeGroup+"."+prSameIdentifier, cmd.PersistentFlags().Lookup(prSameIdentifier)))
 
 	const backgroundIdentifier string = "background"
-	nonmemCmd.PersistentFlags().Bool(backgroundIdentifier, false, "RAW NMFE OPTION - Tells nonmem not to scan StdIn for control characters")
-	errpanic(viper.BindPFlag(nmfeGroup+"."+backgroundIdentifier, nonmemCmd.PersistentFlags().Lookup(backgroundIdentifier)))
+	cmd.PersistentFlags().Bool(backgroundIdentifier, false, "RAW NMFE OPTION - Tells nonmem not to scan StdIn for control characters")
+	errpanic(viper.BindPFlag(nmfeGroup+"."+backgroundIdentifier, cmd.PersistentFlags().Lookup(backgroundIdentifier)))
 
 	const prCompileIdentifier string = "prcompile"
-	nonmemCmd.PersistentFlags().Bool(prCompileIdentifier, false, "RAW NMFE OPTION - Forces PREDPP compilation")
-	errpanic(viper.BindPFlag(nmfeGroup+"."+prCompileIdentifier, nonmemCmd.PersistentFlags().Lookup(prCompileIdentifier)))
+	cmd.PersistentFlags().Bool(prCompileIdentifier, false, "RAW NMFE OPTION - Forces PREDPP compilation")
+	errpanic(viper.BindPFlag(nmfeGroup+"."+prCompileIdentifier, cmd.PersistentFlags().Lookup(prCompileIdentifier)))
 
 	const noBuildIdentifier string = "nobuild"
-	nonmemCmd.PersistentFlags().Bool(noBuildIdentifier, false, "RAW NMFE OPTION - Skips recompiling and rebuilding on nonmem executable")
-	errpanic(viper.BindPFlag(nmfeGroup+"."+noBuildIdentifier, nonmemCmd.PersistentFlags().Lookup(noBuildIdentifier)))
+	cmd.PersistentFlags().Bool(noBuildIdentifier, false, "RAW NMFE OPTION - Skips recompiling and rebuilding on nonmem executable")
+	errpanic(viper.BindPFlag(nmfeGroup+"."+noBuildIdentifier, cmd.PersistentFlags().Lookup(noBuildIdentifier)))
 
 	const maxLimIdentifier string = "maxlim"
-	nonmemCmd.PersistentFlags().Int(maxLimIdentifier, 100, "RAW NMFE OPTION - Set the maximum values set for the buffers used by Nonmem")
-	errpanic(viper.BindPFlag(nmfeGroup+"."+maxLimIdentifier, nonmemCmd.PersistentFlags().Lookup(maxLimIdentifier)))
+	cmd.PersistentFlags().Int(maxLimIdentifier, 100, "RAW NMFE OPTION - Set the maximum values set for the buffers used by Nonmem")
+	errpanic(viper.BindPFlag(nmfeGroup+"."+maxLimIdentifier, cmd.PersistentFlags().Lookup(maxLimIdentifier)))
+
+	cmd.AddCommand(NewCleanCmd())
+	cmd.AddCommand(NewCovcorCmd())
+	cmd.AddCommand(NewProbsCmd())
+	cmd.AddCommand(NewRecleanCmd())
+	cmd.AddCommand(NewRunCmd())
+	cmd.AddCommand(NewScaffoldCmd())
+	cmd.AddCommand(NewSummaryCmd())
+
+	return cmd
 }
 
 // "Copies" a file by reading its content (optionally updating the path).

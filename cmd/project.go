@@ -33,16 +33,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-// probsCmd represents the command to get information about a given modeling project.
-var probsCmd = &cobra.Command{
-	Use:   "probs",
-	Short: "summarize information about project",
-	Long: `get information about models in the project: 
-nmu project
- `,
-	RunE: probs,
-}
-
 func probs(_ *cobra.Command, args []string) error {
 	if debug {
 		viper.Debug()
@@ -86,8 +76,15 @@ func probs(_ *cobra.Command, args []string) error {
 
 	return nil
 }
-func init() {
-	nonmemCmd.AddCommand(probsCmd)
+func NewProbsCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "probs",
+		Short: "summarize information about project",
+		Long: `get information about models in the project:
+nmu project
+ `,
+		RunE: probs,
+	}
 }
 
 type runSummary struct {

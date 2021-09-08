@@ -30,14 +30,6 @@ bbi nonmem covcor run001/run001
 bbi nonmem covcor run001/run001.cov
  `
 
-// runCmd represents the run command.
-var covcorCmd = &cobra.Command{
-	Use:   "covcor",
-	Short: "load .cov and .cor output from a model run",
-	Long:  covcorLongDescription,
-	Run:   covcor,
-}
-
 func covcor(cmd *cobra.Command, args []string) {
 	if debug {
 		viper.Debug()
@@ -51,6 +43,12 @@ func covcor(cmd *cobra.Command, args []string) {
 	jsonRes, _ := json.MarshalIndent(results, "", "\t")
 	fmt.Printf("%s\n", jsonRes)
 }
-func init() {
-	nonmemCmd.AddCommand(covcorCmd)
+
+func NewCovcorCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "covcor",
+		Short: "load .cov and .cor output from a model run",
+		Long:  covcorLongDescription,
+		Run:   covcor,
+	}
 }

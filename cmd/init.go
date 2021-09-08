@@ -18,15 +18,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-// RunCmd represents the run command.
-var initCmd = &cobra.Command{
-	Use:   "init",
-	Short: "Create configuration file with defaults",
-	Long: `Run bbi init to create a bbi.yaml configuration file in the current directory.
- `,
-	RunE: initializer,
-}
-
 func initializer(cmd *cobra.Command, _ []string) error {
 	fs := afero.NewOsFs()
 
@@ -92,11 +83,18 @@ func initializer(cmd *cobra.Command, _ []string) error {
 	return nil
 }
 
-func init() {
-	RootCmd.AddCommand(initCmd)
+func NewInitCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "init",
+		Short: "Create configuration file with defaults",
+		Long: `Run bbi init to create a bbi.yaml configuration file in the current directory.
+ `,
+		RunE: initializer,
+	}
 
 	const directory string = "dir"
-	initCmd.Flags().StringSlice(directory, []string{}, "A directory in which to look for NonMem Installations")
+	cmd.Flags().StringSlice(directory, []string{}, "A directory in which to look for NonMem Installations")
+	return cmd
 }
 
 // Evaluates if a specific directory path is nonmem-ish.
