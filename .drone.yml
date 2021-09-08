@@ -2,37 +2,34 @@
 kind: pipeline
 type: exec
 name: testing
+
 platform:
   os: linux
   arch: amd64
+
 workspace:
   path: /tmp/drone
-global_variables:
-  SGE: &sge_environment
-    SGE_CELL: default
-    SGE_EXECD_PORT: 6445
-    SGE_ROOT: /opt/sge
-    SGE_ARCH: lx-amd64
-    SGE_QMASTER_PORT: 6444
-    SGE_CLUSTER_NAME: p6444
-  SGE_PATH: &sge_path /usr/local/texlive/2019/bin/x86_64-linux:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/bin:/opt/amazon/openmpi/bin:/opt/amazon/efa/bin/:/usr/local/texlive/2019/bin/x86_64-linux:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/bin:/opt/amazon/openmpi/bin:/opt/amazon/efa/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+
 steps:
   - name: Sanity and Cleanup
     commands:
       - if [ -d /tmp/${DRONE_BUILD_NUMBER}/bbitest ] ; then rm -rf /tmp/${DRONE_BUILD_NUMBER}/bbitest; fi
+
   - name: Build bbi
     commands:
       - mkdir -p /tmp/${DRONE_BUILD_NUMBER} ; git rev-parse HEAD > /tmp/${DRONE_BUILD_NUMBER}/bbi_hash
       - go build -o bbi cmd/bbi/main.go
       - ./bbi version
+
   - name: Get bbitest
-    environment:
-      BBITEST_BRANCH: master
     commands:
       - git clone https://github.com/metrumresearchgroup/bbitest.git /tmp/${DRONE_BUILD_NUMBER}/bbitest
       - cd /tmp/${DRONE_BUILD_NUMBER}/bbitest
       - mkdir -p /tmp/${DRONE_BUILD_NUMBER} ; git rev-parse HEAD > /tmp/${DRONE_BUILD_NUMBER}/bbitest_hash
       - if [ ! -z $BBITEST_BRANCH ]; then git checkout $BBITEST_BRANCH; fi
+    environment:
+      BBITEST_BRANCH: master
+
   - name: Copy commit hashes to s3
     commands:
       - printf "[\n" > /tmp/${DRONE_BUILD_NUMBER}/commits.json
@@ -40,17 +37,36 @@ steps:
       - printf "  {\"repo\":\"metrumresearchgroup/bbitest\", \"commit\":\"$(cat /tmp/${DRONE_BUILD_NUMBER}/bbitest_hash)\"}\n" >> /tmp/${DRONE_BUILD_NUMBER}/commits.json
       - printf "]\n" >> /tmp/${DRONE_BUILD_NUMBER}/commits.json
       - aws s3 cp /tmp/${DRONE_BUILD_NUMBER}/commits.json s3://mrg-validation/bbi/${DRONE_BUILD_NUMBER}/commits.json
+
   - name: Test
+    commands:
+      - if [ ! -d /data/${DRONE_BUILD_NUMBER}/apps ] ; then mkdir -p /data/${DRONE_BUILD_NUMBER}/apps; chmod -R 0755 /data/${DRONE_BUILD_NUMBER}/apps; cp bbi /data/${DRONE_BUILD_NUMBER}/apps; else cp bbi /data/${DRONE_BUILD_NUMBER}/apps; fi
+      - export PATH=$PATH:/data/${DRONE_BUILD_NUMBER}/apps
+      - cd /tmp/${DRONE_BUILD_NUMBER}/bbitest
+      - export ROOT_EXECUTION_DIR=/data/${DRONE_BUILD_NUMBER}
+      - export BBI_GRID_NAME_PREFIX="drone_${DRONE_BUILD_NUMBER}"
+      - bbi init --dir /opt/NONMEM
+      - go test ./... -v --json -timeout 30m | tee test_output.json
+      - aws s3 cp test_output.json s3://mrg-validation/bbi/${DRONE_BUILD_NUMBER}/results.json
+      - chmod +x failure_detector.sh
+      - ./failure_detector.sh test_output.json
+      - rm -rf /data/${DRONE_BUILD_NUMBER}
+      - rm -rf /tmp/${DRONE_BUILD_NUMBER}/bbitest
     environment:
-      <<: *sge_environment
-      PATH: *sge_path
-      MPIEXEC_PATH: /usr/bin/mpiexec
-      NONMEMROOT: /opt/NONMEM
-      NMVERSION: nm74gf
-      SGE: true
-      POST_EXECUTION: true
-      NMQUAL: true
       LOCAL: true
+      MPIEXEC_PATH: /usr/bin/mpiexec
+      NMQUAL: true
+      NMVERSION: nm74gf
+      NONMEMROOT: /opt/NONMEM
+      PATH: /usr/local/texlive/2019/bin/x86_64-linux:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/bin:/opt/amazon/openmpi/bin:/opt/amazon/efa/bin/:/usr/local/texlive/2019/bin/x86_64-linux:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/bin:/opt/amazon/openmpi/bin:/opt/amazon/efa/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+      POST_EXECUTION: true
+      SGE: true
+      SGE_ARCH: lx-amd64
+      SGE_CELL: default
+      SGE_CLUSTER_NAME: p6444
+      SGE_EXECD_PORT: 6445
+      SGE_QMASTER_PORT: 6444
+      SGE_ROOT: /opt/sge
     volumes:
       - name: nonmem
         path: /opt/NONMEM
@@ -58,32 +74,18 @@ steps:
         path: /tmp
       - name: data
         path: /data
+
+  - name: Cleanup on failure
     commands:
-      #Move the built BBI binary into build root
-      - if [ ! -d /data/${DRONE_BUILD_NUMBER}/apps ] ; then mkdir -p /data/${DRONE_BUILD_NUMBER}/apps; chmod -R 0755 /data/${DRONE_BUILD_NUMBER}/apps; cp bbi /data/${DRONE_BUILD_NUMBER}/apps; else cp bbi /data/${DRONE_BUILD_NUMBER}/apps; fi
-      #Update path to include build root
-      - export PATH=$PATH:/data/${DRONE_BUILD_NUMBER}/apps
-      - cd /tmp/${DRONE_BUILD_NUMBER}/bbitest
-      - export ROOT_EXECUTION_DIR=/data/${DRONE_BUILD_NUMBER}
-      - export BBI_GRID_NAME_PREFIX="drone_${DRONE_BUILD_NUMBER}"
-      #Run test suite and copy results to s3
-      - bbi init --dir /opt/NONMEM
-      - go test ./... -v --json -timeout 30m | tee test_output.json
-      - aws s3 cp test_output.json s3://mrg-validation/bbi/${DRONE_BUILD_NUMBER}/results.json
-      #Check for test failures and clean up
-      - chmod +x failure_detector.sh
-      - ./failure_detector.sh test_output.json
       - rm -rf /data/${DRONE_BUILD_NUMBER}
       - rm -rf /tmp/${DRONE_BUILD_NUMBER}/bbitest
-  - name: Cleanup on failure
     volumes:
       - name: data
         path: /data
-    commands:
-      - rm -rf /data/${DRONE_BUILD_NUMBER}
-      - rm -rf /tmp/${DRONE_BUILD_NUMBER}/bbitest
     when:
-      status: failure
+      status:
+        - failure
+
 volumes:
   - name: nonmem
     host:
@@ -94,16 +96,29 @@ volumes:
   - name: data
     host:
       path: /data
+---
+kind: pipeline
+type: docker
+name: lint
 
+steps:
+  - name: lint
+    image: golang:1.17
+    commands:
+      - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.42.1
+      - golangci-lint run
 ---
 kind: pipeline
 type: exec
 name: validation
+
 platform:
   os: linux
   arch: amd64
+
 workspace:
   path: /tmp/drone
+
 steps:
   - name: GoProjectValidator
     commands:
@@ -120,41 +135,48 @@ steps:
       - aws s3 cp rendered/specification.md s3://mrg-validation/bbi/${DRONE_TAG}/specification.md
       - aws s3 cp rendered/testing_and_validation.md s3://mrg-validation/bbi/${DRONE_TAG}/testing_and_validation.md
       - aws s3 cp rendered/traceability_matrix.md s3://mrg-validation/bbi/${DRONE_TAG}/traceability_matrix.md
-      #Render PDFs of the documents
       - pandoc -o specification.pdf -V geometry:"paperwidth=8in, paperheight=11in, margin=15pt" rendered/specification.md
       - pandoc -o testing_and_validation.pdf -V geometry:"paperwidth=8in, paperheight=11in, margin=15pt" rendered/testing_and_validation.md
       - pandoc -o traceability_matrix.pdf -V geometry:"paperwidth=22in, paperheight=210mm, margin=2cm" rendered/traceability_matrix.md
-      #Copy PDFs to S3
       - aws s3 cp specification.pdf s3://mrg-validation/bbi/${DRONE_TAG}/specification.pdf
       - aws s3 cp testing_and_validation.pdf s3://mrg-validation/bbi/${DRONE_TAG}/testing_and_validation.pdf
       - aws s3 cp traceability_matrix.pdf s3://mrg-validation/bbi/${DRONE_TAG}/traceability_matrix.pdf
+
 trigger:
   event:
     - tag
+
 depends_on:
   - testing
 
 ---
-name: goreleaser
 kind: pipeline
 type: docker
+name: goreleaser
+
+platform:
+  os: linux
+  arch: amd64
+
 steps:
   - name: goreleaser
     image: goreleaser/goreleaser
-    environment:
-      VERSION: ${DRONE_TAG}
-      #Forcing DBN to be empty such that we don't set it for hte LDFLags
-      DRONE_BUILD_NUMBER: ""
-      GITHUB_TOKEN:
-        from_secret: GITHUB_TOKEN
     commands:
       - git config --global user.email "drone@metrumrg.com"
       - git config --global user.name "Drony"
       - git fetch --tags
       - cd cmd/bbi
       - goreleaser --rm-dist
+    environment:
+      GITHUB_TOKEN:
+        from_secret: GITHUB_TOKEN
+      VERSION: ${DRONE_TAG}
+
 trigger:
   event:
     - tag
+
 depends_on:
   - testing
+
+...
