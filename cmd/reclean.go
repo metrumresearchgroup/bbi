@@ -24,16 +24,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-// cleanCmd represents the clean command.
-var recleanCmd = &cobra.Command{
-	Use:   "reclean",
-	Short: "clean files in an estimation directory by clean level",
-	Long: `
-	bbi reclean run001_est_01
- `,
-	RunE: reclean,
-}
-
 func reclean(cmd *cobra.Command, args []string) error {
 	if debug {
 		viper.Debug()
@@ -46,9 +36,18 @@ func reclean(cmd *cobra.Command, args []string) error {
 
 	return nil
 }
-func init() {
-	nonmemCmd.AddCommand(recleanCmd)
 
-	recleanCmd.Flags().Int("recleanLvl", 0, "clean level to apply")
-	errpanic(viper.BindPFlag("recleanLvl", recleanCmd.Flags().Lookup("recleanLvl")))
+func NewRecleanCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "reclean",
+		Short: "clean files in an estimation directory by clean level",
+		Long: `
+	bbi reclean run001_est_01
+ `,
+		RunE: reclean,
+	}
+
+	cmd.Flags().Int("recleanLvl", 0, "clean level to apply")
+	errpanic(viper.BindPFlag("recleanLvl", cmd.Flags().Lookup("recleanLvl")))
+	return cmd
 }

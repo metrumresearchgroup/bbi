@@ -49,12 +49,6 @@ var (
 	executionWaitGroup sync.WaitGroup
 )
 
-// RootCmd represents the base command when called without any subcommands.
-var RootCmd = &cobra.Command{
-	Use:   "bbi",
-	Short: "manage and execute models",
-	Long:  fmt.Sprintf("bbi CLI version %s", VERSION),
-}
 
 // Execute adds all child commands to the root command sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
@@ -62,14 +56,22 @@ func Execute(build string) {
 	if build != "" {
 		VERSION = fmt.Sprintf("%s-%s", VERSION, build)
 	}
-	RootCmd.Long = fmt.Sprintf("bbi cli version %s", VERSION)
-	if err := RootCmd.Execute(); err != nil {
+	cmd := NewRootCmd()
+	cmd.Long = fmt.Sprintf("bbi cli version %s", VERSION)
+	if err := cmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(-1)
 	}
 }
 
-func init() {
+// RootCmd represents the base command when called without any subcommands.
+func NewRootCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "bbi",
+		Short: "manage and execute models",
+		Long:  fmt.Sprintf("bbi CLI version %s", VERSION),
+	}
+
 	// Set random for application
 	rand.Seed(time.Now().UnixNano())
 
@@ -82,14 +84,20 @@ func init() {
 	// Here you will define your flags and configuration settings.
 	// Cobra supports Persistent Flags, which, if defined here,
 	// will be global for your application.
-	RootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
-	RootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "debug mode")
-	errpanic(viper.BindPFlag("debug", RootCmd.PersistentFlags().Lookup("debug"))) // Bind Debug to viper
-	RootCmd.PersistentFlags().IntVar(&threads, "threads", 4, "number of threads to execute with locally or nodes to execute on in parallel")
-	errpanic(viper.BindPFlag("threads", RootCmd.PersistentFlags().Lookup("threads"))) // Update to make sure viper binds to the flag
-	RootCmd.PersistentFlags().BoolVar(&Json, "json", false, "json tree of output, if possible")
-	errpanic(viper.BindPFlag("json", RootCmd.PersistentFlags().Lookup("json"))) // Bind to viper
-	RootCmd.PersistentFlags().BoolVarP(&preview, "preview", "p", false, "preview action, but don't actually run command")
+	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
+	cmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "debug mode")
+	errpanic(viper.BindPFlag("debug", cmd.PersistentFlags().Lookup("debug"))) // Bind Debug to viper
+	cmd.PersistentFlags().IntVar(&threads, "threads", 4, "number of threads to execute with locally or nodes to execute on in parallel")
+	errpanic(viper.BindPFlag("threads", cmd.PersistentFlags().Lookup("threads"))) // Update to make sure viper binds to the flag
+	cmd.PersistentFlags().BoolVar(&Json, "json", false, "json tree of output, if possible")
+	errpanic(viper.BindPFlag("json", cmd.PersistentFlags().Lookup("json"))) // Bind to viper
+	cmd.PersistentFlags().BoolVarP(&preview, "preview", "p", false, "preview action, but don't actually run command")
+
+	cmd.AddCommand(NewInitCmd())
+	cmd.AddCommand(NewNonmemCmd())
+	cmd.AddCommand(NewVersionCmd())
+
+	return cmd
 }
 
 // initConfig reads in config file and ENV variables if set.

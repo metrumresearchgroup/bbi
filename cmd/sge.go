@@ -154,21 +154,19 @@ func (l SGEModel) Cleanup(_ *turnstile.ChannelMap) {
 
 //End Scalable method definitions
 
-// runCmd represents the run command.
-var sgeCMD = &cobra.Command{
-	Use:   "sge",
-	Short: "sge specifies to run a (set of) models on the Sun Grid Engine",
-	Long:  runLongDescription,
-	Run:   sge,
-}
-
 func errpanic(err error) {
 	if err != nil {
 		panic(err)
 	}
 }
-func init() {
-	runCmd.AddCommand(sgeCMD)
+
+func NewSgeCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "sge",
+		Short: "sge specifies to run a (set of) models on the Sun Grid Engine",
+		Long:  runLongDescription,
+		Run:   sge,
+	}
 
 	bbi, err := os.Executable()
 
@@ -177,12 +175,13 @@ func init() {
 	}
 
 	//String Variables
-	sgeCMD.PersistentFlags().String("bbi_binary", bbi, "directory path for bbi to be called in goroutines (SGE Execution)")
-	errpanic(viper.BindPFlag("bbi_binary", sgeCMD.PersistentFlags().Lookup("bbi_binary")))
+	cmd.PersistentFlags().String("bbi_binary", bbi, "directory path for bbi to be called in goroutines (SGE Execution)")
+	errpanic(viper.BindPFlag("bbi_binary", cmd.PersistentFlags().Lookup("bbi_binary")))
 
 	const gridNamePrefixIdentifier string = "grid_name_prefix"
-	sgeCMD.PersistentFlags().String(gridNamePrefixIdentifier, "", "Any prefix you wish to add to the name of jobs being submitted to the grid")
-	errpanic(viper.BindPFlag(gridNamePrefixIdentifier, sgeCMD.PersistentFlags().Lookup(gridNamePrefixIdentifier)))
+	cmd.PersistentFlags().String(gridNamePrefixIdentifier, "", "Any prefix you wish to add to the name of jobs being submitted to the grid")
+	errpanic(viper.BindPFlag(gridNamePrefixIdentifier, cmd.PersistentFlags().Lookup(gridNamePrefixIdentifier)))
+	return cmd
 }
 
 func sge(_ *cobra.Command, args []string) {

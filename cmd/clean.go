@@ -39,41 +39,6 @@ var (
 	regex      bool
 )
 
-// cleanCmd represents the clean command.
-var cleanCmd = &cobra.Command{
-	Use:   "clean",
-	Short: "clean files and folders",
-	Long: `
-glob examples:
-bbi clean *.mod // anything with extension .mod
-bbi clean *.mod --noFolders // anything with extension .mod
-bbi clean run* // anything starting with run
-regular expression examples:
-
-bbi clean ^run --regex // anything beginning with the letters run
-bbi clean ^run -v --regex // print out files and folders that will be deleted 
-bbi clean ^run --filesOnly --regex // only remove matching files 
-bbi clean _est_ --dirsOnly --regex // only remove matching folders  
-bbi clean _est_ --dirsOnly --preview --regex // show what output would be if clean occured but don't actually clean 
-bbi clean "run009.[^mod]" --regex // all matching run009.<ext> but not .mod files
-bbi clean "run009.(mod|lst)$" --regex // match run009.lst and run009.mod
-
-can also clean via the opposite of a match with inverse
-
-bbi clean ".modt{0,1}$" --filesOnly --inverse --regex // clean all files not matching .mod or .modt
-
-clean copied files via
-
-bbi clean --copiedRuns="run001"
-bbi clean --copiedRuns="run[001:010]"
-
-can be a comma separated list as well
-
-bbi clean --copiedRuns="run[001:010],run100"
- `,
-	RunE: clean,
-}
-
 func clean(cmd *cobra.Command, args []string) error {
 	if debug {
 		viper.Debug()
@@ -184,11 +149,45 @@ func getMatches(s []string, expr string, regex bool) ([]string, error) {
 	}
 }
 
-func init() {
-	nonmemCmd.AddCommand(cleanCmd)
-	cleanCmd.Flags().BoolVar(&dirsOnly, "dirsOnly", false, "only match and clean directories")
-	cleanCmd.Flags().BoolVar(&filesOnly, "filesOnly", false, "only match and clean files")
-	cleanCmd.Flags().BoolVar(&inverse, "inverse", false, "inverse selection from the given regex match criteria")
-	cleanCmd.Flags().BoolVar(&regex, "regex", false, "use regular expression to match instead of glob")
-	cleanCmd.Flags().StringVar(&copiedRuns, "copiedRuns", "", "run names")
+func NewCleanCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "clean",
+		Short: "clean files and folders",
+		Long: `
+glob examples:
+bbi clean *.mod // anything with extension .mod
+bbi clean *.mod --noFolders // anything with extension .mod
+bbi clean run* // anything starting with run
+regular expression examples:
+
+bbi clean ^run --regex // anything beginning with the letters run
+bbi clean ^run -v --regex // print out files and folders that will be deleted
+bbi clean ^run --filesOnly --regex // only remove matching files
+bbi clean _est_ --dirsOnly --regex // only remove matching folders
+bbi clean _est_ --dirsOnly --preview --regex // show what output would be if clean occured but don't actually clean
+bbi clean "run009.[^mod]" --regex // all matching run009.<ext> but not .mod files
+bbi clean "run009.(mod|lst)$" --regex // match run009.lst and run009.mod
+
+can also clean via the opposite of a match with inverse
+
+bbi clean ".modt{0,1}$" --filesOnly --inverse --regex // clean all files not matching .mod or .modt
+
+clean copied files via
+
+bbi clean --copiedRuns="run001"
+bbi clean --copiedRuns="run[001:010]"
+
+can be a comma separated list as well
+
+bbi clean --copiedRuns="run[001:010],run100"
+ `,
+		RunE: clean,
+	}
+
+	cmd.Flags().BoolVar(&dirsOnly, "dirsOnly", false, "only match and clean directories")
+	cmd.Flags().BoolVar(&filesOnly, "filesOnly", false, "only match and clean files")
+	cmd.Flags().BoolVar(&inverse, "inverse", false, "inverse selection from the given regex match criteria")
+	cmd.Flags().BoolVar(&regex, "regex", false, "use regular expression to match instead of glob")
+	cmd.Flags().StringVar(&copiedRuns, "copiedRuns", "", "run names")
+	return cmd
 }

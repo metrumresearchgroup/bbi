@@ -40,15 +40,6 @@ bbi nonmem summary run001/run001
 bbi nonmem summary run001/run001.lst
 bbi nonmem summary run001/run001.res
  `
-
-// runCmd represents the run command.
-var summaryCmd = &cobra.Command{
-	Use:   "summary",
-	Short: "summarize the output of model(s)",
-	Long:  summaryLongDescription,
-	Run:   summary,
-}
-
 type jsonResults struct {
 	Results []parser.SummaryOutput
 	Errors  []error
@@ -162,11 +153,19 @@ func summary(_ *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 }
-func init() {
-	nonmemCmd.AddCommand(summaryCmd)
+
+func NewSummaryCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "summary",
+		Short: "summarize the output of model(s)",
+		Long:  summaryLongDescription,
+		Run:   summary,
+	}
+
 	// Used for Summary
-	summaryCmd.PersistentFlags().BoolVar(&noExt, "no-ext-file", false, "do not use ext file")
-	summaryCmd.PersistentFlags().BoolVar(&noGrd, "no-grd-file", false, "do not use grd file")
-	summaryCmd.PersistentFlags().BoolVar(&noShk, "no-shk-file", false, "do not use shk file")
-	summaryCmd.PersistentFlags().StringVar(&extFile, "ext-file", "", "name of custom ext-file")
+	cmd.PersistentFlags().BoolVar(&noExt, "no-ext-file", false, "do not use ext file")
+	cmd.PersistentFlags().BoolVar(&noGrd, "no-grd-file", false, "do not use grd file")
+	cmd.PersistentFlags().BoolVar(&noShk, "no-shk-file", false, "do not use shk file")
+	cmd.PersistentFlags().StringVar(&extFile, "ext-file", "", "name of custom ext-file")
+	return cmd
 }

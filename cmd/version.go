@@ -21,20 +21,19 @@ import (
 )
 
 // runCmd represents the run command.
-var versionCmd = &cobra.Command{
-	Use:   "version",
-	Short: "check version",
-	Long: `check the current bbi version
-bbi version 
+func NewVersionCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "version",
+		Short: "check version",
+		Long: `check the current bbi version
+bbi version
  `,
-	Run: version,
+		Run: version,
+	}
 }
 
 func version(cmd *cobra.Command, args []string) {
 	fmt.Println(buildVersionString(VERSION))
-}
-func init() {
-	RootCmd.AddCommand(versionCmd)
 }
 
 func buildVersionString(version string) string {

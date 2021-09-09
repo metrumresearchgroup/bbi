@@ -344,21 +344,19 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 
 // End Scalable method definitions
 
-// runCmd represents the run command.
-var localCmd = &cobra.Command{
-	Use:   "local",
-	Short: "local specifies to run a (set of) models locally",
-	Long:  runLongDescription,
-	Run:   local,
-}
-
-func init() {
-	runCmd.AddCommand(localCmd)
+func NewLocalCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "local",
+		Short: "local specifies to run a (set of) models locally",
+		Long:  runLongDescription,
+		Run:   local,
+	}
 
 	childDirIdentifier := "create_child_dirs"
-	localCmd.PersistentFlags().Bool(childDirIdentifier, true, "Indicates whether or not local branch execution"+
+	cmd.PersistentFlags().Bool(childDirIdentifier, true, "Indicates whether or not local branch execution"+
 		"should create a new subdirectory with the output_dir variable as its name and execute in that directory")
-	errpanic(viper.BindPFlag("local."+childDirIdentifier, localCmd.PersistentFlags().Lookup(childDirIdentifier)))
+	errpanic(viper.BindPFlag("local."+childDirIdentifier, cmd.PersistentFlags().Lookup(childDirIdentifier)))
+	return cmd
 }
 
 func local(_ *cobra.Command, args []string) {

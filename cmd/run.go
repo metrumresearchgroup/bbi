@@ -54,81 +54,83 @@ const postProcessingScriptTemplate string = `#!/bin/bash
 {{ .Script }}
 `
 
-// RunCmd represents the run command.
-var runCmd = &cobra.Command{
-	Use:   "run",
-	Short: "run a (set of) models locally or on the grid",
-	Long:  runLongDescription,
-	Run:   run,
-}
-
 func run(_ *cobra.Command, _ []string) {
 	println(runLongDescription)
 }
 
-func init() {
+func NewRunCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "run",
+		Short: "run a (set of) models locally or on the grid",
+		Long:  runLongDescription,
+		Run:   run,
+	}
+
 	// String Variables
-	// runCmd.PersistentFlags().String("cacheDir", "", "directory path for cache of nonmem executables for NM7.4+")
-	// viper.BindPFlag("cacheDir", runCmd.PersistentFlags().Lookup("cacheDir"))
+	// cmd.PersistentFlags().String("cacheDir", "", "directory path for cache of nonmem executables for NM7.4+")
+	// viper.BindPFlag("cacheDir", cmd.PersistentFlags().Lookup("cacheDir"))
 
-	// runCmd.PersistentFlags().String("cacheExe", "", "name of executable stored in cache")
-	// viper.BindPFlag("cacheExe", runCmd.PersistentFlags().Lookup("cacheExe"))
+	// cmd.PersistentFlags().String("cacheExe", "", "name of executable stored in cache")
+	// viper.BindPFlag("cacheExe", cmd.PersistentFlags().Lookup("cacheExe"))
 
-	// runCmd.PersistentFlags().String("saveExe", "", "what to name the executable when stored in cache")
-	// viper.BindPFlag("saveExe", runCmd.PersistentFlags().Lookup("saveExe"))
+	// cmd.PersistentFlags().String("saveExe", "", "what to name the executable when stored in cache")
+	// viper.BindPFlag("saveExe", cmd.PersistentFlags().Lookup("saveExe"))
 
-	runCmd.PersistentFlags().String("output_dir", "{{ .Name }}", "Go template for the output directory to use for storging details of each executed model")
-	errpanic(viper.BindPFlag("output_dir", runCmd.PersistentFlags().Lookup("output_dir")))
+	cmd.PersistentFlags().String("output_dir", "{{ .Name }}", "Go template for the output directory to use for storging details of each executed model")
+	errpanic(viper.BindPFlag("output_dir", cmd.PersistentFlags().Lookup("output_dir")))
 	viper.SetDefault("output_dir", "{{ .Name }}")
 
 	// Int Variables
-	runCmd.PersistentFlags().Int("clean_lvl", 1, "clean level used for file output from a given (set of) runs")
-	errpanic(viper.BindPFlag("clean_lvl", runCmd.PersistentFlags().Lookup("clean_lvl")))
+	cmd.PersistentFlags().Int("clean_lvl", 1, "clean level used for file output from a given (set of) runs")
+	errpanic(viper.BindPFlag("clean_lvl", cmd.PersistentFlags().Lookup("clean_lvl")))
 	// TODO: these are likely not meangingful as should be set in configlib, but want to configm
 	viper.SetDefault("clean_lvl", 1)
 
-	runCmd.PersistentFlags().Int("copy_lvl", 0, "copy level used for file output from a given (set of) runs")
-	errpanic(viper.BindPFlag("copy_lvl", runCmd.PersistentFlags().Lookup("copy_lvl")))
+	cmd.PersistentFlags().Int("copy_lvl", 0, "copy level used for file output from a given (set of) runs")
+	errpanic(viper.BindPFlag("copy_lvl", cmd.PersistentFlags().Lookup("copy_lvl")))
 	viper.SetDefault("copy_lvl", 0)
 
-	// runCmd.PersistentFlags().Int("gitignoreLvl", 0, "gitignore lvl for a given (set of) runs")
-	// viper.BindPFlag("gitignoreLvl", runCmd.PersistentFlags().Lookup("gitignoreLvl"))
+	// cmd.PersistentFlags().Int("gitignoreLvl", 0, "gitignore lvl for a given (set of) runs")
+	// viper.BindPFlag("gitignoreLvl", cmd.PersistentFlags().Lookup("gitignoreLvl"))
 	// viper.SetDefault("gitignoreLvl", 1)
 
 	// Bool Variables
-	runCmd.PersistentFlags().Bool("git", false, "whether git is used")
-	errpanic(viper.BindPFlag("git", runCmd.PersistentFlags().Lookup("git")))
+	cmd.PersistentFlags().Bool("git", false, "whether git is used")
+	errpanic(viper.BindPFlag("git", cmd.PersistentFlags().Lookup("git")))
 	viper.SetDefault("git", true)
 
-	runCmd.PersistentFlags().Bool("overwrite", false, "Whether or not to remove existing output directories if they are present")
-	errpanic(viper.BindPFlag("overwrite", runCmd.PersistentFlags().Lookup("overwrite")))
+	cmd.PersistentFlags().Bool("overwrite", false, "Whether or not to remove existing output directories if they are present")
+	errpanic(viper.BindPFlag("overwrite", cmd.PersistentFlags().Lookup("overwrite")))
 	viper.SetDefault("overwrite", false)
 
 	const configIdentifier string = "config"
-	runCmd.PersistentFlags().String(configIdentifier, "", "Path (relative or absolute) to another bbi.yaml to load")
-	errpanic(viper.BindPFlag(configIdentifier, runCmd.PersistentFlags().Lookup(configIdentifier)))
+	cmd.PersistentFlags().String(configIdentifier, "", "Path (relative or absolute) to another bbi.yaml to load")
+	errpanic(viper.BindPFlag(configIdentifier, cmd.PersistentFlags().Lookup(configIdentifier)))
 
 	const saveconfig string = "save_config"
-	runCmd.PersistentFlags().Bool(saveconfig, true, "Whether or not to save the existing configuration to a file with the model")
-	errpanic(viper.BindPFlag(saveconfig, runCmd.PersistentFlags().Lookup(saveconfig)))
+	cmd.PersistentFlags().Bool(saveconfig, true, "Whether or not to save the existing configuration to a file with the model")
+	errpanic(viper.BindPFlag(saveconfig, cmd.PersistentFlags().Lookup(saveconfig)))
 
 	const delayIdentifier string = "delay"
-	runCmd.PersistentFlags().Int(delayIdentifier, 0, "Selects a random number of seconds between 1 and this value to stagger / jitter job execution. Assists in dealing with large volumes of work dealing with the same data set. May avoid NMTRAN issues about not being able read / close files")
-	errpanic(viper.BindPFlag(delayIdentifier, runCmd.PersistentFlags().Lookup(delayIdentifier)))
+	cmd.PersistentFlags().Int(delayIdentifier, 0, "Selects a random number of seconds between 1 and this value to stagger / jitter job execution. Assists in dealing with large volumes of work dealing with the same data set. May avoid NMTRAN issues about not being able read / close files")
+	errpanic(viper.BindPFlag(delayIdentifier, cmd.PersistentFlags().Lookup(delayIdentifier)))
 
 	const logFileIdentifier string = "log_file"
-	runCmd.PersistentFlags().String(logFileIdentifier, "", "If populated, specifies the file into which to store the output / logging details from bbi")
-	errpanic(viper.BindPFlag(logFileIdentifier, runCmd.PersistentFlags().Lookup(logFileIdentifier)))
+	cmd.PersistentFlags().String(logFileIdentifier, "", "If populated, specifies the file into which to store the output / logging details from bbi")
+	errpanic(viper.BindPFlag(logFileIdentifier, cmd.PersistentFlags().Lookup(logFileIdentifier)))
 
 	const postExecutionHookIdentifier string = "post_work_executable"
-	runCmd.PersistentFlags().String(postExecutionHookIdentifier, "", "A script or binary to run when job execution completes or fails")
-	errpanic(viper.BindPFlag(postExecutionHookIdentifier, runCmd.PersistentFlags().Lookup(postExecutionHookIdentifier)))
+	cmd.PersistentFlags().String(postExecutionHookIdentifier, "", "A script or binary to run when job execution completes or fails")
+	errpanic(viper.BindPFlag(postExecutionHookIdentifier, cmd.PersistentFlags().Lookup(postExecutionHookIdentifier)))
 
 	const additionalEnvIdentifier string = "additional_post_work_envs"
-	runCmd.PersistentFlags().StringSlice(additionalEnvIdentifier, []string{}, "Any additional values (as ENV KEY=VALUE) to provide for the post execution environment")
-	errpanic(viper.BindPFlag(additionalEnvIdentifier, runCmd.PersistentFlags().Lookup(additionalEnvIdentifier)))
+	cmd.PersistentFlags().StringSlice(additionalEnvIdentifier, []string{}, "Any additional values (as ENV KEY=VALUE) to provide for the post execution environment")
+	errpanic(viper.BindPFlag(additionalEnvIdentifier, cmd.PersistentFlags().Lookup(additionalEnvIdentifier)))
 
-	nonmemCmd.AddCommand(runCmd)
+	cmd.AddCommand(NewLocalCmd())
+	cmd.AddCommand(NewSgeCmd())
+
+	return cmd
 }
 
 type PostWorkExecutor interface {
