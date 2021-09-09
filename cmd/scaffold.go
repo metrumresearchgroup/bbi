@@ -68,12 +68,14 @@ func scaffold(cmd *cobra.Command, args []string) error {
 			log.Fatalf("error creating cache directory: %s", err)
 		}
 		fmt.Println("adding .gitignore to cache directory...")
-		errpanic(utils.WriteLinesFS(AppFs, []string{
+		if err = utils.WriteLinesFS(AppFs, []string{
 			"*",
 			"*/",
 			"!.gitignore",
 			"",
-		}, filepath.Join(cache, ".gitignore")))
+		}, filepath.Join(cache, ".gitignore")); err != nil {
+			return err
+		}
 	}
 
 	return nil

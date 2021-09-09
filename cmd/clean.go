@@ -107,7 +107,7 @@ func clean(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	//TODO: Have this operate now based on model name?
+	// TODO: Have this operate now based on model name?
 	if copiedRuns != "" {
 		copies := strings.Split(copiedRuns, ",")
 		for _, arg := range copies {
@@ -141,14 +141,19 @@ func clean(cmd *cobra.Command, args []string) error {
 
 		return nil
 	}
+
 	if !filesOnly {
 		for _, f := range matchedFolders {
-			errpanic(AppFs.RemoveAll(filepath.Join(dir, f)))
+			// explicitly ignoring errors here, as this is not critical
+			// and it's more important to try than to succeed
+			_ = AppFs.RemoveAll(filepath.Join(dir, f))
 		}
 	}
 	if !dirsOnly {
 		for _, f := range matchedFiles {
-			errpanic(AppFs.Remove(filepath.Join(dir, f)))
+			// explicitly ignoring errors here, as this is not critical
+			// and it's more important to try than to succeed
+			_ = AppFs.Remove(filepath.Join(dir, f))
 		}
 	}
 

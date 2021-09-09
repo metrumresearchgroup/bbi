@@ -246,7 +246,9 @@ func copyFileToDestination(l *NonMemModel, modifyPath bool) error {
 
 	if exists, _ := afero.DirExists(fs, l.OutputDir); !exists {
 		// Create the directory
-		errpanic(fs.MkdirAll(l.OutputDir, 0750))
+		if err := fs.MkdirAll(l.OutputDir, 0750); err != nil {
+			return err
+		}
 	}
 
 	stats, err := fs.Stat(l.Path)
@@ -258,7 +260,8 @@ func copyFileToDestination(l *NonMemModel, modifyPath bool) error {
 		// this is going to break the hashing so it doesn't matter anyway, but this implementation will strip
 		// trailing newlines, so for a file that doesn't modify the path, it will unnecessarily invalidate a hash check
 		// hence we'll use an alternate implementation of ioutils to make sure hashes match if no modification is needed
-		sourceLines, err := utils.ReadLines(l.Path)
+		var sourceLines []string
+		sourceLines, err = utils.ReadLines(l.Path)
 
 		if err != nil {
 			return errors.New("Unable to read the contents of " + l.Path)
@@ -274,16 +277,19 @@ func copyFileToDestination(l *NonMemModel, modifyPath bool) error {
 
 		// Write the file contents
 		fileContents := strings.Join(sourceLines, "\n")
-		errpanic(afero.WriteFile(fs, path.Join(l.OutputDir, filename), []byte(fileContents), stats.Mode()))
+		if err = afero.WriteFile(fs, path.Join(l.OutputDir, filename), []byte(fileContents), stats.Mode()); err != nil {
+			return err
+		}
 	} else {
-		input, err := ioutil.ReadFile(l.Path)
+		var input []byte
+		input, err = ioutil.ReadFile(l.Path)
 		if err != nil {
-			return errors.New("Unable to read the contents of " + l.Path)
+			return fmt.Errorf("unable to read %s: %w", l.Path, err)
 		}
 
 		err = ioutil.WriteFile(path.Join(l.OutputDir, filename), input, stats.Mode())
 		if err != nil {
-			return errors.New("Unable to write to new dir the contents " + l.Path)
+			return fmt.Errorf("unable to write contents %s: %w", l.Path, err)
 		}
 	}
 
@@ -956,11 +962,12 @@ func createChildDirectories(l *NonMemModel, sge bool) error {
 	// Now that the directory is created, let's create the gitignore file if specified
 	if viper.GetBool("git") {
 		log.Debugf("%s Writing initial gitignore file", l.LogIdentifier())
-		WriteGitIgnoreFile(l.OutputDir)
+		if err = WriteGitIgnoreFile(l.OutputDir); err != nil {
+			return err
+		}
 	}
 
 	err = configlib.WriteViperConfig(l.OutputDir, sge, l.Configuration)
-
 	if err != nil {
 		return err
 	}

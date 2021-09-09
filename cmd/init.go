@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -23,27 +24,25 @@ var initCmd = &cobra.Command{
 	Short: "Create configuration file with defaults",
 	Long: `Run bbi init to create a bbi.yaml configuration file in the current directory.
  `,
-	Run: initializer,
+	RunE: initializer,
 }
 
-func initializer(cmd *cobra.Command, _ []string) {
+func initializer(cmd *cobra.Command, _ []string) error {
 	fs := afero.NewOsFs()
 
 	locations := []string{}
 
 	dir, err := cmd.Flags().GetStringSlice("dir")
-
 	if err != nil {
-		log.Fatalf("An error occurred trying to get the dir string: %s", err)
+		return fmt.Errorf("get dir string: %w", err)
 	}
 
 	for _, l := range dir {
 		var files []os.FileInfo
 		// For each directory underneath the dir provided. Let's see if it's nonmemmy
 		files, err = afero.ReadDir(fs, l)
-
 		if err != nil {
-			log.Fatalf("Unable to list contents of directory %s. Error is %s", dir, err)
+			return fmt.Errorf("list directory: %w", err)
 		}
 
 		for _, v := range files {
@@ -63,7 +62,7 @@ func initializer(cmd *cobra.Command, _ []string) {
 			var nm string
 			nm, err = findNonMemBinary(v)
 			if err != nil {
-				log.Print(err)
+				log.Println(err)
 
 				continue
 			}
@@ -81,13 +80,16 @@ func initializer(cmd *cobra.Command, _ []string) {
 	errpanic(viper.Unmarshal(&c))
 
 	yamlString, err := yaml.Marshal(c)
-
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("marshal yaml: %w", err)
 	}
 
 	// Write the byte array to file
-	errpanic(afero.WriteFile(fs, "./bbi.yaml", yamlString, 0755))
+	if err = afero.WriteFile(fs, "./bbi.yaml", yamlString, 0755); err != nil {
+		return fmt.Errorf("write bbi.yaml: %w", err)
+	}
+
+	return nil
 }
 
 func init() {
