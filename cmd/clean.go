@@ -18,10 +18,14 @@ import (
 	"fmt"
 	"log"
 	"path/filepath"
+	"regexp"
 	"strings"
+
+	"github.com/gobwas/glob"
 
 	"bbi/runner"
 	"bbi/utils"
+
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -35,7 +39,7 @@ var (
 	regex      bool
 )
 
-// cleanCmd represents the clean command
+// cleanCmd represents the clean command.
 var cleanCmd = &cobra.Command{
 	Use:   "clean",
 	Short: "clean files and folders",
@@ -80,7 +84,7 @@ func clean(cmd *cobra.Command, args []string) error {
 	dir, _ := filepath.Abs(".")
 	dirInfo, err := afero.ReadDir(AppFs, dir)
 	if err != nil {
-		return fmt.Errorf("error finding dir (%s)", err)
+		return fmt.Errorf("finding dir: %w", err)
 	}
 	files := utils.ListFiles(dirInfo)
 	folders := utils.ListDirNames(dirInfo)
@@ -103,7 +107,7 @@ func clean(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	//TODO: Have this operate now based on model name?
+	// TODO: Have this operate now based on model name?
 	if copiedRuns != "" {
 		copies := strings.Split(copiedRuns, ",")
 		for _, arg := range copies {
@@ -134,44 +138,50 @@ func clean(cmd *cobra.Command, args []string) error {
 	if preview {
 		fmt.Println("would clean files: ", matchedFiles)
 		fmt.Println("would clean folders: ", matchedFolders)
+
 		return nil
 	}
+
 	if !filesOnly {
 		for _, f := range matchedFolders {
-			AppFs.RemoveAll(filepath.Join(dir, f))
+			// explicitly ignoring errors here, as this is not critical
+			// and it's more important to try than to succeed
+			_ = AppFs.RemoveAll(filepath.Join(dir, f))
 		}
 	}
 	if !dirsOnly {
 		for _, f := range matchedFiles {
-			AppFs.Remove(filepath.Join(dir, f))
+			// explicitly ignoring errors here, as this is not critical
+			// and it's more important to try than to succeed
+			_ = AppFs.Remove(filepath.Join(dir, f))
 		}
 	}
+
 	return nil
 }
 
 func getMatches(s []string, expr string, regex bool) ([]string, error) {
-	var matches []string
-	var err error
 	if regex {
-		if !inverse {
-			matches, err = utils.ListMatchesByRegex(s, expr)
-		} else {
-			matches, err = utils.ListNonMatchesByRegex(s, expr)
-		}
+		rx, err := regexp.Compile(expr)
 		if err != nil {
-			return nil, fmt.Errorf("error with regex (%s), err: (%s)", expr, err)
+			return nil, err
+		}
+		if inverse {
+			return utils.ListNonMatchesByRegex(s, rx), nil
+		} else {
+			return utils.ListMatchesByRegex(s, rx), nil
 		}
 	} else {
-		if !inverse {
-			matches, err = utils.ListMatchesByGlob(s, expr)
-		} else {
-			matches, err = utils.ListNonMatchesByGlob(s, expr)
-		}
+		gb, err := glob.Compile(expr)
 		if err != nil {
-			return nil, fmt.Errorf("error with glob (%s), err: (%s)", expr, err)
+			return nil, err
+		}
+		if inverse {
+			return utils.ListNonMatchesByGlob(s, gb), nil
+		} else {
+			return utils.ListMatchesByGlob(s, gb), nil
 		}
 	}
-	return matches, nil
 }
 
 func init() {

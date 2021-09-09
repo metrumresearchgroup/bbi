@@ -114,7 +114,6 @@ func TestParTestParseShrinkage2(t *testing.T) {
 }
 
 func TestParseGradient(t *testing.T) {
-
 	var tests = []struct {
 		lines                []string
 		hasZeroFinalGradient bool
@@ -255,7 +254,6 @@ func TestConditionNumber(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-
 		conditionNumber := mustCalculateConditionNumber(tt.lines, tt.n)
 		// compare to three decimal places
 		assert.Equal(t, tt.conditionNumber, math.Round(conditionNumber*1000)/1000, "Fail :"+tt.context)
@@ -498,7 +496,7 @@ func TestSetCorrelationsOk(t *testing.T) {
 }
 
 // These tests show there is little improvement to be gained by optimizing the
-// code for a lower diagonal matrix, or using for loops instead of range
+// code for a lower diagonal matrix, or using for loops instead of range.
 func BenchmarkCheckMatrix1(b *testing.B) {
 	dim := 10000
 	matrix := make([][]float64, dim)
@@ -546,6 +544,7 @@ func checkMatrix(matrix [][]float64, limit float64) bool {
 			}
 		}
 	}
+
 	return true
 }
 
@@ -561,6 +560,7 @@ func checkMatrix2(matrix [][]float64, limit float64) bool {
 			}
 		}
 	}
+
 	return true
 }
 

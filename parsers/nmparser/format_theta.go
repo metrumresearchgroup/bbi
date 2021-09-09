@@ -2,7 +2,7 @@ package parser
 
 import "strings"
 
-// FormatThetaBlock will format each line in the theta block
+// FormatThetaBlock will format each line in the theta block.
 func FormatThetaBlock(lines []string) []string {
 	var result = make([]string, 0)
 	longestCommentIndex := 0
@@ -32,5 +32,6 @@ func FormatThetaBlock(lines []string) []string {
 		}
 		result = append(result, theta+comment)
 	}
+
 	return result
 }

@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// ParseBlockStructure parses the structure of a parameter block
+// ParseBlockStructure parses the structure of a parameter block.
 func ParseBlockStructure(lines []string) []int {
 	var combinedLines string
 	var i int
@@ -18,5 +18,6 @@ func ParseBlockStructure(lines []string) []int {
 		i, _ = strconv.Atoi(str)
 		iArr = append(iArr, i)
 	}
+
 	return iArr
 }

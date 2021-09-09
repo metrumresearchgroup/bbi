@@ -2,6 +2,7 @@ package runner
 
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"path/filepath"
 	"text/template"
@@ -9,6 +10,7 @@ import (
 	"errors"
 
 	"bbi/utils"
+
 	"github.com/spf13/afero"
 )
 
@@ -16,7 +18,7 @@ import (
 // modelPath is the relative path of the model from where Estimate model is called from
 // cacheDir is the location of the cache dir, relative to the baseDir,
 //		for nonmem executable for version 7.4 for use in precompilation
-// exeNameInCache is the name of the nonmem executable in the cache dir
+// exeNameInCache is the name of the nonmem executable in the cache dir.
 func EstimateModel(
 	fs afero.Fs,
 	modelPath string,
@@ -24,27 +26,29 @@ func EstimateModel(
 ) ReturnStatus {
 
 	modelFile := filepath.Base(modelPath)
-	//Renaming to fileName to be a bit more explicit
+	// Renaming to fileName to be a bit more explicit
 	fileName, _ := utils.FileAndExt(modelPath)
 	dir, _ := filepath.Abs(filepath.Dir(modelPath))
 
-	outputDirectoryName, err := processDirectoryTemplate(fileName, runSettings)
+	// TODO: solve ineffassign of err
+	outputDirectoryName, _ := processDirectoryTemplate(fileName, runSettings) // nolint:staticcheck
 
-	//Need to get the absolute path for the directory
+	// Need to get the absolute path for the directory
 	outputDirectoryPath := filepath.Join(dir, outputDirectoryName)
 
 	isDirectory, _ := afero.IsDir(fs, outputDirectoryPath)
 	isEmpty, _ := afero.IsEmpty(fs, outputDirectoryPath)
 
-	//The desired directory is present, but not empty.
+	// The desired directory is present, but not empty.
 	if isDirectory && !isEmpty {
-
 		if runSettings.Overwrite {
-			//Let's remove the entire friggin dir and its contents
+			// Let's remove the entire friggin dir and its contents
 			log.Print("Settings are configured to over write. Removing existing directory")
-			fs.RemoveAll(outputDirectoryPath)
+			if err := fs.RemoveAll(outputDirectoryPath); err != nil {
+				fmt.Printf("error calling removeAll: %s", err)
+			}
 		} else {
-			//Generate an error and bubble it up to the user
+			// Generate an error and bubble it up to the user
 			return ReturnStatus{
 				RunDir: outputDirectoryPath,
 				DidRun: false,
@@ -72,6 +76,7 @@ func EstimateModel(
 	extraFiles, err := PrepareEstRun(fs, dir, modelFile, outputDirectoryPath)
 	if err != nil {
 		log.Printf("error preparing estimation run: %s", err)
+
 		return ReturnStatus{
 			RunDir: outputDirectoryPath,
 			DidRun: false,
@@ -81,13 +86,14 @@ func EstimateModel(
 
 	if runSettings.Git {
 		// for now just add a gitignore to add everything in run output by default
-		utils.WriteLinesFS(fs, []string{"*"}, filepath.Join(dir, outputDirectoryPath, ".gitignore"))
+		if err = utils.WriteLinesFS(fs, []string{"*"}, filepath.Join(dir, outputDirectoryPath, ".gitignore")); err != nil {
+			fmt.Printf("error writing lines: %s", err)
+		}
 	}
 	// deal with cache maybe
 	noBuild := false
 	if exeNameInCache != "" {
-		err := utils.SetupCacheForRun(fs, dir, outputDirectoryPath, cacheDir, exeNameInCache, debug)
-		if err != nil {
+		if err = utils.SetupCacheForRun(fs, dir, outputDirectoryPath, cacheDir, exeNameInCache, debug); err != nil {
 			log.Printf("error setting up cache: %v \n unable to precompile model", err)
 		} else {
 			noBuild = true
@@ -102,6 +108,7 @@ func EstimateModel(
 
 	if err != nil {
 		log.Printf("error during estimation run: %s", err)
+
 		return ReturnStatus{
 			RunDir: outputDirectoryPath,
 			DidRun: true,
@@ -114,8 +121,7 @@ func EstimateModel(
 	}
 
 	if runSettings.SaveExe != "" {
-		err := utils.CopyExeToCache(fs, outputDirectoryPath, cacheDir, runSettings.SaveExe)
-		if err != nil {
+		if err = utils.CopyExeToCache(fs, outputDirectoryPath, cacheDir, runSettings.SaveExe); err != nil {
 			log.Printf("error during estimation run: %s", err)
 		}
 	}
@@ -136,6 +142,7 @@ func EstimateModel(
 	)
 	if err != nil {
 		log.Printf("error cleaning estimation run: %s", err)
+
 		return ReturnStatus{
 			RunDir: outputDirectoryPath,
 			DidRun: true,
@@ -145,6 +152,7 @@ func EstimateModel(
 	if verbose {
 		log.Println("done cleaning up!")
 	}
+
 	return ReturnStatus{
 		RunDir: outputDirectoryPath,
 		DidRun: true,
@@ -152,7 +160,7 @@ func EstimateModel(
 	}
 }
 
-//Processes the go template for the output directory and returns the processed string and any relative errors
+// Processes the go template for the output directory and returns the processed string and any relative errors
 // name: The name of the model from which the template will be derived.
 // r: The RunSettings struct containing the configurations from the run.
 func processDirectoryTemplate(name string, r RunSettings) (string, error) {

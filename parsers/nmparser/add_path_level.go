@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-// AddPathLevelToData adds a level to the path declared in $DATA
+// AddPathLevelToData adds a level to the path declared in $DATA.
 func AddPathLevelToData(s string) string {
 	dataComponents := strings.Fields(s)
 	// path should be second field
@@ -27,6 +27,7 @@ func AddPathLevelToData(s string) string {
 			strings.Join(dataComponents[2:], " "),
 		)
 	}
+
 	return strings.Join([]string{
 		"$DATA",
 		newPath,

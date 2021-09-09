@@ -11,7 +11,7 @@ import (
 )
 
 //ReadParamsAndOutputFromExt returns the lines associated
-// with either parameter table outputs or output lines (-100xxx lines)
+// with either parameter table outputs or output lines (-100xxx lines).
 //
 func ReadParamsAndOutputFromExt(path string) ([]string, error) {
 	inFile, err := os.Open(path)
@@ -44,6 +44,7 @@ func ReadParamsAndOutputFromExt(path string) ([]string, error) {
 	// explicitly handle line that's too long
 	if errors.Is(scanner.Err(), bufio.ErrTooLong) {
 		err = fmt.Errorf("Attempting to parse %s with ReadParamsAndOutputFromExt(): %w", path, scanner.Err())
+
 		return nil, err
 	}
 
@@ -52,12 +53,14 @@ func ReadParamsAndOutputFromExt(path string) ([]string, error) {
 		emptyFileMsg := fmt.Sprintf("A file exists at %s but it is empty.\n", path)
 		renameExtMsg := "If you sent NONMEM output to a different file you can use --ext-file=NEWFILE to specify the new file name.\n"
 		err = errors.New(emptyFileMsg + renameExtMsg)
+
 		return nil, err
 	}
+
 	return lines, nil
 }
 
-//ReadLines reads lines for a file at a given path
+//ReadLines reads lines for a file at a given path.
 func ReadLines(path string) ([]string, error) {
 	inFile, err := os.Open(path)
 	if err != nil {
@@ -70,10 +73,11 @@ func ReadLines(path string) ([]string, error) {
 	for scanner.Scan() {
 		lines = append(lines, scanner.Text())
 	}
+
 	return lines, nil
 }
 
-//ReadLinesFS reads lines for a file at a given path
+//ReadLinesFS reads lines for a file at a given path.
 func ReadLinesFS(fs afero.Fs, path string) ([]string, error) {
 	inFile, err := fs.Open(path)
 	if err != nil {
@@ -86,10 +90,11 @@ func ReadLinesFS(fs afero.Fs, path string) ([]string, error) {
 	for scanner.Scan() {
 		lines = append(lines, scanner.Text())
 	}
+
 	return lines, nil
 }
 
-//WriteLines writes lines to a file at a given path given a filesystem
+//WriteLines writes lines to a file at a given path given a filesystem.
 func WriteLines(lines []string, path string) error {
 	file, err := os.Create(path)
 	if err != nil {
@@ -101,10 +106,11 @@ func WriteLines(lines []string, path string) error {
 	for _, line := range lines {
 		fmt.Fprintln(w, line)
 	}
+
 	return w.Flush()
 }
 
-//WriteLinesFS writes lines to a file at a given path given a filesystem
+//WriteLinesFS writes lines to a file at a given path given a filesystem.
 func WriteLinesFS(fs afero.Fs, lines []string, path string) error {
 	file, err := fs.Create(path)
 	if err != nil {
@@ -116,15 +122,17 @@ func WriteLinesFS(fs afero.Fs, lines []string, path string) error {
 	for _, line := range lines {
 		fmt.Fprintln(w, line)
 	}
+
 	return w.Flush()
 }
 
-// HasZero returns true if any float in the slice is zero
+// HasZero returns true if any float in the slice is zero.
 func HasZero(floats []float64) bool {
 	for _, f := range floats {
 		if f == 0 {
 			return true
 		}
 	}
+
 	return false
 }

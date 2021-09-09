@@ -15,14 +15,7 @@
 package cmd
 
 import (
-	"bbi/configlib"
 	"fmt"
-	"github.com/metrumresearchgroup/turnstile"
-	log "github.com/sirupsen/logrus"
-	"github.com/spf13/afero"
-	"github.com/spf13/cobra"
-	flag "github.com/spf13/pflag"
-	"github.com/spf13/viper"
 	"io"
 	"math/rand"
 	"os"
@@ -30,27 +23,33 @@ import (
 	"path/filepath"
 	"sync"
 	"time"
+
+	"bbi/configlib"
+
+	"github.com/metrumresearchgroup/turnstile"
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/afero"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
-// VERSION is the current bbi version
+// VERSION is the current bbi version.
 var (
 	VERSION string = "develop"
 )
 
 var (
-	// name of config file
-	cfgFile string
-	// verbose is whether to give verbose output
+	// verbose is whether to give verbose output.
 	verbose bool
 	debug   bool
 	threads int
-	//Json indicates whether we should have a JSON tree of output
+	// Json indicates whether we should have a JSON tree of output.
 	Json               bool
 	preview            bool
 	executionWaitGroup sync.WaitGroup
 )
 
-// RootCmd represents the base command when called without any subcommands
+// RootCmd represents the base command when called without any subcommands.
 var RootCmd = &cobra.Command{
 	Use:   "bbi",
 	Short: "manage and execute models",
@@ -71,13 +70,12 @@ func Execute(build string) {
 }
 
 func init() {
-
-	//Set random for application
+	// Set random for application
 	rand.Seed(time.Now().UnixNano())
 
 	cobra.OnInitialize(initConfig)
 
-	//Removed "." To avoid IDEs not displaying or typical ignore patterns dropping it.
+	// Removed "." To avoid IDEs not displaying or typical ignore patterns dropping it.
 	viper.SetConfigName("bbi")
 	viper.SetConfigType("yaml")
 
@@ -86,38 +84,30 @@ func init() {
 	// will be global for your application.
 	RootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
 	RootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "debug mode")
-	viper.BindPFlag("debug", RootCmd.PersistentFlags().Lookup("debug")) //Bind Debug to viper
+	errpanic(viper.BindPFlag("debug", RootCmd.PersistentFlags().Lookup("debug"))) // Bind Debug to viper
 	RootCmd.PersistentFlags().IntVar(&threads, "threads", 4, "number of threads to execute with locally or nodes to execute on in parallel")
-	viper.BindPFlag("threads", RootCmd.PersistentFlags().Lookup("threads")) //Update to make sure viper binds to the flag
+	errpanic(viper.BindPFlag("threads", RootCmd.PersistentFlags().Lookup("threads"))) // Update to make sure viper binds to the flag
 	RootCmd.PersistentFlags().BoolVar(&Json, "json", false, "json tree of output, if possible")
-	viper.BindPFlag("json", RootCmd.PersistentFlags().Lookup("json")) //Bind to viper
+	errpanic(viper.BindPFlag("json", RootCmd.PersistentFlags().Lookup("json"))) // Bind to viper
 	RootCmd.PersistentFlags().BoolVarP(&preview, "preview", "p", false, "preview action, but don't actually run command")
 }
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	err := configlib.LoadGlobalConfig("bbi")
-	if err != nil {
-		fmt.Println(fmt.Errorf("err initializing config %s", err))
+	if err := configlib.LoadGlobalConfig("bbi"); err != nil {
+		log.Fatalf("initializing config %s", err.Error())
 	}
 }
 
-func flagChanged(flags *flag.FlagSet, key string) bool {
-	flag := flags.Lookup(key)
-	if flag == nil {
-		return false
-	}
-	return flag.Changed
-}
-
-//Assumes random has been set previously and seeded to avoid reproducible data sets
-//Here random is set during root.go setup
+// Assumes random has been set previously and seeded to avoid reproducible data sets
+// Here random is set during root.go setup.
 func randomFloat(min int, max int) float64 {
-	return float64(float64(min) + rand.Float64()*(float64(max)-float64(min)))
+	// TODO: explain purpose of this use of rand if it's cryptographic.
+	return float64(min) + rand.Float64()*(float64(max)-float64(min)) // nolint:gosec
 }
 
 func logSetup(config configlib.Config) {
-	//Set Logrus level if we're debug
+	// Set Logrus level if we're debug
 	if config.Debug {
 		log.Info("Setting logging to DEBUG")
 		log.SetLevel(log.DebugLevel)
@@ -132,7 +122,7 @@ func logSetup(config configlib.Config) {
 		log.Debugf("A logfile has been specified at %s", config.Logfile)
 		logfile := config.Logfile
 
-		//If the path is relative
+		// If the path is relative
 		if !path.IsAbs(config.Logfile) {
 			log.Debugf("The config file specified at %s appears to be relatively referenced", config.Logfile)
 			whereami, err := os.Getwd()
@@ -155,7 +145,7 @@ func logSetup(config configlib.Config) {
 			}
 			outfile = of
 		} else {
-			//Doesn't exist. Let's create
+			// Doesn't exist. Let's create
 			of, err := fs.Create(logfile)
 			if err != nil {
 				log.Fatalf("Error creating new log file located at %s. Details are: %s", logfile, err)
@@ -168,10 +158,10 @@ func logSetup(config configlib.Config) {
 	}
 }
 
-//RecordConcurrentError handles the processing of cancellation messages as well placing concurrent errors onto the stack
+// RecordConcurrentError handles the processing of cancellation messages as well placing concurrent errors onto the stack.
 func RecordConcurrentError(model string, notes string, err error, channels *turnstile.ChannelMap, cancel chan bool, executor PostWorkExecutor) {
 	cancel <- true
 	channels.Errors <- newConcurrentError(model, notes, err)
 
-	PostWorkExecution(executor, model, channels, cancel, false, err)
+	PostWorkExecution(executor, false, err)
 }

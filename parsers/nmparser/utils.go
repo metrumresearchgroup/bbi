@@ -4,7 +4,7 @@ import (
 	"strings"
 )
 
-// createDiagonalBlock creates a slice of ints that would form a diagonal matrix with value 1 for diagonal and 0 for off diagonal elements
+// createDiagonalBlock creates a slice of ints that would form a diagonal matrix with value 1 for diagonal and 0 for off diagonal elements.
 func createDiagonalBlock(num int) []int {
 	var iArr []int
 	for i := 1; i <= num; i++ {
@@ -16,11 +16,12 @@ func createDiagonalBlock(num int) []int {
 			}
 		}
 	}
+
 	return iArr
 }
 
 // Checks the final estimation method against a list of non-gradient based methods.
-// Primarily used for deciding whether to look for a .grd file to parse
+// Primarily used for deciding whether to look for a .grd file to parse.
 func CheckIfNotGradientBased(results SummaryOutput) bool {
 	finalMethod := results.RunDetails.EstimationMethods[len(results.RunDetails.EstimationMethods)-1]
 

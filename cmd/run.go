@@ -1,12 +1,8 @@
 package cmd
 
 import (
-	"bbi/configlib"
 	"bytes"
-	"github.com/metrumresearchgroup/turnstile"
-	log "github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+	"errors"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -14,6 +10,12 @@ import (
 	"strconv"
 	"strings"
 	"text/template"
+
+	"bbi/configlib"
+
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 const runLongDescription string = `run nonmem model(s), for example: 
@@ -52,7 +54,7 @@ const postProcessingScriptTemplate string = `#!/bin/bash
 {{ .Script }}
 `
 
-// RunCmd represents the run command
+// RunCmd represents the run command.
 var runCmd = &cobra.Command{
 	Use:   "run",
 	Short: "run a (set of) models locally or on the grid",
@@ -60,13 +62,12 @@ var runCmd = &cobra.Command{
 	Run:   run,
 }
 
-func run(cmd *cobra.Command, args []string) {
+func run(_ *cobra.Command, _ []string) {
 	println(runLongDescription)
 }
 
 func init() {
-
-	//String Variables
+	// String Variables
 	// runCmd.PersistentFlags().String("cacheDir", "", "directory path for cache of nonmem executables for NM7.4+")
 	// viper.BindPFlag("cacheDir", runCmd.PersistentFlags().Lookup("cacheDir"))
 
@@ -77,62 +78,61 @@ func init() {
 	// viper.BindPFlag("saveExe", runCmd.PersistentFlags().Lookup("saveExe"))
 
 	runCmd.PersistentFlags().String("output_dir", "{{ .Name }}", "Go template for the output directory to use for storging details of each executed model")
-	viper.BindPFlag("output_dir", runCmd.PersistentFlags().Lookup("output_dir"))
+	errpanic(viper.BindPFlag("output_dir", runCmd.PersistentFlags().Lookup("output_dir")))
 	viper.SetDefault("output_dir", "{{ .Name }}")
 
-	//Int Variables
+	// Int Variables
 	runCmd.PersistentFlags().Int("clean_lvl", 1, "clean level used for file output from a given (set of) runs")
-	viper.BindPFlag("clean_lvl", runCmd.PersistentFlags().Lookup("clean_lvl"))
+	errpanic(viper.BindPFlag("clean_lvl", runCmd.PersistentFlags().Lookup("clean_lvl")))
 	// TODO: these are likely not meangingful as should be set in configlib, but want to configm
 	viper.SetDefault("clean_lvl", 1)
 
 	runCmd.PersistentFlags().Int("copy_lvl", 0, "copy level used for file output from a given (set of) runs")
-	viper.BindPFlag("copy_lvl", runCmd.PersistentFlags().Lookup("copy_lvl"))
+	errpanic(viper.BindPFlag("copy_lvl", runCmd.PersistentFlags().Lookup("copy_lvl")))
 	viper.SetDefault("copy_lvl", 0)
 
 	// runCmd.PersistentFlags().Int("gitignoreLvl", 0, "gitignore lvl for a given (set of) runs")
 	// viper.BindPFlag("gitignoreLvl", runCmd.PersistentFlags().Lookup("gitignoreLvl"))
 	// viper.SetDefault("gitignoreLvl", 1)
 
-	//Bool Variables
+	// Bool Variables
 	runCmd.PersistentFlags().Bool("git", false, "whether git is used")
-	viper.BindPFlag("git", runCmd.PersistentFlags().Lookup("git"))
+	errpanic(viper.BindPFlag("git", runCmd.PersistentFlags().Lookup("git")))
 	viper.SetDefault("git", true)
 
 	runCmd.PersistentFlags().Bool("overwrite", false, "Whether or not to remove existing output directories if they are present")
-	viper.BindPFlag("overwrite", runCmd.PersistentFlags().Lookup("overwrite"))
+	errpanic(viper.BindPFlag("overwrite", runCmd.PersistentFlags().Lookup("overwrite")))
 	viper.SetDefault("overwrite", false)
 
 	const configIdentifier string = "config"
 	runCmd.PersistentFlags().String(configIdentifier, "", "Path (relative or absolute) to another bbi.yaml to load")
-	viper.BindPFlag(configIdentifier, runCmd.PersistentFlags().Lookup(configIdentifier))
+	errpanic(viper.BindPFlag(configIdentifier, runCmd.PersistentFlags().Lookup(configIdentifier)))
 
 	const saveconfig string = "save_config"
 	runCmd.PersistentFlags().Bool(saveconfig, true, "Whether or not to save the existing configuration to a file with the model")
-	viper.BindPFlag(saveconfig, runCmd.PersistentFlags().Lookup(saveconfig))
+	errpanic(viper.BindPFlag(saveconfig, runCmd.PersistentFlags().Lookup(saveconfig)))
 
 	const delayIdentifier string = "delay"
 	runCmd.PersistentFlags().Int(delayIdentifier, 0, "Selects a random number of seconds between 1 and this value to stagger / jitter job execution. Assists in dealing with large volumes of work dealing with the same data set. May avoid NMTRAN issues about not being able read / close files")
-	viper.BindPFlag(delayIdentifier, runCmd.PersistentFlags().Lookup(delayIdentifier))
+	errpanic(viper.BindPFlag(delayIdentifier, runCmd.PersistentFlags().Lookup(delayIdentifier)))
 
 	const logFileIdentifier string = "log_file"
 	runCmd.PersistentFlags().String(logFileIdentifier, "", "If populated, specifies the file into which to store the output / logging details from bbi")
-	viper.BindPFlag(logFileIdentifier, runCmd.PersistentFlags().Lookup(logFileIdentifier))
+	errpanic(viper.BindPFlag(logFileIdentifier, runCmd.PersistentFlags().Lookup(logFileIdentifier)))
 
 	const postExecutionHookIdentifier string = "post_work_executable"
 	runCmd.PersistentFlags().String(postExecutionHookIdentifier, "", "A script or binary to run when job execution completes or fails")
-	viper.BindPFlag(postExecutionHookIdentifier, runCmd.PersistentFlags().Lookup(postExecutionHookIdentifier))
+	errpanic(viper.BindPFlag(postExecutionHookIdentifier, runCmd.PersistentFlags().Lookup(postExecutionHookIdentifier)))
 
 	const additionalEnvIdentifier string = "additional_post_work_envs"
 	runCmd.PersistentFlags().StringSlice(additionalEnvIdentifier, []string{}, "Any additional values (as ENV KEY=VALUE) to provide for the post execution environment")
-	viper.BindPFlag(additionalEnvIdentifier, runCmd.PersistentFlags().Lookup(additionalEnvIdentifier))
+	errpanic(viper.BindPFlag(additionalEnvIdentifier, runCmd.PersistentFlags().Lookup(additionalEnvIdentifier)))
 
 	nonmemCmd.AddCommand(runCmd)
-
 }
 
 type PostWorkExecutor interface {
-	BuildExecutionEnvironment(completed bool, err error) //Sets the Struct content for the PostExecutionHookEnvironment
+	BuildExecutionEnvironment(completed bool, err error) // Sets the Struct content for the PostExecutionHookEnvironment
 	GetPostWorkConfig() *PostExecutionHookEnvironment
 	GetPostWorkExecutablePath() string
 	GetGlobalConfig() configlib.Config
@@ -140,7 +140,7 @@ type PostWorkExecutor interface {
 }
 
 type PostExecutionHookEnvironment struct {
-	ExecutionBinary string `yaml:"execution_binary" json:"execution_binary, omitempty"`
+	ExecutionBinary string `yaml:"execution_binary" json:"execution_binary,omitempty"`
 	ModelPath       string `yaml:"model_path" json:"model_path,omitempty"`
 	Model           string `yaml:"model" json:"model,omitempty"`
 	Filename        string `yaml:"filename" json:"filename,omitempty"`
@@ -150,7 +150,7 @@ type PostExecutionHookEnvironment struct {
 	Error           error  `yaml:"error" json:"error,omitempty"`
 }
 
-func PostExecutionEnvironment(directive *PostExecutionHookEnvironment, additional []string) ([]string, error) {
+func PostExecutionEnvironment(directive *PostExecutionHookEnvironment, additional []string) []string {
 	environmentalPrefix := "BBI_"
 
 	pathEnvironment := environmentalPrefix + "MODEL_PATH"
@@ -179,13 +179,13 @@ func PostExecutionEnvironment(directive *PostExecutionHookEnvironment, additiona
 
 	executionEnvironment = append(executionEnvironment, errorEnvironment+"="+`"`+errorText+`"`)
 
-	//Add user provided values
+	// Add user provided values
 	executionEnvironment = append(executionEnvironment, additional...)
 
-	return executionEnvironment, nil
+	return executionEnvironment
 }
 
-func PostWorkExecution(job PostWorkExecutor, filename string, channels *turnstile.ChannelMap, cancel chan bool, successful bool, err error) {
+func PostWorkExecution(job PostWorkExecutor, successful bool, err error) {
 	config := job.GetGlobalConfig()
 	if config.PostWorkExecutable != "" {
 		log.Debug("Beginning execution of post work hooks")
@@ -200,19 +200,11 @@ func PostWorkExecution(job PostWorkExecutor, filename string, channels *turnstil
 		executionChannel := make(chan executionStatus, 1)
 
 		go func() {
-			for {
-				select {
-				//Failure processing
-				case status := <-executionChannel:
-					if status.err != nil {
-						job.BuildExecutionEnvironment(false, status.err)
-					}
-
-					executionWaitGroup.Done()
-				default:
-					//
-				}
+			status := <-executionChannel
+			if status.err != nil {
+				job.BuildExecutionEnvironment(false, status.err)
 			}
+			executionWaitGroup.Done()
 		}()
 
 		go func() {
@@ -240,7 +232,7 @@ func ExecutePostWorkDirectivesWithEnvironment(worker PostWorkExecutor) (string, 
 		"postWorkEnv":    postWorkEnv,
 	}).Debug("Collected details. Preparing to set environment")
 
-	environment, err := PostExecutionEnvironment(postworkConfig, postWorkEnv)
+	environment := PostExecutionEnvironment(postworkConfig, postWorkEnv)
 
 	environment = append(environment, os.Environ()...)
 
@@ -249,10 +241,6 @@ func ExecutePostWorkDirectivesWithEnvironment(worker PostWorkExecutor) (string, 
 	}).Debug("Environment prepared")
 
 	environmentToPersist := onlyBbiVariables(environment)
-
-	if err != nil {
-		return "", err
-	}
 
 	log.Debug("Beginning template operations")
 
@@ -290,16 +278,17 @@ func ExecutePostWorkDirectivesWithEnvironment(worker PostWorkExecutor) (string, 
 		"rendered": string(processedBytes),
 	}).Debug("Writing contents to file in output directory")
 
-	err = ioutil.WriteFile(filepath.Join(worker.GetWorkingPath(), "post_processing.sh"), processedBytes, 0755)
+	// TODO: use more secure permission of 0600 or less
+	err = ioutil.WriteFile(filepath.Join(worker.GetWorkingPath(), "post_processing.sh"), processedBytes, 0755) // nolint:gosec
 
 	if err != nil {
 		return "", err
 	}
 
-	//Needs to be the processed value, not the config template.
+	// Needs to be the processed value, not the config template.
 	cmd := exec.Command(filepath.Join(worker.GetWorkingPath(), "post_processing.sh"))
 
-	//Set the environment for the binary.
+	// Set the environment for the binary.
 	cmd.Env = environment
 
 	log.WithFields(log.Fields{
@@ -313,7 +302,8 @@ func ExecutePostWorkDirectivesWithEnvironment(worker PostWorkExecutor) (string, 
 	log.Debugf("Output from command was %s", string(outputBytes))
 
 	if err != nil {
-		if exitError, ok := err.(*exec.ExitError); ok {
+		var exitError *exec.ExitError
+		if errors.As(err, &exitError) {
 			code := exitError.ExitCode()
 			details := exitError.String()
 

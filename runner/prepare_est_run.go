@@ -7,10 +7,11 @@ import (
 
 	parser "bbi/parsers/nmparser"
 	"bbi/utils"
+
 	"github.com/spf13/afero"
 )
 
-// ModFileInfo stores information parsed from a model file such as declared files for use in other parts of the program
+// ModFileInfo stores information parsed from a model file such as declared files for use in other parts of the program.
 type ModFileInfo struct {
 	Files []string
 }
@@ -18,7 +19,7 @@ type ModFileInfo struct {
 // PrepareEstRun prepares the directories and files needed to execute a run in the correct subdirectory
 // dir is the directory the model file is current in
 // runName is the file name of the model
-// runDir is the name of the new subdirectory to be created
+// runDir is the name of the new subdirectory to be created.
 func PrepareEstRun(fs afero.Fs, dir string, runName string, runDir string) (ModFileInfo, error) {
 	if !filepath.IsAbs(runDir) {
 		runDir = filepath.Join(
@@ -28,14 +29,14 @@ func PrepareEstRun(fs afero.Fs, dir string, runName string, runDir string) (ModF
 	}
 	err := fs.MkdirAll(runDir, 0755)
 	if err != nil {
-		return ModFileInfo{}, fmt.Errorf("Error creating new subdir to execute, with err: %s", err)
+		return ModFileInfo{}, fmt.Errorf("creating new subdir to execute: %w", err)
 	}
 	fileLines, err := utils.ReadLinesFS(fs, filepath.Join(
 		dir,
 		runName,
 	))
 	if err != nil {
-		return ModFileInfo{}, fmt.Errorf("Error reading in model file, with err: %s", err)
+		return ModFileInfo{}, fmt.Errorf("reading in model file: %w", err)
 	}
 	mfi := ModFileInfo{parser.FindOutputFiles(fileLines)}
 	err = utils.WriteLinesFS(
@@ -47,7 +48,8 @@ func PrepareEstRun(fs afero.Fs, dir string, runName string, runDir string) (ModF
 		),
 	)
 	if err != nil {
-		return mfi, fmt.Errorf("Error copying file to new run dir, with err: %s", err)
+		return mfi, fmt.Errorf("copying file to new run dir: %w", err)
 	}
+
 	return mfi, nil
 }

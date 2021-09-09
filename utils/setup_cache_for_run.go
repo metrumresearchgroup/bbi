@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/afero"
 )
 
-// SetupCacheForRun copies over the cached nonmem executable from the cache to the run directory
+// SetupCacheForRun copies over the cached nonmem executable from the cache to the run directory.
 func SetupCacheForRun(
 	fs afero.Fs,
 	baseDir string,
@@ -20,6 +20,7 @@ func SetupCacheForRun(
 	nmNameInCache string,
 	debug bool,
 ) error {
+
 	var fullCacheDirPath string
 	var fullModelDirPath string
 	if filepath.IsAbs(cacheDir) {
@@ -43,12 +44,14 @@ func SetupCacheForRun(
 	ok, err := DirExists(fullCacheDirPath, fs)
 	if !ok || err != nil {
 		log.Printf("issue with cache directory at: %s, no precompiled model will be used. ERR: %s, ok: %v", cacheDir, err, ok)
+
 		return err
 	}
 	//check that modelDir exists to copy nonmem executable into
 	ok, err = DirExists(fullModelDirPath, fs)
 	if !ok || err != nil {
 		log.Printf("issue with model directory at: %s, no precompiled model will be used. ERR: %s, ok: %v", cacheDir, err, ok)
+
 		return err
 	}
 	// check nmNameInCache is in in cache
@@ -62,12 +65,13 @@ func SetupCacheForRun(
 	ok, err = Exists(fileToCopyLocation, fs)
 	if !ok || err != nil {
 		log.Printf("no cached model detected at: %s, skipping attempt to precompile", fileToCopyLocation)
+
 		return err
 	}
 
 	fileToCopy, err := fs.Open(fileToCopyLocation)
 	if err != nil {
-		return fmt.Errorf("error copying file: (%s)", err)
+		return fmt.Errorf("copying file: %w", err)
 	}
 	defer fileToCopy.Close()
 
@@ -83,20 +87,22 @@ func SetupCacheForRun(
 	)
 	newFile, err := fs.Create(newFileLocation)
 	if err != nil {
-		return fmt.Errorf("error creating new file: (%s)", err)
+		return fmt.Errorf("creating new file: %w", err)
 	}
 	defer newFile.Close()
 
 	_, err = io.Copy(newFile, fileToCopy)
 	if err != nil {
-		return fmt.Errorf("error copying to new file: (%s)", err)
+		return fmt.Errorf("copying to new file: %w", err)
 	}
 	if debug {
 		log.Println("changing executable privileges for nonmem executable")
 	}
 	if err := os.Chmod(newFileLocation, 0777); err != nil {
 		log.Println("error changing permissions of executable after copying from cache")
+
 		return (err)
 	}
+
 	return nil
 }

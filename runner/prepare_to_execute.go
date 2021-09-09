@@ -1,10 +1,12 @@
 package runner
 
-import "strings"
-import parser "bbi/parsers/nmparser"
+import (
+	parser "bbi/parsers/nmparser"
+	"strings"
+)
 
 //PrepareForExecution parses and prepares strings from a file for execution in a different context
-// for example, replacing the $DATA path
+// for example, replacing the $DATA path.
 func PrepareForExecution(s []string) []string {
 	for i, line := range s {
 		if strings.Contains(line, "$DATA") {
@@ -13,5 +15,6 @@ func PrepareForExecution(s []string) []string {
 			break
 		}
 	}
+
 	return s
 }

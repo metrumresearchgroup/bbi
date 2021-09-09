@@ -27,12 +27,13 @@ import (
 
 	parser "bbi/parsers/nmparser"
 	"bbi/utils"
+
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-// probsCmd represents the command to get information about a given modeling project
+// probsCmd represents the command to get information about a given modeling project.
 var probsCmd = &cobra.Command{
 	Use:   "probs",
 	Short: "summarize information about project",
@@ -42,7 +43,7 @@ nmu project
 	RunE: probs,
 }
 
-func probs(cmd *cobra.Command, args []string) error {
+func probs(_ *cobra.Command, args []string) error {
 	if debug {
 		viper.Debug()
 	}
@@ -56,6 +57,7 @@ func probs(cmd *cobra.Command, args []string) error {
 		dirPath = args[0]
 	default:
 		fmt.Println("currently only supports scanning one directory")
+
 		return errors.New("project only supports specifying one directory")
 	}
 
@@ -65,7 +67,7 @@ func probs(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	modelSummaries := modSummaries(AppFs, modelFiles, dir)
+	modelSummaries := modSummaries(AppFs, modelFiles)
 	if Json {
 		jsonRes, _ := json.MarshalIndent(modelSummaries, "", "\t")
 		fmt.Printf("%s\n", jsonRes)
@@ -81,6 +83,7 @@ func probs(cmd *cobra.Command, args []string) error {
 		}
 		probSummary(probSummaries)
 	}
+
 	return nil
 }
 func init() {
@@ -93,7 +96,7 @@ type runSummary struct {
 	Summary parser.ModelInfo
 }
 
-func modSummaries(AppFs afero.Fs, files []string, dir string) []runSummary {
+func modSummaries(AppFs afero.Fs, files []string) []runSummary {
 	var summaries []runSummary
 	for _, file := range files {
 		var rs runSummary
@@ -108,6 +111,7 @@ func modSummaries(AppFs afero.Fs, files []string, dir string) []runSummary {
 		}
 		summaries = append(summaries, rs)
 	}
+
 	return summaries
 }
 
@@ -116,9 +120,8 @@ type modelSummary struct {
 	Prob      string
 }
 
-// probSummary prints the problem statements from each model
+// probSummary prints the problem statements from each model.
 func probSummary(mp []modelSummary) {
-
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetAlignment(tablewriter.ALIGN_LEFT)
 	table.SetColWidth(100)

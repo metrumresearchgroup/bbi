@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func setMissingValuesToDefault(results *SummaryOutput, etaCount, epsCount int) {
+func setMissingValuesToDefault(results *SummaryOutput, _ /*etaCount*/, _ /*epsCount*/ int) {
 	// method name
 	for i := range results.ParametersData {
 		if len(results.ParametersData[i].Method) == 0 {

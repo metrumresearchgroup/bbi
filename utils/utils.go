@@ -22,14 +22,16 @@ const FilePathSeparator = string(filepath.Separator)
 // and returns the path with the new extension.
 func ReplaceExtension(path string, newExt string) string {
 	f, _ := FileAndExt(path)
+
 	return f + "." + newExt
 }
 
 // Filename takes a path, strips out the extension,
 // and returns the name of the file.
-func Filename(in string) (name string) {
-	name, _ = FileAndExt(in)
-	return
+func Filename(in string) string {
+	name, _ := FileAndExt(in)
+
+	return name
 }
 
 // FileAndExt returns the filename and any extension of a file path as
@@ -56,7 +58,6 @@ func FileAndExt(in string) (name string, ext string) {
 }
 
 func extractFilename(in, ext, base, pathSeparator string) (name string) {
-
 	// No file name cases. These are defined as:
 	// 1. any "in" path that ends in a pathSeparator
 	// 2. any "base" consisting of just an pathSeparator
@@ -64,17 +65,15 @@ func extractFilename(in, ext, base, pathSeparator string) (name string) {
 	// 4. any "base" consisting of just the current directory i.e. "."
 	// 5. any "base" consisting of just the parent directory i.e. ".."
 	if (strings.LastIndex(in, pathSeparator) == len(in)-1) || base == "" || base == "." || base == ".." || base == pathSeparator {
-		name = "" // there is NO filename
+		return "" // there is NO filename
 	} else if ext != "" { // there was an Extension
 		// return the filename minus the extension (and the ".")
-		name = base[:strings.LastIndex(base, ".")]
+		return base[:strings.LastIndex(base, ".")]
 	} else {
 		// no extension case so just return base, which willi
 		// be the filename
-		name = base
+		return base
 	}
-	return
-
 }
 
 // GetRelativePath returns the relative path of a given path.
@@ -93,13 +92,14 @@ func GetRelativePath(path, base string) (final string, err error) {
 	if strings.HasSuffix(filepath.FromSlash(path), FilePathSeparator) && !strings.HasSuffix(name, FilePathSeparator) {
 		name += FilePathSeparator
 	}
+
 	return name, nil
 }
 
 // ExtractRootPaths extracts the root paths from the supplied list of paths.
 // The resulting root path will not contain any file separators, but there
 // may be duplicates.
-// So "/content/section/" becomes "content"
+// So "/content/section/" becomes "content".
 func ExtractRootPaths(paths []string) []string {
 	r := make([]string, len(paths))
 	for i, p := range paths {
@@ -108,13 +108,14 @@ func ExtractRootPaths(paths []string) []string {
 		for _, section := range sections {
 			if section != "" {
 				root = section
+
 				break
 			}
 		}
 		r[i] = root
 	}
-	return r
 
+	return r
 }
 
 func getRealFileInfo(fs afero.Fs, path string) (os.FileInfo, string, error) {
@@ -126,16 +127,18 @@ func getRealFileInfo(fs afero.Fs, path string) (os.FileInfo, string, error) {
 	}
 
 	if fileInfo.Mode()&os.ModeSymlink == os.ModeSymlink {
-		link, err := filepath.EvalSymlinks(path)
+		var link string
+		link, err = filepath.EvalSymlinks(path)
 		if err != nil {
-			return nil, "", fmt.Errorf("Cannot read symbolic link '%s', error was: %s", path, err)
+			return nil, "", fmt.Errorf("read symbolic link '%s': %w", path, err)
 		}
 		fileInfo, err = lstatIfOs(fs, link)
 		if err != nil {
-			return nil, "", fmt.Errorf("Cannot stat '%s', error was: %s", link, err)
+			return nil, "", fmt.Errorf("stat '%s': %w", link, err)
 		}
 		realPath = link
 	}
+
 	return fileInfo, realPath, nil
 }
 
@@ -152,15 +155,13 @@ func GetRealPath(fs afero.Fs, path string) (string, error) {
 }
 
 // Code copied from Afero's path.go
-// if the filesystem is OsFs use Lstat, else use fs.Stat
+// if the filesystem is OsFs use Lstat, else use fs.Stat.
 func lstatIfOs(fs afero.Fs, path string) (info os.FileInfo, err error) {
-	_, ok := fs.(*afero.OsFs)
-	if ok {
-		info, err = os.Lstat(path)
+	if _, ok := fs.(*afero.OsFs); ok {
+		return os.Lstat(path)
 	} else {
-		info, err = fs.Stat(path)
+		return fs.Stat(path)
 	}
-	return
 }
 
 // SafeWriteToDisk is the same as WriteToDisk
@@ -213,7 +214,7 @@ func Exists(path string, fs afero.Fs) (bool, error) {
 // AppFs := afero.NewOsFs()
 // dir := filepath.Dir(".")
 // dirInfo, _ := afero.ReadDir(AppFs, dir)
-// ListDirNames(dirInfo)
+// ListDirNames(dirInfo).
 func ListDirNames(fd []os.FileInfo) []string {
 	dirs := []string{}
 	for _, pDir := range fd {
@@ -222,6 +223,7 @@ func ListDirNames(fd []os.FileInfo) []string {
 			dirs = append(dirs, pDir.Name())
 		}
 	}
+
 	return dirs
 }
 
@@ -229,7 +231,7 @@ func ListDirNames(fd []os.FileInfo) []string {
 // AppFs := afero.NewOsFs()
 // dir := filepath.Dir(".")
 // dirInfo, _ := afero.ReadDir(AppFs, dir)
-// ListDirNames(dirInfo)
+// ListDirNames(dirInfo).
 func ListFiles(fd []os.FileInfo) []string {
 	files := []string{}
 	for _, pFile := range fd {
@@ -238,16 +240,18 @@ func ListFiles(fd []os.FileInfo) []string {
 			files = append(files, pFile.Name())
 		}
 	}
+
 	return files
 }
 
 // Takes a boolean slice and returns a boolean for whether
-// any elements of the slice are true
+// any elements of the slice are true.
 func AnyTrue(bools []bool) bool {
 	for _, v := range bools {
 		if v {
 			return true
 		}
 	}
+
 	return false
 }

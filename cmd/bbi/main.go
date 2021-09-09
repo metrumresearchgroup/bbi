@@ -4,7 +4,7 @@ import (
 	"bbi/cmd"
 )
 
-// buildTime  can be set from LDFLAGS during development
+// buildTime  can be set from LDFLAGS during development.
 var buildTime string
 
 // if want to generate docs

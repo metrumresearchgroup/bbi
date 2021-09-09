@@ -4,9 +4,8 @@ import (
 	"strings"
 )
 
-// ParseFinalParameterEstimatesFromLst parses the final estimates of model parameters from lst file
+// ParseFinalParameterEstimatesFromLst parses the final estimates of model parameters from lst file.
 func ParseFinalParameterEstimatesFromLst(lines []string) ParametersResult {
-
 	var thetaStart int
 	var omegaStart int
 	var sigmaStart int
@@ -27,6 +26,7 @@ func ParseFinalParameterEstimatesFromLst(lines []string) ParametersResult {
 	for n := sigmaStart; n < len(lines); n++ {
 		if strings.HasPrefix(lines[n], "1") {
 			sigmaEnd = n
+
 			break
 		}
 	}

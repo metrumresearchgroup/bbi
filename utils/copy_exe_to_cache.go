@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/afero"
 )
 
-// CopyExeToCache copies over the nonmem executable to the cache from the run directory
+// CopyExeToCache copies over the nonmem executable to the cache from the run directory.
 func CopyExeToCache(
 	fs afero.Fs,
 	modelDir string,
@@ -24,12 +24,14 @@ func CopyExeToCache(
 	ok, err := DirExists(fullCacheDirPath, fs)
 	if !ok || err != nil {
 		log.Printf("issue with cache directory at: %s, will not save executable to cache. ERR: %s, ok: %v", cacheDir, err, ok)
+
 		return err
 	}
 	//check that modelDir exists to copy nonmem executable into
 	ok, err = DirExists(fullModelDirPath, fs)
 	if !ok || err != nil {
 		log.Printf("issue with model directory at: %s, will not save executable to cache. ERR: %s, ok: %v", cacheDir, err, ok)
+
 		return err
 	}
 	// check nmNameInCache is in in cache
@@ -41,7 +43,7 @@ func CopyExeToCache(
 	)
 	cacheFile, err := fs.Create(newCacheFileLocation)
 	if err != nil {
-		return fmt.Errorf("error copying file: (%s)", err)
+		return fmt.Errorf("copying file: %w", err)
 	}
 	defer cacheFile.Close()
 
@@ -57,13 +59,14 @@ func CopyExeToCache(
 	)
 	exeFile, err := fs.Open(exeLocation)
 	if err != nil {
-		return fmt.Errorf("error with nonmem exe file: (%s)", err)
+		return fmt.Errorf("nonmem exe file: %w", err)
 	}
 	defer exeFile.Close()
 
 	_, err = io.Copy(cacheFile, exeFile)
 	if err != nil {
-		return fmt.Errorf("error copying to new file: (%s)", err)
+		return fmt.Errorf("copying to new file: %w", err)
 	}
+
 	return nil
 }

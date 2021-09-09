@@ -1,6 +1,7 @@
 package configlib
 
 import (
+	"errors"
 	"os"
 	"path"
 	"path/filepath"
@@ -26,7 +27,7 @@ type Config struct {
 	Local              LocalDetail             `mapstructure:"local" yaml:"local" json:"local,omitempty"`
 	Nonmem             map[string]NonMemDetail `mapstructure:"nonmem" json:"nonmem,omitempty" yaml:"nonmem"`
 	Parallel           bool                    `mapstructure:"parallel" json:"parallel" yaml:"parallel"`
-	Delay              int                     `mapstructure:"delay" yaml:"delay" json:"delay,omitempty" yaml:"delay"`
+	Delay              int                     `mapstructure:"delay" yaml:"delay" json:"delay,omitempty"`
 	NMQual             bool                    `mapstructure:"nmqual" yaml:"nmqual" json:"nmqual,omitempty"`
 	JSON               bool                    `mapstructure:"json" yaml:"json" json:"json,omitempty"`
 	Logfile            string                  `mapstructure:"log_file" yaml:"log_file" json:"log_file,omitempty"`
@@ -35,16 +36,16 @@ type Config struct {
 	ParallelTimeout    int                     `mapstructure:"parallel_timeout" yaml:"parallel_timeout" json:"parallel_timeout,omitempty"`
 	Parafile           string                  `mapstructure:"parafile" yaml:"parafile" json:"parafile,omitempty"`
 	PostWorkExecutable string                  `mapstructure:"post_work_executable" yaml:"post_work_executable" json:"post_work_executable,omitempty"`
-	postWorkExecEnvs   []string                `mapstructure:"additional_post_work_envs" yaml:"additional_post_work_envs" json:"additional_post_work_envs,omitempty"`
+	PostWorkExecEnvs   []string                `mapstructure:"additional_post_work_envs" yaml:"additional_post_work_envs" json:"additional_post_work_envs,omitempty"`
 	GridNamePrefix     string                  `mapstructure:"grid_name_prefix" yaml:"grid_name_prefix" json:"grid_name_prefix,omitempty"`
 }
 
 func (c *Config) GetPostWorkExecEnvs() []string {
-	return c.postWorkExecEnvs
+	return c.PostWorkExecEnvs
 }
 
 func (c *Config) SetPostWorkExecEnvs(envs []string) {
-	c.postWorkExecEnvs = envs
+	c.PostWorkExecEnvs = envs
 }
 
 type NonMemDetail struct {
@@ -66,16 +67,16 @@ type NMFEOptions struct {
 	PRDefault   bool   `mapstructure:"prdefault" yaml:"prdefault" json:"prdefault,omitempty"`
 	TPRDefault  bool   `mapstructure:"tprdefault" yaml:"tprdefault" json:"tprdefault,omitempty"`
 	NoBuild     bool   `mapstructure:"nobuild" yaml:"nobuild" json:"nobuild,omitempty"`
-	MaxLim      int    `mapstructure:"maxlim" yaml:"maxlim" json:"maxlim,omitempty"` //Default (empty value) is 3
+	MaxLim      int    `mapstructure:"maxlim" yaml:"maxlim" json:"maxlim,omitempty"` // Default (empty value) is 3
 }
 
 func (c Config) RenderYamlToFile(path string) error {
-
 	fs := afero.NewOsFs()
 	yamlBytes, err := yaml.Marshal(c)
 
 	if err != nil {
 		log.Error("An error occurred serializing the config down to yaml")
+
 		return err
 	}
 
@@ -85,12 +86,14 @@ func (c Config) RenderYamlToFile(path string) error {
 
 	if err != nil {
 		log.Error("An error occurred trying to write the serialized config yaml to file")
+
 		return err
 	}
+
 	return nil
 }
 
-// LoadGlobalConfig loads nonmemutils configuration into the global Viper
+// LoadGlobalConfig loads nonmemutils configuration into the global Viper.
 func LoadGlobalConfig(configFilename string) error {
 	viper.SetConfigName(configFilename)
 	viper.SetConfigType("yaml")
@@ -98,14 +101,17 @@ func LoadGlobalConfig(configFilename string) error {
 	viper.SetEnvPrefix("bbi")
 	err := viper.ReadInConfig()
 	if err != nil {
-		if _, ok := err.(viper.ConfigParseError); ok {
-			return err
+		var cpe viper.ConfigParseError
+		if errors.As(err, &cpe) {
+			return cpe
 		}
 		loadDefaultSettings() // still load default settings as don't need a config file
+
 		return nil
 	}
 
 	loadDefaultSettings()
+
 	return nil
 }
 
@@ -116,18 +122,20 @@ func loadDefaultSettings() {
 	viper.SetDefault("threads", runtime.NumCPU())
 }
 
-//SaveConfig takes the viper settings and writes them to a file in the original path
+// SaveConfig takes the viper settings and writes them to a file in the original path.
 func SaveConfig(configpath string) {
 	if viper.GetBool("saveConfig") {
-		viper.WriteConfigAs(path.Join(configpath, "bbi.yaml"))
+		err := viper.WriteConfigAs(path.Join(configpath, "bbi.yaml"))
+		if err != nil {
+			log.Fatalf("got error writing config: %s", err)
+		}
 	}
 }
 
 func WriteViperConfig(path string, sge bool, config Config) error {
 	if sge {
-
-		//Set the config to overwrite false and re-write config. This ensures that the local phase will not deal with io contention
-		//around the SGE output streams
+		// Set the config to overwrite false and re-write config. This ensures that the local phase will not deal with io contention
+		// around the SGE output streams
 		log.Debug("Updating bbi config to overwrite=false. This avoids IO contention with the grid engine for the next execution round")
 		config.Overwrite = false
 		config.SaveConfig = false
@@ -158,6 +166,7 @@ func ReadSpecifiedFileIntoConfigStruct(config string) (Config, error) {
 
 	if err != nil {
 		log.Errorf("An error occurred trying to read the file %s into viper", config)
+
 		return returnConfig, err
 	}
 
@@ -165,6 +174,7 @@ func ReadSpecifiedFileIntoConfigStruct(config string) (Config, error) {
 
 	if err != nil {
 		log.Errorf("Unable to read file %s into viper!", config)
+
 		return returnConfig, err
 	}
 
@@ -172,7 +182,6 @@ func ReadSpecifiedFileIntoConfigStruct(config string) (Config, error) {
 }
 
 func LocateAndReadConfigFile() (Config, error) {
-
 	var config Config
 
 	if len(viper.GetString("config")) == 0 {
@@ -192,7 +201,7 @@ func LocateAndReadConfigFile() (Config, error) {
 		log.Infof("Successfully loaded default configuration from %s", filepath.Join(currentDir, "bbi.yaml"))
 	}
 
-	//Config provided
+	// Config provided
 	if len(viper.GetString("config")) > 0 {
 		log.Debugf("A config file has been specified at %s", viper.GetString("config"))
 		var err error
@@ -210,7 +219,7 @@ func LocateAndReadConfigFile() (Config, error) {
 
 	// Now, let's make sure we have a fully qualified path to the Execution script
 	if config.PostWorkExecutable != "" && !filepath.IsAbs(config.PostWorkExecutable) {
-		//Let's re-write with the full path.
+		// Let's re-write with the full path.
 		whereami, err := os.Getwd()
 
 		if err != nil {

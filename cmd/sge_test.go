@@ -44,6 +44,7 @@ func Test_gridengineJobName(t *testing.T) {
 			got, err := gridengineJobName(tt.args.model)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("gridengineJobName() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
 			if got != tt.want {

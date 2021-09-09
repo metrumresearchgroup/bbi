@@ -10,7 +10,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
-// Summary prints all results from the parsed LstData
+// Summary prints all results from the parsed LstData.
 func (results SummaryOutput) Summary() bool {
 	thetaTable := tablewriter.NewWriter(os.Stdout)
 	thetaTable.SetAlignment(tablewriter.ALIGN_LEFT)
@@ -42,7 +42,7 @@ func (results SummaryOutput) Summary() bool {
 		}
 
 		thetaTable.Append([]string{
-			string("TH " + strconv.Itoa(i+1)),
+			"TH " + strconv.Itoa(i+1),
 			results.ParameterNames.Theta[i],
 			strconv.FormatFloat(numResult, 'f', -1, 64),
 			s4})
@@ -99,11 +99,11 @@ func (results SummaryOutput) Summary() bool {
 
 	fmt.Println(results.RunDetails.ProblemText)
 	fmt.Println("Dataset: " + results.RunDetails.DataSet)
-	fmt.Println(fmt.Sprintf("Records: %v   Observations: %v  Subjects: %v",
+	fmt.Printf("Records: %v   Observations: %v  Subjects: %v\n",
 		results.RunDetails.NumberOfDataRecords,
 		results.RunDetails.NumberOfObs,
 		results.RunDetails.NumberOfSubjects,
-	))
+	)
 	fmt.Println("Estimation Method(s):")
 	for _, em := range results.RunDetails.EstimationMethods {
 		fmt.Println(" - " + em)
@@ -120,5 +120,6 @@ func (results SummaryOutput) Summary() bool {
 
 	thetaTable.Render()
 	omegaTable.Render()
+
 	return true
 }

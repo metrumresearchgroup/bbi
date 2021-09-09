@@ -32,7 +32,6 @@ var thetaResults01Parsed = []float64{
 }
 
 func TestParseThetaResultsBlock(t *testing.T) {
-
 	parsedData := ParseThetaResults(thetaResults01)
 	for i, val := range parsedData {
 		if val != thetaResults01Parsed[i] {

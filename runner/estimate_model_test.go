@@ -7,7 +7,6 @@ import (
 )
 
 func TestDefaultEstimateModel(t *testing.T) {
-
 	r := RunSettings{
 		OutputDir: "{{ .Name }}",
 	}
@@ -31,7 +30,7 @@ func TestCustomEstimateModel(t *testing.T) {
 	assert.Equal(t, out, "oh_cat_hai")
 }
 
-//Should just get back the provided output dir
+//Should just get back the provided output dir.
 func TestLogiclessTemplateForEstimateModel(t *testing.T) {
 	r := RunSettings{
 		OutputDir: "notatemplate",

@@ -6,11 +6,11 @@ import (
 	"strings"
 )
 
-// ParseThetaResults parses theta results
+// ParseThetaResults parses theta results.
 func ParseThetaResults(lines []string) []float64 {
 	var thetaLine string
 	var thetaValues []float64
-	r := regexp.MustCompile("E[\\+|\\-]")
+	r := regexp.MustCompile(`E[+-]`)
 	for _, line := range lines {
 		if r.MatchString(line) {
 			thetaLine += line
@@ -24,5 +24,6 @@ func ParseThetaResults(lines []string) []float64 {
 		}
 		thetaValues = append(thetaValues, parsedVal)
 	}
+
 	return thetaValues
 }

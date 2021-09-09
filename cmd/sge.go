@@ -1,10 +1,8 @@
 package cmd
 
 import (
-	"bbi/utils"
 	"bytes"
 	"errors"
-	log "github.com/sirupsen/logrus"
 	"os/exec"
 	"path"
 	"path/filepath"
@@ -13,9 +11,14 @@ import (
 	"text/template"
 	"time"
 
+	"bbi/utils"
+
+	log "github.com/sirupsen/logrus"
+
 	"os"
 
 	"bbi/configlib"
+
 	"github.com/metrumresearchgroup/turnstile"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
@@ -26,7 +29,7 @@ type sgeOperation struct {
 	Models []SGEModel `json:"models"`
 }
 
-//SGEModel is the struct used for SGE operations containing the NonMemModel
+//SGEModel is the struct used for SGE operations containing the NonMemModel.
 type SGEModel struct {
 	Nonmem               *NonMemModel
 	Cancel               chan bool
@@ -62,7 +65,7 @@ func (s *SGEModel) GetWorkingPath() string {
 	return s.Nonmem.OutputDir
 }
 
-//Begin Scalable method definitions
+//Begin Scalable method definitions.
 func (l SGEModel) CancellationChannel() chan bool {
 	return l.Cancel
 }
@@ -79,7 +82,7 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 	log.Debugf("%s Overwrite is currrently set to %t", l.Nonmem.LogIdentifier(), l.Nonmem.Configuration.Overwrite)
 	log.Debugf("%s Beginning evaluation of whether or not %s exists", l.Nonmem.LogIdentifier(), l.Nonmem.OutputDir)
 
-	err := createChildDirectories(l.Nonmem, l.Cancel, channels, true)
+	err := createChildDirectories(l.Nonmem, true)
 
 	//Save the config into the output directory
 
@@ -88,6 +91,7 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 		p := &l
 		p.BuildExecutionEnvironment(false, err)
 		RecordConcurrentError(p.Nonmem.FileName, err.Error(), err, channels, p.Cancel, p)
+
 		return
 	}
 
@@ -98,6 +102,7 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 		p := &l
 		p.BuildExecutionEnvironment(false, err)
 		RecordConcurrentError(p.Nonmem.Model, "An error occurred during the creation of the executable script for this model", err, channels, p.Cancel, p)
+
 		return
 	}
 
@@ -116,7 +121,7 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 	}
 }
 
-//Work describes the Turnstile execution phase -> IE What heavy lifting should be done
+//Work describes the Turnstile execution phase -> IE What heavy lifting should be done.
 func (l SGEModel) Work(channels *turnstile.ChannelMap) {
 	cerr := executeNonMemJob(executeSGEJob, l.Nonmem)
 
@@ -124,6 +129,7 @@ func (l SGEModel) Work(channels *turnstile.ChannelMap) {
 		p := &l
 		p.BuildExecutionEnvironment(false, cerr.Error)
 		RecordConcurrentError(p.Nonmem.Model, cerr.Notes, cerr.Error, channels, p.Cancel, p)
+
 		return
 	}
 
@@ -132,13 +138,13 @@ func (l SGEModel) Work(channels *turnstile.ChannelMap) {
 	channels.Completed <- 1
 }
 
-//Monitor is the 3rd phase of turnstile (not implemented here)
-func (l SGEModel) Monitor(channels *turnstile.ChannelMap) {
+//Monitor is the 3rd phase of turnstile (not implemented here).
+func (l SGEModel) Monitor(_ *turnstile.ChannelMap) {
 	//Do nothing for this implementation
 }
 
 //Cleanup is the last phase of execution, in which computation / hard work is done and we're cleaning up leftover files, copying results around et all.
-func (l SGEModel) Cleanup(channels *turnstile.ChannelMap) {
+func (l SGEModel) Cleanup(_ *turnstile.ChannelMap) {
 	//err := configlib.WriteViperConfig(l.Nonmem.OutputDir, true)
 	//
 	//if err != nil {
@@ -148,7 +154,7 @@ func (l SGEModel) Cleanup(channels *turnstile.ChannelMap) {
 
 //End Scalable method definitions
 
-// runCmd represents the run command
+// runCmd represents the run command.
 var sgeCMD = &cobra.Command{
 	Use:   "sge",
 	Short: "sge specifies to run a (set of) models on the Sun Grid Engine",
@@ -156,6 +162,11 @@ var sgeCMD = &cobra.Command{
 	Run:   sge,
 }
 
+func errpanic(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
 func init() {
 	runCmd.AddCommand(sgeCMD)
 
@@ -167,15 +178,14 @@ func init() {
 
 	//String Variables
 	sgeCMD.PersistentFlags().String("bbi_binary", bbi, "directory path for bbi to be called in goroutines (SGE Execution)")
-	viper.BindPFlag("bbi_binary", sgeCMD.PersistentFlags().Lookup("bbi_binary"))
+	errpanic(viper.BindPFlag("bbi_binary", sgeCMD.PersistentFlags().Lookup("bbi_binary")))
 
 	const gridNamePrefixIdentifier string = "grid_name_prefix"
 	sgeCMD.PersistentFlags().String(gridNamePrefixIdentifier, "", "Any prefix you wish to add to the name of jobs being submitted to the grid")
-	viper.BindPFlag(gridNamePrefixIdentifier, sgeCMD.PersistentFlags().Lookup(gridNamePrefixIdentifier))
+	errpanic(viper.BindPFlag(gridNamePrefixIdentifier, sgeCMD.PersistentFlags().Lookup(gridNamePrefixIdentifier)))
 }
 
-func sge(cmd *cobra.Command, args []string) {
-
+func sge(_ *cobra.Command, args []string) {
 	config, err := configlib.LocateAndReadConfigFile()
 	if err != nil {
 		log.Fatalf("Failed to process configuration: %s", err)
@@ -311,7 +321,6 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 	output, err := command.CombinedOutput()
 
 	if err != nil {
-
 		//Let's look to see if it's just because of the typical "No queues present" error
 		if !strings.Contains(string(output), "job is not allowed to run in any queue") {
 			//If the error doesn't appear to be the above error, we'll generate the concurrent error and move along
@@ -349,7 +358,6 @@ func sgeModelsFromArguments(args []string, config configlib.Config) ([]SGEModel,
 
 //Generate the command line script to execute bbi on the grid.
 func generateBbiScript(fileTemplate string, l NonMemModel) ([]byte, error) {
-
 	t, err := template.New("file").Parse(fileTemplate)
 	buf := new(bytes.Buffer)
 	if err != nil {

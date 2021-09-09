@@ -35,7 +35,6 @@ var omegaResults02Parsed = []float64{
 }
 
 func TestParseBlockResults(t *testing.T) {
-
 	parsedData := ParseBlockResults(omegaResults01)
 	for i, val := range parsedData {
 		if val != omegaResults01Parsed[i] {
@@ -46,7 +45,6 @@ func TestParseBlockResults(t *testing.T) {
 }
 
 func TestParseBlockResultsWithDots(t *testing.T) {
-
 	parsedData := ParseBlockResults(omegaResults02)
 	for i, val := range parsedData {
 		if val != omegaResults02Parsed[i] {

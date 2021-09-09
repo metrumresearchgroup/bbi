@@ -23,6 +23,7 @@ func parseCovLines(lines []string) ExtData {
 				if len(paramNames) == 0 {
 					paramNames = strings.Fields(line)
 				}
+
 				continue
 			}
 
@@ -65,7 +66,7 @@ func getThetaMatrix(lines []string) [][]float64 {
 
 // GetThetaValues extracts the theta values from a file that has
 // thetas, such as cov/cor/ext data and returns the
-// data as a FlatArray
+// data as a FlatArray.
 func GetThetaValues(lines []string) []FlatArray {
 	var result []FlatArray
 	data := parseCovLines(lines)
@@ -75,5 +76,6 @@ func GetThetaValues(lines []string) []FlatArray {
 		thetas := MakeFlatArray(m, len(m))
 		result = append(result, thetas)
 	}
+
 	return result
 }

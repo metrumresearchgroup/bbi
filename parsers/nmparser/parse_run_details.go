@@ -7,17 +7,19 @@ import (
 )
 
 func parseFinalTime(line string) float64 {
-	re := regexp.MustCompile("[-+]?([0-9]*\\.[0-9]+|[0-9]+)$")
+	re := regexp.MustCompile(`[-+]?([\d]*\.[\d]+|[\d]+)$`)
 	res, err := strconv.ParseFloat(re.FindString(line), 64)
 	if err != nil {
 		res = DefaultFloat64
 	}
+
 	return res
 }
 
 func parseNMVersion(line string) string {
-	re := regexp.MustCompile("[^\\s]+$")
+	re := regexp.MustCompile(`[^\s]+$`)
 	res := re.FindString(line)
+
 	return res
 }
 
@@ -25,21 +27,24 @@ func replaceTrim(line string, replacement string) string {
 	return strings.TrimSpace(strings.Replace(line, replacement, "", -1))
 }
 
-func parseValue(line string, value string) string {
+// TODO: remove parseValue if we find no use
+/* func parseValue(line string, value string) string {
 	tokens := strings.Fields(line)
 	for _, s := range tokens {
 		if strings.Contains(s, value) {
 			return replaceTrim(s, value)
 		}
 	}
+
 	return ""
-}
+} */
 
 func parseLine(line string, n int) string {
 	tokens := strings.Fields(line)
 	if len(tokens) >= n {
 		return tokens[n]
 	}
+
 	return ""
 }
 

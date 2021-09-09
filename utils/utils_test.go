@@ -51,7 +51,6 @@ func TestIsDir(t *testing.T) {
 	}
 
 	for i, d := range data {
-
 		exists, _ := IsDir(d.input, new(afero.OsFs))
 		if d.expected != exists {
 			t.Errorf("Test %d failed. Expected %t got %t", i, d.expected, exists)
