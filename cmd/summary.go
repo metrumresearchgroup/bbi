@@ -40,6 +40,7 @@ bbi nonmem summary run001/run001
 bbi nonmem summary run001/run001.lst
 bbi nonmem summary run001/run001.res
  `
+
 type jsonResults struct {
 	Results []parser.SummaryOutput
 	Errors  []error
@@ -167,5 +168,6 @@ func NewSummaryCmd() *cobra.Command {
 	cmd.PersistentFlags().BoolVar(&noGrd, "no-grd-file", false, "do not use grd file")
 	cmd.PersistentFlags().BoolVar(&noShk, "no-shk-file", false, "do not use shk file")
 	cmd.PersistentFlags().StringVar(&extFile, "ext-file", "", "name of custom ext-file")
+
 	return cmd
 }

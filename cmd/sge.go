@@ -181,6 +181,7 @@ func NewSgeCmd() *cobra.Command {
 	const gridNamePrefixIdentifier string = "grid_name_prefix"
 	cmd.PersistentFlags().String(gridNamePrefixIdentifier, "", "Any prefix you wish to add to the name of jobs being submitted to the grid")
 	errpanic(viper.BindPFlag(gridNamePrefixIdentifier, cmd.PersistentFlags().Lookup(gridNamePrefixIdentifier)))
+
 	return cmd
 }
 

@@ -49,5 +49,6 @@ func NewRecleanCmd() *cobra.Command {
 
 	cmd.Flags().Int("recleanLvl", 0, "clean level to apply")
 	errpanic(viper.BindPFlag("recleanLvl", cmd.Flags().Lookup("recleanLvl")))
+
 	return cmd
 }
