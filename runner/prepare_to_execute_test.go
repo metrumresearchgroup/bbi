@@ -14,10 +14,10 @@ func TestPrepareForExecution(tt *testing.T) {
 		out  []string
 	}
 
-	pathtests := []pathtest{}
+	var tests []pathtest
 
 	if runtime.GOOS == "windows" {
-		pathtests = []pathtest{
+		tests = []pathtest{
 			{
 				name: "no ignore",
 				in: []string{
@@ -46,7 +46,7 @@ func TestPrepareForExecution(tt *testing.T) {
 			},
 		}
 	} else {
-		pathtests = []pathtest{
+		tests = []pathtest{
 			{
 				name: "no ignore",
 				in: []string{
@@ -75,7 +75,7 @@ func TestPrepareForExecution(tt *testing.T) {
 			},
 		}
 	}
-	for _, test := range pathtests {
+	for _, test := range tests {
 		tt.Run(test.name, func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 

@@ -8,10 +8,8 @@ import (
 )
 
 func TestReadExt(tt *testing.T) {
-
 	// simply check that reading in the entire file vs only the values that should be taken
 	// will change the number of rows present
-
 	tests := []struct {
 		input     string
 		length    int
