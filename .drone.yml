@@ -28,7 +28,7 @@ steps:
       - mkdir -p /tmp/${DRONE_BUILD_NUMBER} ; git rev-parse HEAD > /tmp/${DRONE_BUILD_NUMBER}/bbitest_hash
       - if [ ! -z $BBITEST_BRANCH ]; then git checkout $BBITEST_BRANCH; fi
     environment:
-      BBITEST_BRANCH: develop
+      BBITEST_BRANCH: master
 
   - name: Copy commit hashes to s3
     commands:
