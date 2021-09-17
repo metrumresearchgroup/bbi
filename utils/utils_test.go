@@ -5,82 +5,168 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/metrumresearchgroup/wrapt"
 	"github.com/spf13/afero"
 )
 
-func TestDirExists(t *testing.T) {
-	type test struct {
-		input    string
-		expected bool
+func TestDirExists(tt *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  bool
+	}{
+		{
+			name:  "current",
+			input: ".",
+			want:  true,
+		},
+		{
+			name:  "blank",
+			input: "./",
+			want:  true,
+		},
+		{
+			name:  "parent",
+			input: "..",
+			want:  true,
+		},
+		{
+			name:  "parent slash",
+			input: "../",
+			want:  true,
+		},
+		{
+			name:  "current slash parent",
+			input: "./..",
+			want:  true,
+		},
+		{
+			name:  "current slash parent slash",
+			input: "./../",
+			want:  true,
+		},
+		{
+			name:  "tempdir",
+			input: os.TempDir(),
+			want:  true,
+		},
+		{
+			name:  "tempdir slash",
+			input: os.TempDir() + FilePathSeparator,
+			want:  true,
+		},
+		{
+			name:  "slash",
+			input: "/",
+			want:  true,
+		},
+		{
+			name:  "slash name",
+			input: "/some-really-random-directory-name",
+			want:  false,
+		},
+		{
+			name:  "slashed names",
+			input: "/some/really/random/directory/name",
+			want:  false,
+		},
+		{
+			name:  "dot slash name",
+			input: "./some-really-random-local-directory-name",
+			want:  false,
+		},
+		{
+			name:  "dot slashed names",
+			input: "./some/really/random/local/directory/name",
+			want:  false,
+		},
 	}
 
-	data := []test{
-		{".", true},
-		{"./", true},
-		{"..", true},
-		{"../", true},
-		{"./..", true},
-		{"./../", true},
-		{os.TempDir(), true},
-		{os.TempDir() + FilePathSeparator, true},
-		{"/", true},
-		{"/some-really-random-directory-name", false},
-		{"/some/really/random/directory/name", false},
-		{"./some-really-random-local-directory-name", false},
-		{"./some/really/random/local/directory/name", false},
-	}
+	for _, test := range tests {
+		tt.Run(test.name, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-	for i, d := range data {
-		exists, _ := DirExists(filepath.FromSlash(d.input), new(afero.OsFs))
-		if d.expected != exists {
-			t.Errorf("Test %d failed. Expected %t got %t", i, d.expected, exists)
-		}
+			got, _ := DirExists(filepath.FromSlash(test.input), new(afero.OsFs))
+
+			t.R.Equal(test.want, got)
+		})
 	}
 }
 
-func TestIsDir(t *testing.T) {
-	type test struct {
-		input    string
-		expected bool
-	}
-	data := []test{
-		{"./", true},
-		{"/", true},
-		{"./this-directory-does-not-existi", false},
-		{"/this-absolute-directory/does-not-exist", false},
+func TestIsDir(tt *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  bool
+	}{
+		{
+			name:  "dot slash",
+			input: "./",
+			want:  true,
+		},
+		{
+			name:  "slash",
+			input: "/",
+			want:  true,
+		},
+		{
+			name:  "dot slash non-existent",
+			input: "./this-directory-does-not-existi",
+			want:  false,
+		},
+		{
+			name:  "slash non-existent slash",
+			input: "/this-absolute-directory/does-not-exist",
+			want:  false,
+		},
 	}
 
-	for i, d := range data {
-		exists, _ := IsDir(d.input, new(afero.OsFs))
-		if d.expected != exists {
-			t.Errorf("Test %d failed. Expected %t got %t", i, d.expected, exists)
-		}
+	for _, test := range tests {
+		tt.Run(test.name, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+
+			got, _ := IsDir(test.input, new(afero.OsFs))
+
+			t.R.Equal(test.want, got)
+		})
 	}
 }
 
-func TestFileAndExt(t *testing.T) {
+func TestFileAndExt(tt *testing.T) {
 	type fileAndExt struct {
 		file string
 		ext  string
 	}
-	type test struct {
-		input    string
-		expected fileAndExt
-	}
-	data := []test{
-		{"test.txt", fileAndExt{"test", ".txt"}},
-		{"path/test.txt", fileAndExt{"test", ".txt"}},
-		{"../relativepath/test.txt", fileAndExt{"test", ".txt"}},
-		{"/absolutepath/test.txt", fileAndExt{"test", ".txt"}},
+	tests := []struct {
+		input string
+		want  fileAndExt
+	}{
+		{
+			input: "test.txt",
+			want:  fileAndExt{"test", ".txt"},
+		},
+		{
+			input: "path/test.txt",
+			want:  fileAndExt{"test", ".txt"},
+		},
+		{
+			input: "../relativepath/test.txt",
+			want:  fileAndExt{"test", ".txt"},
+		},
+		{
+			input: "/absolutepath/test.txt",
+			want:  fileAndExt{"test", ".txt"},
+		},
 	}
 
-	for i, d := range data {
-		file, ext := FileAndExt(d.input)
-		if file != d.expected.file {
-			t.Errorf("Test %d failed. Expected %s got %s", i, d.expected.file, file)
-		}
-		if ext != d.expected.ext {
-			t.Errorf("Test %d failed. Expected %s got %s", i, d.expected.ext, ext)
-		}
+	for _, test := range tests {
+		tt.Run(test.input, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+
+			file, ext := FileAndExt(test.input)
+
+			t.R.Equal(test.want.file, file)
+			t.R.Equal(test.want.ext, ext)
+		})
 	}
 }

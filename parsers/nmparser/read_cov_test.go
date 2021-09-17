@@ -3,10 +3,10 @@ package parser
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/metrumresearchgroup/wrapt"
 )
 
-func TestReadParseCovLines(t *testing.T) {
+func TestReadParseCovLines(tt *testing.T) {
 	var tests = []struct {
 		lines    []string
 		context  string
@@ -96,15 +96,19 @@ func TestReadParseCovLines(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		extData := parseCovLines(tt.lines)
-		assert.Equal(t, len(extData.EstimationMethods), tt.nMethods, "failed to extract separate tables")
-		assert.Equal(t, tt.lines[0], extData.EstimationMethods[0], "Fail :"+tt.context)
-		t.Log("heres a log message in EstimationMethods")
-		res := GetThetaValues(tt.lines)
-		for _, fa := range res {
-			assert.Equal(t, -0.214341, fa.Values[9], "Fail :"+tt.context)
-			assert.Equal(t, 9, fa.Dim, "Fail :"+tt.context)
-		}
+	for _, test := range tests {
+		tt.Run(test.context, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+
+			extData := parseCovLines(test.lines)
+			t.A.Equal(len(extData.EstimationMethods), test.nMethods, "failed to extract separate tables")
+			t.A.Equal(test.lines[0], extData.EstimationMethods[0])
+			t.Log("heres a log message in EstimationMethods")
+			res := GetThetaValues(test.lines)
+			for _, fa := range res {
+				t.A.Equal(-0.214341, fa.Values[9])
+				t.A.Equal(9, fa.Dim)
+			}
+		})
 	}
 }

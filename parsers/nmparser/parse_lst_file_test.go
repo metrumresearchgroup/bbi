@@ -5,31 +5,35 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/metrumresearchgroup/wrapt"
 )
 
-func TestParseOBJV(t *testing.T) {
+func TestParseOBJV(tt *testing.T) {
+	t := wrapt.WrapT(tt)
+
 	var ofvDetails []OfvDetails
 	var expected OfvDetails
 
 	expected.OFVNoConstant = 821.705
 	ofvDetails = parseOFV("OBJECTIVE FUNCTION VALUE WITHOUT CONSTANT: 821.705", ofvDetails)
-	assert.Equal(t, expected, ofvDetails)
+	t.A.Equal(expected, ofvDetails)
 
 	expected.OFVWithConstant = 1639.561
 	ofvDetails = parseOFV("OBJECTIVE FUNCTION VALUE WITH CONSTANT:       1639.561", ofvDetails)
-	assert.Equal(t, expected, ofvDetails)
+	t.A.Equal(expected, ofvDetails)
 
 	expected.ConstantToOFV = 817.855
 	ofvDetails = parseOFV("N*LOG(2PI) CONSTANT TO OBJECTIVE FUNCTION:    817.855", ofvDetails)
-	assert.Equal(t, expected, ofvDetails)
+	t.A.Equal(expected, ofvDetails)
 
 	expected.OFVNoConstant = -7913.528
 	ofvDetails = parseOFV("#OBJV:********************************************    -7913.528       **************************************************", ofvDetails)
-	assert.Equal(t, expected, ofvDetails)
+	t.A.Equal(expected, ofvDetails)
 }
 
-func TestParTestParseOBJV2(t *testing.T) {
+func TestParTestParseOBJV2(tt *testing.T) {
+	t := wrapt.WrapT(tt)
+
 	var lines = []string{
 		"OBJECTIVE FUNCTION VALUE WITHOUT CONSTANT: 821.705",
 		"OBJECTIVE FUNCTION VALUE WITH CONSTANT:       1639.561",
@@ -42,10 +46,12 @@ func TestParTestParseOBJV2(t *testing.T) {
 		OFVNoConstant:   -7913.528,
 	}
 	lstData := ParseLstEstimationFile(lines)
-	assert.Equal(t, lstData.OFV, expected)
+	t.A.Equal(lstData.OFV, expected)
 }
 
-func TestParTestParseOBJV3(t *testing.T) {
+func TestParTestParseOBJV3(tt *testing.T) {
+	t := wrapt.WrapT(tt)
+
 	var lines = []string{
 		"#OBJV:********************************************    -7913.528       **************************************************",
 		"OBJECTIVE FUNCTION VALUE WITHOUT CONSTANT: 821.705",
@@ -58,39 +64,43 @@ func TestParTestParseOBJV3(t *testing.T) {
 		OFVNoConstant:   821.705,
 	}
 	lstData := ParseLstEstimationFile(lines)
-	assert.Equal(t, expected, lstData.OFV)
+	t.A.Equal(expected, lstData.OFV)
 }
 
-func TestParTestParseShrinkage(t *testing.T) {
+func TestParTestParseShrinkage(tt *testing.T) {
+	t := wrapt.WrapT(tt)
+
 	var shrinkageDetails ShrinkageDetails
 	var expected ShrinkageDetails
 
 	expected.EtaSD = []float64{4.0774, 29.015, 11.401}
 	shrinkageDetails = parseShrinkage("ETASHRINKSD(%)  4.0774E+00  2.9015E+01  1.1401E+01", shrinkageDetails)
-	assert.Equal(t, expected, shrinkageDetails)
+	t.A.Equal(expected, shrinkageDetails)
 
 	expected.EtaVR = []float64{7.9885, 49.611, 21.502}
 	shrinkageDetails = parseShrinkage("ETASHRINKVR(%)  7.9885E+00  4.9611E+01  2.1502E+01", shrinkageDetails)
-	assert.Equal(t, expected, shrinkageDetails)
+	t.A.Equal(expected, shrinkageDetails)
 
 	expected.EbvSD = []float64{4.0725, 28.322, 12.255}
 	shrinkageDetails = parseShrinkage("EBVSHRINKSD(%)  4.0725E+00  2.8322E+01  1.2255E+01", shrinkageDetails)
-	assert.Equal(t, expected, shrinkageDetails)
+	t.A.Equal(expected, shrinkageDetails)
 
 	expected.EbvVR = []float64{7.9791, 48.623, 23.009}
 	shrinkageDetails = parseShrinkage("EBVSHRINKVR(%)  7.9791E+00  4.8623E+01  2.3009E+01", shrinkageDetails)
-	assert.Equal(t, expected, shrinkageDetails)
+	t.A.Equal(expected, shrinkageDetails)
 
 	expected.EpsSD = []float64{12.507, 12.507}
 	shrinkageDetails = parseShrinkage("EPSSHRINKSD(%)  1.2507E+01  1.2507E+01", shrinkageDetails)
-	assert.Equal(t, expected, shrinkageDetails)
+	t.A.Equal(expected, shrinkageDetails)
 
 	expected.EpsVR = []float64{23.451, 23.451}
 	shrinkageDetails = parseShrinkage("EPSSHRINKVR(%)  2.3451E+01  2.3451E+01", shrinkageDetails)
-	assert.Equal(t, expected, shrinkageDetails)
+	t.A.Equal(expected, shrinkageDetails)
 }
 
-func TestParTestParseShrinkage2(t *testing.T) {
+func TestParTestParseShrinkage2(tt *testing.T) {
+	t := wrapt.WrapT(tt)
+
 	var lines = []string{
 		"ETASHRINKSD(%)  4.0774E+00  2.9015E+01  1.1401E+01",
 		"ETASHRINKVR(%)  7.9885E+00  4.9611E+01  2.1502E+01",
@@ -99,21 +109,28 @@ func TestParTestParseShrinkage2(t *testing.T) {
 		"EPSSHRINKSD(%)  1.2507E+01  1.2507E+01",
 		"EPSSHRINKVR(%)  2.3451E+01  2.3451E+01",
 	}
-	expected := ShrinkageDetails{
-		EtaSD: []float64{4.0774, 29.015, 11.401},
-		EtaVR: []float64{7.9885, 49.611, 21.502},
+	want := [][]ShrinkageDetails{
+		{
+			{
+				EtaSD: []float64{4.0774, 29.015, 11.401},
+				EtaVR: []float64{7.9885, 49.611, 21.502},
 
-		EbvSD: []float64{4.0725, 28.322, 12.255},
-		EbvVR: []float64{7.9791, 48.623, 23.009},
+				EbvSD: []float64{4.0725, 28.322, 12.255},
+				EbvVR: []float64{7.9791, 48.623, 23.009},
 
-		EpsSD: []float64{12.507, 12.507},
-		EpsVR: []float64{23.451, 23.451},
+				EpsSD: []float64{12.507, 12.507},
+				EpsVR: []float64{23.451, 23.451},
+			},
+		},
 	}
-	lstData := ParseLstEstimationFile(lines)
-	assert.Equal(t, expected, lstData.ShrinkageDetails[0][0])
+	got := ParseLstEstimationFile(lines)
+
+	t.A.Equal(want, got.ShrinkageDetails)
 }
 
-func TestParseGradient(t *testing.T) {
+func TestParseGradient(tt *testing.T) {
+	t := wrapt.WrapT(tt)
+
 	var tests = []struct {
 		lines                []string
 		hasZeroFinalGradient bool
@@ -168,11 +185,13 @@ func TestParseGradient(t *testing.T) {
 
 	for _, tt := range tests {
 		noZeroFinal := parseGradient(tt.lines)
-		assert.Equal(t, tt.hasZeroFinalGradient, noZeroFinal, "Fail hasZeroFinalGradient: "+tt.context)
+		t.A.Equal(tt.hasZeroFinalGradient, noZeroFinal, "Fail hasZeroFinalGradient: "+tt.context)
 	}
 }
 
-func TestConditionNumber(t *testing.T) {
+func TestConditionNumber(tt *testing.T) {
+	t := wrapt.WrapT(tt)
+
 	var tests = []struct {
 		lines                []string
 		n                    int
@@ -256,11 +275,12 @@ func TestConditionNumber(t *testing.T) {
 	for _, tt := range tests {
 		conditionNumber := mustCalculateConditionNumber(tt.lines, tt.n)
 		// compare to three decimal places
-		assert.Equal(t, tt.conditionNumber, math.Round(conditionNumber*1000)/1000, "Fail :"+tt.context)
+		t.A.Equal(tt.conditionNumber, math.Round(conditionNumber*1000)/1000, "Fail :"+tt.context)
 	}
 }
 
-func TestSetCorrelationsOk(t *testing.T) {
+func TestSetCorrelationsOk(tt *testing.T) {
+	t := wrapt.WrapT(tt)
 	var tests = []struct {
 		lines          []string
 		n              int
@@ -490,8 +510,8 @@ func TestSetCorrelationsOk(t *testing.T) {
 
 	for _, tt := range tests {
 		correlationsOk := getCorrelationStatus(tt.lines, tt.n, 0.90)
-		assert.Equal(t, tt.correlationsOk, correlationsOk, "Fail :"+tt.context)
-		//assert.Equal(t, true, false, "Fail :"+tt.context)
+		t.A.Equal(tt.correlationsOk, correlationsOk, "Fail :"+tt.context)
+		// t.A.Equal(true, false, "Fail :"+tt.context)
 	}
 }
 
@@ -564,7 +584,8 @@ func checkMatrix2(matrix [][]float64, limit float64) bool {
 	return true
 }
 
-func TestCheckMatrix(t *testing.T) {
+func TestCheckMatrix(tt *testing.T) {
+	t := wrapt.WrapT(tt)
 	dim := 3
 	matrix := make([][]float64, dim)
 	for i := range matrix {
@@ -582,7 +603,7 @@ func TestCheckMatrix(t *testing.T) {
 	count = 1.0
 	for j := range matrix {
 		for k := range matrix[j] {
-			assert.Equal(t, matrix[j][k], count, "Fail")
+			t.A.Equal(matrix[j][k], count, "Fail")
 			count++
 		}
 	}
@@ -592,13 +613,14 @@ func TestCheckMatrix(t *testing.T) {
 	count = 1.0
 	for k := range matrix {
 		for j := range matrix[k] {
-			assert.Equal(t, matrix[j][k], count, "Fail")
+			t.A.Equal(matrix[j][k], count, "Fail")
 			count++
 		}
 	}
 }
 
-func TestSetCov(t *testing.T) {
+func TestSetCov(tt *testing.T) {
+	t := wrapt.WrapT(tt)
 	var tests = []struct {
 		lines   []string
 		n       int
@@ -680,15 +702,16 @@ func TestSetCov(t *testing.T) {
 
 	for _, tt := range tests {
 		covTheta := getThetaValues(tt.lines, tt.n)
-		assert.Equal(t, 9, covTheta.Dim, "Fail :"+tt.context)
-		assert.Equal(t, 0.609, covTheta.Values[0], "Fail :"+tt.context)
-		assert.Equal(t, -0.0799, covTheta.Values[1], "Fail :"+tt.context)
-		assert.Equal(t, 8.0, covTheta.Values[7], "Fail :"+tt.context)
-		assert.Equal(t, 9.9, covTheta.Values[80], "Fail :"+tt.context)
+		t.A.Equal(9, covTheta.Dim, "Fail :"+tt.context)
+		t.A.Equal(0.609, covTheta.Values[0], "Fail :"+tt.context)
+		t.A.Equal(-0.0799, covTheta.Values[1], "Fail :"+tt.context)
+		t.A.Equal(8.0, covTheta.Values[7], "Fail :"+tt.context)
+		t.A.Equal(9.9, covTheta.Values[80], "Fail :"+tt.context)
 	}
 }
 
-func TestGetGradientLine(t *testing.T) {
+func TestGetGradientLine(tt *testing.T) {
+	t := wrapt.WrapT(tt)
 	var tests = []struct {
 		lines    []string
 		n        int
@@ -707,8 +730,8 @@ func TestGetGradientLine(t *testing.T) {
 
 	for _, tt := range tests {
 		line := getGradientLine(tt.lines, tt.n)
-		assert.Equal(t, tt.expected, line, "Fail :"+tt.expected)
+		t.A.Equal(tt.expected, line, "Fail :"+tt.expected)
 		hasZero := parseGradient([]string{line})
-		assert.Equal(t, true, hasZero, "Fail :"+tt.expected)
+		t.A.Equal(true, hasZero, "Fail :"+tt.expected)
 	}
 }

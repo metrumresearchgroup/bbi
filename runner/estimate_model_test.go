@@ -3,42 +3,48 @@ package runner
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/metrumresearchgroup/wrapt"
 )
 
-func TestDefaultEstimateModel(t *testing.T) {
+func TestDefaultEstimateModel(tt *testing.T) {
+	t := wrapt.WrapT(tt)
+
 	r := RunSettings{
 		OutputDir: "{{ .Name }}",
 	}
 
 	out, err := processDirectoryTemplate("cat", r)
 
-	assert.Nil(t, err)
-	assert.NotEmpty(t, out)
-	assert.Equal(t, "cat", out)
+	t.A.Nil(err)
+	t.A.NotEmpty(out)
+	t.A.Equal("cat", out)
 }
 
-func TestCustomEstimateModel(t *testing.T) {
+func TestCustomEstimateModel(tt *testing.T) {
+	t := wrapt.WrapT(tt)
+
 	r := RunSettings{
 		OutputDir: "oh_{{ .Name }}_hai",
 	}
 
 	out, err := processDirectoryTemplate("cat", r)
 
-	assert.Nil(t, err)
-	assert.NotEmpty(t, out)
-	assert.Equal(t, out, "oh_cat_hai")
+	t.A.Nil(err)
+	t.A.NotEmpty(out)
+	t.A.Equal(out, "oh_cat_hai")
 }
 
 //Should just get back the provided output dir.
-func TestLogiclessTemplateForEstimateModel(t *testing.T) {
+func TestLogiclessTemplateForEstimateModel(tt *testing.T) {
+	t := wrapt.WrapT(tt)
+
 	r := RunSettings{
 		OutputDir: "notatemplate",
 	}
 
 	out, err := processDirectoryTemplate("cat", r)
 
-	assert.NotEmpty(t, out)
-	assert.Equal(t, out, r.OutputDir)
-	assert.Nil(t, err)
+	t.A.NotEmpty(out)
+	t.A.Equal(out, r.OutputDir)
+	t.A.Nil(err)
 }

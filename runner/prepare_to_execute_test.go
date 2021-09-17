@@ -1,40 +1,44 @@
 package runner
 
 import (
-	"fmt"
 	"runtime"
 	"testing"
+
+	"github.com/metrumresearchgroup/wrapt"
 )
 
-func TestPrepareForExecution(t *testing.T) {
-	var pathtests []struct {
-		in  []string
-		out []string
+func TestPrepareForExecution(tt *testing.T) {
+	type pathtest struct {
+		name string
+		in   []string
+		out  []string
 	}
+
+	pathtests := []pathtest{}
+
 	if runtime.GOOS == "windows" {
-		pathtests = []struct {
-			in  []string
-			out []string
-		}{
+		pathtests = []pathtest{
 			{
-				[]string{
+				name: "no ignore",
+				in: []string{
 					"$PROB",
 					"$DATA ../modeling.csv",
 					"$PK",
 				},
-				[]string{
+				out: []string{
 					"$PROB",
 					"$DATA ..\\..\\modeling.csv",
 					"$PK",
 				},
 			},
 			{
-				[]string{
+				name: "ignore",
+				in: []string{
 					"$PROB",
 					"$DATA ..\\modeling.csv IGNORE=@",
 					"$PK",
 				},
-				[]string{
+				out: []string{
 					"$PROB",
 					"$DATA ..\\..\\modeling.csv IGNORE=@",
 					"$PK",
@@ -42,29 +46,28 @@ func TestPrepareForExecution(t *testing.T) {
 			},
 		}
 	} else {
-		pathtests = []struct {
-			in  []string
-			out []string
-		}{
+		pathtests = []pathtest{
 			{
-				[]string{
+				name: "no ignore",
+				in: []string{
 					"$PROB",
 					"$DATA ../modeling.csv",
 					"$PK",
 				},
-				[]string{
+				out: []string{
 					"$PROB",
 					"$DATA ../../modeling.csv",
 					"$PK",
 				},
 			},
 			{
-				[]string{
+				name: "ignore",
+				in: []string{
 					"$PROB",
 					"$DATA ../modeling.csv IGNORE=@",
 					"$PK",
 				},
-				[]string{
+				out: []string{
 					"$PROB",
 					"$DATA ../../modeling.csv IGNORE=@",
 					"$PK",
@@ -72,13 +75,13 @@ func TestPrepareForExecution(t *testing.T) {
 			},
 		}
 	}
-	for _, tt := range pathtests {
-		res := PrepareForExecution(tt.in)
-		for i, l := range res {
-			if l != tt.out[i] {
-				t.Log(fmt.Sprintf(", GOT: %s, EXPECTED: %s, at INDEX: %b", tt.in, tt.out, i))
-				t.Fail()
-			}
-		}
+	for _, test := range pathtests {
+		tt.Run(test.name, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+
+			res := PrepareForExecution(test.in)
+
+			t.R.Equal(test.out, res)
+		})
 	}
 }

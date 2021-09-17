@@ -3,12 +3,12 @@ package parser
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/metrumresearchgroup/wrapt"
 )
 
 // TODO: did not add a test for nm75 with shrinkage type 11 since these table tests are kind of a mess
 
-func TestReadParseShkLines(t *testing.T) {
+func TestReadParseShkLines(tt *testing.T) {
 	var tests = []struct {
 		lines          []string
 		expectedTables []string
@@ -86,34 +86,29 @@ func TestReadParseShkLines(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		ed := ParseShkLines(tt.lines)
-		assert.Equal(t, tt.expectedTables, ed.EstimationMethods, "Fail :"+tt.context)
-		assert.Equal(t, "TYPE", ed.ParameterNames[0], "Fail :"+tt.context)
-		assert.Equal(t, "ETA(4)", ed.ParameterNames[5], "Fail :"+tt.context)
-		//assert.Equal(t, "1            1 -3.67026E-03 -3.91460E-03 -8.00654E-03 -1.95727E-03", ed.EstimationLines[0][0], "Fail :"+tt.context)
-		//assert.Equal(t, "1            1  1.67026E-03  2.91460E-03  3.00654E-03  4.95727E-03", ed.EstimationLines[2][0], "Fail :"+tt.context)
+	for _, test := range tests {
+		tt.Run(test.context, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-		shk := ParseShrinkage(ed.EstimationLines[0], tt.etaCount, tt.epsCount)
-		//assert.Equal(t, -0.00367026, shk[0].EtaBar[0], "Fail :"+tt.context)
-		assert.Equal(t, tt.etaCount, len(shk[0].EtaBar), "Fail :"+tt.context)
+			ed := ParseShkLines(test.lines)
+			t.R.Equal(test.expectedTables, ed.EstimationMethods)
+			t.R.Equal("TYPE", ed.ParameterNames[0])
+			t.R.Equal("ETA(4)", ed.ParameterNames[5])
 
-		sd := ParseShkData(ed, tt.etaCount, tt.epsCount)
-		//assert.Equal(t, -0.00367026, sd[0][0].EtaBar[0], "Fail :"+tt.context)
-		//assert.Equal(t, 7.45166, sd[1][0].EbvVR[0], "Fail :"+tt.context)
-		//assert.Equal(t, 60.4504, sd[1][0].EbvVR[3], "Fail :"+tt.context)
+			shk := ParseShrinkage(ed.EstimationLines[0], test.etaCount, test.epsCount)
+			t.R.Equal(test.etaCount, len(shk[0].EtaBar))
 
-		assert.Equal(t, tt.epsCount, len(sd[0][0].EpsSD), "Fail :"+tt.context)
-		//assert.Equal(t, tt.epsCount, len(sd[2][0].EpsSD), "Fail :"+tt.context)
-		assert.Equal(t, tt.epsCount, len(sd[0][0].EpsVR), "Fail :"+tt.context)
-		//assert.Equal(t, tt.epsCount, len(sd[2][0].EpsVR), "Fail :"+tt.context)
+			sd := ParseShkData(ed, test.etaCount, test.epsCount)
 
-		assert.Equal(t, tt.etaCount, len(sd[0][0].EtaBar), "Fail :"+tt.context)
-		//assert.Equal(t, tt.etaCount, len(sd[2][0].EtaSD), "Fail :"+tt.context)
+			t.R.Equal(test.epsCount, len(sd[0][0].EpsSD))
+			t.R.Equal(test.epsCount, len(sd[0][0].EpsVR))
+
+			t.R.Equal(test.etaCount, len(sd[0][0].EtaBar))
+		})
 	}
 }
 
-func TestReadParseShkLines2(t *testing.T) {
+func TestReadParseShkLines2(tt *testing.T) {
 	var tests = []struct {
 		lines     []string
 		expected1 string
@@ -173,19 +168,23 @@ func TestReadParseShkLines2(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		ed := ParseShkLines(tt.lines)
+	for _, test := range tests {
+		tt.Run(test.context, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-		shk := ParseShrinkage(ed.EstimationLines[0], tt.etaCount, tt.epsCount)
-		assert.Equal(t, 3, len(shk), "Fail :"+tt.context)
+			ed := ParseShkLines(test.lines)
 
-		for i := range shk {
-			assert.Equal(t, int64(i+1), shk[i].SubPop, "Fail :"+tt.context)
-		}
+			shk := ParseShrinkage(ed.EstimationLines[0], test.etaCount, test.epsCount)
+			t.R.Equal(3, len(shk))
 
-		sd := ParseShkData(ed, tt.etaCount, tt.epsCount)
-		assert.Equal(t, float64(11), sd[0][0].EtaBar[0], "Fail :"+tt.context)
-		assert.Equal(t, float64(92), sd[0][1].EbvVR[0], "Fail :"+tt.context)
-		assert.Equal(t, float64(33), sd[0][2].EtaSD[0], "Fail :"+tt.context)
+			for i := range shk {
+				t.R.Equal(int64(i+1), shk[i].SubPop)
+			}
+
+			sd := ParseShkData(ed, test.etaCount, test.epsCount)
+			t.R.Equal(float64(11), sd[0][0].EtaBar[0])
+			t.R.Equal(float64(92), sd[0][1].EbvVR[0])
+			t.R.Equal(float64(33), sd[0][2].EtaSD[0])
+		})
 	}
 }

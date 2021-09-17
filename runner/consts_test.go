@@ -1,8 +1,9 @@
 package runner
 
 import (
-	"fmt"
 	"testing"
+
+	"github.com/metrumresearchgroup/wrapt"
 )
 
 // TODO: remove initResults if we find no use
@@ -24,43 +25,40 @@ import (
 	return results01
 } */
 
-func initFilenameKeys() []string {
-	return []string{
-		"run001.clt",
-		"run001.coi",
-		"run001.cor",
-		"run001.cov",
-		"run001.cpu",
-		"run001.ext",
-		"run001.grd",
-		"run001.lst",
-		"run001.phi",
-		"run001.shk",
-		"run001.shm",
-		"run001.xml",
+func TestEstOutputFilesByRun(tt *testing.T) {
+	var tests = []struct {
+		in  string
+		out []string
+	}{
+		{
+			"run001",
+			[]string{
+				"run001.clt",
+				"run001.coi",
+				"run001.cor",
+				"run001.cov",
+				"run001.cpu",
+				"run001.ext",
+				"run001.grd",
+				"run001.lst",
+				"run001.phi",
+				"run001.shk",
+				"run001.shm",
+				"run001.xml",
+			},
+		},
 	}
-}
+	for _, test := range tests {
+		tt.Run(test.in, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-var estOutputFilesByRunTests = []struct {
-	in  string
-	out []string
-}{
-	{
-		"run001",
-		initFilenameKeys(),
-	},
-}
+			got := EstOutputFilesByRun(test.in)
 
-func TestEstOutputFilesByRun(t *testing.T) {
-	for _, tt := range estOutputFilesByRunTests {
-		data := EstOutputFilesByRun(tt.in)
-		for _, key := range tt.out {
-			_, ok := data[key]
-			fmt.Println(ok)
-			if !ok {
-				t.Log(fmt.Sprintf("GOT: NO KEY, EXPECTED: %s", key))
-				t.Fail()
+			for _, key := range test.out {
+				_, ok := got[key]
+
+				t.A.True(ok, "missing key %s", key)
 			}
-		}
+		})
 	}
 }

@@ -3,10 +3,10 @@ package parser
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/metrumresearchgroup/wrapt"
 )
 
-func TestReadExt(t *testing.T) {
+func TestReadExt(tt *testing.T) {
 	var tests = []struct {
 		lines   []string
 		context string
@@ -49,31 +49,35 @@ func TestReadExt(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		ext := ParseExtLines(tt.lines)
-		assert.Equal(t, 2, len(ext.EstimationMethods), "Fail :"+tt.context)
+	for _, test := range tests {
+		tt.Run(test.context, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-		pd, pn := ParseParamsExt(ext)
+			ext := ParseExtLines(test.lines)
+			t.A.Equal(2, len(ext.EstimationMethods))
 
-		assert.Equal(t, 2, len(pd), "Fail :"+tt.context)
-		assert.Equal(t, tt.lines[0], pd[0].Method, "Fail :"+tt.context)
-		assert.Equal(t, tt.lines[15], pd[1].Method, "Fail :"+tt.context)
+			pd, pn := ParseParamsExt(ext)
 
-		assert.Equal(t, 9, len(pn.Theta), "Fail :"+tt.context)
-		assert.Equal(t, 26.4905, pd[0].Estimates.Theta[0], "Fail :"+tt.context)
-		assert.Equal(t, 0.75, pd[0].Estimates.Theta[len(pd[0].Estimates.Theta)-1], "Fail :"+tt.context)
+			t.A.Equal(2, len(pd))
+			t.A.Equal(test.lines[0], pd[0].Method)
+			t.A.Equal(test.lines[15], pd[1].Method)
 
-		assert.Equal(t, 6, len(pn.Omega), "Fail :"+tt.context)
-		assert.Equal(t, 0.100611, pd[0].Estimates.Omega[0], "Fail :"+tt.context)
-		assert.Equal(t, 0.0111726, pd[0].Estimates.Omega[len(pd[0].Estimates.Omega)-1], "Fail :"+tt.context)
+			t.A.Equal(9, len(pn.Theta))
+			t.A.Equal(26.4905, pd[0].Estimates.Theta[0])
+			t.A.Equal(0.75, pd[0].Estimates.Theta[len(pd[0].Estimates.Theta)-1])
 
-		assert.Equal(t, 1, len(pn.Sigma), "Fail :"+tt.context)
-		assert.Equal(t, 0.00245104, pd[0].Estimates.Sigma[0], "Fail :"+tt.context)
+			t.A.Equal(6, len(pn.Omega))
+			t.A.Equal(0.100611, pd[0].Estimates.Omega[0])
+			t.A.Equal(0.0111726, pd[0].Estimates.Omega[len(pd[0].Estimates.Omega)-1])
 
-		assert.Equal(t, 1.0, pd[1].Estimates.Theta[0], "Fail :"+tt.context)
-		assert.Equal(t, 2.0, pd[1].StdErr.Theta[0], "Fail :"+tt.context)
-		assert.Equal(t, 0.317192, pd[1].RandomEffectSD.Omega[0], "Fail :"+tt.context)
-		assert.Equal(t, 0.0151246, pd[1].RandomEffectSDSE.Omega[0], "Fail :"+tt.context)
-		assert.Equal(t, 7.0, pd[1].Fixed.Theta[0], "Fail :"+tt.context)
+			t.A.Equal(1, len(pn.Sigma))
+			t.A.Equal(0.00245104, pd[0].Estimates.Sigma[0])
+
+			t.A.Equal(1.0, pd[1].Estimates.Theta[0])
+			t.A.Equal(2.0, pd[1].StdErr.Theta[0])
+			t.A.Equal(0.317192, pd[1].RandomEffectSD.Omega[0])
+			t.A.Equal(0.0151246, pd[1].RandomEffectSDSE.Omega[0])
+			t.A.Equal(7.0, pd[1].Fixed.Theta[0])
+		})
 	}
 }

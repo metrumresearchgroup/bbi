@@ -1,13 +1,15 @@
 package runner
 
 import (
-	"reflect"
 	"testing"
 
+	"github.com/metrumresearchgroup/wrapt"
 	"github.com/spf13/afero"
 )
 
-func TestReadCopiedFiles(t *testing.T) {
+func TestReadCopiedFiles(tt *testing.T) {
+	t := wrapt.WrapT(tt)
+
 	results := []struct {
 		input  string
 		output []TargetedFile
@@ -23,17 +25,15 @@ func TestReadCopiedFiles(t *testing.T) {
 	fs := afero.NewOsFs()
 	for _, r := range results {
 		dat, err := ReadCopiedFiles(fs, r.input)
-		if err != nil {
-			t.Error(err)
-		}
-		if !reflect.DeepEqual(dat, r.output) {
-			t.Log("GOT: ", dat, " Expected: ", r.output)
-			t.Fail()
-		}
+
+		t.R.NoError(err)
+		t.R.Equal(r.output, dat)
 	}
 }
 
-func TestGetCopiedFilenames(t *testing.T) {
+func TestGetCopiedFilenames(tt *testing.T) {
+	t := wrapt.WrapT(tt)
+
 	results := []struct {
 		input  string
 		output []string
@@ -49,15 +49,8 @@ func TestGetCopiedFilenames(t *testing.T) {
 	fs := afero.NewOsFs()
 	for _, r := range results {
 		dat, err := GetCopiedFilenames(fs, r.input)
-		if err != nil {
-			t.Error(err)
-		}
-		for i, f := range dat {
-			ef := r.output[i]
-			if f != r.output[i] {
-				t.Log("GOT: ", f, " Expected: ", ef)
-				t.Fail()
-			}
-		}
+
+		t.R.NoError(err)
+		t.R.Equal(r.output, dat)
 	}
 }

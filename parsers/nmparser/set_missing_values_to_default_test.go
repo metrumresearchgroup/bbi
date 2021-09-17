@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/metrumresearchgroup/wrapt"
 )
 
-func TestSetMissingValuesToDefaultParameterDataMethod(t *testing.T) {
+func TestSetMissingValuesToDefaultParameterDataMethod(tt *testing.T) {
 	var tests = []struct {
 		modelOutput SummaryOutput
 		etaCount    int
@@ -29,14 +29,20 @@ func TestSetMissingValuesToDefaultParameterDataMethod(t *testing.T) {
 			expected: "Test Method",
 		},
 	}
-	for _, tt := range tests {
-		setMissingValuesToDefault(&tt.modelOutput, tt.etaCount, tt.epsCount)
-		assert.Equal(t, tt.expected, tt.modelOutput.ParametersData[0].Method, "Fail :"+tt.expected)
+	for _, test := range tests {
+		tt.Run(test.expected, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+
+			setMissingValuesToDefault(&test.modelOutput, test.etaCount, test.epsCount)
+
+			t.R.Equal(test.expected, test.modelOutput.ParametersData[0].Method)
+		})
 	}
 }
 
-func TestSetMissingValuesToDefaultParameterDataStdErrDimension(t *testing.T) {
+func TestSetMissingValuesToDefaultParameterDataStdErrDimension(tt *testing.T) {
 	var tests = []struct {
+		name        string
 		modelOutput SummaryOutput
 		etaCount    int
 		epsCount    int
@@ -44,6 +50,7 @@ func TestSetMissingValuesToDefaultParameterDataStdErrDimension(t *testing.T) {
 		context     string
 	}{
 		{
+			name: "test",
 			modelOutput: SummaryOutput{
 				ParametersData: []ParametersData{ParametersData{
 					Estimates: ParametersResult{
@@ -56,15 +63,20 @@ func TestSetMissingValuesToDefaultParameterDataStdErrDimension(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		setMissingValuesToDefault(&tt.modelOutput, tt.etaCount, tt.epsCount)
-		assert.Equal(t, tt.expected, len(tt.modelOutput.ParametersData[0].StdErr.Theta), "Fail :"+tt.context)
-		assert.NotEqual(t, tt.expected, len(tt.modelOutput.ParametersData[0].StdErr.Omega), "Fail :"+tt.context)
+	for _, test := range tests {
+		tt.Run(test.name, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+
+			setMissingValuesToDefault(&test.modelOutput, test.etaCount, test.epsCount)
+			t.R.Equal(test.expected, len(test.modelOutput.ParametersData[0].StdErr.Theta))
+			t.R.Equal(test.expected, len(test.modelOutput.ParametersData[0].StdErr.Omega))
+		})
 	}
 }
 
-func TestSetMissingValuesToDefaultParameterDataRESDDimension(t *testing.T) {
+func TestSetMissingValuesToDefaultParameterDataRESDDimension(tt *testing.T) {
 	var tests = []struct {
+		name        string
 		modelOutput SummaryOutput
 		etaCount    int
 		epsCount    int
@@ -72,6 +84,7 @@ func TestSetMissingValuesToDefaultParameterDataRESDDimension(t *testing.T) {
 		context     string
 	}{
 		{
+			name: "test",
 			modelOutput: SummaryOutput{
 				ParametersData: []ParametersData{ParametersData{
 					Estimates: ParametersResult{
@@ -84,15 +97,20 @@ func TestSetMissingValuesToDefaultParameterDataRESDDimension(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		setMissingValuesToDefault(&tt.modelOutput, tt.etaCount, tt.epsCount)
-		assert.Equal(t, tt.expected, len(tt.modelOutput.ParametersData[0].RandomEffectSD.Omega), "Fail :"+tt.context)
-		assert.NotEqual(t, tt.expected, len(tt.modelOutput.ParametersData[0].RandomEffectSD.Sigma), "Fail :"+tt.context)
+	for _, test := range tests {
+		tt.Run(test.name, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+
+			setMissingValuesToDefault(&test.modelOutput, test.etaCount, test.epsCount)
+			t.R.Equal(test.expected, len(test.modelOutput.ParametersData[0].RandomEffectSD.Omega))
+			t.R.NotEqual(test.expected, len(test.modelOutput.ParametersData[0].RandomEffectSD.Sigma))
+		})
 	}
 }
 
-func TestSetMissingValuesToDefaultParameterDataValues(t *testing.T) {
+func TestSetMissingValuesToDefaultParameterDataValues(tt *testing.T) {
 	var tests = []struct {
+		name        string
 		modelOutput SummaryOutput
 		etaCount    int
 		epsCount    int
@@ -100,6 +118,7 @@ func TestSetMissingValuesToDefaultParameterDataValues(t *testing.T) {
 		context     string
 	}{
 		{
+			name: "test",
 			modelOutput: SummaryOutput{
 				ParametersData: []ParametersData{ParametersData{
 					Estimates: ParametersResult{
@@ -113,20 +132,25 @@ func TestSetMissingValuesToDefaultParameterDataValues(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		setMissingValuesToDefault(&tt.modelOutput, tt.etaCount, tt.epsCount)
-		assert.Equal(t, 7, len(tt.modelOutput.ParametersData[0].StdErr.Theta), "Fail :"+tt.context)
-		assert.Equal(t, 2, len(tt.modelOutput.ParametersData[0].RandomEffectSD.Sigma), "Fail :"+tt.context)
-		assert.Equal(t, 3, len(tt.modelOutput.ParametersData[0].RandomEffectSDSE.Omega), "Fail :"+tt.context)
+	for _, test := range tests {
+		tt.Run(test.name, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-		assert.Equal(t, DefaultFloat64, tt.modelOutput.ParametersData[0].StdErr.Theta[0], "Fail :"+tt.context)
-		assert.Equal(t, DefaultFloat64, tt.modelOutput.ParametersData[0].RandomEffectSD.Sigma[1], "Fail :"+tt.context)
-		assert.Equal(t, DefaultFloat64, tt.modelOutput.ParametersData[0].RandomEffectSDSE.Omega[2], "Fail :"+tt.context)
+			setMissingValuesToDefault(&test.modelOutput, test.etaCount, test.epsCount)
+			t.R.Equal(7, len(test.modelOutput.ParametersData[0].StdErr.Theta), "Fail :"+test.context)
+			t.R.Equal(2, len(test.modelOutput.ParametersData[0].RandomEffectSD.Sigma), "Fail :"+test.context)
+			t.R.Equal(3, len(test.modelOutput.ParametersData[0].RandomEffectSDSE.Omega), "Fail :"+test.context)
+
+			t.R.Equal(DefaultFloat64, test.modelOutput.ParametersData[0].StdErr.Theta[0], "Fail :"+test.context)
+			t.R.Equal(DefaultFloat64, test.modelOutput.ParametersData[0].RandomEffectSD.Sigma[1], "Fail :"+test.context)
+			t.R.Equal(DefaultFloat64, test.modelOutput.ParametersData[0].RandomEffectSDSE.Omega[2], "Fail :"+test.context)
+		})
 	}
 }
 
-func TestSetMissingValuesToDefaultParameterNameValues(t *testing.T) {
+func TestSetMissingValuesToDefaultParameterNameValues(tt *testing.T) {
 	var tests = []struct {
+		name        string
 		modelOutput SummaryOutput
 		etaCount    int
 		epsCount    int
@@ -134,6 +158,7 @@ func TestSetMissingValuesToDefaultParameterNameValues(t *testing.T) {
 		context     string
 	}{
 		{
+			name: "test",
 			modelOutput: SummaryOutput{
 				ParametersData: []ParametersData{ParametersData{
 					Estimates: ParametersResult{
@@ -146,16 +171,21 @@ func TestSetMissingValuesToDefaultParameterNameValues(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		setMissingValuesToDefault(&tt.modelOutput, tt.etaCount, tt.epsCount)
-		for i := range tt.modelOutput.ParametersData[0].Estimates.Theta {
-			assert.Equal(t, fmt.Sprintf("THETA%d", i+1), tt.modelOutput.ParameterNames.Theta[i], "Fail :"+tt.context)
-		}
+	for _, test := range tests {
+		tt.Run(test.name, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+
+			setMissingValuesToDefault(&test.modelOutput, test.etaCount, test.epsCount)
+			for i := range test.modelOutput.ParametersData[0].Estimates.Theta {
+				t.R.Equal(fmt.Sprintf("THETA%d", i+1), test.modelOutput.ParameterNames.Theta[i])
+			}
+		})
 	}
 }
 
-func TestSetMissingValuesToDefaultShrinkageEta(t *testing.T) {
+func TestSetMissingValuesToDefaultShrinkageEta(tt *testing.T) {
 	var tests = []struct {
+		name        string
 		modelOutput SummaryOutput
 		etaCount    int
 		epsCount    int
@@ -163,6 +193,7 @@ func TestSetMissingValuesToDefaultShrinkageEta(t *testing.T) {
 		context     string
 	}{
 		{
+			name: "test",
 			modelOutput: SummaryOutput{
 				ParametersData: []ParametersData{ParametersData{
 					Estimates: ParametersResult{},
@@ -173,15 +204,21 @@ func TestSetMissingValuesToDefaultShrinkageEta(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		setMissingValuesToDefault(&tt.modelOutput, tt.etaCount, tt.epsCount)
-		assert.Equal(t, tt.etaCount, len(tt.modelOutput.ShrinkageDetails[0][0].EtaBar), "Fail :"+tt.context)
-		assert.Equal(t, DefaultFloat64, tt.modelOutput.ShrinkageDetails[0][0].EtaBar[tt.etaCount-1], "Fail :"+tt.context)
+	for _, test := range tests {
+		tt.Run(test.name, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+
+			setMissingValuesToDefault(&test.modelOutput, test.etaCount, test.epsCount)
+
+			t.R.Equal(test.etaCount, len(test.modelOutput.ShrinkageDetails[0][0].EtaBar))
+			t.R.Equal(DefaultFloat64, test.modelOutput.ShrinkageDetails[0][0].EtaBar[test.etaCount-1])
+		})
 	}
 }
 
-func TestSetMissingValuesToDefaultShrinkageEps(t *testing.T) {
+func TestSetMissingValuesToDefaultShrinkageEps(tt *testing.T) {
 	var tests = []struct {
+		name        string
 		modelOutput SummaryOutput
 		etaCount    int
 		epsCount    int
@@ -189,6 +226,7 @@ func TestSetMissingValuesToDefaultShrinkageEps(t *testing.T) {
 		context     string
 	}{
 		{
+			name: "test",
 			modelOutput: SummaryOutput{
 				ParametersData: []ParametersData{ParametersData{
 					Estimates: ParametersResult{},
@@ -199,9 +237,14 @@ func TestSetMissingValuesToDefaultShrinkageEps(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		setMissingValuesToDefault(&tt.modelOutput, tt.etaCount, tt.epsCount)
-		assert.Equal(t, tt.epsCount, len(tt.modelOutput.ShrinkageDetails[0][0].EpsVR), "Fail :"+tt.context)
-		assert.Equal(t, DefaultFloat64, tt.modelOutput.ShrinkageDetails[0][0].EpsVR[tt.epsCount-1], "Fail :"+tt.context)
+	for _, test := range tests {
+		tt.Run(test.name, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+
+			setMissingValuesToDefault(&test.modelOutput, test.etaCount, test.epsCount)
+
+			t.R.Equal(test.epsCount, len(test.modelOutput.ShrinkageDetails[0][0].EpsVR))
+			t.R.Equal(DefaultFloat64, test.modelOutput.ShrinkageDetails[0][0].EpsVR[test.epsCount-1])
+		})
 	}
 }
