@@ -3,10 +3,10 @@ package parser
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/metrumresearchgroup/wrapt"
 )
 
-func TestDefaultParameterNames(t *testing.T) {
+func TestDefaultParameterNames(tt *testing.T) {
 	tests := []struct {
 		values   map[string]int
 		expected ParameterNames
@@ -40,10 +40,13 @@ func TestDefaultParameterNames(t *testing.T) {
 			context: "multiple params",
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.context, func(t *testing.T) {
-			pn := NewDefaultParameterNames(tt.values["nTheta"], tt.values["nOmega"], tt.values["nSigma"])
-			assert.Equal(t, tt.expected, pn, "Fail :"+tt.context)
+	for _, test := range tests {
+		tt.Run(test.context, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+
+			pn := NewDefaultParameterNames(test.values["nTheta"], test.values["nOmega"], test.values["nSigma"])
+
+			t.R.Equal(test.expected, pn)
 		})
 	}
 }

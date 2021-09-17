@@ -189,5 +189,6 @@ bbi clean --copiedRuns="run[001:010],run100"
 	cmd.Flags().BoolVar(&inverse, "inverse", false, "inverse selection from the given regex match criteria")
 	cmd.Flags().BoolVar(&regex, "regex", false, "use regular expression to match instead of glob")
 	cmd.Flags().StringVar(&copiedRuns, "copiedRuns", "", "run names")
+
 	return cmd
 }

@@ -3,125 +3,149 @@ package parser
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/metrumresearchgroup/wrapt"
 )
 
-func TestGetDiagonalIndices(t *testing.T) {
+func TestGetDiagonalIndices(tt *testing.T) {
 	tests := []struct {
+		name     string
 		input    []int
 		expected []int
 	}{
 		{
-			[]int{1, 2, 3},
-			[]int{0, 2},
+			name:     "0",
+			input:    []int{1, 2, 3},
+			expected: []int{0, 2},
 		},
 		{
-			[]int{1, 0, 2, 0, 0, 3},
-			[]int{0, 2, 5},
+			name:     "1",
+			input:    []int{1, 0, 2, 0, 0, 3},
+			expected: []int{0, 2, 5},
+		},
+		{
+			name:     "2",
+			input:    []int{1, 1, 1, 1, 1, 1},
+			expected: []int{0, 2, 5},
+		},
+		{
+			name:     "3",
+			input:    []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+			expected: []int{0, 2, 5, 9},
+		},
+		{
+			name:     "4",
+			input:    []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16},
+			expected: []int{0, 2, 5, 9, 14},
 		},
 		// {
-		// 	[]int{1, 1, 1, 2},
-		// 	[]int{0, 2, 3},
+		//  name: "5",
+		// 	input: []int{1, 1, 1, 2},
+		// 	expected: []int{0, 2, 3},
 		// },
-		{
-			[]int{1, 1, 1, 1, 1, 1},
-			[]int{0, 2, 5},
-		},
-		{
-			[]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
-			[]int{0, 2, 5, 9},
-		},
-		{
-			[]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16},
-			[]int{0, 2, 5, 9, 14},
-		},
 	}
-	for _, tst := range tests {
-		actual := GetDiagonalIndices(tst.input)
-		assert.Equal(t, tst.expected, actual)
+	for _, test := range tests {
+		tt.Run(test.name, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+
+			actual := GetDiagonalIndices(test.input)
+
+			t.R.Equal(test.expected, actual)
+		})
 	}
 }
 
-func TestGetDiagonalIndices2(t *testing.T) {
+func TestGetDiagonalIndices2(tt *testing.T) {
 	tests := []struct {
+		name     string
 		input    int
 		expected []int
 	}{
 		{
-			3,
-			[]int{0, 2},
+			name:     "0",
+			input:    3,
+			expected: []int{0, 2},
 		},
 		{
-			6,
-			[]int{0, 2, 5},
+			name:     "1",
+			input:    6,
+			expected: []int{0, 2, 5},
 		},
 		{
-			10,
-			[]int{0, 2, 5, 9},
+			name:     "2",
+			input:    10,
+			expected: []int{0, 2, 5, 9},
 		},
 		{
-			15,
-			[]int{0, 2, 5, 9, 14},
+			name:     "3",
+			input:    15,
+			expected: []int{0, 2, 5, 9, 14},
 		},
 		{
-			21,
-			[]int{0, 2, 5, 9, 14, 20},
+			name:     "4",
+			input:    21,
+			expected: []int{0, 2, 5, 9, 14, 20},
 		},
 		{
-			45,
-			[]int{0, 2, 5, 9, 14, 20, 27, 35, 44},
+			name:     "5",
+			input:    45,
+			expected: []int{0, 2, 5, 9, 14, 20, 27, 35, 44},
 		},
 	}
-	for _, tst := range tests {
-		//	input := make([]int, tst.input)
-		var input []int
-		for i := 1; i <= tst.input; i++ {
-			input = append(input, i)
-		}
+	for _, test := range tests {
+		tt.Run(test.name, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-		actual := GetDiagonalIndices(input)
-		assert.Equal(t, tst.expected, actual)
+			var input []int
+			for i := 1; i <= test.input; i++ {
+				input = append(input, i)
+			}
+
+			actual := GetDiagonalIndices(input)
+
+			t.R.Equal(test.expected, actual)
+		})
 	}
 }
 
-func TestGetBlockParameterNames(t *testing.T) {
+func TestGetBlockParameterNames(tt *testing.T) {
 	tests := []struct {
 		name     string
+		function string
 		length   int
 		expected []string
 	}{
 		{
-			"OMEGA",
-			3,
-			[]string{"OMEGA(1,1)", "OMEGA(2,1)", "OMEGA(2,2)"},
+			name:     "3 omega",
+			function: "OMEGA",
+			length:   3,
+			expected: []string{"OMEGA(1,1)", "OMEGA(2,1)", "OMEGA(2,2)"},
 		},
 		{
-			"OMEGA",
-			6,
-			[]string{"OMEGA(1,1)", "OMEGA(2,1)", "OMEGA(2,2)", "OMEGA(3,1)", "OMEGA(3,2)", "OMEGA(3,3)"},
+			name:     "6 omega",
+			function: "OMEGA",
+			length:   6,
+			expected: []string{"OMEGA(1,1)", "OMEGA(2,1)", "OMEGA(2,2)", "OMEGA(3,1)", "OMEGA(3,2)", "OMEGA(3,3)"},
 		},
 		{
-			"OMEGA",
-			10,
-			[]string{"OMEGA(1,1)", "OMEGA(2,1)", "OMEGA(2,2)", "OMEGA(3,1)", "OMEGA(3,2)", "OMEGA(3,3)", "OMEGA(4,1)", "OMEGA(4,2)", "OMEGA(4,3)", "OMEGA(4,4)"},
+			name:     "10 omega",
+			function: "OMEGA",
+			length:   10,
+			expected: []string{"OMEGA(1,1)", "OMEGA(2,1)", "OMEGA(2,2)", "OMEGA(3,1)", "OMEGA(3,2)", "OMEGA(3,3)", "OMEGA(4,1)", "OMEGA(4,2)", "OMEGA(4,3)", "OMEGA(4,4)"},
 		},
 		{
-			"SIGMA",
-			3,
-			[]string{"SIGMA(1,1)", "SIGMA(2,1)", "SIGMA(2,2)"},
+			name:     "3 sigma",
+			function: "SIGMA",
+			length:   3,
+			expected: []string{"SIGMA(1,1)", "SIGMA(2,1)", "SIGMA(2,2)"},
 		},
 	}
+	for _, test := range tests {
+		tt.Run(test.name, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-	for _, tt := range tests {
-		sa := GetBlockParameterNames(tt.name, tt.length)
-		assert.Equal(t, tt.expected, sa)
-		assert.Equal(t, tt.length, len(sa))
+			got := GetBlockParameterNames(test.function, test.length)
+
+			t.R.Equal(test.expected, got)
+		})
 	}
 }
-
-// func TestDiagMap(t *testing.T) {
-// 	for n := 1; n < 100; n++ {
-// 		L := n * (n + 1) / 2
-// 		fmt.Printf("%d : %d,  \n", L, n)
-// 	}
-// }

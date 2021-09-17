@@ -4,16 +4,16 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"reflect"
 	"testing"
 
 	"bbi/configlib"
 
 	"github.com/google/uuid"
+	"github.com/metrumresearchgroup/wrapt"
 	"github.com/spf13/afero"
 )
 
-func Test_doesDirectoryContainOutputFiles(t *testing.T) {
+func Test_doesDirectoryContainOutputFiles(tt *testing.T) {
 	good := uuid.New().String()
 	bad := uuid.New().String()
 
@@ -47,15 +47,17 @@ func Test_doesDirectoryContainOutputFiles(t *testing.T) {
 			want: true,
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := doesDirectoryContainOutputFiles(tt.args.path, tt.args.modelname); got != tt.want {
-				t.Errorf("doesDirectoryContainOutputFiles() = %v, want %v", got, tt.want)
-			}
+	for _, test := range tests {
+		tt.Run(test.name, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+
+			got := doesDirectoryContainOutputFiles(test.args.path, test.args.modelname)
+
+			t.R.Equal(test.want, got)
 		})
 	}
 
-	//Cleanup the directories
+	// Cleanup the directories
 	os.RemoveAll(good)
 	os.RemoveAll(bad)
 }
@@ -65,7 +67,7 @@ func emptyFile(path string) {
 	empty.Close()
 }
 
-func Test_processNMFEOptions(t *testing.T) {
+func Test_processNMFEOptions(tt *testing.T) {
 	type args struct {
 		config configlib.Config
 	}
@@ -148,16 +150,18 @@ func Test_processNMFEOptions(t *testing.T) {
 			},
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := processNMFEOptions(tt.args.config); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("processNMFEOptions() = %v, want %v", got, tt.want)
-			}
+	for _, test := range tests {
+		tt.Run(test.name, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+
+			got := processNMFEOptions(test.args.config)
+
+			t.R.Equal(test.want, got)
 		})
 	}
 }
 
-func Test_modelDataFile(t *testing.T) {
+func Test_modelDataFile(tt *testing.T) {
 	type args struct {
 		modelLines []string
 	}
@@ -192,25 +196,22 @@ func Test_modelDataFile(t *testing.T) {
 			wantErr: true,
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := modelDataFile(tt.args.modelLines)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("modelDataFile() error = %v, wantErr %v", err, tt.wantErr)
+	for _, test := range tests {
+		tt.Run(test.name, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-				return
-			}
-			if got != tt.want {
-				t.Errorf("modelDataFile() got = %v, want %v", got, tt.want)
-			}
+			got, err := modelDataFile(test.args.modelLines)
+
+			t.R.WantError(test.wantErr, err)
+			t.R.Equal(test.want, got)
 		})
 	}
 }
 
-func Test_dataFileIsPresent(t *testing.T) {
+func Test_dataFileIsPresent(tt *testing.T) {
 	const testingDir string = "/tmp/testing/bbi"
 	const testingFile string = "test.txt"
-	//Temporary working directory
+	// Temporary working directory
 	fs := afero.NewOsFs()
 	fs.RemoveAll(testingDir)
 	fs.MkdirAll(testingDir, 0755)
@@ -243,11 +244,13 @@ func Test_dataFileIsPresent(t *testing.T) {
 			wantErr: true,
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := dataFileIsPresent(tt.args.datafile, tt.args.modelpath); (err != nil) != tt.wantErr {
-				t.Errorf("dataFileIsPresent() error = %v, wantErr %v", err, tt.wantErr)
-			}
+	for _, test := range tests {
+		tt.Run(test.name, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+
+			err := dataFileIsPresent(test.args.datafile, test.args.modelpath)
+
+			t.R.WantError(test.wantErr, err)
 		})
 	}
 }

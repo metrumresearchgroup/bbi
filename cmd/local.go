@@ -220,7 +220,7 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 	}
 
 	dataHashChan := make(chan string)
-	go HashFileOnChannel(dataHashChan, l.Nonmem.DataPath, l.Nonmem.FileName)
+	go HashFileOnChannel(dataHashChan, path.Join(l.Nonmem.OutputDir, l.Nonmem.DataPath), l.Nonmem.FileName)
 
 	modelHashChan := make(chan string)
 	go HashFileOnChannel(modelHashChan, path.Join(l.Nonmem.OriginalPath, l.Nonmem.OriginalModel), l.Nonmem.FileName)
@@ -356,6 +356,7 @@ func NewLocalCmd() *cobra.Command {
 	cmd.PersistentFlags().Bool(childDirIdentifier, true, "Indicates whether or not local branch execution"+
 		"should create a new subdirectory with the output_dir variable as its name and execute in that directory")
 	errpanic(viper.BindPFlag("local."+childDirIdentifier, cmd.PersistentFlags().Lookup(childDirIdentifier)))
+
 	return cmd
 }
 

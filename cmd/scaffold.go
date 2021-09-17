@@ -83,5 +83,6 @@ func NewScaffoldCmd() *cobra.Command {
 
 	cmd.Flags().String("cacheDir", "", "create cache directory at path/name")
 	errpanic(viper.BindPFlag("cacheDir", cmd.Flags().Lookup("cacheDir")))
+
 	return cmd
 }
