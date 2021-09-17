@@ -220,7 +220,7 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 	}
 
 	dataHashChan := make(chan string)
-	go HashFileOnChannel(dataHashChan, path.Join(l.Nonmem.OutputDir,l.Nonmem.DataPath), l.Nonmem.FileName)
+	go HashFileOnChannel(dataHashChan, path.Join(l.Nonmem.OutputDir, l.Nonmem.DataPath), l.Nonmem.FileName)
 
 	modelHashChan := make(chan string)
 	go HashFileOnChannel(modelHashChan, path.Join(l.Nonmem.OriginalPath, l.Nonmem.OriginalModel), l.Nonmem.FileName)
