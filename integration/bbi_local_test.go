@@ -26,7 +26,7 @@ func TestBbiCompletesLocalExecution(tt *testing.T) {
 		"metrum_std",
 		"period_test",
 	})
-	t.R.NotEmpty(err)
+	t.R.NoError(err)
 	t.R.Len(scenarios, 5)
 
 	// Test shouldn't take longer than 5 min in total
