@@ -115,23 +115,27 @@ func TestPostExecutionSucceeds(tt *testing.T) {
 
 				var exists bool
 				exists, err = afero.Exists(afero.NewOsFs(), filepath.Join(ROOT_EXECUTION_DIR, "working", v.identifier, m.identifier+".out"))
-
 				t.R.NoError(err)
 				t.R.True(exists)
 
-				// Does the file contain the expected Details:
-				// SCENARIO (Additional provided value)
-				file, _ := os.Open(filepath.Join(ROOT_EXECUTION_DIR, "working", v.identifier, m.identifier+".out"))
-				defer file.Close()
+				lines := func() []string {
+					// Does the file contain the expected Details:
+					// SCENARIO (Additional provided value)
+					var file *os.File
+					file, err = os.Open(filepath.Join(ROOT_EXECUTION_DIR, "working", v.identifier, m.identifier+".out"))
+					t.R.NoError(err)
+					defer file.Close()
 
-				var lines []string
+					scanner := bufio.NewScanner(file)
+					// scanner.Split(bufio.ScanLines)
 
-				scanner := bufio.NewScanner(file)
-				// scanner.Split(bufio.ScanLines)
+					var lines []string
+					for scanner.Scan() {
+						lines = append(lines, scanner.Text())
+					}
 
-				for scanner.Scan() {
-					lines = append(lines, scanner.Text())
-				}
+					return lines
+				}()
 
 				t.R.True(doesOutputFileContainKeyWithValue(lines, "BBI_MODEL", m.filename))
 				t.R.True(doesOutputFileContainKeyWithValue(lines, "BBI_MODEL_FILENAME", m.identifier))
@@ -144,8 +148,6 @@ func TestPostExecutionSucceeds(tt *testing.T) {
 
 	// Test a scenario for the first scenario where we force failure. Model is deleted (not found)
 	t.Run("verify_failure_results", func(t *wrapt.T) {
-		var lines []string
-
 		scenario := scenarios[0]
 		err = scenario.Prepare(context.Background())
 		t.R.NoError(err)
@@ -171,22 +173,28 @@ func TestPostExecutionSucceeds(tt *testing.T) {
 			err = os.Remove(filepath.Join(scenario.Workpath, v.identifier+".out"))
 			t.R.NoError(err)
 
-			output, err := v.Execute(scenario, arguments...)
-
-			// Does the file contain the expected Details:
-			// SCENARIO (Additional provided value)
-			file, _ := os.Open(filepath.Join(ROOT_EXECUTION_DIR, "working", scenario.identifier, v.identifier+".out"))
-			defer file.Close()
-
-			scanner := bufio.NewScanner(file)
-			// scanner.Split(bufio.ScanLines)
-
-			for scanner.Scan() {
-				lines = append(lines, scanner.Text())
-			}
-
-			t.R.NotNil(err)
+			var output string
+			output, err = v.Execute(scenario, arguments...)
 			t.R.Error(err)
+
+			lines := func() []string {
+				var lines []string
+				// Does the file contain the expected Details:
+				// SCENARIO (Additional provided value)
+				var file *os.File
+				file, err = os.Open(filepath.Join(ROOT_EXECUTION_DIR, "working", scenario.identifier, v.identifier+".out"))
+				t.R.NoError(err)
+				defer file.Close()
+
+				scanner := bufio.NewScanner(file)
+				// scanner.Split(bufio.ScanLines)
+
+				for scanner.Scan() {
+					lines = append(lines, scanner.Text())
+				}
+
+				return lines
+			}()
 
 			t.R.True(doesOutputFileContainKeyWithValue(lines, "BBI_SUCCESSFUL", "false"))
 			if err != nil {
