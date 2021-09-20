@@ -11,29 +11,17 @@ workspace:
   path: /tmp/drone
 
 steps:
-  - name: Sanity and Cleanup
-    commands:
-      - if [ -d /tmp/${DRONE_BUILD_NUMBER}/bbitest ] ; then rm -rf /tmp/${DRONE_BUILD_NUMBER}/bbitest; fi
-
   - name: Build bbi
     commands:
       - mkdir -p /tmp/${DRONE_BUILD_NUMBER} ; git rev-parse HEAD > /tmp/${DRONE_BUILD_NUMBER}/bbi_hash
       - # this is a hack around the current design; will clean up after passing a test or two
-      - cp /tmp/${DRONE_BUILD_NUMBER}/bbi_hash /tmp/${DRONE_BUILD_NUMBER}/bbitest_hash
       - go build -o bbi cmd/bbi/main.go
       - ./bbi version
-
-  - name: Copy integration
-    commands:
-      # this is a hack around the current design; will clean up after passing a test or two
-      - cp -R integration/ /tmp/${DRONE_BUILD_NUMBER}/bbitest
-      - cd /tmp/${DRONE_BUILD_NUMBER}/bbitest
 
   - name: Copy commit hashes to s3
     commands:
       - printf "[\n" > /tmp/${DRONE_BUILD_NUMBER}/commits.json
       - printf "  {\"repo\":\"metrumresearchgroup/bbi\", \"commit\":\"$(cat /tmp/${DRONE_BUILD_NUMBER}/bbi_hash)\"},\n" >> /tmp/${DRONE_BUILD_NUMBER}/commits.json
-      - printf "  {\"repo\":\"metrumresearchgroup/bbitest\", \"commit\":\"$(cat /tmp/${DRONE_BUILD_NUMBER}/bbitest_hash)\"}\n" >> /tmp/${DRONE_BUILD_NUMBER}/commits.json
       - printf "]\n" >> /tmp/${DRONE_BUILD_NUMBER}/commits.json
       - aws s3 cp /tmp/${DRONE_BUILD_NUMBER}/commits.json s3://mrg-validation/bbi/${DRONE_BUILD_NUMBER}/commits.json
 
@@ -41,7 +29,7 @@ steps:
     commands:
       - if [ ! -d /data/${DRONE_BUILD_NUMBER}/apps ] ; then mkdir -p /data/${DRONE_BUILD_NUMBER}/apps; chmod -R 0755 /data/${DRONE_BUILD_NUMBER}/apps; cp bbi /data/${DRONE_BUILD_NUMBER}/apps; else cp bbi /data/${DRONE_BUILD_NUMBER}/apps; fi
       - export PATH=$PATH:/data/${DRONE_BUILD_NUMBER}/apps
-      - cd /tmp/${DRONE_BUILD_NUMBER}/bbitest
+      - cd integration
       - export ROOT_EXECUTION_DIR=/data/${DRONE_BUILD_NUMBER}
       - export BBI_GRID_NAME_PREFIX="drone_${DRONE_BUILD_NUMBER}"
       - bbi init --dir /opt/NONMEM
@@ -50,7 +38,6 @@ steps:
       - chmod +x failure_detector.sh
       - ./failure_detector.sh test_output.json
       - rm -rf /data/${DRONE_BUILD_NUMBER}
-      - rm -rf /tmp/${DRONE_BUILD_NUMBER}/bbitest
     environment:
       LOCAL: true
       MPIEXEC_PATH: /usr/bin/mpiexec
@@ -77,7 +64,6 @@ steps:
   - name: Cleanup on failure
     commands:
       - rm -rf /data/${DRONE_BUILD_NUMBER}
-      - rm -rf /tmp/${DRONE_BUILD_NUMBER}/bbitest
     volumes:
       - name: data
         path: /data
