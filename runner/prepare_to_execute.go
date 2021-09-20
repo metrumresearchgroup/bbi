@@ -1,8 +1,9 @@
 package runner
 
 import (
-	parser "bbi/parsers/nmparser"
 	"strings"
+
+	parser "github.com/metrumresearchgroup/bbi/parsers/nmparser"
 )
 
 //PrepareForExecution parses and prepares strings from a file for execution in a different context

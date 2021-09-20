@@ -15,9 +15,10 @@
 package cmd
 
 import (
-	parser "bbi/parsers/nmparser"
 	"encoding/json"
 	"fmt"
+
+	parser "github.com/metrumresearchgroup/bbi/parsers/nmparser"
 
 	log "github.com/sirupsen/logrus"
 

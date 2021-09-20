@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"bbi/configlib"
+	"github.com/metrumresearchgroup/bbi/configlib"
 
 	"github.com/google/uuid"
 	"github.com/metrumresearchgroup/wrapt"

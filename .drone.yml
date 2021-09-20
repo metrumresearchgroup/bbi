@@ -18,17 +18,16 @@ steps:
   - name: Build bbi
     commands:
       - mkdir -p /tmp/${DRONE_BUILD_NUMBER} ; git rev-parse HEAD > /tmp/${DRONE_BUILD_NUMBER}/bbi_hash
+      - # this is a hack around the current design; will clean up after passing a test or two
+      - cp /tmp/${DRONE_BUILD_NUMBER}/bbi_hash /tmp/${DRONE_BUILD_NUMBER}/bbitest_hash
       - go build -o bbi cmd/bbi/main.go
       - ./bbi version
 
-  - name: Get bbitest
+  - name: Copy integration
     commands:
-      - git clone https://github.com/metrumresearchgroup/bbitest.git /tmp/${DRONE_BUILD_NUMBER}/bbitest
+      # this is a hack around the current design; will clean up after passing a test or two
+      - cp -R integration/ /tmp/${DRONE_BUILD_NUMBER}/bbitest
       - cd /tmp/${DRONE_BUILD_NUMBER}/bbitest
-      - mkdir -p /tmp/${DRONE_BUILD_NUMBER} ; git rev-parse HEAD > /tmp/${DRONE_BUILD_NUMBER}/bbitest_hash
-      - if [ ! -z $BBITEST_BRANCH ]; then git checkout $BBITEST_BRANCH; fi
-    environment:
-      BBITEST_BRANCH: master
 
   - name: Copy commit hashes to s3
     commands:

@@ -1,0 +1,762 @@
+{
+	"run_details": {
+		"version": "7.4.4",
+		"run_start": "-999999999",
+		"run_end": "Mon Aug 24 13:29:51 EDT 2020",
+		"estimation_time": 145,
+		"cpu_time": 408.523,
+		"function_evaluations": -999999999,
+		"significant_digits": -999999999,
+		"problem_text": "RUN# example2 (from sampc)",
+		"mod_file": "-999999999",
+		"estimation_method": [
+			"Iterative Two Stage (No Prior)",
+			"Importance Sampling (No Prior)",
+			"Stochastic Approximation Expectation-Maximization (No Prior)",
+			"Objective Function Evaluation by Importance Sampling (No Prior)",
+			"MCMC Bayesian Analysis"
+		],
+		"data_set": "../example2.csv",
+		"number_of_subjects": 400,
+		"number_of_obs": 2000,
+		"number_of_data_records": 2400,
+		"output_files_used": [
+			"example2_bayes.lst",
+			"example2_bayes.cpu",
+			"example2_bayes.ext"
+		]
+	},
+	"run_heuristics": {
+		"covariance_step_aborted": false,
+		"large_condition_number": false,
+		"eigenvalue_issues": false,
+		"correlations_not_ok": false,
+		"parameter_near_boundary": false,
+		"hessian_reset": false,
+		"has_final_zero_gradient": false,
+		"minimization_terminated": false,
+		"eta_pval_significant": false,
+		"prderr": false
+	},
+	"parameters_data": [
+		{
+			"method": "TABLE NO.     1: Iterative Two Stage (No Prior): Goal Function=FINAL VALUE OF OBJECTIVE FUNCTION: Problem=1 Subproblem=0 Superproblem1=0 Iteration1=0 Superproblem2=0 Iteration2=0",
+			"estimates": {
+				"theta": [
+					3.30275,
+					3.25636,
+					-0.611284,
+					-0.208127,
+					0.728967,
+					1.13667,
+					0.337477,
+					0.191719,
+					0.691923,
+					2.2983,
+					0.0999153
+				],
+				"omega": [
+					0.0102808,
+					0.000165819,
+					0.00795601,
+					0.00120055,
+					-0.000360578,
+					0.00998908,
+					-0.000630844,
+					0.000453655,
+					0.00202238,
+					0.00973306
+				],
+				"sigma": [
+					1
+				]
+			},
+			"std_err": {
+				"theta": [
+					0.0380461,
+					0.028842,
+					0.0110937,
+					0.00842217,
+					0.048389,
+					0.0410429,
+					0.013422,
+					0.0118567,
+					0.010523,
+					0.00893687,
+					0.00298448
+				],
+				"omega": [
+					0.00100672,
+					0.000865131,
+					0.00149678,
+					0.00129208,
+					0.00143822,
+					0.00282721,
+					0.00111778,
+					0.00115593,
+					0.00198475,
+					0.00199998
+				],
+				"sigma": [
+					0
+				]
+			},
+			"random_effect_sd": {
+				"omega": [
+					0.101394,
+					0.0183347,
+					0.0891965,
+					0.118469,
+					-0.0404472,
+					0.0999454,
+					-0.0630644,
+					0.0515529,
+					0.205105,
+					0.0986563
+				],
+				"sigma": [
+					1
+				]
+			},
+			"random_effect_sdse": {
+				"omega": [
+					0.0049644,
+					0.0946735,
+					0.00839034,
+					0.120377,
+					0.164545,
+					0.0141438,
+					0.115913,
+					0.127887,
+					0.162351,
+					0.0101361
+				],
+				"sigma": [
+					10000000000
+				]
+			},
+			"fixed": {
+				"theta": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"omega": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"sigma": [
+					1
+				]
+			}
+		},
+		{
+			"method": "TABLE NO.     2: Importance Sampling (No Prior): Goal Function=FINAL VALUE OF OBJECTIVE FUNCTION: Problem=1 Subproblem=0 Superproblem1=0 Iteration1=0 Superproblem2=0 Iteration2=0",
+			"estimates": {
+				"theta": [
+					3.30073,
+					3.2541,
+					-0.61237,
+					-0.20862,
+					0.7376,
+					1.14159,
+					0.334262,
+					0.190709,
+					0.690655,
+					2.29873,
+					0.100015
+				],
+				"omega": [
+					0.0103243,
+					0.000195697,
+					0.00798982,
+					0.00119334,
+					-0.000232896,
+					0.00979714,
+					-0.000656799,
+					0.000505325,
+					0.00192836,
+					0.00972803
+				],
+				"sigma": [
+					1
+				]
+			},
+			"std_err": {
+				"theta": [
+					0.0327653,
+					0.0287357,
+					0.00955889,
+					0.00833768,
+					0.0389863,
+					0.0359517,
+					0.0112757,
+					0.0104081,
+					0.0103728,
+					0.00853012,
+					0.00277642
+				],
+				"omega": [
+					0.000967327,
+					0.000835605,
+					0.00137549,
+					0.00121371,
+					0.00135526,
+					0.00269511,
+					0.000970565,
+					0.00110173,
+					0.00187734,
+					0.00179471
+				],
+				"sigma": [
+					0
+				]
+			},
+			"random_effect_sd": {
+				"omega": [
+					0.101609,
+					0.0215469,
+					0.0893858,
+					0.118654,
+					-0.0263235,
+					0.0989805,
+					-0.0655374,
+					0.0573179,
+					0.197527,
+					0.0986308
+				],
+				"sigma": [
+					1
+				]
+			},
+			"random_effect_sdse": {
+				"omega": [
+					0.00476006,
+					0.0910804,
+					0.00769414,
+					0.112566,
+					0.154572,
+					0.0136144,
+					0.0999945,
+					0.122288,
+					0.156979,
+					0.00909815
+				],
+				"sigma": [
+					10000000000
+				]
+			},
+			"fixed": {
+				"theta": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"omega": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"sigma": [
+					1
+				]
+			}
+		},
+		{
+			"method": "TABLE NO.     3: Stochastic Approximation Expectation-Maximization (No Prior): Goal Function=FINAL VALUE OF LIKELIHOOD FUNCTION: Problem=1 Subproblem=0 Superproblem1=0 Iteration1=0 Superproblem2=0 Iteration2=0",
+			"estimates": {
+				"theta": [
+					3.29866,
+					3.25217,
+					-0.611854,
+					-0.208278,
+					0.731909,
+					1.13654,
+					0.336058,
+					0.192084,
+					0.688312,
+					2.297,
+					0.100123
+				],
+				"omega": [
+					0.0101633,
+					0.00000154108,
+					0.0079095,
+					0.000957241,
+					-0.00071738,
+					0.00946758,
+					-0.000894612,
+					0.000064063,
+					0.00152438,
+					0.00933568
+				],
+				"sigma": [
+					1
+				]
+			},
+			"std_err": {
+				"theta": [
+					0.0380988,
+					0.0289624,
+					0.0111095,
+					0.00845647,
+					0.0489662,
+					0.0421666,
+					0.0135744,
+					0.0121451,
+					0.0104385,
+					0.00886415,
+					0.00299278
+				],
+				"omega": [
+					0.000994555,
+					0.000851413,
+					0.00149231,
+					0.00127799,
+					0.00141247,
+					0.00277247,
+					0.00109736,
+					0.00112798,
+					0.00193207,
+					0.00196293
+				],
+				"sigma": [
+					0
+				]
+			},
+			"random_effect_sd": {
+				"omega": [
+					0.100813,
+					0.000171883,
+					0.0889354,
+					0.0975852,
+					-0.0829001,
+					0.0973015,
+					-0.0918426,
+					0.0074552,
+					0.162144,
+					0.0966213
+				],
+				"sigma": [
+					1
+				]
+			},
+			"random_effect_sdse": {
+				"omega": [
+					0.00493266,
+					0.0949528,
+					0.00838988,
+					0.12457,
+					0.169542,
+					0.0142468,
+					0.118593,
+					0.130801,
+					0.174065,
+					0.0101578
+				],
+				"sigma": [
+					10000000000
+				]
+			},
+			"fixed": {
+				"theta": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"omega": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"sigma": [
+					1
+				]
+			}
+		},
+		{
+			"method": "TABLE NO.     4: Objective Function Evaluation by Importance Sampling (No Prior): Goal Function=FINAL VALUE OF OBJECTIVE FUNCTION: Problem=1 Subproblem=0 Superproblem1=0 Iteration1=0 Superproblem2=0 Iteration2=0",
+			"estimates": {
+				"theta": [
+					3.29866,
+					3.25217,
+					-0.611854,
+					-0.208278,
+					0.731909,
+					1.13654,
+					0.336058,
+					0.192084,
+					0.688312,
+					2.297,
+					0.100123
+				],
+				"omega": [
+					0.0101633,
+					0.00000154108,
+					0.0079095,
+					0.000957241,
+					-0.00071738,
+					0.00946758,
+					-0.000894612,
+					0.000064063,
+					0.00152438,
+					0.00933568
+				],
+				"sigma": [
+					1
+				]
+			},
+			"std_err": {
+				"theta": [
+					0.0327092,
+					0.0287098,
+					0.00953558,
+					0.00833189,
+					0.039686,
+					0.0361405,
+					0.0114551,
+					0.0104677,
+					0.0104182,
+					0.008521,
+					0.0028165
+				],
+				"omega": [
+					0.000954677,
+					0.000815936,
+					0.00135476,
+					0.00127343,
+					0.0014601,
+					0.00306016,
+					0.000994687,
+					0.00109644,
+					0.00217039,
+					0.00193542
+				],
+				"sigma": [
+					0
+				]
+			},
+			"random_effect_sd": {
+				"omega": [
+					0.100813,
+					0.000171883,
+					0.0889354,
+					0.0975852,
+					-0.0829001,
+					0.0973015,
+					-0.0918426,
+					0.0074552,
+					0.162144,
+					0.0966213
+				],
+				"sigma": [
+					1
+				]
+			},
+			"random_effect_sdse": {
+				"omega": [
+					0.00473488,
+					0.0909978,
+					0.00761653,
+					0.120646,
+					0.175394,
+					0.0157252,
+					0.1077,
+					0.127246,
+					0.195228,
+					0.0100155
+				],
+				"sigma": [
+					10000000000
+				]
+			},
+			"fixed": {
+				"theta": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"omega": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"sigma": [
+					1
+				]
+			}
+		},
+		{
+			"method": "TABLE NO.     5: MCMC Bayesian Analysis: Goal Function=AVERAGE VALUE OF LIKELIHOOD FUNCTION: Problem=1 Subproblem=0 Superproblem1=0 Iteration1=0 Superproblem2=0 Iteration2=0",
+			"estimates": {
+				"theta": [
+					3.29985,
+					3.25371,
+					-0.612185,
+					-0.208483,
+					0.736429,
+					1.14018,
+					0.334758,
+					0.191257,
+					0.691017,
+					2.29896,
+					-0.0938344
+				],
+				"omega": [
+					0.0102589,
+					-0.00000131873,
+					0.00773598,
+					0.000780823,
+					-0.000742596,
+					0.00854391,
+					-0.000962659,
+					0.000156825,
+					0.000778218,
+					0.0089707
+				],
+				"sigma": [
+					1
+				]
+			},
+			"std_err": {
+				"theta": [
+					0.0318766,
+					0.0281556,
+					0.00927873,
+					0.0081354,
+					0.0383015,
+					0.0328733,
+					0.0111652,
+					0.00950874,
+					0.0099531,
+					0.00819333,
+					0.0387836
+				],
+				"omega": [
+					0.000955594,
+					0.000804776,
+					0.00128392,
+					0.00111981,
+					0.00126254,
+					0.00233384,
+					0.00088731,
+					0.00100286,
+					0.00158005,
+					0.00154492
+				],
+				"sigma": [
+					0
+				]
+			},
+			"random_effect_sd": {
+				"omega": [
+					0.101176,
+					-0.00399524,
+					0.0876542,
+					0.0776169,
+					-0.0996334,
+					0.0915766,
+					-0.104858,
+					0.0157807,
+					0.0632021,
+					0.0943658
+				],
+				"sigma": [
+					1
+				]
+			},
+			"random_effect_sdse": {
+				"omega": [
+					0.00471236,
+					0.0902623,
+					0.00726294,
+					0.115749,
+					0.16129,
+					0.0125578,
+					0.0958171,
+					0.119818,
+					0.167055,
+					0.00811249
+				],
+				"sigma": [
+					0
+				]
+			},
+			"fixed": {
+				"theta": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"omega": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"sigma": [
+					1
+				]
+			}
+		}
+	],
+	"parameter_names": {
+		"theta": [
+			"THETA1",
+			"THETA2",
+			"THETA3",
+			"THETA4",
+			"THETA5",
+			"THETA6",
+			"THETA7",
+			"THETA8",
+			"THETA9",
+			"THETA10",
+			"THETA11"
+		],
+		"omega": [
+			"OMEGA(1,1)",
+			"OMEGA(2,1)",
+			"OMEGA(2,2)",
+			"OMEGA(3,1)",
+			"OMEGA(3,2)",
+			"OMEGA(3,3)",
+			"OMEGA(4,1)",
+			"OMEGA(4,2)",
+			"OMEGA(4,3)",
+			"OMEGA(4,4)"
+		],
+		"sigma": [
+			"SIGMA(1,1)"
+		]
+	},
+	"ofv": [
+		{
+			"method": "Iterative Two Stage (No Prior)",
+			"ofv_no_constant": -10771.858,
+			"constant_to_ofv": 3675.754132818691,
+			"ofv_with_constant": -7096.103687996414
+		},
+		{
+			"method": "Importance Sampling (No Prior)",
+			"ofv_no_constant": -10784.644,
+			"constant_to_ofv": 3675.754132818691,
+			"ofv_with_constant": -7108.8897112213035
+		},
+		{
+			"method": "Stochastic Approximation Expectation-Maximization (No Prior)",
+			"ofv_no_constant": -19712.951,
+			"constant_to_ofv": 2940.6033062549527,
+			"ofv_with_constant": -16772.34765621837
+		},
+		{
+			"method": "Objective Function Evaluation by Importance Sampling (No Prior)",
+			"ofv_no_constant": -10782.895,
+			"constant_to_ofv": 3675.754132818691,
+			"ofv_with_constant": -7107.14056998183
+		},
+		{
+			"method": "MCMC Bayesian Analysis",
+			"ofv_no_constant": -19241.109,
+			"constant_to_ofv": 70.36391281252571,
+			"ofv_with_constant": -19170.744656735224
+		}
+	],
+	"condition_number": [
+		{
+			"method": "Iterative Two Stage (No Prior)",
+			"condition_number": -999999999
+		},
+		{
+			"method": "Importance Sampling (No Prior)",
+			"condition_number": -999999999
+		},
+		{
+			"method": "Stochastic Approximation Expectation-Maximization (No Prior)",
+			"condition_number": -999999999
+		},
+		{
+			"method": "Objective Function Evaluation by Importance Sampling (No Prior)",
+			"condition_number": -999999999
+		},
+		{
+			"method": "MCMC Bayesian Analysis",
+			"condition_number": -999999999
+		}
+	]
+}

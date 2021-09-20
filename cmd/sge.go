@@ -11,13 +11,13 @@ import (
 	"text/template"
 	"time"
 
-	"bbi/utils"
+	"github.com/metrumresearchgroup/bbi/utils"
 
 	log "github.com/sirupsen/logrus"
 
 	"os"
 
-	"bbi/configlib"
+	"github.com/metrumresearchgroup/bbi/configlib"
 
 	"github.com/metrumresearchgroup/turnstile"
 	"github.com/spf13/afero"

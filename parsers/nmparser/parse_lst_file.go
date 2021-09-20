@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"bbi/utils"
+	"github.com/metrumresearchgroup/bbi/utils"
 )
 
 func parseShrinkage(line string, shrinkageDetails ShrinkageDetails) ShrinkageDetails {

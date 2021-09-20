@@ -1,9 +1,11 @@
-module bbi
+module github.com/metrumresearchgroup/bbi
 
 go 1.15
 
 require (
+	github.com/apcera/termtables v0.0.0-20170405184538-bcbc5dc54055 // indirect
 	github.com/clbanning/mxj v1.8.4
+	github.com/dpastoor/nonmemutils v0.0.0-20170926132219-43a4badba679 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/ghodss/yaml v1.0.0
 	github.com/gobwas/glob v0.2.3
@@ -13,6 +15,8 @@ require (
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/magiconair/properties v1.8.4 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
+	github.com/metrumresearchgroup/babylon v0.2.0
+	github.com/metrumresearchgroup/gogridengine v0.0.1
 	github.com/metrumresearchgroup/turnstile v0.1.0
 	github.com/metrumresearchgroup/wrapt v0.0.2
 	github.com/mitchellh/go-homedir v1.1.0

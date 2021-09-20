@@ -19,7 +19,7 @@ import (
 	"log"
 	"path/filepath"
 
-	"bbi/utils"
+	"github.com/metrumresearchgroup/bbi/utils"
 
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"

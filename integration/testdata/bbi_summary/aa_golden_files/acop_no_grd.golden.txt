@@ -1,0 +1,21 @@
+LEM PK model 1 cmt base
+Dataset: ../../data/acop.csv
+Records: 799   Observations: 760  Subjects: 40
+Estimation Method(s):
+ - First Order Conditional Estimation with Interaction
+No Heuristic Problems Detected
++-------+--------+------------+-------------------+
+| THETA |  NAME  |  ESTIMATE  |   STDERR (RSE)    |
++-------+--------+------------+-------------------+
+| TH 1  | THETA1 | 2.31034    | 0.086147 (3.7%)   |
+| TH 2  | THETA2 | 54.9596    | 3.32914 (6.1%)    |
+| TH 3  | THETA3 | 464.659    | 29.6177 (6.4%)    |
+| TH 4  | THETA4 | -0.0805722 | [31m0.0555149 (68.9%)[0m |
+| TH 5  | THETA5 | 4.1303     | [31m1.35989 (32.9%)[0m   |
++-------+--------+------------+-------------------+
++------------+------+----------+---------------+
+|   OMEGA    | ETA  | ESTIMATE | SHRINKAGE (%) |
++------------+------+----------+---------------+
+| OMEGA(1,1) | ETA1 | 0.096441 | 17.511500     |
+| OMEGA(2,2) | ETA2 | 0.153571 | 2.059620      |
++------------+------+----------+---------------+

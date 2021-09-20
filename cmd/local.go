@@ -13,14 +13,14 @@ import (
 	"strings"
 	"time"
 
-	"bbi/configlib"
+	"github.com/metrumresearchgroup/bbi/configlib"
 
 	log "github.com/sirupsen/logrus"
 
 	"os"
 
-	"bbi/runner"
-	"bbi/utils"
+	"github.com/metrumresearchgroup/bbi/runner"
+	"github.com/metrumresearchgroup/bbi/utils"
 
 	"github.com/metrumresearchgroup/turnstile"
 	"github.com/spf13/afero"

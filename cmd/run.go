@@ -11,7 +11,7 @@ import (
 	"strings"
 	"text/template"
 
-	"bbi/configlib"
+	"github.com/metrumresearchgroup/bbi/configlib"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"

@@ -6,7 +6,7 @@ import (
 
 	"github.com/metrumresearchgroup/wrapt"
 
-	"bbi/utils"
+	"github.com/metrumresearchgroup/bbi/utils"
 )
 
 func TestReadParseGrdLines(tt *testing.T) {

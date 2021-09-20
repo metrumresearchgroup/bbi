@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bbi/cmd"
+	"github.com/metrumresearchgroup/bbi/cmd"
 )
 
 // buildTime  can be set from LDFLAGS during development.
