@@ -61,36 +61,36 @@ func TestKVPExpansion(tt *testing.T) {
 }
 
 func TestPostExecutionSucceeds(tt *testing.T) {
-	if !FeatureEnabled("POST_EXECUTION") {
-		tt.Skip("Post execution not enabled as far as testing is concerned")
-	}
-
-	tests := []struct {
-		name string
-	}{
-		{name: "240"},
-		{name: "acop"},
-		{name: "ctl_test"},
-		{name: "metrum_std"},
-	}
-
-	if err := ioutil.WriteFile(filepath.Join(ROOT_EXECUTION_DIR, "post.sh"), []byte(postExecutionScriptString), 0755); err != nil {
-		tt.Fatal(err)
-	}
-
 	var scenarios []*Scenario
-	for _, test := range tests {
-		tt.Run("create "+test.name, func(tt *testing.T) {
-			t := wrapt.WrapT(tt)
-			scenario := InitializeScenario(t, test.name)
-			scenario.Prepare(t, context.Background())
+
+	func() {
+		t := wrapt.WrapT(tt)
+
+		var err error
+		// Skip the test if the flag isn't enabled
+		if !FeatureEnabled("POST_EXECUTION") {
+			t.Skip("Post execution not enabled as far as testing is concerned")
+		}
+
+		for _, name := range []string{
+			"240",
+			"acop",
+			"ctl_test",
+			"metrum_std",
+		} {
+			scenario := InitializeScenario(t, name)
 			scenarios = append(scenarios, scenario)
-		})
-	}
+		}
+
+		err = ioutil.WriteFile(filepath.Join(ROOT_EXECUTION_DIR, "post.sh"), []byte(postExecutionScriptString), 0755)
+		t.R.NoError(err)
+	}()
 
 	for _, scenario := range scenarios {
-		tt.Run("run "+scenario.identifier, func(tt *testing.T) {
+		tt.Run(scenario.identifier, func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
+
+			scenario.Prepare(t, context.Background())
 
 			arguments := []string{
 				"-d",
@@ -107,7 +107,9 @@ func TestPostExecutionSucceeds(tt *testing.T) {
 
 			// Do the actual execution
 			for _, m := range scenario.models {
-				t.Run(scenario.identifier+"_post_execution", func(tt *wrapt.T) {
+				tt.Run(scenario.identifier+"_post_execution", func(tt *testing.T) {
+					t := wrapt.WrapT(tt)
+
 					var output string
 					output, err := m.Execute(scenario, arguments...)
 					t.R.NoError(err)
@@ -155,64 +157,69 @@ func TestPostExecutionSucceeds(tt *testing.T) {
 		})
 	}
 
-	for _, scenario := range scenarios {
-		tt.Run(scenario.identifier, func(tt *testing.T) {
-			t := wrapt.WrapT(tt)
+	// Test a scenario for the first scenario where we force failure. Model is deleted (not found)
+	tt.Run("verify_failure_results", func(tt *testing.T) {
+		t := wrapt.WrapT(tt)
 
-			arguments := []string{
-				"nonmem",
-				"--nm_version",
-				os.Getenv("NMVERSION"),
-				"run",
-				"local",
-				"--post_work_executable",
-				filepath.Join(ROOT_EXECUTION_DIR, "post.sh"),
-				"--overwrite=false",
-				// `--additional_post_work_envs "BBI_SCENARIO=` + scenario.identifier + ` BBI_ROOT_EXECUTION_DIR=` + ROOT_EXECUTION_DIR  + `"`,
-				// "--additional_post_work_envs BBI_ROOT_EXECUTION_DIR=" + ROOT_EXECUTION_DIR,
-			}
+		scenario := scenarios[0]
+		scenario.Prepare(t, context.Background())
 
-			// Removing the model won't do anything. Execute with overwrite = false?
-			for _, model := range scenario.models {
-				t.Run(model.identifier, func(tt *wrapt.T) {
-					var err error
+		arguments := []string{
+			"nonmem",
+			"--nm_version",
+			os.Getenv("NMVERSION"),
+			"run",
+			"local",
+			"--post_work_executable",
+			filepath.Join(ROOT_EXECUTION_DIR, "post.sh"),
+			"--overwrite=false",
+			// `--additional_post_work_envs "BBI_SCENARIO=` + scenario.identifier + ` BBI_ROOT_EXECUTION_DIR=` + ROOT_EXECUTION_DIR  + `"`,
+			// "--additional_post_work_envs BBI_ROOT_EXECUTION_DIR=" + ROOT_EXECUTION_DIR,
+		}
 
-					t.R.NoError(os.Setenv("BBI_ADDITIONAL_POST_WORK_ENVS", `BBI_SCENARIO=`+scenario.identifier+` BBI_ROOT_EXECUTION_DIR=`+ROOT_EXECUTION_DIR))
+		// Removing the model won't do anything. Execute with overwrite = false?
+		for _, v := range scenario.models {
+			tt.Run(v.identifier, func(tt *testing.T) {
+				t := wrapt.WrapT(tt)
 
-					// preventive remove, if file doesn't exit, that's fine.
-					_ = os.Remove(filepath.Join(scenario.Workpath, model.identifier+".out"))
+				var err error
 
-					var output string
-					output, err = model.Execute(scenario, arguments...)
-					t.R.Error(err)
+				err = os.Setenv("BBI_ADDITIONAL_POST_WORK_ENVS", `BBI_SCENARIO=`+scenario.identifier+` BBI_ROOT_EXECUTION_DIR=`+ROOT_EXECUTION_DIR)
+				t.R.NoError(err)
 
-					lines := func() []string {
-						var lines []string
-						// Does the file contain the expected Details:
-						// SCENARIO (Additional provided value)
-						var file *os.File
-						file, err = os.Open(filepath.Join(ROOT_EXECUTION_DIR, "working", scenario.identifier, model.identifier+".out"))
-						t.R.NoError(err)
-						defer func() { t.R.NoError(file.Close()) }()
+				err = os.Remove(filepath.Join(scenario.Workpath, v.identifier+".out"))
+				t.R.NoError(err)
 
-						scanner := bufio.NewScanner(file)
-						// scanner.Split(bufio.ScanLines)
+				var output string
+				output, err = v.Execute(scenario, arguments...)
+				t.R.Error(err)
 
-						for scanner.Scan() {
-							lines = append(lines, scanner.Text())
-						}
+				lines := func() []string {
+					var lines []string
+					// Does the file contain the expected Details:
+					// SCENARIO (Additional provided value)
+					var file *os.File
+					file, err = os.Open(filepath.Join(ROOT_EXECUTION_DIR, "working", scenario.identifier, v.identifier+".out"))
+					t.R.NoError(err)
+					defer file.Close()
 
-						return lines
-					}()
+					scanner := bufio.NewScanner(file)
+					// scanner.Split(bufio.ScanLines)
 
-					t.R.True(doesOutputFileContainKeyWithValue(lines, "BBI_SUCCESSFUL", "false"))
-					if err != nil {
-						t.R.True(doesExecutionOutputContainErrorString(err.Error(), output))
+					for scanner.Scan() {
+						lines = append(lines, scanner.Text())
 					}
-				})
-			}
-		})
-	}
+
+					return lines
+				}()
+
+				t.R.True(doesOutputFileContainKeyWithValue(lines, "BBI_SUCCESSFUL", "false"))
+				if err != nil {
+					t.R.True(doesExecutionOutputContainErrorString(err.Error(), output))
+				}
+			})
+		}
+	})
 }
 
 func doesOutputFileContainKeyWithValue(lines []string, key string, value string) bool {
