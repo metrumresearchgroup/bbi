@@ -239,8 +239,7 @@ func TestSpecifiedConfigByAbsPathLoaded(tt *testing.T) {
 	dest, _ := fs.Create(filepath.Join(ROOT_EXECUTION_DIR, "meow", "bbi.yaml"))
 	defer t.R.NoError(dest.Close())
 
-	_, err := io.Copy(dest, source)
-	t.R.NoError(err)
+	_, _ = io.Copy(dest, source)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
@@ -298,8 +297,7 @@ func TestSpecifiedConfigByRelativePathLoaded(tt *testing.T) {
 	dest, _ := fs.Create(filepath.Join(ROOT_EXECUTION_DIR, "meow", "bbi.yaml"))
 	defer t.R.NoError(dest.Close())
 
-	_, err := io.Copy(dest, source)
-	t.R.NoError(err)
+	_, _ = io.Copy(dest, source)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
