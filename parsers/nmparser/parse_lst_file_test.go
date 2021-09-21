@@ -139,8 +139,6 @@ func TestParTestParseShrinkage2(tt *testing.T) {
 }
 
 func TestParseGradient(tt *testing.T) {
-	t := wrapt.WrapT(tt)
-
 	var tests = []struct {
 		lines                []string
 		hasZeroFinalGradient bool
@@ -193,15 +191,17 @@ func TestParseGradient(tt *testing.T) {
 		// },
 	}
 
-	for _, tt := range tests {
-		noZeroFinal := parseGradient(tt.lines)
-		t.A.Equal(tt.hasZeroFinalGradient, noZeroFinal, "Fail hasZeroFinalGradient: "+tt.context)
+	for _, test := range tests {
+		tt.Run(test.context, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+
+			noZeroFinal := parseGradient(test.lines)
+			t.A.Equal(test.hasZeroFinalGradient, noZeroFinal, "Fail hasZeroFinalGradient: "+test.context)
+		})
 	}
 }
 
 func TestConditionNumber(tt *testing.T) {
-	t := wrapt.WrapT(tt)
-
 	var tests = []struct {
 		lines                []string
 		n                    int
@@ -282,15 +282,19 @@ func TestConditionNumber(tt *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		conditionNumber := mustCalculateConditionNumber(tt.lines, tt.n)
-		// compare to three decimal places
-		t.A.Equal(tt.conditionNumber, math.Round(conditionNumber*1000)/1000, "Fail :"+tt.context)
+	for _, test := range tests {
+		tt.Run(test.context, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+
+			conditionNumber := mustCalculateConditionNumber(test.lines, test.n)
+
+			// compare to three decimal places
+			t.A.Equal(test.conditionNumber, math.Round(conditionNumber*1000)/1000, "Fail :"+test.context)
+		})
 	}
 }
 
 func TestSetCorrelationsOk(tt *testing.T) {
-	t := wrapt.WrapT(tt)
 	var tests = []struct {
 		lines          []string
 		n              int
@@ -518,10 +522,13 @@ func TestSetCorrelationsOk(tt *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		correlationsOk := getCorrelationStatus(tt.lines, tt.n, 0.90)
-		t.A.Equal(tt.correlationsOk, correlationsOk, "Fail :"+tt.context)
-		// t.A.Equal(true, false, "Fail :"+tt.context)
+	for _, test := range tests {
+		tt.Run(test.context, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+
+			correlationsOk := getCorrelationStatus(test.lines, test.n, 0.90)
+			t.A.Equal(test.correlationsOk, correlationsOk, "Fail :"+test.context)
+		})
 	}
 }
 
@@ -543,6 +550,7 @@ func BenchmarkCheckMatrix1(b *testing.B) {
 		checkMatrix(matrix, 1)
 	}
 }
+
 func BenchmarkCheckMatrix2(b *testing.B) {
 	dim := 10000
 	matrix := make([][]float64, dim)
@@ -630,7 +638,6 @@ func TestCheckMatrix(tt *testing.T) {
 }
 
 func TestSetCov(tt *testing.T) {
-	t := wrapt.WrapT(tt)
 	var tests = []struct {
 		lines   []string
 		n       int
@@ -710,24 +717,29 @@ func TestSetCov(tt *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		covTheta := getThetaValues(tt.lines, tt.n)
-		t.A.Equal(9, covTheta.Dim, "Fail :"+tt.context)
-		t.A.Equal(0.609, covTheta.Values[0], "Fail :"+tt.context)
-		t.A.Equal(-0.0799, covTheta.Values[1], "Fail :"+tt.context)
-		t.A.Equal(8.0, covTheta.Values[7], "Fail :"+tt.context)
-		t.A.Equal(9.9, covTheta.Values[80], "Fail :"+tt.context)
+	for _, test := range tests {
+		tt.Run(test.context, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+
+			covTheta := getThetaValues(test.lines, test.n)
+			t.A.Equal(9, covTheta.Dim, "Fail :"+test.context)
+			t.A.Equal(0.609, covTheta.Values[0], "Fail :"+test.context)
+			t.A.Equal(-0.0799, covTheta.Values[1], "Fail :"+test.context)
+			t.A.Equal(8.0, covTheta.Values[7], "Fail :"+test.context)
+			t.A.Equal(9.9, covTheta.Values[80], "Fail :"+test.context)
+		})
 	}
 }
 
 func TestGetGradientLine(tt *testing.T) {
-	t := wrapt.WrapT(tt)
 	var tests = []struct {
+		context  string
 		lines    []string
 		n        int
 		expected string
 	}{
 		{
+			context: "only test",
 			lines: []string{
 				"GRADIENT:  -2.9680E-01  6.9220E-01  3.9483E+00 -4.6290E+00  8.4163E-02  6.2807E-02  1.8689E-01  6.9662E-02  1.8307E-01  8.3694E-01",
 				"             0.0000E+00",
@@ -738,10 +750,14 @@ func TestGetGradientLine(tt *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		line := getGradientLine(tt.lines, tt.n)
-		t.A.Equal(tt.expected, line, "Fail :"+tt.expected)
-		hasZero := parseGradient([]string{line})
-		t.A.Equal(true, hasZero, "Fail :"+tt.expected)
+	for _, test := range tests {
+		tt.Run(test.context, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+
+			line := getGradientLine(test.lines, test.n)
+			t.A.Equal(test.expected, line, "Fail :"+test.expected)
+			hasZero := parseGradient([]string{line})
+			t.A.Equal(true, hasZero, "Fail :"+test.expected)
+		})
 	}
 }
