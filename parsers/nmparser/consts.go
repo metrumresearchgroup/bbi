@@ -1,5 +1,17 @@
 package parser
 
+func omega(n int) [][2]int {
+	out := make([][2]int, 0, ((n*n)+n)/2)
+
+	for i := 1; i <= n; i++ {
+		for j := 1; j <= i; j++ {
+			out = append(out, [2]int{i, j})
+		}
+	}
+
+	return out
+}
+
 var omegaIndices = map[int]string{
 	0:    "(1,1)",
 	1:    "(2,1)",

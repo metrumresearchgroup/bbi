@@ -17,8 +17,10 @@ func Test_doesDirectoryContainOutputFiles(tt *testing.T) {
 	good := uuid.New().String()
 	bad := uuid.New().String()
 
-	os.Mkdir(good, 0755)
-	os.Mkdir(bad, 0755)
+	t := wrapt.WrapT(tt)
+
+	t.R.NoError(os.Mkdir(good, 0755))
+	t.R.NoError(os.Mkdir(bad, 0755))
 	emptyFile(path.Join(bad, "meow.cov"))
 
 	type args struct {
@@ -211,13 +213,15 @@ func Test_modelDataFile(tt *testing.T) {
 func Test_dataFileIsPresent(tt *testing.T) {
 	const testingDir string = "/tmp/testing/bbi"
 	const testingFile string = "test.txt"
+
+	t := wrapt.WrapT(tt)
 	// Temporary working directory
 	fs := afero.NewOsFs()
-	fs.RemoveAll(testingDir)
-	fs.MkdirAll(testingDir, 0755)
+	t.R.NoError(fs.RemoveAll(testingDir))
+	t.R.NoError(fs.MkdirAll(testingDir, 0755))
 	file, _ := fs.Create(filepath.Join(testingDir, testingFile))
-	file.Sync()
-	file.Close()
+	t.R.NoError(file.Sync())
+	t.R.NoError(file.Close())
 
 	type args struct {
 		datafile  string

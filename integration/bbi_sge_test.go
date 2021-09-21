@@ -38,7 +38,7 @@ func TestBbiCompletesSGEExecution(tt *testing.T) {
 
 	// TODO Break this into a method that takes a function for execution
 	for _, v := range scenarios {
-		v.Prepare(ctx)
+		t.R.NoError(v.Prepare(ctx))
 
 		for _, m := range v.models {
 			nonMemArguments := []string{
@@ -93,7 +93,7 @@ func TestBbiCompletesParallelSGEExecution(tt *testing.T) {
 	// TODO Break this into a method that takes a function for execution
 	for _, v := range scenarios[0:3] {
 		// log.Infof("Beginning SGE parallel execution test for model set %s",v.identifier)
-		v.Prepare(ctx)
+		t.R.NoError(v.Prepare(ctx))
 
 		for _, m := range v.models {
 			nonMemArguments := []string{

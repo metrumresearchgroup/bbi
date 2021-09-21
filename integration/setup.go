@@ -192,15 +192,19 @@ func InitializeScenarios(selected []string) ([]*Scenario, error) {
 	log.Infof("Beginning work with %s as the root", EXECUTION_DIR)
 
 	fs := afero.NewOsFs()
-	if ok, _ := afero.DirExists(fs, EXECUTION_DIR); !ok {
-		if err := fs.MkdirAll(EXECUTION_DIR, 0755); err != nil {
+	ok, err := afero.DirExists(fs, EXECUTION_DIR)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		if err = fs.MkdirAll(EXECUTION_DIR, 0755); err != nil {
 			return nil, err
 		}
 	} else {
-		if err := fs.RemoveAll(EXECUTION_DIR); err != nil {
+		if err = fs.RemoveAll(EXECUTION_DIR); err != nil {
 			return nil, err
 		}
-		if err := fs.MkdirAll(EXECUTION_DIR, 0755); err != nil {
+		if err = fs.MkdirAll(EXECUTION_DIR, 0755); err != nil {
 			return nil, err
 		}
 	}

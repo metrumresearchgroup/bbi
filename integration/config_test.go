@@ -28,7 +28,7 @@ func TestBBIConfigJSONCreated(tt *testing.T) {
 	t.R.Len(scenarios, 4)
 
 	for _, v := range scenarios {
-		v.Prepare(context.Background())
+		t.R.NoError(v.Prepare(context.Background()))
 
 		for _, m := range v.models {
 			args := []string{
@@ -67,7 +67,7 @@ func AssertBBIConfigContainsSpecifiedNMVersion(t *wrapt.T, details NonMemTesting
 
 	nm := cmd.NonMemModel{}
 
-	json.Unmarshal(cbytes, &nm)
+	t.R.NoError(json.Unmarshal(cbytes, &nm))
 
 	t.A.NotNil(nm)
 	t.A.NotEqual(nm, cmd.NonMemModel{})

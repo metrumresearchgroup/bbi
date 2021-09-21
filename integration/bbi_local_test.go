@@ -36,7 +36,8 @@ func TestBbiCompletesLocalExecution(tt *testing.T) {
 
 	// TODO Break this into a method that takes a function for execution
 	for _, v := range scenarios {
-		v.Prepare(ctx)
+		err = v.Prepare(ctx)
+		t.R.NoError(err)
 
 		for _, m := range v.models {
 			nonMemArguments := []string{
@@ -89,7 +90,7 @@ func TestNMFEOptionsEndInScript(tt *testing.T) {
 
 	// TODO Break this into a method that takes a function for execution
 	for _, v := range scenarios {
-		v.Prepare(ctx)
+		t.R.NoError(v.Prepare(ctx))
 
 		for _, m := range v.models {
 			nonMemArguments := []string{
@@ -107,9 +108,9 @@ func TestNMFEOptionsEndInScript(tt *testing.T) {
 			t.R.NoError(err)
 
 			// Now let's run the script that was generated
-			os.Chdir(filepath.Join(v.Workpath, m.identifier))
+			t.R.NoError(os.Chdir(filepath.Join(v.Workpath, m.identifier)))
 			_, err = executeCommand(ctx, filepath.Join(v.Workpath, m.identifier, m.identifier+".sh"))
-			os.Chdir(whereami)
+			t.R.NoError(os.Chdir(whereami))
 			t.R.NoError(err)
 
 			testingDetails := NonMemTestingDetails{
@@ -149,7 +150,7 @@ func TestBbiParallelExecution(tt *testing.T) {
 	// TODO Break this into a method that takes a function for execution
 	for _, v := range scenarios {
 		// log.Infof("Beginning localized parallel execution test for model set %s",v.identifier)
-		v.Prepare(ctx)
+		t.R.NoError(v.Prepare(ctx))
 
 		for _, m := range v.models {
 			nonMemArguments := []string{
@@ -207,7 +208,7 @@ func TestDefaultConfigLoaded(tt *testing.T) {
 		os.Getenv("NMVERSION"),
 	}
 
-	scenario.Prepare(ctx)
+	t.R.NoError(scenario.Prepare(ctx))
 
 	for _, v := range scenario.models {
 		out, _ := v.Execute(scenario, nonMemArguments...)
@@ -228,17 +229,18 @@ func TestSpecifiedConfigByAbsPathLoaded(tt *testing.T) {
 	fs := afero.NewOsFs()
 
 	if ok, _ := afero.DirExists(fs, filepath.Join(ROOT_EXECUTION_DIR, "meow")); ok {
-		fs.RemoveAll(filepath.Join(ROOT_EXECUTION_DIR, "meow"))
+		t.R.NoError(fs.RemoveAll(filepath.Join(ROOT_EXECUTION_DIR, "meow")))
 	}
 
-	fs.MkdirAll(filepath.Join(ROOT_EXECUTION_DIR, "meow"), 0755)
+	t.R.NoError(fs.MkdirAll(filepath.Join(ROOT_EXECUTION_DIR, "meow"), 0755))
 	// Copy the bbi file here
 	source, _ := fs.Open("bbi.yaml")
-	defer source.Close()
+	defer t.R.NoError(source.Close())
 	dest, _ := fs.Create(filepath.Join(ROOT_EXECUTION_DIR, "meow", "bbi.yaml"))
-	defer dest.Close()
+	defer t.R.NoError(dest.Close())
 
-	io.Copy(dest, source)
+	_, err := io.Copy(dest, source)
+	t.R.NoError(err)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
@@ -265,7 +267,7 @@ func TestSpecifiedConfigByAbsPathLoaded(tt *testing.T) {
 		os.Getenv("NMVERSION"),
 	}
 
-	scenario.Prepare(ctx)
+	t.R.NoError(scenario.Prepare(ctx))
 
 	for _, v := range scenario.models {
 		out, _ := v.Execute(scenario, nonMemArguments...)
@@ -286,17 +288,18 @@ func TestSpecifiedConfigByRelativePathLoaded(tt *testing.T) {
 	fs := afero.NewOsFs()
 
 	if ok, _ := afero.DirExists(fs, filepath.Join(ROOT_EXECUTION_DIR, "meow")); ok {
-		fs.RemoveAll(filepath.Join(ROOT_EXECUTION_DIR, "meow"))
+		t.R.NoError(fs.RemoveAll(filepath.Join(ROOT_EXECUTION_DIR, "meow")))
 	}
 
-	fs.MkdirAll(filepath.Join(ROOT_EXECUTION_DIR, "meow"), 0755)
+	t.R.NoError(fs.MkdirAll(filepath.Join(ROOT_EXECUTION_DIR, "meow"), 0755))
 	// Copy the bbi file here
 	source, _ := fs.Open("bbi.yaml")
-	defer source.Close()
+	defer t.R.NoError(source.Close())
 	dest, _ := fs.Create(filepath.Join(ROOT_EXECUTION_DIR, "meow", "bbi.yaml"))
-	defer dest.Close()
+	defer t.R.NoError(dest.Close())
 
-	io.Copy(dest, source)
+	_, err := io.Copy(dest, source)
+	t.R.NoError(err)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
@@ -322,7 +325,7 @@ func TestSpecifiedConfigByRelativePathLoaded(tt *testing.T) {
 		os.Getenv("NMVERSION"),
 	}
 
-	scenario.Prepare(ctx)
+	t.R.NoError(scenario.Prepare(ctx))
 
 	for _, v := range scenario.models {
 		out, _ := v.Execute(scenario, nonMemArguments...)

@@ -24,7 +24,7 @@ func TestBBIExpandsWithoutPrefix(tt *testing.T) {
 	t.R.Len(scenarios, 1)
 
 	scenario := scenarios[0]
-	scenario.Prepare(context.Background())
+	t.R.NoError(scenario.Prepare(context.Background()))
 
 	targets := `10[1:5].ctl`
 
@@ -91,7 +91,7 @@ func TestBBIExpandsWithPrefix(tt *testing.T) {
 	t.R.Len(scenarios, 1)
 
 	scenario := scenarios[0]
-	scenario.Prepare(context.Background())
+	t.R.NoError(scenario.Prepare(context.Background()))
 
 	targets := `bbi_mainrun_10[1:3].ctl`
 
@@ -157,7 +157,7 @@ func TestBBIExpandsWithPrefixToPartialMatch(tt *testing.T) {
 	t.R.Len(scenarios, 1)
 
 	scenario := scenarios[0]
-	scenario.Prepare(context.Background())
+	t.R.NoError(scenario.Prepare(context.Background()))
 
 	targets := `bbi_mainrun_10[2:3].ctl`
 

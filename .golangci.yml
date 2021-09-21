@@ -5,10 +5,8 @@ issues:
     - path: _test\.go
       linters:
         - gocyclo
-        - errcheck
         - dupl
         - gosec
-        - nlreturn
 
 linters-settings:
   errcheck:
