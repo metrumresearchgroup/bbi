@@ -1,0 +1,229 @@
+{
+	"run_details": {
+		"version": "7.4.4",
+		"run_start": "-999999999",
+		"run_end": "Wed Jul  8 17:32:01 EDT 2020",
+		"estimation_time": 42.06,
+		"cpu_time": 39.23,
+		"function_evaluations": 665,
+		"significant_digits": 3.8,
+		"problem_text": "LEM BS-12 106-104 + COV-effects(CRCL, AGE) on CL",
+		"mod_file": "-999999999",
+		"estimation_method": [
+			"First Order Conditional Estimation with Interaction"
+		],
+		"data_set": "../data/12.csv",
+		"number_of_subjects": 160,
+		"number_of_obs": 3158,
+		"number_of_data_records": 4319,
+		"output_files_used": [
+			"12.lst",
+			"12.cpu",
+			"12.ext",
+			"12.grd",
+			"12.shk"
+		]
+	},
+	"run_heuristics": {
+		"covariance_step_aborted": false,
+		"large_condition_number": false,
+		"eigenvalue_issues": false,
+		"correlations_not_ok": false,
+		"parameter_near_boundary": false,
+		"hessian_reset": false,
+		"has_final_zero_gradient": false,
+		"minimization_terminated": false,
+		"eta_pval_significant": false,
+		"prderr": false
+	},
+	"parameters_data": [
+		{
+			"method": "TABLE NO.     1: First Order Conditional Estimation with Interaction: Goal Function=MINIMUM VALUE OF OBJECTIVE FUNCTION: Problem=1 Subproblem=0 Superproblem1=0 Iteration1=0 Superproblem2=0 Iteration2=0",
+			"estimates": {
+				"theta": [
+					0.422797,
+					4.13924,
+					1.18583,
+					4.17865,
+					1.29131,
+					0.520889,
+					-0.0701583,
+					0.340205
+				],
+				"omega": [
+					0.169074,
+					0.0830623,
+					0.0930905,
+					0.128221,
+					0.072105,
+					0.10827
+				],
+				"sigma": [
+					0.0381873
+				]
+			},
+			"std_err": {
+				"theta": [
+					-999999999,
+					-999999999,
+					-999999999,
+					-999999999,
+					-999999999,
+					-999999999,
+					-999999999,
+					-999999999
+				],
+				"omega": [
+					-999999999,
+					-999999999,
+					-999999999,
+					-999999999,
+					-999999999,
+					-999999999
+				],
+				"sigma": [
+					-999999999
+				]
+			},
+			"random_effect_sd": {
+				"omega": [
+					0.411186,
+					0.662084,
+					0.305107,
+					0.94769,
+					0.718223,
+					0.329043
+				],
+				"sigma": [
+					0.195416
+				]
+			},
+			"random_effect_sdse": {
+				"omega": [
+					-999999999,
+					-999999999,
+					-999999999,
+					-999999999,
+					-999999999,
+					-999999999
+				],
+				"sigma": [
+					-999999999
+				]
+			},
+			"fixed": {
+				"theta": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"omega": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"sigma": [
+					0
+				]
+			}
+		}
+	],
+	"parameter_names": {
+		"theta": [
+			"THETA1",
+			"THETA2",
+			"THETA3",
+			"THETA4",
+			"THETA5",
+			"THETA6",
+			"THETA7",
+			"THETA8"
+		],
+		"omega": [
+			"OMEGA(1,1)",
+			"OMEGA(2,1)",
+			"OMEGA(2,2)",
+			"OMEGA(3,1)",
+			"OMEGA(3,2)",
+			"OMEGA(3,3)"
+		],
+		"sigma": [
+			"SIGMA(1,1)"
+		]
+	},
+	"ofv": [
+		{
+			"method": "First Order Conditional Estimation with Interaction",
+			"ofv_no_constant": 31470.725,
+			"constant_to_ofv": 5804.015775720713,
+			"ofv_with_constant": 37274.74040639444
+		}
+	],
+	"condition_number": [
+		{
+			"method": "First Order Conditional Estimation with Interaction",
+			"condition_number": -999999999
+		}
+	],
+	"shrinkage_details": [
+		[
+			{
+				"sub_pop": 1,
+				"eta_bar": [
+					-0.00013593,
+					0.00042796,
+					0.000997795
+				],
+				"ebv_bar_se": [
+					0.0307158,
+					0.0230429,
+					0.0257082
+				],
+				"pval": [
+					0.996469,
+					0.985182,
+					0.96904
+				],
+				"eta_sd": [
+					5.21383,
+					4.16904,
+					0.861924
+				],
+				"eps_sd": [
+					4.54321
+				],
+				"ebv_sd": [
+					5.55069,
+					4.41324,
+					1.1504
+				],
+				"num_subjects": [
+					160,
+					160,
+					160
+				],
+				"eta_vr": [
+					10.1558,
+					8.16426,
+					1.71642
+				],
+				"eps_vr": [
+					8.88001
+				],
+				"ebv_vr": [
+					10.7933,
+					8.63171,
+					2.28757
+				]
+			}
+		]
+	]
+}

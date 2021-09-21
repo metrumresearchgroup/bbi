@@ -24,7 +24,7 @@ import (
 	"sync"
 	"time"
 
-	"bbi/configlib"
+	"github.com/metrumresearchgroup/bbi/configlib"
 
 	"github.com/metrumresearchgroup/turnstile"
 	log "github.com/sirupsen/logrus"

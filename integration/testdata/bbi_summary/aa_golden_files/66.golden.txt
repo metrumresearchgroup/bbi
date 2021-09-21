@@ -1,0 +1,25 @@
+LEM BS-66 106-104 + COV-effects(CRCL, AGE) on CL
+Dataset: ../data/66.csv
+Records: 4359   Observations: 3176  Subjects: 160
+Estimation Method(s):
+ - First Order Conditional Estimation with Interaction
+No Heuristic Problems Detected
++-------+--------+----------+--------------+
+| THETA |  NAME  | ESTIMATE | STDERR (RSE) |
++-------+--------+----------+--------------+
+| TH 1  | THETA1 | 0.401312 | -            |
+| TH 2  | THETA2 | 1.68093  | -            |
+| TH 3  | THETA3 | 1.63742  | -            |
+| TH 4  | THETA4 | 6.58992  | -            |
+| TH 5  | THETA5 | -2.85282 | -            |
+| TH 6  | THETA6 | 0.630011 | -            |
+| TH 7  | THETA7 | 0.715531 | -            |
+| TH 8  | THETA8 | 0.471257 | -            |
++-------+--------+----------+--------------+
++------------+------+----------+
+|   OMEGA    | ETA  | ESTIMATE |
++------------+------+----------+
+| OMEGA(1,1) | ETA1 | 0.200281 |
+| OMEGA(2,2) | ETA2 | 0.199351 |
+| OMEGA(3,3) | ETA3 | 0.200792 |
++------------+------+----------+

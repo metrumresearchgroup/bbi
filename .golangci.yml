@@ -49,7 +49,7 @@ linters:
     - typecheck
     - unused
     - varcheck
-    - gosec
+#    - gosec
     - unparam
     - unconvert
     - dupl

@@ -1,0 +1,476 @@
+{
+	"run_details": {
+		"version": "7.4.4",
+		"run_start": "-999999999",
+		"run_end": "Tue May  4 16:04:45 EDT 2021",
+		"estimation_time": 28.97,
+		"cpu_time": 79.435,
+		"function_evaluations": -999999999,
+		"significant_digits": -999999999,
+		"problem_text": "RUN# example2 (from sampc)",
+		"mod_file": "-999999999",
+		"estimation_method": [
+			"Stochastic Approximation Expectation-Maximization",
+			"Objective Function Evaluation by Importance Sampling"
+		],
+		"data_set": "../example2.csv",
+		"number_of_subjects": 400,
+		"number_of_obs": 2000,
+		"number_of_data_records": 2400,
+		"output_files_used": [
+			"example2_saemimp.lst",
+			"example2_saemimp.cpu",
+			"example2_saemimp.ext",
+			"example2_saemimp.shk"
+		]
+	},
+	"run_heuristics": {
+		"covariance_step_aborted": false,
+		"large_condition_number": true,
+		"eigenvalue_issues": true,
+		"correlations_not_ok": false,
+		"parameter_near_boundary": false,
+		"hessian_reset": false,
+		"has_final_zero_gradient": false,
+		"minimization_terminated": false,
+		"eta_pval_significant": true,
+		"prderr": false
+	},
+	"parameters_data": [
+		{
+			"method": "TABLE NO.     1: Stochastic Approximation Expectation-Maximization: Goal Function=FINAL VALUE OF LIKELIHOOD FUNCTION: Problem=1 Subproblem=0 Superproblem1=0 Iteration1=0 Superproblem2=0 Iteration2=0",
+			"estimates": {
+				"theta": [
+					1.45321,
+					2.02404,
+					-0.389586,
+					-0.26794,
+					0.0061369,
+					0.994208,
+					0.207939,
+					-0.0792681,
+					0.307834,
+					1.55347,
+					0.334152,
+					-0.38885
+				],
+				"omega": [
+					0.945168,
+					1.2494,
+					3.92804,
+					0.0915011,
+					0.128638,
+					2.90112,
+					0.207223,
+					-0.225864,
+					0.667385,
+					2.64356
+				],
+				"sigma": [
+					1
+				]
+			},
+			"std_err": {
+				"theta": [
+					0.437837,
+					0.373015,
+					0.129458,
+					0.11045,
+					1.02406,
+					0.790556,
+					0.294944,
+					0.234041,
+					569316,
+					569316,
+					0.00108134,
+					569316
+				],
+				"omega": [
+					0.082124,
+					0.164968,
+					0.51683,
+					0.14855,
+					0.307111,
+					0.327339,
+					0.135904,
+					0.397884,
+					0.264696,
+					0.324094
+				],
+				"sigma": [
+					0
+				]
+			},
+			"random_effect_sd": {
+				"omega": [
+					0.972198,
+					0.648423,
+					1.98193,
+					0.0552572,
+					0.0381064,
+					1.70327,
+					0.131096,
+					-0.0700915,
+					0.24099,
+					1.6259
+				],
+				"sigma": [
+					1
+				]
+			},
+			"random_effect_sdse": {
+				"omega": [
+					0.0422363,
+					0.0462838,
+					0.130386,
+					0.0900489,
+					0.0904554,
+					0.0960916,
+					0.0819264,
+					0.121346,
+					0.0886257,
+					0.0996657
+				],
+				"sigma": [
+					10000000000
+				]
+			},
+			"fixed": {
+				"theta": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"omega": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"sigma": [
+					1
+				]
+			}
+		},
+		{
+			"method": "TABLE NO.     2: Objective Function Evaluation by Importance Sampling: Goal Function=FINAL VALUE OF OBJECTIVE FUNCTION: Problem=1 Subproblem=0 Superproblem1=0 Iteration1=0 Superproblem2=0 Iteration2=0",
+			"estimates": {
+				"theta": [
+					1.45321,
+					2.02404,
+					-0.389586,
+					-0.26794,
+					0.0061369,
+					0.994208,
+					0.207939,
+					-0.0792681,
+					0.307834,
+					1.55347,
+					0.334152,
+					-0.38885
+				],
+				"omega": [
+					0.945168,
+					1.2494,
+					3.92804,
+					0.0915011,
+					0.128638,
+					2.90112,
+					0.207223,
+					-0.225864,
+					0.667385,
+					2.64356
+				],
+				"sigma": [
+					1
+				]
+			},
+			"std_err": {
+				"theta": [
+					0.454598,
+					0.345813,
+					0.115886,
+					0.0916079,
+					0.403565,
+					0.247447,
+					0.102,
+					0.0697687,
+					0.130701,
+					0.0567104,
+					0.104926,
+					0.166613
+				],
+				"omega": [
+					0.0400201,
+					0.103477,
+					0.168223,
+					0.0947592,
+					0.0382632,
+					0.0613066,
+					0.027427,
+					0.0906814,
+					0.0686312,
+					0.0297101
+				],
+				"sigma": [
+					0
+				]
+			},
+			"random_effect_sd": {
+				"omega": [
+					0.972198,
+					0.648423,
+					1.98193,
+					0.0552572,
+					0.0381064,
+					1.70327,
+					0.131096,
+					-0.0700915,
+					0.24099,
+					1.6259
+				],
+				"sigma": [
+					1
+				]
+			},
+			"random_effect_sdse": {
+				"omega": [
+					0.0205823,
+					0.0276208,
+					0.0424393,
+					0.0576308,
+					0.0110462,
+					0.0179968,
+					0.0150947,
+					0.0298381,
+					0.0218992,
+					0.00913649
+				],
+				"sigma": [
+					10000000000
+				]
+			},
+			"fixed": {
+				"theta": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"omega": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"sigma": [
+					1
+				]
+			}
+		}
+	],
+	"parameter_names": {
+		"theta": [
+			"THETA1",
+			"THETA2",
+			"THETA3",
+			"THETA4",
+			"THETA5",
+			"THETA6",
+			"THETA7",
+			"THETA8",
+			"THETA9",
+			"THETA10",
+			"THETA11",
+			"THETA12"
+		],
+		"omega": [
+			"OMEGA(1,1)",
+			"OMEGA(2,1)",
+			"OMEGA(2,2)",
+			"OMEGA(3,1)",
+			"OMEGA(3,2)",
+			"OMEGA(3,3)",
+			"OMEGA(4,1)",
+			"OMEGA(4,2)",
+			"OMEGA(4,3)",
+			"OMEGA(4,4)"
+		],
+		"sigma": [
+			"SIGMA(1,1)"
+		]
+	},
+	"ofv": [
+		{
+			"method": "Stochastic Approximation Expectation-Maximization",
+			"ofv_no_constant": -1549.735,
+			"constant_to_ofv": 2940.6033062549527,
+			"ofv_with_constant": 1390.8683014801343
+		},
+		{
+			"method": "Objective Function Evaluation by Importance Sampling",
+			"ofv_no_constant": -3755.81,
+			"constant_to_ofv": 3675.754132818691,
+			"ofv_with_constant": -80.05622535290195
+		}
+	],
+	"condition_number": [
+		{
+			"method": "Stochastic Approximation Expectation-Maximization",
+			"condition_number": 162759000000000
+		},
+		{
+			"method": "Objective Function Evaluation by Importance Sampling",
+			"condition_number": 4132470
+		}
+	],
+	"shrinkage_details": [
+		[
+			{
+				"sub_pop": 1,
+				"eta_bar": [
+					0.0589207,
+					0.0570932,
+					-0.00528671,
+					0.0271081
+				],
+				"ebv_bar_se": [
+					0.0296001,
+					0.0644323,
+					0.0525059,
+					0.0521409
+				],
+				"pval": [
+					0.0465298,
+					0.375566,
+					0.919798,
+					0.603132
+				],
+				"eta_sd": [
+					39.0305,
+					34.8988,
+					38.2696,
+					35.7819
+				],
+				"eps_sd": [
+					1e-10
+				],
+				"ebv_sd": [
+					34.2025,
+					31.3168,
+					36.7474,
+					34.93
+				],
+				"num_subjects": [
+					400,
+					400,
+					400,
+					400
+				],
+				"eta_vr": [
+					62.8272,
+					57.6183,
+					61.8935,
+					58.7603
+				],
+				"eps_vr": [
+					1e-10
+				],
+				"ebv_vr": [
+					56.7069,
+					52.8261,
+					59.9911,
+					57.659
+				]
+			}
+		],
+		[
+			{
+				"sub_pop": 1,
+				"eta_bar": [
+					1.09891,
+					0.947762,
+					0.294106,
+					0.826715
+				],
+				"ebv_bar_se": [
+					0.0112526,
+					0.0228106,
+					0.0141828,
+					0.0158127
+				],
+				"pval": [
+					0,
+					0,
+					1.74801e-95,
+					0
+				],
+				"eta_sd": [
+					76.8223,
+					76.9526,
+					83.3255,
+					80.5246
+				],
+				"eps_sd": [
+					42.9698
+				],
+				"ebv_sd": [
+					4.5583,
+					3.921,
+					12.7788,
+					10.5015
+				],
+				"num_subjects": [
+					400,
+					400,
+					400,
+					400
+				],
+				"eta_vr": [
+					94.6279,
+					94.6882,
+					97.2196,
+					96.2071
+				],
+				"eps_vr": [
+					67.4756
+				],
+				"ebv_vr": [
+					8.90881,
+					7.68825,
+					23.9246,
+					19.9002
+				]
+			}
+		]
+	]
+}

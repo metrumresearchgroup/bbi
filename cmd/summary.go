@@ -20,7 +20,7 @@ import (
 	"os"
 	"runtime"
 
-	parser "bbi/parsers/nmparser"
+	parser "github.com/metrumresearchgroup/bbi/parsers/nmparser"
 
 	log "github.com/sirupsen/logrus"
 

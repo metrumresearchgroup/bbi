@@ -1,8 +1,9 @@
 package cmd
 
 import (
-	"bbi/configlib"
 	"testing"
+
+	"github.com/metrumresearchgroup/bbi/configlib"
 )
 
 func Test_gridengineJobName(t *testing.T) {

@@ -1,0 +1,203 @@
+{
+	"run_details": {
+		"version": "7.4.4",
+		"run_start": "-999999999",
+		"run_end": "Fri Aug 21 16:30:36 EDT 2020",
+		"estimation_time": 2898.17,
+		"covariance_time": 0.46,
+		"cpu_time": 16217.448,
+		"function_evaluations": -999999999,
+		"significant_digits": -999999999,
+		"problem_text": "Run# 1001.1",
+		"mod_file": "-999999999",
+		"estimation_method": [
+			"MCMC Bayesian Analysis"
+		],
+		"data_set": "../tranNM_final.csv",
+		"number_of_subjects": 240,
+		"number_of_obs": 599,
+		"number_of_data_records": 921,
+		"output_files_used": [
+			"1001.lst",
+			"1001.cpu",
+			"1001.1.TXT"
+		]
+	},
+	"run_heuristics": {
+		"covariance_step_aborted": false,
+		"large_condition_number": true,
+		"eigenvalue_issues": false,
+		"correlations_not_ok": false,
+		"parameter_near_boundary": false,
+		"hessian_reset": false,
+		"has_final_zero_gradient": false,
+		"minimization_terminated": false,
+		"eta_pval_significant": false,
+		"prderr": true
+	},
+	"parameters_data": [
+		{
+			"method": "TABLE NO.     1: MCMC Bayesian Analysis: Goal Function=AVERAGE VALUE OF LIKELIHOOD FUNCTION: Problem=1 Subproblem=0 Superproblem1=0 Iteration1=0 Superproblem2=0 Iteration2=0",
+			"estimates": {
+				"theta": [
+					-0.781944,
+					5.7034,
+					0.927234,
+					0.312975,
+					-11.7761,
+					5.4667
+				],
+				"omega": [
+					0.010501,
+					0,
+					0.150807,
+					0,
+					0.0829253,
+					0.0669023,
+					0,
+					-0.660065,
+					-0.317443,
+					7.47305
+				],
+				"sigma": [
+					1153.93,
+					0,
+					2003.57
+				]
+			},
+			"std_err": {
+				"theta": [
+					0.139962,
+					0.126721,
+					0.00452754,
+					0.223964,
+					0.328198,
+					1.13918
+				],
+				"omega": [
+					0.0037499,
+					0,
+					0.0781363,
+					0,
+					0.0551678,
+					0.0397002,
+					0,
+					0.339095,
+					0.263342,
+					1.387
+				],
+				"sigma": [
+					361.532,
+					0,
+					181.573
+				]
+			},
+			"random_effect_sd": {
+				"omega": [
+					0.100984,
+					0,
+					0.375745,
+					0,
+					0.771794,
+					0.248466,
+					0,
+					-0.611532,
+					-0.419198,
+					2.72227
+				],
+				"sigma": [
+					33.5911,
+					0,
+					44.7157
+				]
+			},
+			"random_effect_sdse": {
+				"omega": [
+					0.017415,
+					0,
+					0.0981016,
+					0,
+					0.144615,
+					0.0718845,
+					0,
+					0.206188,
+					0.295028,
+					0.249616
+				],
+				"sigma": [
+					5.05622,
+					0,
+					2.02038
+				]
+			},
+			"fixed": {
+				"theta": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"omega": [
+					0,
+					1,
+					0,
+					1,
+					0,
+					0,
+					1,
+					0,
+					0,
+					0
+				],
+				"sigma": [
+					0,
+					1,
+					0
+				]
+			}
+		}
+	],
+	"parameter_names": {
+		"theta": [
+			"THETA1",
+			"THETA2",
+			"THETA3",
+			"THETA4",
+			"THETA5",
+			"THETA6"
+		],
+		"omega": [
+			"OMEGA(1,1)",
+			"OMEGA(2,1)",
+			"OMEGA(2,2)",
+			"OMEGA(3,1)",
+			"OMEGA(3,2)",
+			"OMEGA(3,3)",
+			"OMEGA(4,1)",
+			"OMEGA(4,2)",
+			"OMEGA(4,3)",
+			"OMEGA(4,4)"
+		],
+		"sigma": [
+			"SIGMA(1,1)",
+			"SIGMA(2,1)",
+			"SIGMA(2,2)"
+		]
+	},
+	"ofv": [
+		{
+			"method": "MCMC Bayesian Analysis",
+			"ofv_no_constant": 3842.571,
+			"constant_to_ofv": 44.868349604386125,
+			"ofv_with_constant": 3887.4392217087275
+		}
+	],
+	"condition_number": [
+		{
+			"method": "MCMC Bayesian Analysis",
+			"condition_number": 4353.17
+		}
+	]
+}

@@ -9,7 +9,7 @@ import (
 	"regexp"
 	"strings"
 
-	"bbi/configlib"
+	"github.com/metrumresearchgroup/bbi/configlib"
 
 	"github.com/ghodss/yaml"
 

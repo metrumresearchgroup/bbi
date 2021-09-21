@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	parser "bbi/parsers/nmparser"
-	"bbi/utils"
+	parser "github.com/metrumresearchgroup/bbi/parsers/nmparser"
+	"github.com/metrumresearchgroup/bbi/utils"
 
 	"github.com/kr/pretty"
 	"github.com/mitchellh/go-homedir"
