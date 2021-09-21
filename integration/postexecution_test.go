@@ -196,8 +196,8 @@ func TestPostExecutionFails(tt *testing.T) {
 					err = os.Setenv("BBI_ADDITIONAL_POST_WORK_ENVS", `BBI_SCENARIO=`+scenario.identifier+` BBI_ROOT_EXECUTION_DIR=`+ROOT_EXECUTION_DIR)
 					t.R.NoError(err)
 
-					err = os.Remove(filepath.Join(scenario.Workpath, model.identifier+".out"))
-					t.R.NoError(err)
+					// preventive remove, if file doesn't exit, that's fine.
+					_ = os.Remove(filepath.Join(scenario.Workpath, model.identifier+".out"))
 
 					var output string
 					output, err = model.Execute(scenario, arguments...)
