@@ -74,17 +74,23 @@ func TestPostExecutionSucceeds(tt *testing.T) {
 		{name: "metrum_std"},
 	}
 
-	err := ioutil.WriteFile(filepath.Join(ROOT_EXECUTION_DIR, "post.sh"), []byte(postExecutionScriptString), 0755)
-	if err != nil {
+	if err := ioutil.WriteFile(filepath.Join(ROOT_EXECUTION_DIR, "post.sh"), []byte(postExecutionScriptString), 0755); err != nil {
 		tt.Fatal(err)
 	}
 
+	var scenarios []*Scenario
 	for _, test := range tests {
-		tt.Run(test.name, func(tt *testing.T) {
+		tt.Run("create "+test.name, func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
-
 			scenario := InitializeScenario(t, test.name)
 			scenario.Prepare(t, context.Background())
+			scenarios = append(scenarios, scenario)
+		})
+	}
+
+	for _, scenario := range scenarios {
+		tt.Run("run "+scenario.identifier, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
 			arguments := []string{
 				"-d",
@@ -103,7 +109,7 @@ func TestPostExecutionSucceeds(tt *testing.T) {
 			for _, m := range scenario.models {
 				t.Run(scenario.identifier+"_post_execution", func(tt *wrapt.T) {
 					var output string
-					output, err = m.Execute(scenario, arguments...)
+					output, err := m.Execute(scenario, arguments...)
 					t.R.NoError(err)
 
 					nmd := NonMemTestingDetails{
@@ -148,32 +154,10 @@ func TestPostExecutionSucceeds(tt *testing.T) {
 			}
 		})
 	}
-}
 
-func TestPostExecutionFails(tt *testing.T) {
-	if !FeatureEnabled("POST_EXECUTION") {
-		tt.Skip("Post execution not enabled as far as testing is concerned")
-	}
-
-	tests := []struct {
-		name string
-	}{
-		{name: "240"},
-		// {name: "acop"},
-		// {name: "ctl_test"},
-		// {name: "metrum_std"},
-	}
-
-	if err := ioutil.WriteFile(filepath.Join(ROOT_EXECUTION_DIR, "post.sh"), []byte(postExecutionScriptString), 0755); err != nil {
-		tt.Fatal(err)
-	}
-
-	for _, test := range tests {
-		tt.Run(test.name, func(tt *testing.T) {
+	for _, scenario := range scenarios {
+		tt.Run(scenario.identifier, func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
-
-			scenario := InitializeScenario(t, test.name)
-			scenario.Prepare(t, context.Background())
 
 			arguments := []string{
 				"nonmem",
@@ -193,8 +177,7 @@ func TestPostExecutionFails(tt *testing.T) {
 				t.Run(model.identifier, func(tt *wrapt.T) {
 					var err error
 
-					err = os.Setenv("BBI_ADDITIONAL_POST_WORK_ENVS", `BBI_SCENARIO=`+scenario.identifier+` BBI_ROOT_EXECUTION_DIR=`+ROOT_EXECUTION_DIR)
-					t.R.NoError(err)
+					t.R.NoError(os.Setenv("BBI_ADDITIONAL_POST_WORK_ENVS", `BBI_SCENARIO=`+scenario.identifier+` BBI_ROOT_EXECUTION_DIR=`+ROOT_EXECUTION_DIR))
 
 					// preventive remove, if file doesn't exit, that's fine.
 					_ = os.Remove(filepath.Join(scenario.Workpath, model.identifier+".out"))
