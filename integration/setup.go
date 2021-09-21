@@ -70,6 +70,8 @@ func (m Model) Execute(scenario *Scenario, args ...string) (string, error) {
 	return executeCommand(scenario.ctx, "bbi", cmdArguments...)
 }
 
+var ErrNoModelsLocated = errors.New("no model directories were located in the provided scenario")
+
 func newScenario(path string) (Scenario, error) {
 	scenario := Scenario{
 		identifier: filepath.Base(path),
@@ -83,7 +85,7 @@ func newScenario(path string) (Scenario, error) {
 	scenario.archive = scenario.identifier + ".tar.gz"
 
 	if len(scenario.models) == 0 {
-		return scenario, errors.New("no model directories were located in the provided scenario")
+		return scenario, ErrNoModelsLocated
 	}
 
 	return scenario, nil
@@ -214,7 +216,11 @@ func InitializeScenario(t *wrapt.T, selected string) *Scenario {
 	for _, dir := range dirs {
 		if strings.EqualFold(selected, filepath.Base(dir)) {
 			scenario, err = newScenario(dir)
-			t.R.NoError(err)
+
+			// skip no models located.
+			if !errors.Is(err, ErrNoModelsLocated) {
+				t.R.NoError(err)
+			}
 
 			func() {
 				var f *os.File

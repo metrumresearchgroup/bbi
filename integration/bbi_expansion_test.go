@@ -113,9 +113,7 @@ func TestBBIExpandsWithPrefix(tt *testing.T) {
 
 	// Verify nonmem completed for all five
 	for _, m := range expandedModels {
-		tt.Run(m, func(tt *testing.T) {
-			t := wrapt.WrapT(tt)
-
+		t.Run(m, func(t *wrapt.T) {
 			file := filepath.Base(m)
 			extension := filepath.Ext(file)
 			identifier := strings.Replace(file, extension, "", 1)
@@ -182,9 +180,7 @@ func TestBBIExpandsWithPrefixToPartialMatch(tt *testing.T) {
 
 			// Verify nonmem completed for all five
 			for _, m := range expandedModels {
-				tt.Run(m, func(tt *testing.T) {
-					t := wrapt.WrapT(tt)
-
+				t.Run(m, func(tt *wrapt.T) {
 					file := filepath.Base(m)
 					extension := filepath.Ext(file)
 					identifier := strings.Replace(file, extension, "", 1)
