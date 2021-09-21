@@ -16,27 +16,24 @@ import (
 )
 
 func TestBBIConfigJSONCreated(tt *testing.T) {
-	t := wrapt.WrapT(tt)
+	tests := []struct {
+		name string
+	}{
+		{name: "240"},
+		{name: "acop"},
+		{name: "ctl_test"},
+		{name: "metrum_std"},
+	}
 
-	scenarios, err := InitializeScenarios([]string{
-		"240",
-		"acop",
-		"ctl_test",
-		"metrum_std",
-	})
-	t.R.NoError(err)
-	t.R.Len(scenarios, 4)
-
-	for _, v := range scenarios {
-		tt.Run(v.identifier, func(tt *testing.T) {
+	for _, test := range tests {
+		tt.Run(test.name, func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
-			t.R.NoError(v.Prepare(context.Background()))
+			scenario := InitializeScenario(t, test.name)
+			scenario.Prepare(t, context.Background())
 
-			for _, m := range v.models {
-				tt.Run(m.identifier, func(tt *testing.T) {
-					t := wrapt.WrapT(tt)
-
+			for _, model := range scenario.models {
+				t.Run(model.identifier, func(t *wrapt.T) {
 					args := []string{
 						"nonmem",
 						"run",
@@ -45,14 +42,14 @@ func TestBBIConfigJSONCreated(tt *testing.T) {
 						os.Getenv("NMVERSION"),
 					}
 
-					output, err := m.Execute(v, args...)
+					output, err := model.Execute(scenario, args...)
 
 					t.A.Nil(err)
 					t.A.NotNil(output)
 
 					nmd := NonMemTestingDetails{
-						OutputDir: filepath.Join(v.Workpath, m.identifier),
-						Model:     m,
+						OutputDir: filepath.Join(scenario.Workpath, model.identifier),
+						Model:     model,
 						Output:    output,
 					}
 
@@ -96,15 +93,8 @@ func TestConfigValuesAreCorrectInWrittenFile(tt *testing.T) {
 		--mpi_exec_path
 	*/
 
-	scenarios, err := InitializeScenarios([]string{
-		"240",
-	})
-	t.R.NoError(err)
-	t.R.Len(scenarios, 1)
-
-	scenario := scenarios[0]
-	err = scenario.Prepare(context.Background())
-	t.R.NoError(err)
+	scenario := InitializeScenario(t, "240")
+	scenario.Prepare(t, context.Background())
 
 	commandAndArgs := []string{
 		"--debug=true", // Needs to be in debug mode to generate the expected output
@@ -123,9 +113,7 @@ func TestConfigValuesAreCorrectInWrittenFile(tt *testing.T) {
 	}
 
 	for _, m := range scenario.models {
-		tt.Run(m.identifier, func(tt *testing.T) {
-			t := wrapt.WrapT(tt)
-
+		t.Run(m.identifier, func(tt *wrapt.T) {
 			output, err := m.Execute(scenario, commandAndArgs...)
 
 			t.A.Nil(err)

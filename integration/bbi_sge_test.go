@@ -14,39 +14,33 @@ import (
 )
 
 func TestBbiCompletesSGEExecution(tt *testing.T) {
-	t := wrapt.WrapT(tt)
-
-	// Get BB and make sure we have the test data moved over.
-	// Clean Slate
-
 	if !FeatureEnabled("SGE") {
-		t.Skip("Skipping SGE as it's not enabled")
+		tt.Skip("Skipping SGE as it's not enabled")
 	}
 
-	scenarios, err := InitializeScenarios([]string{
-		"240",
-		"acop",
-		"ctl_test",
-	})
-	t.R.NoError(err)
-	t.R.Len(scenarios, 3)
+	tests := []struct {
+		name string
+	}{
+		{name: "240"},
+		{name: "acop"},
+		{name: "ctl_test"},
+	}
 
-	// Test shouldn't take longer than 5 min in total
-	// TODO use the context downstream in a runModel function
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
-	defer cancel()
-
-	// TODO Break this into a method that takes a function for execution
-	for _, v := range scenarios {
-		tt.Run(v.identifier, func(tt *testing.T) {
+	for _, test := range tests {
+		tt.Run(test.name, func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
-			t.R.NoError(v.Prepare(ctx))
+			scenario := InitializeScenario(t, test.name)
 
-			for _, m := range v.models {
-				tt.Run(m.identifier, func(tt *testing.T) {
-					t := wrapt.WrapT(tt)
+			// Test shouldn't take longer than 5 min in total
+			// TODO use the context downstream in a runModel function
+			ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
+			defer cancel()
 
+			scenario.Prepare(t, ctx)
+
+			for _, model := range scenario.models {
+				t.Run(model.identifier, func(t *wrapt.T) {
 					nonMemArguments := []string{
 						"-d",
 						"nonmem",
@@ -56,14 +50,14 @@ func TestBbiCompletesSGEExecution(tt *testing.T) {
 						os.Getenv("NMVERSION"),
 					}
 
-					_, err := m.Execute(v, nonMemArguments...)
+					_, err := model.Execute(scenario, nonMemArguments...)
 					t.R.NoError(err)
 
-					WaitForSGEToTerminate(getGridNameIdentifier(m))
+					WaitForSGEToTerminate(getGridNameIdentifier(model))
 
 					testingDetails := NonMemTestingDetails{
-						OutputDir: filepath.Join(v.Workpath, m.identifier),
-						Model:     m,
+						OutputDir: filepath.Join(scenario.Workpath, model.identifier),
+						Model:     model,
 					}
 
 					AssertNonMemCompleted(t, testingDetails)
@@ -76,40 +70,34 @@ func TestBbiCompletesSGEExecution(tt *testing.T) {
 }
 
 func TestBbiCompletesParallelSGEExecution(tt *testing.T) {
-	t := wrapt.WrapT(tt)
-
-	// Get BB and make sure we have the test data moved over.
-	// Clean Slate
-
 	if !FeatureEnabled("SGE") {
-		t.Skip("Skipping SG Parallel execution as it's not enabled")
+		tt.Skip("Skipping SG Parallel execution as it's not enabled")
 	}
 
-	scenarios, err := InitializeScenarios([]string{
-		"240",
-		"acop",
-		"ctl_test",
-	})
-	t.R.NoError(err)
-	t.R.Len(scenarios, 3)
+	tests := []struct {
+		name string
+	}{
+		{name: "240"},
+		{name: "acop"},
+		{name: "ctl_test"},
+	}
 
-	// Test shouldn't take longer than 5 min in total
-	// TODO use the context downstream in a runModel function
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
-	defer cancel()
-
-	// TODO Break this into a method that takes a function for execution
-	for _, v := range scenarios[0:3] {
-		tt.Run(v.identifier, func(tt *testing.T) {
+	for _, test := range tests {
+		tt.Run(test.name, func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
+			scenario := InitializeScenario(t, test.name)
+
+			// Test shouldn't take longer than 5 min in total
+			// TODO use the context downstream in a runModel function
+			ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
+			defer cancel()
+
 			// log.Infof("Beginning SGE parallel execution test for model set %s",v.identifier)
-			t.R.NoError(v.Prepare(ctx))
+			scenario.Prepare(t, ctx)
 
-			for _, m := range v.models {
-				tt.Run(m.identifier, func(tt *testing.T) {
-					t := wrapt.WrapT(tt)
-
+			for _, m := range scenario.models {
+				t.Run(m.identifier, func(t *wrapt.T) {
 					nonMemArguments := []string{
 						"-d",
 						"nonmem",
@@ -124,13 +112,13 @@ func TestBbiCompletesParallelSGEExecution(tt *testing.T) {
 						"2",
 					}
 
-					_, err := m.Execute(v, nonMemArguments...)
+					_, err := m.Execute(scenario, nonMemArguments...)
 					t.R.NoError(err)
 
 					WaitForSGEToTerminate(getGridNameIdentifier(m))
 
 					testingDetails := NonMemTestingDetails{
-						OutputDir: filepath.Join(v.Workpath, m.identifier),
+						OutputDir: filepath.Join(scenario.Workpath, m.identifier),
 						Model:     m,
 					}
 

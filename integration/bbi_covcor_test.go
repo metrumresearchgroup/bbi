@@ -11,20 +11,22 @@ import (
 )
 
 func TestCovCorHappyPath(tt *testing.T) {
-	var models = []string{
-		"acop",
-		"example2_itsimp",
-		"1001",
+	var models = []struct {
+		name string
+	}{
+		{name: "acop"},
+		{name: "example2_itsimp"},
+		{name: "1001"},
 	}
 
 	for _, mod := range models {
-		tt.Run(mod, func(tt *testing.T) {
+		tt.Run(mod.name, func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			commandAndArgs := []string{
 				"nonmem",
 				"covcor",
-				filepath.Join(SUMMARY_TEST_DIR, mod, mod),
+				filepath.Join(SUMMARY_TEST_DIR, mod.name, mod.name),
 			}
 
 			output, err := executeCommand(context.Background(), "bbi", commandAndArgs...)
@@ -34,7 +36,7 @@ func TestCovCorHappyPath(tt *testing.T) {
 
 			gtd := GoldenFileTestingDetails{
 				outputString:   output,
-				goldenFilePath: filepath.Join(SUMMARY_TEST_DIR, SUMMARY_GOLD_DIR, mod+".golden.covcor.json"),
+				goldenFilePath: filepath.Join(SUMMARY_TEST_DIR, SUMMARY_GOLD_DIR, mod.name+".golden.covcor.json"),
 			}
 
 			if os.Getenv(":q") == "true" {
@@ -47,21 +49,23 @@ func TestCovCorHappyPath(tt *testing.T) {
 }
 
 func TestCovCorErrors(tt *testing.T) {
-	var models = []string{
-		"12",
-		"iovmm",
+	var models = []struct {
+		name string
+	}{
+		{name: "12"},
+		{name: "iovmm"},
 	}
 
 	rgx := regexp.MustCompile(noFilePresentError)
 
 	for _, mod := range models {
-		tt.Run(mod, func(tt *testing.T) {
+		tt.Run(mod.name, func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			commandAndArgs := []string{
 				"nonmem",
 				"covcor",
-				filepath.Join(SUMMARY_TEST_DIR, mod, mod),
+				filepath.Join(SUMMARY_TEST_DIR, mod.name, mod.name),
 			}
 
 			// try without flag and get error

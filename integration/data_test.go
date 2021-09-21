@@ -16,22 +16,12 @@ import (
 func TestHasValidDataPathForCTL(tt *testing.T) {
 	t := wrapt.WrapT(tt)
 
-	scenarios, err := InitializeScenarios([]string{
-		"ctl_test",
-	})
-	t.R.NoError(err)
-	t.R.Len(scenarios, 1)
-
-	scenario := scenarios[0]
-
-	err = scenario.Prepare(context.Background())
-	t.R.NoError(err)
+	scenario := InitializeScenario(t, "ctl_test")
+	scenario.Prepare(t, context.Background())
 
 	// Directories et all should be prepared.
 	for _, m := range scenario.models {
-		tt.Run(fmt.Sprintf("validPathCTL_%s", m.filename), func(tt *testing.T) {
-			t := wrapt.WrapT(tt)
-
+		t.Run(fmt.Sprintf("validPathCTL_%s", m.filename), func(t *wrapt.T) {
 			args := []string{
 				"nonmem",
 				"run",
@@ -59,23 +49,12 @@ func TestHasValidDataPathForCTL(tt *testing.T) {
 func TestHasInvalidDataPath(tt *testing.T) {
 	t := wrapt.WrapT(tt)
 
-	scenarios, err := InitializeScenarios([]string{
-		"ctl_test",
-	})
-	t.R.NoError(err)
-	t.R.Len(scenarios, 1)
-
-	// Take the 3rd scenario for the CTL file
-	scenario := scenarios[0]
-
-	err = scenario.Prepare(context.Background())
-	t.R.NoError(err)
+	scenario := InitializeScenario(t, "ctl_test")
+	scenario.Prepare(t, context.Background())
 
 	// Directories et all should be prepared.
 	for _, m := range scenario.models {
-		tt.Run(m.identifier, func(tt *testing.T) {
-			t := wrapt.WrapT(tt)
-
+		t.Run(m.identifier, func(t *wrapt.T) {
 			// We need to manipulate the file to contain an invalid file reference
 			file, _ := os.Open(filepath.Join(scenario.Workpath, m.filename))
 			b, _ := ioutil.ReadAll(file)
@@ -97,9 +76,7 @@ func TestHasInvalidDataPath(tt *testing.T) {
 				t.Log("Had a problem writing the file")
 			}
 
-			tt.Run(fmt.Sprintf("invalidPathCTL_%s", m.filename), func(tt *testing.T) {
-				t := wrapt.WrapT(tt)
-
+			t.Run(fmt.Sprintf("invalidPathCTL_%s", m.filename), func(t *wrapt.T) {
 				args := []string{
 					"nonmem",
 					"run",
@@ -108,7 +85,7 @@ func TestHasInvalidDataPath(tt *testing.T) {
 					os.Getenv("NMVERSION"),
 				}
 
-				_, err := m.Execute(scenario, args...)
+				_, err = m.Execute(scenario, args...)
 
 				// ntd := NonMemTestingDetails{
 				//	t:         t,
@@ -128,17 +105,8 @@ func TestHasInvalidDataPath(tt *testing.T) {
 func TestHasValidComplexPathCTLAndMod(tt *testing.T) {
 	t := wrapt.WrapT(tt)
 
-	scenarios, err := InitializeScenarios([]string{
-		"metrum_std",
-	})
-	t.R.NoError(err)
-	t.R.Len(scenarios, 1)
-
-	// Take the 3rd scenario for the CTL file
-	scenario := scenarios[0]
-
-	err = scenario.Prepare(context.Background())
-	t.R.NoError(err)
+	scenario := InitializeScenario(t, "metrum_std")
+	scenario.Prepare(t, context.Background())
 
 	// Because we have a relatively complex model Structure we're going to set the model manually
 	scenario.models = modelsFromOriginalScenarioPath(filepath.Join(scenario.Workpath, "model", "nonmem", "test_suite_1"))
@@ -147,9 +115,7 @@ func TestHasValidComplexPathCTLAndMod(tt *testing.T) {
 
 	// Directories et all should be prepared.
 	for _, m := range scenario.models {
-		tt.Run(fmt.Sprintf("validComplexPathFor_%s", m.filename), func(tt *testing.T) {
-			t := wrapt.WrapT(tt)
-
+		t.Run(fmt.Sprintf("validComplexPathFor_%s", m.filename), func(t *wrapt.T) {
 			args := []string{
 				"nonmem",
 				"run",

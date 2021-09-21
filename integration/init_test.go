@@ -15,44 +15,41 @@ import (
 )
 
 func TestInitialization(tt *testing.T) {
-	t := wrapt.WrapT(tt)
+	tests := []struct {
+		name string
+	}{
+		{name: "240"},
+		{name: "acop"},
+		{name: "ctl_test"},
+		{name: "metrum_std"},
+	}
 
-	scenarios, err := InitializeScenarios([]string{
-		"240",
-		"acop",
-		"ctl_test",
-		"metrum_std",
-	})
-	t.R.NoError(err)
-	t.R.Len(scenarios, 4)
-
-	for _, s := range scenarios {
-		tt.Run(s.identifier, func(tt *testing.T) {
+	for _, test := range tests {
+		tt.Run(test.name, func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
-			err = s.Prepare(context.Background())
-			t.R.NoError(err)
+			scenario := InitializeScenario(t, test.name)
+			scenario.Prepare(t, context.Background())
 
-			tt.Run(fmt.Sprintf("init_%s", s.identifier), func(tt *testing.T) {
-				t := wrapt.WrapT(tt)
+			t.Run(fmt.Sprintf("init_%s", scenario.identifier), func(t *wrapt.T) {
+				_, err := executeCommand(context.Background(), "bbi", "init", "--dir", os.Getenv("NONMEMROOT"))
+				t.R.NoError(err)
 
-				_, err = executeCommand(context.Background(), "bbi", "init", "--dir", os.Getenv("NONMEMROOT"))
-
-				t.A.Nil(err)
-
-				t.A.FileExists(filepath.Join(s.Workpath, "bbi.yaml"))
+				t.A.FileExists(filepath.Join(scenario.Workpath, "bbi.yaml"))
 
 				// Verify that we have nonmem contents!
 				c := configlib.Config{}
 
-				configHandle, _ := os.Open(filepath.Join(s.Workpath, "bbi.yaml"))
-				bytes, _ := ioutil.ReadAll(configHandle)
-				err = yaml.Unmarshal(bytes, &c)
+				configHandle, err := os.Open(filepath.Join(scenario.Workpath, "bbi.yaml"))
+				t.R.NoError(err)
+				defer func() { t.R.NoError(configHandle.Close()) }()
+
+				bytes, err := ioutil.ReadAll(configHandle)
 				t.R.NoError(err)
 
+				t.R.NoError(yaml.Unmarshal(bytes, &c))
+
 				t.A.Greater(len(c.Nonmem), 0)
-				err = configHandle.Close()
-				t.R.NoError(err)
 			})
 		})
 	}

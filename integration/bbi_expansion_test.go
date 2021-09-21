@@ -17,14 +17,8 @@ func TestBBIExpandsWithoutPrefix(tt *testing.T) {
 	// INFO[0000] A total of 9 models have completed the initial preparation phase`
 	t := wrapt.WrapT(tt)
 
-	scenarios, err := InitializeScenarios([]string{
-		"bbi_expansion",
-	})
-	t.R.NoError(err)
-	t.R.Len(scenarios, 1)
-
-	scenario := scenarios[0]
-	t.R.NoError(scenario.Prepare(context.Background()))
+	scenario := InitializeScenario(t, "bbi_expansion")
+	scenario.Prepare(t, context.Background())
 
 	targets := `10[1:5].ctl`
 
@@ -88,15 +82,8 @@ func TestBBIExpandsWithPrefix(tt *testing.T) {
 	// INFO[0000] A total of 9 models have completed the initial preparation phase`
 	t := wrapt.WrapT(tt)
 
-	scenarios, err := InitializeScenarios([]string{
-		"bbi_expansion",
-	})
-
-	t.R.NoError(err)
-	t.R.Len(scenarios, 1)
-
-	scenario := scenarios[0]
-	t.R.NoError(scenario.Prepare(context.Background()))
+	scenario := InitializeScenario(t, "bbi_expansion")
+	scenario.Prepare(t, context.Background())
 
 	targets := `bbi_mainrun_10[1:3].ctl`
 
@@ -155,70 +142,71 @@ func TestBBIExpandsWithPrefix(tt *testing.T) {
 
 // Test that expansion works with 001-005 etc.
 func TestBBIExpandsWithPrefixToPartialMatch(tt *testing.T) {
-	//	lines :=`DEBU[0000] expanded models: [240/001.mod 240/002.mod 240/003.mod 240/004.mod 240/005.mod 240/006.mod 240/007.mod 240/008.mod 240/009.mod]
-	// INFO[0000] A total of 9 models have completed the initial preparation phase`
-	t := wrapt.WrapT(tt)
-
-	scenarios, err := InitializeScenarios([]string{
-		"bbi_expansion",
-	})
-	t.R.NoError(err)
-	t.R.Len(scenarios, 1)
-
-	scenario := scenarios[0]
-	t.R.NoError(scenario.Prepare(context.Background()))
-
-	targets := `bbi_mainrun_10[2:3].ctl`
-
-	commandAndArgs := []string{
-		"-d", // Needs to be in debug mode to generate the expected output
-		"--threads",
-		"2",
-		"nonmem",
-		"run",
-		"local",
-		"--nm_version",
-		os.Getenv("NMVERSION"),
-		filepath.Join(scenario.Workpath, "model", targets),
+	tests := []struct {
+		name string
+	}{
+		{name: "bbi_expansion"},
 	}
-
-	output, err := executeCommand(context.Background(), "bbi", commandAndArgs...)
-
-	t.R.NoError(err)
-	t.R.NotEmpty(output)
-
-	modelsLine, _ := findOutputLine(strings.Split(output, "\n"))
-	modelsLine = strings.TrimSuffix(modelsLine, "\n")
-	expandedModels := outputLineToModels(modelsLine)
-
-	// Verify that we expanded to three models
-	t.R.Len(expandedModels, 2)
-
-	// Verify nonmem completed for all five
-	for _, m := range expandedModels {
-		tt.Run(m, func(tt *testing.T) {
+	for _, test := range tests {
+		tt.Run(test.name, func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
-			file := filepath.Base(m)
-			extension := filepath.Ext(file)
-			identifier := strings.Replace(file, extension, "", 1)
-			outputDir := filepath.Join(scenario.Workpath, "model", identifier)
+			scenario := InitializeScenario(t, test.name)
+			scenario.Prepare(t, context.Background())
 
-			internalModel := Model{
-				identifier: identifier,
-				filename:   file,
-				extension:  extension,
-				path:       outputDir,
+			targets := `bbi_mainrun_10[2:3].ctl`
+
+			commandAndArgs := []string{
+				"-d", // Needs to be in debug mode to generate the expected output
+				"--threads",
+				"2",
+				"nonmem",
+				"run",
+				"local",
+				"--nm_version",
+				os.Getenv("NMVERSION"),
+				filepath.Join(scenario.Workpath, "model", targets),
 			}
 
-			nmd := NonMemTestingDetails{
-				OutputDir: internalModel.path,
-				Model:     internalModel,
-				Output:    output,
-			}
+			output, err := executeCommand(context.Background(), "bbi", commandAndArgs...)
 
-			AssertNonMemCompleted(t, nmd)
-			AssertNonMemCreatedOutputFiles(t, nmd)
+			t.R.NoError(err)
+			t.R.NotEmpty(output)
+
+			modelsLine, _ := findOutputLine(strings.Split(output, "\n"))
+			modelsLine = strings.TrimSuffix(modelsLine, "\n")
+			expandedModels := outputLineToModels(modelsLine)
+
+			// Verify that we expanded to three models
+			t.R.Len(expandedModels, 2)
+
+			// Verify nonmem completed for all five
+			for _, m := range expandedModels {
+				tt.Run(m, func(tt *testing.T) {
+					t := wrapt.WrapT(tt)
+
+					file := filepath.Base(m)
+					extension := filepath.Ext(file)
+					identifier := strings.Replace(file, extension, "", 1)
+					outputDir := filepath.Join(scenario.Workpath, "model", identifier)
+
+					internalModel := Model{
+						identifier: identifier,
+						filename:   file,
+						extension:  extension,
+						path:       outputDir,
+					}
+
+					nmd := NonMemTestingDetails{
+						OutputDir: internalModel.path,
+						Model:     internalModel,
+						Output:    output,
+					}
+
+					AssertNonMemCompleted(t, nmd)
+					AssertNonMemCreatedOutputFiles(t, nmd)
+				})
+			}
 		})
 	}
 }
