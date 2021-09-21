@@ -11,23 +11,23 @@ import (
 func TestParseOBJV(tt *testing.T) {
 	t := wrapt.WrapT(tt)
 
-	var ofvDetails []OfvDetails
-	var expected OfvDetails
+	var ofvDetails = []OfvDetails{NewOfvDetails("dummy")}
+	var expected = []OfvDetails{NewOfvDetails("dummy")}
 
-	expected.OFVNoConstant = 821.705
 	ofvDetails = parseOFV("OBJECTIVE FUNCTION VALUE WITHOUT CONSTANT: 821.705", ofvDetails)
+	expected[0].OFVNoConstant = 821.705
 	t.A.Equal(expected, ofvDetails)
 
-	expected.OFVWithConstant = 1639.561
 	ofvDetails = parseOFV("OBJECTIVE FUNCTION VALUE WITH CONSTANT:       1639.561", ofvDetails)
+	expected[0].OFVWithConstant = 1639.561
 	t.A.Equal(expected, ofvDetails)
 
-	expected.ConstantToOFV = 817.855
 	ofvDetails = parseOFV("N*LOG(2PI) CONSTANT TO OBJECTIVE FUNCTION:    817.855", ofvDetails)
+	expected[0].ConstantToOFV = 817.855
 	t.A.Equal(expected, ofvDetails)
 
-	expected.OFVNoConstant = -7913.528
 	ofvDetails = parseOFV("#OBJV:********************************************    -7913.528       **************************************************", ofvDetails)
+	expected[0].OFVNoConstant = -7913.528
 	t.A.Equal(expected, ofvDetails)
 }
 
@@ -35,16 +35,21 @@ func TestParTestParseOBJV2(tt *testing.T) {
 	t := wrapt.WrapT(tt)
 
 	var lines = []string{
+		"#METH: dummy",
 		"OBJECTIVE FUNCTION VALUE WITHOUT CONSTANT: 821.705",
 		"OBJECTIVE FUNCTION VALUE WITH CONSTANT:       1639.561",
 		"N*LOG(2PI) CONSTANT TO OBJECTIVE FUNCTION:    817.855",
 		"#OBJV:********************************************    -7913.528       **************************************************",
 	}
-	expected := OfvDetails{
-		ConstantToOFV:   817.855,
-		OFVWithConstant: 1639.561,
-		OFVNoConstant:   -7913.528,
+	expected := []OfvDetails{
+		{
+			EstMethod:       "dummy",
+			ConstantToOFV:   817.855,
+			OFVWithConstant: 1639.561,
+			OFVNoConstant:   -7913.528,
+		},
 	}
+
 	lstData := ParseLstEstimationFile(lines)
 	t.A.Equal(lstData.OFV, expected)
 }
@@ -53,15 +58,19 @@ func TestParTestParseOBJV3(tt *testing.T) {
 	t := wrapt.WrapT(tt)
 
 	var lines = []string{
+		"#METH: dummy",
 		"#OBJV:********************************************    -7913.528       **************************************************",
 		"OBJECTIVE FUNCTION VALUE WITHOUT CONSTANT: 821.705",
 		"OBJECTIVE FUNCTION VALUE WITH CONSTANT:       1639.561",
 		"N*LOG(2PI) CONSTANT TO OBJECTIVE FUNCTION:    817.855",
 	}
-	expected := OfvDetails{
-		ConstantToOFV:   817.855,
-		OFVWithConstant: 1639.561,
-		OFVNoConstant:   821.705,
+	expected := []OfvDetails{
+		{
+			EstMethod:       "dummy",
+			ConstantToOFV:   817.855,
+			OFVWithConstant: 1639.561,
+			OFVNoConstant:   821.705,
+		},
 	}
 	lstData := ParseLstEstimationFile(lines)
 	t.A.Equal(expected, lstData.OFV)
@@ -98,6 +107,7 @@ func TestParTestParseShrinkage(tt *testing.T) {
 	t.A.Equal(expected, shrinkageDetails)
 }
 
+// TODO: test represents something that the parser skips processing.
 func TestParTestParseShrinkage2(tt *testing.T) {
 	t := wrapt.WrapT(tt)
 
