@@ -78,30 +78,34 @@ func TestHashingForNMQualWorksWithOriginalModFile(tt *testing.T) {
 	t.R.NoError(err)
 
 	for _, m := range scenario.models {
-		args := []string{
-			"nonmem",
-			"run",
-			"--nm_version",
-			os.Getenv("NMVERSION"),
-			"--nmqual=true",
-			"local",
-		}
+		tt.Run(m.identifier, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-		output, err := m.Execute(scenario, args...)
+			args := []string{
+				"nonmem",
+				"run",
+				"--nm_version",
+				os.Getenv("NMVERSION"),
+				"--nmqual=true",
+				"local",
+			}
 
-		nmd := NonMemTestingDetails{
-			OutputDir: filepath.Join(scenario.Workpath, m.identifier),
-			Model:     m,
-			Output:    output,
-			Scenario:  scenario,
-		}
+			output, err := m.Execute(scenario, args...)
 
-		t.R.NoError(err)
-		AssertNonMemCompleted(t, nmd)
-		AssertNonMemCreatedOutputFiles(t, nmd)
-		AssertScriptContainsAutologReference(t, nmd)
-		AssertDataSourceIsHashedAndCorrect(t, nmd)
-		AssertModelIsHashedAndCorrect(t, nmd)
+			nmd := NonMemTestingDetails{
+				OutputDir: filepath.Join(scenario.Workpath, m.identifier),
+				Model:     m,
+				Output:    output,
+				Scenario:  scenario,
+			}
+
+			t.R.NoError(err)
+			AssertNonMemCompleted(t, nmd)
+			AssertNonMemCreatedOutputFiles(t, nmd)
+			AssertScriptContainsAutologReference(t, nmd)
+			AssertDataSourceIsHashedAndCorrect(t, nmd)
+			AssertModelIsHashedAndCorrect(t, nmd)
+		})
 	}
 }
 

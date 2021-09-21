@@ -54,27 +54,31 @@ func TestBBIExpandsWithoutPrefix(tt *testing.T) {
 
 	// Verify nonmem completed for all five
 	for _, m := range expandedModels {
-		file := filepath.Base(m)
-		extension := filepath.Ext(file)
-		identifier := strings.Replace(file, extension, "", 1)
-		outputDir := filepath.Join(scenario.Workpath, "model", identifier)
+		tt.Run(m, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-		internalModel := Model{
-			identifier: identifier,
-			filename:   file,
-			extension:  extension,
-			path:       outputDir,
-		}
+			file := filepath.Base(m)
+			extension := filepath.Ext(file)
+			identifier := strings.Replace(file, extension, "", 1)
+			outputDir := filepath.Join(scenario.Workpath, "model", identifier)
 
-		nmd := NonMemTestingDetails{
-			OutputDir: internalModel.path,
-			Model:     internalModel,
-			Output:    output,
-			Scenario:  scenario,
-		}
+			internalModel := Model{
+				identifier: identifier,
+				filename:   file,
+				extension:  extension,
+				path:       outputDir,
+			}
 
-		AssertNonMemCompleted(t, nmd)
-		AssertNonMemCreatedOutputFiles(t, nmd)
+			nmd := NonMemTestingDetails{
+				OutputDir: internalModel.path,
+				Model:     internalModel,
+				Output:    output,
+				Scenario:  scenario,
+			}
+
+			AssertNonMemCompleted(t, nmd)
+			AssertNonMemCreatedOutputFiles(t, nmd)
+		})
 	}
 }
 
@@ -87,6 +91,7 @@ func TestBBIExpandsWithPrefix(tt *testing.T) {
 	scenarios, err := InitializeScenarios([]string{
 		"bbi_expansion",
 	})
+
 	t.R.NoError(err)
 	t.R.Len(scenarios, 1)
 
@@ -121,26 +126,30 @@ func TestBBIExpandsWithPrefix(tt *testing.T) {
 
 	// Verify nonmem completed for all five
 	for _, m := range expandedModels {
-		file := filepath.Base(m)
-		extension := filepath.Ext(file)
-		identifier := strings.Replace(file, extension, "", 1)
-		outputDir := filepath.Join(scenario.Workpath, "model", identifier)
+		tt.Run(m, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-		internalModel := Model{
-			identifier: identifier,
-			filename:   file,
-			extension:  extension,
-			path:       outputDir,
-		}
+			file := filepath.Base(m)
+			extension := filepath.Ext(file)
+			identifier := strings.Replace(file, extension, "", 1)
+			outputDir := filepath.Join(scenario.Workpath, "model", identifier)
 
-		nmd := NonMemTestingDetails{
-			OutputDir: internalModel.path,
-			Model:     internalModel,
-			Output:    output,
-		}
+			internalModel := Model{
+				identifier: identifier,
+				filename:   file,
+				extension:  extension,
+				path:       outputDir,
+			}
 
-		AssertNonMemCompleted(t, nmd)
-		AssertNonMemCreatedOutputFiles(t, nmd)
+			nmd := NonMemTestingDetails{
+				OutputDir: internalModel.path,
+				Model:     internalModel,
+				Output:    output,
+			}
+
+			AssertNonMemCompleted(t, nmd)
+			AssertNonMemCreatedOutputFiles(t, nmd)
+		})
 	}
 }
 
@@ -187,26 +196,30 @@ func TestBBIExpandsWithPrefixToPartialMatch(tt *testing.T) {
 
 	// Verify nonmem completed for all five
 	for _, m := range expandedModels {
-		file := filepath.Base(m)
-		extension := filepath.Ext(file)
-		identifier := strings.Replace(file, extension, "", 1)
-		outputDir := filepath.Join(scenario.Workpath, "model", identifier)
+		tt.Run(m, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-		internalModel := Model{
-			identifier: identifier,
-			filename:   file,
-			extension:  extension,
-			path:       outputDir,
-		}
+			file := filepath.Base(m)
+			extension := filepath.Ext(file)
+			identifier := strings.Replace(file, extension, "", 1)
+			outputDir := filepath.Join(scenario.Workpath, "model", identifier)
 
-		nmd := NonMemTestingDetails{
-			OutputDir: internalModel.path,
-			Model:     internalModel,
-			Output:    output,
-		}
+			internalModel := Model{
+				identifier: identifier,
+				filename:   file,
+				extension:  extension,
+				path:       outputDir,
+			}
 
-		AssertNonMemCompleted(t, nmd)
-		AssertNonMemCreatedOutputFiles(t, nmd)
+			nmd := NonMemTestingDetails{
+				OutputDir: internalModel.path,
+				Model:     internalModel,
+				Output:    output,
+			}
+
+			AssertNonMemCompleted(t, nmd)
+			AssertNonMemCreatedOutputFiles(t, nmd)
+		})
 	}
 }
 

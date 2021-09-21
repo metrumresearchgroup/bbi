@@ -10,64 +10,67 @@ import (
 	"github.com/metrumresearchgroup/wrapt"
 )
 
-var CovCorTestMods = []string{
-	"acop",
-	"example2_itsimp",
-	"1001",
-}
-
 func TestCovCorHappyPath(tt *testing.T) {
-	t := wrapt.WrapT(tt)
+	var models = []string{
+		"acop",
+		"example2_itsimp",
+		"1001",
+	}
 
-	for _, mod := range CovCorTestMods {
-		commandAndArgs := []string{
-			"nonmem",
-			"covcor",
-			filepath.Join(SUMMARY_TEST_DIR, mod, mod),
-		}
+	for _, mod := range models {
+		tt.Run(mod, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-		output, err := executeCommand(context.Background(), "bbi", commandAndArgs...)
+			commandAndArgs := []string{
+				"nonmem",
+				"covcor",
+				filepath.Join(SUMMARY_TEST_DIR, mod, mod),
+			}
 
-		t.R.NoError(err)
-		t.R.NotEmpty(output)
+			output, err := executeCommand(context.Background(), "bbi", commandAndArgs...)
 
-		gtd := GoldenFileTestingDetails{
-			outputString:   output,
-			goldenFilePath: filepath.Join(SUMMARY_TEST_DIR, SUMMARY_GOLD_DIR, mod+".golden.covcor.json"),
-		}
+			t.R.NoError(err)
+			t.R.NotEmpty(output)
 
-		if os.Getenv(":q") == "true" {
-			UpdateGoldenFile(t, gtd)
-		}
+			gtd := GoldenFileTestingDetails{
+				outputString:   output,
+				goldenFilePath: filepath.Join(SUMMARY_TEST_DIR, SUMMARY_GOLD_DIR, mod+".golden.covcor.json"),
+			}
 
-		RequireOutputMatchesGoldenFile(t, gtd)
+			if os.Getenv(":q") == "true" {
+				UpdateGoldenFile(t, gtd)
+			}
+
+			RequireOutputMatchesGoldenFile(t, gtd)
+		})
 	}
 }
 
-var CovCorErrorMods = []string{
-	"12",
-	"iovmm",
-}
-
 func TestCovCorErrors(tt *testing.T) {
-	t := wrapt.WrapT(tt)
+	var models = []string{
+		"12",
+		"iovmm",
+	}
 
-	rgx, err := regexp.Compile(noFilePresentError)
-	t.R.NoError(err)
+	rgx := regexp.MustCompile(noFilePresentError)
 
-	for _, tm := range CovCorErrorMods {
-		commandAndArgs := []string{
-			"nonmem",
-			"covcor",
-			filepath.Join(SUMMARY_TEST_DIR, tm, tm),
-		}
+	for _, mod := range models {
+		tt.Run(mod, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-		// try without flag and get error
-		var output string
-		output, err = executeCommandNoErrorCheck(context.Background(), "bbi", commandAndArgs...)
-		t.R.Error(err)
+			commandAndArgs := []string{
+				"nonmem",
+				"covcor",
+				filepath.Join(SUMMARY_TEST_DIR, mod, mod),
+			}
 
-		errorMatch := rgx.MatchString(output)
-		t.R.True(errorMatch)
+			// try without flag and get error
+			var output string
+			output, err := executeCommandNoErrorCheck(context.Background(), "bbi", commandAndArgs...)
+			t.R.Error(err)
+
+			errorMatch := rgx.MatchString(output)
+			t.R.True(errorMatch)
+		})
 	}
 }

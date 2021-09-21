@@ -38,32 +38,40 @@ func TestBbiCompletesSGEExecution(tt *testing.T) {
 
 	// TODO Break this into a method that takes a function for execution
 	for _, v := range scenarios {
-		t.R.NoError(v.Prepare(ctx))
+		tt.Run(v.identifier, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-		for _, m := range v.models {
-			nonMemArguments := []string{
-				"-d",
-				"nonmem",
-				"run",
-				"sge",
-				"--nm_version",
-				os.Getenv("NMVERSION"),
+			t.R.NoError(v.Prepare(ctx))
+
+			for _, m := range v.models {
+				tt.Run(m.identifier, func(tt *testing.T) {
+					t := wrapt.WrapT(tt)
+
+					nonMemArguments := []string{
+						"-d",
+						"nonmem",
+						"run",
+						"sge",
+						"--nm_version",
+						os.Getenv("NMVERSION"),
+					}
+
+					_, err := m.Execute(v, nonMemArguments...)
+					t.R.NoError(err)
+
+					WaitForSGEToTerminate(getGridNameIdentifier(m))
+
+					testingDetails := NonMemTestingDetails{
+						OutputDir: filepath.Join(v.Workpath, m.identifier),
+						Model:     m,
+					}
+
+					AssertNonMemCompleted(t, testingDetails)
+					AssertNonMemCreatedOutputFiles(t, testingDetails)
+					AssertContainsBBIScript(t, testingDetails)
+				})
 			}
-
-			_, err := m.Execute(v, nonMemArguments...)
-			t.R.NoError(err)
-
-			WaitForSGEToTerminate(getGridNameIdentifier(m))
-
-			testingDetails := NonMemTestingDetails{
-				OutputDir: filepath.Join(v.Workpath, m.identifier),
-				Model:     m,
-			}
-
-			AssertNonMemCompleted(t, testingDetails)
-			AssertNonMemCreatedOutputFiles(t, testingDetails)
-			AssertContainsBBIScript(t, testingDetails)
-		}
+		})
 	}
 }
 
@@ -92,39 +100,47 @@ func TestBbiCompletesParallelSGEExecution(tt *testing.T) {
 
 	// TODO Break this into a method that takes a function for execution
 	for _, v := range scenarios[0:3] {
-		// log.Infof("Beginning SGE parallel execution test for model set %s",v.identifier)
-		t.R.NoError(v.Prepare(ctx))
+		tt.Run(v.identifier, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-		for _, m := range v.models {
-			nonMemArguments := []string{
-				"-d",
-				"nonmem",
-				"run",
-				"sge",
-				"--nm_version",
-				os.Getenv("NMVERSION"),
-				"--parallel=true",
-				"--mpi_exec_path",
-				os.Getenv("MPIEXEC_PATH"),
-				"--threads",
-				"2",
+			// log.Infof("Beginning SGE parallel execution test for model set %s",v.identifier)
+			t.R.NoError(v.Prepare(ctx))
+
+			for _, m := range v.models {
+				tt.Run(m.identifier, func(tt *testing.T) {
+					t := wrapt.WrapT(tt)
+
+					nonMemArguments := []string{
+						"-d",
+						"nonmem",
+						"run",
+						"sge",
+						"--nm_version",
+						os.Getenv("NMVERSION"),
+						"--parallel=true",
+						"--mpi_exec_path",
+						os.Getenv("MPIEXEC_PATH"),
+						"--threads",
+						"2",
+					}
+
+					_, err := m.Execute(v, nonMemArguments...)
+					t.R.NoError(err)
+
+					WaitForSGEToTerminate(getGridNameIdentifier(m))
+
+					testingDetails := NonMemTestingDetails{
+						OutputDir: filepath.Join(v.Workpath, m.identifier),
+						Model:     m,
+					}
+
+					AssertNonMemCompleted(t, testingDetails)
+					AssertNonMemCreatedOutputFiles(t, testingDetails)
+					AssertContainsBBIScript(t, testingDetails)
+					AssertNonMemOutputContainsParafile(t, testingDetails)
+				})
 			}
-
-			_, err := m.Execute(v, nonMemArguments...)
-			t.R.NoError(err)
-
-			WaitForSGEToTerminate(getGridNameIdentifier(m))
-
-			testingDetails := NonMemTestingDetails{
-				OutputDir: filepath.Join(v.Workpath, m.identifier),
-				Model:     m,
-			}
-
-			AssertNonMemCompleted(t, testingDetails)
-			AssertNonMemCreatedOutputFiles(t, testingDetails)
-			AssertContainsBBIScript(t, testingDetails)
-			AssertNonMemOutputContainsParafile(t, testingDetails)
-		}
+		})
 	}
 }
 

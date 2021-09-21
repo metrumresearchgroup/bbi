@@ -36,35 +36,43 @@ func TestBbiCompletesLocalExecution(tt *testing.T) {
 
 	// TODO Break this into a method that takes a function for execution
 	for _, v := range scenarios {
-		err = v.Prepare(ctx)
-		t.R.NoError(err)
+		tt.Run(v.identifier, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-		for _, m := range v.models {
-			nonMemArguments := []string{
-				"-d",
-				"nonmem",
-				"run",
-				"local",
-				"--nm_version",
-				os.Getenv("NMVERSION"),
-			}
-
-			_, err := m.Execute(v, nonMemArguments...)
-
+			err = v.Prepare(ctx)
 			t.R.NoError(err)
 
-			testingDetails := NonMemTestingDetails{
-				OutputDir: filepath.Join(v.Workpath, m.identifier),
-				Model:     m,
-				Scenario:  v,
-			}
+			for _, m := range v.models {
+				tt.Run(m.identifier, func(tt *testing.T) {
+					t := wrapt.WrapT(tt)
 
-			AssertNonMemCompleted(t, testingDetails)
-			AssertNonMemCreatedOutputFiles(t, testingDetails)
-			AssertContainsBBIScript(t, testingDetails)
-			AssertDataSourceIsHashedAndCorrect(t, testingDetails)
-			AssertModelIsHashedAndCorrect(t, testingDetails)
-		}
+					nonMemArguments := []string{
+						"-d",
+						"nonmem",
+						"run",
+						"local",
+						"--nm_version",
+						os.Getenv("NMVERSION"),
+					}
+
+					_, err := m.Execute(v, nonMemArguments...)
+
+					t.R.NoError(err)
+
+					testingDetails := NonMemTestingDetails{
+						OutputDir: filepath.Join(v.Workpath, m.identifier),
+						Model:     m,
+						Scenario:  v,
+					}
+
+					AssertNonMemCompleted(t, testingDetails)
+					AssertNonMemCreatedOutputFiles(t, testingDetails)
+					AssertContainsBBIScript(t, testingDetails)
+					AssertDataSourceIsHashedAndCorrect(t, testingDetails)
+					AssertModelIsHashedAndCorrect(t, testingDetails)
+				})
+			}
+		})
 	}
 }
 
@@ -90,40 +98,48 @@ func TestNMFEOptionsEndInScript(tt *testing.T) {
 
 	// TODO Break this into a method that takes a function for execution
 	for _, v := range scenarios {
-		t.R.NoError(v.Prepare(ctx))
+		tt.Run(v.identifier, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-		for _, m := range v.models {
-			nonMemArguments := []string{
-				"-d",
-				"nonmem",
-				"run",
-				"local",
-				"--nm_version",
-				os.Getenv("NMVERSION"),
-				"--background=true",
-				"--prcompile=true",
+			t.R.NoError(v.Prepare(ctx))
+
+			for _, m := range v.models {
+				tt.Run(m.identifier, func(tt *testing.T) {
+					t := wrapt.WrapT(tt)
+
+					nonMemArguments := []string{
+						"-d",
+						"nonmem",
+						"run",
+						"local",
+						"--nm_version",
+						os.Getenv("NMVERSION"),
+						"--background=true",
+						"--prcompile=true",
+					}
+
+					_, err := m.Execute(v, nonMemArguments...)
+					t.R.NoError(err)
+
+					// Now let's run the script that was generated
+					t.R.NoError(os.Chdir(filepath.Join(v.Workpath, m.identifier)))
+					_, err = executeCommand(ctx, filepath.Join(v.Workpath, m.identifier, m.identifier+".sh"))
+					t.R.NoError(os.Chdir(whereami))
+					t.R.NoError(err)
+
+					testingDetails := NonMemTestingDetails{
+						OutputDir: filepath.Join(v.Workpath, m.identifier),
+						Model:     m,
+					}
+
+					AssertNonMemCompleted(t, testingDetails)
+					AssertNonMemCreatedOutputFiles(t, testingDetails)
+					AssertContainsBBIScript(t, testingDetails)
+					AssertContainsNMFEOptions(t, filepath.Join(testingDetails.OutputDir, m.identifier+".sh"), "-background")
+					AssertContainsNMFEOptions(t, filepath.Join(testingDetails.OutputDir, m.identifier+".sh"), "-prcompile")
+				})
 			}
-
-			_, err := m.Execute(v, nonMemArguments...)
-			t.R.NoError(err)
-
-			// Now let's run the script that was generated
-			t.R.NoError(os.Chdir(filepath.Join(v.Workpath, m.identifier)))
-			_, err = executeCommand(ctx, filepath.Join(v.Workpath, m.identifier, m.identifier+".sh"))
-			t.R.NoError(os.Chdir(whereami))
-			t.R.NoError(err)
-
-			testingDetails := NonMemTestingDetails{
-				OutputDir: filepath.Join(v.Workpath, m.identifier),
-				Model:     m,
-			}
-
-			AssertNonMemCompleted(t, testingDetails)
-			AssertNonMemCreatedOutputFiles(t, testingDetails)
-			AssertContainsBBIScript(t, testingDetails)
-			AssertContainsNMFEOptions(t, filepath.Join(testingDetails.OutputDir, m.identifier+".sh"), "-background")
-			AssertContainsNMFEOptions(t, filepath.Join(testingDetails.OutputDir, m.identifier+".sh"), "-prcompile")
-		}
+		})
 	}
 }
 
@@ -149,38 +165,46 @@ func TestBbiParallelExecution(tt *testing.T) {
 
 	// TODO Break this into a method that takes a function for execution
 	for _, v := range scenarios {
-		// log.Infof("Beginning localized parallel execution test for model set %s",v.identifier)
-		t.R.NoError(v.Prepare(ctx))
+		tt.Run(v.identifier, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-		for _, m := range v.models {
-			nonMemArguments := []string{
-				"-d",
-				"nonmem",
-				"run",
-				"local",
-				"--nm_version",
-				os.Getenv("NMVERSION"),
-				"--parallel=true",
-				"--mpi_exec_path",
-				os.Getenv("MPIEXEC_PATH"),
+			// log.Infof("Beginning localized parallel execution test for model set %s",v.identifier)
+			t.R.NoError(v.Prepare(ctx))
+
+			for _, m := range v.models {
+				tt.Run(m.identifier, func(tt *testing.T) {
+					t := wrapt.WrapT(tt)
+
+					nonMemArguments := []string{
+						"-d",
+						"nonmem",
+						"run",
+						"local",
+						"--nm_version",
+						os.Getenv("NMVERSION"),
+						"--parallel=true",
+						"--mpi_exec_path",
+						os.Getenv("MPIEXEC_PATH"),
+					}
+
+					_, err := m.Execute(v, nonMemArguments...)
+					t.R.NoError(err)
+
+					testingDetails := NonMemTestingDetails{
+						OutputDir: filepath.Join(v.Workpath, m.identifier),
+						Model:     m,
+						Scenario:  v,
+					}
+
+					AssertNonMemCompleted(t, testingDetails)
+					AssertNonMemCreatedOutputFiles(t, testingDetails)
+					AssertContainsBBIScript(t, testingDetails)
+					AssertNonMemOutputContainsParafile(t, testingDetails)
+					AssertDataSourceIsHashedAndCorrect(t, testingDetails)
+					AssertModelIsHashedAndCorrect(t, testingDetails)
+				})
 			}
-
-			_, err := m.Execute(v, nonMemArguments...)
-			t.R.NoError(err)
-
-			testingDetails := NonMemTestingDetails{
-				OutputDir: filepath.Join(v.Workpath, m.identifier),
-				Model:     m,
-				Scenario:  v,
-			}
-
-			AssertNonMemCompleted(t, testingDetails)
-			AssertNonMemCreatedOutputFiles(t, testingDetails)
-			AssertContainsBBIScript(t, testingDetails)
-			AssertNonMemOutputContainsParafile(t, testingDetails)
-			AssertDataSourceIsHashedAndCorrect(t, testingDetails)
-			AssertModelIsHashedAndCorrect(t, testingDetails)
-		}
+		})
 	}
 }
 
@@ -211,14 +235,18 @@ func TestDefaultConfigLoaded(tt *testing.T) {
 	t.R.NoError(scenario.Prepare(ctx))
 
 	for _, v := range scenario.models {
-		out, _ := v.Execute(scenario, nonMemArguments...)
-		nmd := NonMemTestingDetails{
-			OutputDir: "",
-			Model:     v,
-			Output:    out,
-		}
+		tt.Run(v.identifier, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-		AssertDefaultConfigLoaded(t, nmd)
+			out, _ := v.Execute(scenario, nonMemArguments...)
+			nmd := NonMemTestingDetails{
+				OutputDir: "",
+				Model:     v,
+				Output:    out,
+			}
+
+			AssertDefaultConfigLoaded(t, nmd)
+		})
 	}
 }
 
@@ -269,14 +297,18 @@ func TestSpecifiedConfigByAbsPathLoaded(tt *testing.T) {
 	t.R.NoError(scenario.Prepare(ctx))
 
 	for _, v := range scenario.models {
-		out, _ := v.Execute(scenario, nonMemArguments...)
-		nmd := NonMemTestingDetails{
-			OutputDir: "",
-			Model:     v,
-			Output:    out,
-		}
+		tt.Run(v.identifier, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-		AssertSpecifiedConfigLoaded(t, nmd, filepath.Join(ROOT_EXECUTION_DIR, "meow", "bbi.yaml"))
+			out, _ := v.Execute(scenario, nonMemArguments...)
+			nmd := NonMemTestingDetails{
+				OutputDir: "",
+				Model:     v,
+				Output:    out,
+			}
+
+			AssertSpecifiedConfigLoaded(t, nmd, filepath.Join(ROOT_EXECUTION_DIR, "meow", "bbi.yaml"))
+		})
 	}
 }
 
@@ -326,14 +358,18 @@ func TestSpecifiedConfigByRelativePathLoaded(tt *testing.T) {
 	t.R.NoError(scenario.Prepare(ctx))
 
 	for _, v := range scenario.models {
-		out, _ := v.Execute(scenario, nonMemArguments...)
-		nmd := NonMemTestingDetails{
-			OutputDir: "",
-			Model:     v,
-			Output:    out,
-		}
+		tt.Run(v.identifier, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-		AssertSpecifiedConfigLoaded(t, nmd, filepath.Join(ROOT_EXECUTION_DIR, "meow", "bbi.yaml"))
+			out, _ := v.Execute(scenario, nonMemArguments...)
+			nmd := NonMemTestingDetails{
+				OutputDir: "",
+				Model:     v,
+				Output:    out,
+			}
+
+			AssertSpecifiedConfigLoaded(t, nmd, filepath.Join(ROOT_EXECUTION_DIR, "meow", "bbi.yaml"))
+		})
 	}
 }
 

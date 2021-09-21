@@ -28,33 +28,41 @@ func TestBBIConfigJSONCreated(tt *testing.T) {
 	t.R.Len(scenarios, 4)
 
 	for _, v := range scenarios {
-		t.R.NoError(v.Prepare(context.Background()))
+		tt.Run(v.identifier, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-		for _, m := range v.models {
-			args := []string{
-				"nonmem",
-				"run",
-				"local",
-				"--nm_version",
-				os.Getenv("NMVERSION"),
+			t.R.NoError(v.Prepare(context.Background()))
+
+			for _, m := range v.models {
+				tt.Run(m.identifier, func(tt *testing.T) {
+					t := wrapt.WrapT(tt)
+
+					args := []string{
+						"nonmem",
+						"run",
+						"local",
+						"--nm_version",
+						os.Getenv("NMVERSION"),
+					}
+
+					output, err := m.Execute(v, args...)
+
+					t.A.Nil(err)
+					t.A.NotNil(output)
+
+					nmd := NonMemTestingDetails{
+						OutputDir: filepath.Join(v.Workpath, m.identifier),
+						Model:     m,
+						Output:    output,
+					}
+
+					AssertNonMemCompleted(t, nmd)
+					AssertNonMemCreatedOutputFiles(t, nmd)
+					AssertBBIConfigJSONCreated(t, nmd)
+					AssertBBIConfigContainsSpecifiedNMVersion(t, nmd, os.Getenv("NMVERSION"))
+				})
 			}
-
-			output, err := m.Execute(v, args...)
-
-			t.A.Nil(err)
-			t.A.NotNil(output)
-
-			nmd := NonMemTestingDetails{
-				OutputDir: filepath.Join(v.Workpath, m.identifier),
-				Model:     m,
-				Output:    output,
-			}
-
-			AssertNonMemCompleted(t, nmd)
-			AssertNonMemCreatedOutputFiles(t, nmd)
-			AssertBBIConfigJSONCreated(t, nmd)
-			AssertBBIConfigContainsSpecifiedNMVersion(t, nmd, os.Getenv("NMVERSION"))
-		}
+		})
 	}
 }
 
@@ -115,36 +123,40 @@ func TestConfigValuesAreCorrectInWrittenFile(tt *testing.T) {
 	}
 
 	for _, m := range scenario.models {
-		output, err := m.Execute(scenario, commandAndArgs...)
+		tt.Run(m.identifier, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-		t.A.Nil(err)
-		t.A.NotEmpty(output)
+			output, err := m.Execute(scenario, commandAndArgs...)
 
-		nmd := NonMemTestingDetails{
-			OutputDir: filepath.Join(scenario.Workpath, m.identifier),
-			Model:     m,
-			Output:    output,
-		}
+			t.A.Nil(err)
+			t.A.NotEmpty(output)
 
-		AssertNonMemCompleted(t, nmd)
-		AssertNonMemCreatedOutputFiles(t, nmd)
-		AssertNonMemOutputContainsParafile(t, nmd)
+			nmd := NonMemTestingDetails{
+				OutputDir: filepath.Join(scenario.Workpath, m.identifier),
+				Model:     m,
+				Output:    output,
+			}
 
-		// Now read the Config Lib
-		configFile := filepath.Join(scenario.Workpath, m.identifier, "bbi.yaml")
-		file, _ := os.Open(configFile)
-		Config := configlib.Config{}
-		bytes, _ := ioutil.ReadAll(file)
-		err = yaml.Unmarshal(bytes, &Config)
+			AssertNonMemCompleted(t, nmd)
+			AssertNonMemCreatedOutputFiles(t, nmd)
+			AssertNonMemOutputContainsParafile(t, nmd)
 
-		t.A.Nil(err)
+			// Now read the Config Lib
+			configFile := filepath.Join(scenario.Workpath, m.identifier, "bbi.yaml")
+			file, _ := os.Open(configFile)
+			Config := configlib.Config{}
+			bytes, _ := ioutil.ReadAll(file)
+			err = yaml.Unmarshal(bytes, &Config)
 
-		t.A.Equal(3, Config.CleanLvl)
-		t.A.Equal(1, Config.CopyLvl)
-		t.A.Equal(true, Config.Parallel)
-		t.A.Equal(os.Getenv("NMVERSION"), Config.NMVersion)
+			t.A.Nil(err)
 
-		t.A.Equal(os.Getenv("MPIEXEC_PATH"), Config.MPIExecPath)
-		t.A.Equal(false, Config.Overwrite)
+			t.A.Equal(3, Config.CleanLvl)
+			t.A.Equal(1, Config.CopyLvl)
+			t.A.Equal(true, Config.Parallel)
+			t.A.Equal(os.Getenv("NMVERSION"), Config.NMVersion)
+
+			t.A.Equal(os.Getenv("MPIEXEC_PATH"), Config.MPIExecPath)
+			t.A.Equal(false, Config.Overwrite)
+		})
 	}
 }
