@@ -61,30 +61,35 @@ func TestKVPExpansion(tt *testing.T) {
 }
 
 func TestPostExecutionSucceeds(tt *testing.T) {
-	t := wrapt.WrapT(tt)
+	var scenarios []*Scenario
 
-	// Skip the test if the flag isn't enabled
-	if !FeatureEnabled("POST_EXECUTION") {
-		t.Skip("Post execution not enabled as far as testing is concerned")
-	}
+	func() {
+		t := wrapt.WrapT(tt)
 
-	scenarios, err := InitializeScenarios([]string{
-		"240",
-		"acop",
-		"ctl_test",
-		"metrum_std",
-	})
-	t.R.NoError(err)
-	t.R.Len(scenarios, 4)
+		var err error
+		// Skip the test if the flag isn't enabled
+		if !FeatureEnabled("POST_EXECUTION") {
+			t.Skip("Post execution not enabled as far as testing is concerned")
+		}
 
-	err = ioutil.WriteFile(filepath.Join(ROOT_EXECUTION_DIR, "post.sh"), []byte(postExecutionScriptString), 0755)
-	t.R.NoError(err)
+		scenarios, err = InitializeScenarios([]string{
+			"240",
+			"acop",
+			"ctl_test",
+			"metrum_std",
+		})
+		t.R.NoError(err)
+		t.R.Len(scenarios, 4)
+
+		err = ioutil.WriteFile(filepath.Join(ROOT_EXECUTION_DIR, "post.sh"), []byte(postExecutionScriptString), 0755)
+		t.R.NoError(err)
+	}()
 
 	for _, v := range scenarios {
 		tt.Run(v.identifier, func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
-			err = v.Prepare(context.Background())
+			err := v.Prepare(context.Background())
 			t.R.NoError(err)
 
 			arguments := []string{
@@ -153,9 +158,11 @@ func TestPostExecutionSucceeds(tt *testing.T) {
 	}
 
 	// Test a scenario for the first scenario where we force failure. Model is deleted (not found)
-	t.Run("verify_failure_results", func(t *wrapt.T) {
+	tt.Run("verify_failure_results", func(tt *testing.T) {
+		t := wrapt.WrapT(tt)
+
 		scenario := scenarios[0]
-		err = scenario.Prepare(context.Background())
+		err := scenario.Prepare(context.Background())
 		t.R.NoError(err)
 
 		arguments := []string{
@@ -175,6 +182,8 @@ func TestPostExecutionSucceeds(tt *testing.T) {
 		for _, v := range scenario.models {
 			tt.Run(v.identifier, func(tt *testing.T) {
 				t := wrapt.WrapT(tt)
+
+				var err error
 
 				err = os.Setenv("BBI_ADDITIONAL_POST_WORK_ENVS", `BBI_SCENARIO=`+scenario.identifier+` BBI_ROOT_EXECUTION_DIR=`+ROOT_EXECUTION_DIR)
 				t.R.NoError(err)

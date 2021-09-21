@@ -100,7 +100,6 @@ func TestSummaryArgs(tt *testing.T) {
 
 	for _, tm := range SummaryArgsTestMods {
 		tt.Run(tm.mod, func(tt *testing.T) {
-
 			for _, tc := range testConfigs {
 				tt.Run(tc.goldenExt, func(tt *testing.T) {
 					t := wrapt.WrapT(tt)
