@@ -18,10 +18,7 @@ func TestInitialization(tt *testing.T) {
 	tests := []struct {
 		name string
 	}{
-		{name: "240"},
 		{name: "acop"},
-		{name: "ctl_test"},
-		{name: "metrum_std"},
 	}
 
 	for _, test := range tests {
