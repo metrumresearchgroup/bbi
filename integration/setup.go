@@ -14,6 +14,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/metrumresearchgroup/wrapt"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 	"github.com/spf13/viper"
@@ -69,6 +70,8 @@ func (m Model) Execute(scenario *Scenario, args ...string) (string, error) {
 	return executeCommand(scenario.ctx, "bbi", cmdArguments...)
 }
 
+var ErrNoModelsLocated = errors.New("no model directories were located in the provided scenario")
+
 func newScenario(path string) (Scenario, error) {
 	scenario := Scenario{
 		identifier: filepath.Base(path),
@@ -82,7 +85,7 @@ func newScenario(path string) (Scenario, error) {
 	scenario.archive = scenario.identifier + ".tar.gz"
 
 	if len(scenario.models) == 0 {
-		return scenario, errors.New("no model directories were located in the provided scenario")
+		return scenario, ErrNoModelsLocated
 	}
 
 	return scenario, nil
@@ -178,53 +181,55 @@ func Initialize() []*Scenario {
 }
 */
 
-// InitializeScenarios is used to set everything up for specific scenarios by name. These names will correlate to the directory
+// InitializeScenario is used to set everything up for specific scenario by name. The name will correlate to the directory
 // names in the TestData directory. IE 240/acop/ctl_test/metrum_std.
-func InitializeScenarios(selected []string) ([]*Scenario, error) {
-	viper.SetEnvPrefix("bbi")
+func InitializeScenario(t *wrapt.T, selected string) *Scenario {
+	t.Helper()
+
 	viper.AutomaticEnv()
+	viper.SetEnvPrefix("bbi")
 
-	if len(os.Getenv("NONMEMROOT")) == 0 {
-		log.Fatal("Please provide the NONMEMROOT environment variable so that the bbi init command knows where" +
-			"to look for Nonmem installations")
-	}
+	t.R.NotEmpty(os.Getenv("NONMEMROOT"), "NONMEMROOT environment variable missing")
 
-	log.Infof("Beginning work with %s as the root", EXECUTION_DIR)
+	t.Logf("Beginning work with %s as the root", EXECUTION_DIR)
 
 	fs := afero.NewOsFs()
-	if ok, _ := afero.DirExists(fs, EXECUTION_DIR); !ok {
-		if err := fs.MkdirAll(EXECUTION_DIR, 0755); err != nil {
-			return nil, err
-		}
+
+	ok, err := afero.DirExists(fs, EXECUTION_DIR)
+	t.R.NoError(err) // DirExists won't return an error if the file doesn't exist
+
+	if !ok {
+		t.R.NoError(fs.MkdirAll(EXECUTION_DIR, 0755))
 	} else {
-		if err := fs.RemoveAll(EXECUTION_DIR); err != nil {
-			return nil, err
-		}
-		if err := fs.MkdirAll(EXECUTION_DIR, 0755); err != nil {
-			return nil, err
-		}
+		t.R.NoError(fs.RemoveAll(EXECUTION_DIR))
+		t.R.NoError(fs.MkdirAll(EXECUTION_DIR, 0755))
 	}
 
-	var scenarios []*Scenario
+	dirs, err := getScenarioDirs()
+	t.R.NoError(err)
+	whereami, err := os.Getwd()
+	t.R.NoError(err)
 
-	dirs, _ := getScenarioDirs()
-	whereami, _ := os.Getwd()
-
+	var scenario Scenario
 	// Let's navigate to each and try to tar it up
 	// We'll use these later for execution layers by always starting with a clean slate from the tar content
-	for _, v := range dirs {
-		for _, s := range selected {
-			if strings.EqualFold(s, filepath.Base(v)) {
-				n := v
-				scenario, _ := newScenario(n)
-				scenarios = append(scenarios, &scenario)
-				f, _ := os.Create(filepath.Join(whereami, "testdata", filepath.Base(n)+".tar.gz"))
-				err := Tar(filepath.Join(n), f)
-				if err != nil {
-					log.Error(err)
-				}
-				f.Close()
+	for _, dir := range dirs {
+		if strings.EqualFold(selected, filepath.Base(dir)) {
+			scenario, err = newScenario(dir)
+
+			// skip no models located.
+			if !errors.Is(err, ErrNoModelsLocated) {
+				t.R.NoError(err)
 			}
+
+			func() {
+				var f *os.File
+				f, err = os.Create(filepath.Join(whereami, "testdata", filepath.Base(dir)+".tar.gz"))
+				t.R.NoError(err)
+				defer f.Close()
+
+				t.R.NoError(Tar(filepath.Join(dir), f))
+			}()
 		}
 	}
 
@@ -238,22 +243,22 @@ func InitializeScenarios(selected []string) ([]*Scenario, error) {
 		dest, _ := os.Create(filepath.Join(EXECUTION_DIR, filepath.Base(v)))
 		defer dest.Close()
 
-		_, err := io.Copy(dest, source)
-		if err != nil {
-			return nil, err
-		}
+		_, err = io.Copy(dest, source)
+		t.R.NoError(err)
 	}
 
-	return scenarios, nil
+	return &scenario
 }
 
 func getScenarioDirs() ([]string, error) {
-	whereami, _ := os.Getwd()
+	whereami, err := os.Getwd()
+	if err != nil {
+		return nil, err
+	}
 	fs := afero.NewOsFs()
 	directories := []string{}
 
 	contents, err := afero.ReadDir(fs, filepath.Join(whereami, "testdata"))
-
 	if err != nil {
 		log.Error("Unable to parse directory contents of 'testdata'")
 
@@ -429,50 +434,33 @@ func findModelFiles(path string) []string {
 }
 */
 
-func (scenario *Scenario) Prepare(ctx context.Context) error {
-	if _, err := executeCommand(ctx, "bbi", "init", "--dir", os.Getenv("NONMEMROOT")); err != nil {
-		return err
-	}
+func (scenario *Scenario) Prepare(t *wrapt.T, ctx context.Context) {
+	t.Helper()
+
+	_, err := executeCommand(ctx, "bbi", "init", "--dir", os.Getenv("NONMEMROOT"))
+	t.R.NoError(err)
 
 	fs := afero.NewOsFs()
 	scenario.ctx = ctx
 
 	// create Target directory as this untar operation doesn't handle it for you
-	if err := fs.MkdirAll(scenario.Workpath, 0755); err != nil {
-		return err
-	}
+	t.R.NoError(fs.MkdirAll(scenario.Workpath, 0755))
 
 	reader, err := os.Open(filepath.Join(EXECUTION_DIR, scenario.archive))
-	if err != nil {
-		return err
-	}
+	t.R.NoError(err)
 
-	if err = Untar(scenario.Workpath, reader); err != nil {
-		return err
-	}
-
-	if err = reader.Close(); err != nil {
-		return err
-	}
+	t.R.NoError(Untar(scenario.Workpath, reader))
+	defer func() { t.R.NoError(reader.Close()) }()
 
 	whereami, err := os.Getwd()
-	if err != nil {
-		return err
-	}
+	t.R.NoError(err)
 
-	if err = os.Chdir(scenario.Workpath); err != nil {
-		return err
-	}
+	t.R.NoError(os.Chdir(scenario.Workpath))
 
-	if _, err = executeCommand(ctx, "bbi", "init", "--dir", os.Getenv("NONMEMROOT")); err != nil {
-		return err
-	}
+	_, err = executeCommand(ctx, "bbi", "init", "--dir", os.Getenv("NONMEMROOT"))
+	t.R.NoError(err)
 
-	if err = os.Chdir(whereami); err != nil {
-		return err
-	}
-
-	return err
+	t.R.NoError(os.Chdir(whereami))
 }
 
 func FeatureEnabled(key string) bool {

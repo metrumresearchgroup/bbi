@@ -13,7 +13,7 @@ func AddPathLevelToData(s string) string {
 	originalPath := dataComponents[1]
 	if strings.HasPrefix(originalPath, "/") {
 		// don't change if set to absolute path already
-		return (s)
+		return s
 	}
 	newPath := filepath.Join(
 		"..",

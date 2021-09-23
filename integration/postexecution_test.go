@@ -61,96 +61,108 @@ func TestKVPExpansion(tt *testing.T) {
 }
 
 func TestPostExecutionSucceeds(tt *testing.T) {
-	t := wrapt.WrapT(tt)
+	var scenarios []*Scenario
 
-	// Skip the test if the flag isn't enabled
-	if !FeatureEnabled("POST_EXECUTION") {
-		t.Skip("Post execution not enabled as far as testing is concerned")
-	}
+	func() {
+		t := wrapt.WrapT(tt)
 
-	scenarios, err := InitializeScenarios([]string{
-		"240",
-		"acop",
-		"ctl_test",
-		"metrum_std",
-	})
-	t.R.NoError(err)
-	t.R.Len(scenarios, 4)
-
-	err = ioutil.WriteFile(filepath.Join(ROOT_EXECUTION_DIR, "post.sh"), []byte(postExecutionScriptString), 0755)
-	t.R.NoError(err)
-
-	for _, v := range scenarios {
-		err = v.Prepare(context.Background())
-		t.R.NoError(err)
-
-		arguments := []string{
-			"-d",
-			"nonmem",
-			"--nm_version",
-			os.Getenv("NMVERSION"),
-			"run",
-			"local",
-			"--overwrite=true",
-			"--post_work_executable",
-			filepath.Join(ROOT_EXECUTION_DIR, "post.sh"),
-			"--additional_post_work_envs=\"BBI_ROOT_EXECUTION_DIR=" + ROOT_EXECUTION_DIR + " BBI_SCENARIO=" + v.identifier + "\"",
+		var err error
+		// Skip the test if the flag isn't enabled
+		if !FeatureEnabled("POST_EXECUTION") {
+			t.Skip("Post execution not enabled as far as testing is concerned")
 		}
 
-		// Do the actual execution
-		for _, m := range v.models {
-			t.Run(v.identifier+"_post_execution", func(t *wrapt.T) {
-				var output string
-				output, err = m.Execute(v, arguments...)
-				t.R.NoError(err)
+		for _, name := range []string{
+			"240",
+			"acop",
+			"ctl_test",
+			"metrum_std",
+		} {
+			scenario := InitializeScenario(t, name)
+			scenarios = append(scenarios, scenario)
+		}
 
-				nmd := NonMemTestingDetails{
-					OutputDir: filepath.Join(v.Workpath, m.identifier),
-					Model:     m,
-					Output:    output,
-				}
+		err = ioutil.WriteFile(filepath.Join(ROOT_EXECUTION_DIR, "post.sh"), []byte(postExecutionScriptString), 0755)
+		t.R.NoError(err)
+	}()
 
-				AssertNonMemCompleted(t, nmd)
-				AssertNonMemCreatedOutputFiles(t, nmd)
+	for _, scenario := range scenarios {
+		tt.Run(scenario.identifier, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-				var exists bool
-				exists, err = afero.Exists(afero.NewOsFs(), filepath.Join(ROOT_EXECUTION_DIR, "working", v.identifier, m.identifier+".out"))
-				t.R.NoError(err)
-				t.R.True(exists)
+			scenario.Prepare(t, context.Background())
 
-				lines := func() []string {
-					// Does the file contain the expected Details:
-					// SCENARIO (Additional provided value)
-					var file *os.File
-					file, err = os.Open(filepath.Join(ROOT_EXECUTION_DIR, "working", v.identifier, m.identifier+".out"))
+			arguments := []string{
+				"-d",
+				"nonmem",
+				"--nm_version",
+				os.Getenv("NMVERSION"),
+				"run",
+				"local",
+				"--overwrite=true",
+				"--post_work_executable",
+				filepath.Join(ROOT_EXECUTION_DIR, "post.sh"),
+				"--additional_post_work_envs=\"BBI_ROOT_EXECUTION_DIR=" + ROOT_EXECUTION_DIR + " BBI_SCENARIO=" + scenario.identifier + "\"",
+			}
+
+			// Do the actual execution
+			for _, m := range scenario.models {
+				tt.Run(scenario.identifier+"_post_execution", func(tt *testing.T) {
+					t := wrapt.WrapT(tt)
+
+					var output string
+					output, err := m.Execute(scenario, arguments...)
 					t.R.NoError(err)
-					defer file.Close()
 
-					scanner := bufio.NewScanner(file)
-					// scanner.Split(bufio.ScanLines)
-
-					var lines []string
-					for scanner.Scan() {
-						lines = append(lines, scanner.Text())
+					nmd := NonMemTestingDetails{
+						OutputDir: filepath.Join(scenario.Workpath, m.identifier),
+						Model:     m,
+						Output:    output,
 					}
 
-					return lines
-				}()
+					AssertNonMemCompleted(t, nmd)
+					AssertNonMemCreatedOutputFiles(t, nmd)
 
-				t.R.True(doesOutputFileContainKeyWithValue(lines, "BBI_MODEL", m.filename))
-				t.R.True(doesOutputFileContainKeyWithValue(lines, "BBI_MODEL_FILENAME", m.identifier))
-				t.R.True(doesOutputFileContainKeyWithValue(lines, "BBI_MODEL_EXT", strings.Replace(m.extension, ".", "", 1)))
-				t.R.True(doesOutputFileContainKeyWithValue(lines, "BBI_SUCCESSFUL", "true"))
-				t.R.True(doesOutputFileContainKeyWithValue(lines, "BBI_ERROR", ""))
-			})
-		}
+					var exists bool
+					exists, err = afero.Exists(afero.NewOsFs(), filepath.Join(ROOT_EXECUTION_DIR, "working", scenario.identifier, m.identifier+".out"))
+					t.R.NoError(err)
+					t.R.True(exists)
+
+					lines := func() []string {
+						// Does the file contain the expected Details:
+						// SCENARIO (Additional provided value)
+						var file *os.File
+						file, err = os.Open(filepath.Join(ROOT_EXECUTION_DIR, "working", scenario.identifier, m.identifier+".out"))
+						t.R.NoError(err)
+						defer file.Close()
+
+						scanner := bufio.NewScanner(file)
+						// scanner.Split(bufio.ScanLines)
+
+						var lines []string
+						for scanner.Scan() {
+							lines = append(lines, scanner.Text())
+						}
+
+						return lines
+					}()
+
+					t.R.True(doesOutputFileContainKeyWithValue(lines, "BBI_MODEL", m.filename))
+					t.R.True(doesOutputFileContainKeyWithValue(lines, "BBI_MODEL_FILENAME", m.identifier))
+					t.R.True(doesOutputFileContainKeyWithValue(lines, "BBI_MODEL_EXT", strings.Replace(m.extension, ".", "", 1)))
+					t.R.True(doesOutputFileContainKeyWithValue(lines, "BBI_SUCCESSFUL", "true"))
+					t.R.True(doesOutputFileContainKeyWithValue(lines, "BBI_ERROR", ""))
+				})
+			}
+		})
 	}
 
 	// Test a scenario for the first scenario where we force failure. Model is deleted (not found)
-	t.Run("verify_failure_results", func(t *wrapt.T) {
+	tt.Run("verify_failure_results", func(tt *testing.T) {
+		t := wrapt.WrapT(tt)
+
 		scenario := scenarios[0]
-		err = scenario.Prepare(context.Background())
-		t.R.NoError(err)
+		scenario.Prepare(t, context.Background())
 
 		arguments := []string{
 			"nonmem",
@@ -167,39 +179,45 @@ func TestPostExecutionSucceeds(tt *testing.T) {
 
 		// Removing the model won't do anything. Execute with overwrite = false?
 		for _, v := range scenario.models {
-			err = os.Setenv("BBI_ADDITIONAL_POST_WORK_ENVS", `BBI_SCENARIO=`+scenario.identifier+` BBI_ROOT_EXECUTION_DIR=`+ROOT_EXECUTION_DIR)
-			t.R.NoError(err)
+			tt.Run(v.identifier, func(tt *testing.T) {
+				t := wrapt.WrapT(tt)
 
-			err = os.Remove(filepath.Join(scenario.Workpath, v.identifier+".out"))
-			t.R.NoError(err)
+				var err error
 
-			var output string
-			output, err = v.Execute(scenario, arguments...)
-			t.R.Error(err)
-
-			lines := func() []string {
-				var lines []string
-				// Does the file contain the expected Details:
-				// SCENARIO (Additional provided value)
-				var file *os.File
-				file, err = os.Open(filepath.Join(ROOT_EXECUTION_DIR, "working", scenario.identifier, v.identifier+".out"))
+				err = os.Setenv("BBI_ADDITIONAL_POST_WORK_ENVS", `BBI_SCENARIO=`+scenario.identifier+` BBI_ROOT_EXECUTION_DIR=`+ROOT_EXECUTION_DIR)
 				t.R.NoError(err)
-				defer file.Close()
 
-				scanner := bufio.NewScanner(file)
-				// scanner.Split(bufio.ScanLines)
+				err = os.Remove(filepath.Join(scenario.Workpath, v.identifier+".out"))
+				t.R.NoError(err)
 
-				for scanner.Scan() {
-					lines = append(lines, scanner.Text())
+				var output string
+				output, err = v.Execute(scenario, arguments...)
+				t.R.Error(err)
+
+				lines := func() []string {
+					var lines []string
+					// Does the file contain the expected Details:
+					// SCENARIO (Additional provided value)
+					var file *os.File
+					file, err = os.Open(filepath.Join(ROOT_EXECUTION_DIR, "working", scenario.identifier, v.identifier+".out"))
+					t.R.NoError(err)
+					defer file.Close()
+
+					scanner := bufio.NewScanner(file)
+					// scanner.Split(bufio.ScanLines)
+
+					for scanner.Scan() {
+						lines = append(lines, scanner.Text())
+					}
+
+					return lines
+				}()
+
+				t.R.True(doesOutputFileContainKeyWithValue(lines, "BBI_SUCCESSFUL", "false"))
+				if err != nil {
+					t.R.True(doesExecutionOutputContainErrorString(err.Error(), output))
 				}
-
-				return lines
-			}()
-
-			t.R.True(doesOutputFileContainKeyWithValue(lines, "BBI_SUCCESSFUL", "false"))
-			if err != nil {
-				t.R.True(doesExecutionOutputContainErrorString(err.Error(), output))
-			}
+			})
 		}
 	})
 }

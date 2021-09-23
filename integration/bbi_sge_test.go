@@ -14,117 +14,121 @@ import (
 )
 
 func TestBbiCompletesSGEExecution(tt *testing.T) {
-	t := wrapt.WrapT(tt)
-
-	// Get BB and make sure we have the test data moved over.
-	// Clean Slate
-
 	if !FeatureEnabled("SGE") {
-		t.Skip("Skipping SGE as it's not enabled")
+		tt.Skip("Skipping SGE as it's not enabled")
 	}
 
-	scenarios, err := InitializeScenarios([]string{
-		"240",
-		"acop",
-		"ctl_test",
-	})
-	t.R.NoError(err)
-	t.R.Len(scenarios, 3)
+	tests := []struct {
+		name string
+	}{
+		{name: "240"},
+		{name: "acop"},
+		{name: "ctl_test"},
+	}
 
-	// Test shouldn't take longer than 5 min in total
-	// TODO use the context downstream in a runModel function
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
-	defer cancel()
+	for _, test := range tests {
+		tt.Run(test.name, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-	// TODO Break this into a method that takes a function for execution
-	for _, v := range scenarios {
-		v.Prepare(ctx)
+			scenario := InitializeScenario(t, test.name)
 
-		for _, m := range v.models {
-			nonMemArguments := []string{
-				"-d",
-				"nonmem",
-				"run",
-				"sge",
-				"--nm_version",
-				os.Getenv("NMVERSION"),
+			// Test shouldn't take longer than 5 min in total
+			// TODO use the context downstream in a runModel function
+			ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
+			defer cancel()
+
+			scenario.Prepare(t, ctx)
+
+			for _, model := range scenario.models {
+				t.Run(model.identifier, func(t *wrapt.T) {
+					nonMemArguments := []string{
+						"-d",
+						"nonmem",
+						"run",
+						"sge",
+						"--nm_version",
+						os.Getenv("NMVERSION"),
+					}
+
+					_, err := model.Execute(scenario, nonMemArguments...)
+					t.R.NoError(err)
+
+					WaitForSGEToTerminate(getGridNameIdentifier(model))
+
+					testingDetails := NonMemTestingDetails{
+						OutputDir: filepath.Join(scenario.Workpath, model.identifier),
+						Model:     model,
+					}
+
+					AssertNonMemCompleted(t, testingDetails)
+					AssertNonMemCreatedOutputFiles(t, testingDetails)
+					AssertContainsBBIScript(t, testingDetails)
+				})
 			}
-
-			_, err := m.Execute(v, nonMemArguments...)
-			t.R.NoError(err)
-
-			WaitForSGEToTerminate(getGridNameIdentifier(m))
-
-			testingDetails := NonMemTestingDetails{
-				OutputDir: filepath.Join(v.Workpath, m.identifier),
-				Model:     m,
-			}
-
-			AssertNonMemCompleted(t, testingDetails)
-			AssertNonMemCreatedOutputFiles(t, testingDetails)
-			AssertContainsBBIScript(t, testingDetails)
-		}
+		})
 	}
 }
 
 func TestBbiCompletesParallelSGEExecution(tt *testing.T) {
-	t := wrapt.WrapT(tt)
-
-	// Get BB and make sure we have the test data moved over.
-	// Clean Slate
-
 	if !FeatureEnabled("SGE") {
-		t.Skip("Skipping SG Parallel execution as it's not enabled")
+		tt.Skip("Skipping SG Parallel execution as it's not enabled")
 	}
 
-	scenarios, err := InitializeScenarios([]string{
-		"240",
-		"acop",
-		"ctl_test",
-	})
-	t.R.NoError(err)
-	t.R.Len(scenarios, 3)
+	tests := []struct {
+		name string
+	}{
+		{name: "240"},
+		{name: "acop"},
+		{name: "ctl_test"},
+	}
 
-	// Test shouldn't take longer than 5 min in total
-	// TODO use the context downstream in a runModel function
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
-	defer cancel()
+	for _, test := range tests {
+		tt.Run(test.name, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-	// TODO Break this into a method that takes a function for execution
-	for _, v := range scenarios[0:3] {
-		// log.Infof("Beginning SGE parallel execution test for model set %s",v.identifier)
-		v.Prepare(ctx)
+			scenario := InitializeScenario(t, test.name)
 
-		for _, m := range v.models {
-			nonMemArguments := []string{
-				"-d",
-				"nonmem",
-				"run",
-				"sge",
-				"--nm_version",
-				os.Getenv("NMVERSION"),
-				"--parallel=true",
-				"--mpi_exec_path",
-				os.Getenv("MPIEXEC_PATH"),
-				"--threads",
-				"2",
+			// Test shouldn't take longer than 5 min in total
+			// TODO use the context downstream in a runModel function
+			ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
+			defer cancel()
+
+			// log.Infof("Beginning SGE parallel execution test for model set %s",v.identifier)
+			scenario.Prepare(t, ctx)
+
+			for _, m := range scenario.models {
+				t.Run(m.identifier, func(t *wrapt.T) {
+					nonMemArguments := []string{
+						"-d",
+						"nonmem",
+						"run",
+						"sge",
+						"--nm_version",
+						os.Getenv("NMVERSION"),
+						"--parallel=true",
+						"--mpi_exec_path",
+						os.Getenv("MPIEXEC_PATH"),
+						"--threads",
+						"2",
+					}
+
+					_, err := m.Execute(scenario, nonMemArguments...)
+					t.R.NoError(err)
+
+					WaitForSGEToTerminate(getGridNameIdentifier(m))
+
+					testingDetails := NonMemTestingDetails{
+						OutputDir: filepath.Join(scenario.Workpath, m.identifier),
+						Model:     m,
+					}
+
+					AssertNonMemCompleted(t, testingDetails)
+					AssertNonMemCreatedOutputFiles(t, testingDetails)
+					AssertContainsBBIScript(t, testingDetails)
+					AssertNonMemOutputContainsParafile(t, testingDetails)
+				})
 			}
-
-			_, err := m.Execute(v, nonMemArguments...)
-			t.R.NoError(err)
-
-			WaitForSGEToTerminate(getGridNameIdentifier(m))
-
-			testingDetails := NonMemTestingDetails{
-				OutputDir: filepath.Join(v.Workpath, m.identifier),
-				Model:     m,
-			}
-
-			AssertNonMemCompleted(t, testingDetails)
-			AssertNonMemCreatedOutputFiles(t, testingDetails)
-			AssertContainsBBIScript(t, testingDetails)
-			AssertNonMemOutputContainsParafile(t, testingDetails)
-		}
+		})
 	}
 }
 
