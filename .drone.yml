@@ -12,8 +12,6 @@ steps:
 kind: pipeline
 type: exec
 name: testing
-depends_on:
-  - lint
 
 platform:
   os: linux
