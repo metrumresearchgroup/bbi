@@ -18,11 +18,8 @@ func TestBbiCompletesLocalExecution(tt *testing.T) {
 	tests := []struct {
 		name string
 	}{
-		{name: "240"},
 		{name: "acop"},
-		{name: "ctl_test"},
 		{name: "metrum_std"},
-		{name: "period_test"},
 	}
 
 	for _, test := range tests {

@@ -21,7 +21,6 @@ func TestBbiCompletesSGEExecution(tt *testing.T) {
 	tests := []struct {
 		name string
 	}{
-		{name: "240"},
 		{name: "acop"},
 		{name: "ctl_test"},
 	}

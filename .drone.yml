@@ -1,3 +1,13 @@
+kind: pipeline
+type: docker
+name: lint
+
+steps:
+  - name: lint
+    image: golang:1.17
+    commands:
+      - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.42.1
+      - golangci-lint run
 ---
 kind: pipeline
 type: exec
@@ -24,7 +34,36 @@ steps:
       - printf "  {\"repo\":\"metrumresearchgroup/bbi\", \"commit\":\"$(cat /tmp/${DRONE_BUILD_NUMBER}/bbi_hash)\"},\n" >> /tmp/${DRONE_BUILD_NUMBER}/commits.json
       - printf "]\n" >> /tmp/${DRONE_BUILD_NUMBER}/commits.json
       - aws s3 cp /tmp/${DRONE_BUILD_NUMBER}/commits.json s3://mrg-validation/bbi/${DRONE_BUILD_NUMBER}/commits.json
-
+  - name: Unit Test
+    commands:
+      - if [ ! -d /data/${DRONE_BUILD_NUMBER}/apps ] ; then mkdir -p /data/${DRONE_BUILD_NUMBER}/apps; chmod -R 0755 /data/${DRONE_BUILD_NUMBER}/apps; cp bbi /data/${DRONE_BUILD_NUMBER}/apps; else cp bbi /data/${DRONE_BUILD_NUMBER}/apps; fi
+      - export PATH=$PATH:/data/${DRONE_BUILD_NUMBER}/apps
+      - export ROOT_EXECUTION_DIR=/data/${DRONE_BUILD_NUMBER}
+      - export BBI_GRID_NAME_PREFIX="drone_${DRONE_BUILD_NUMBER}"
+      - bbi init --dir /opt/NONMEM
+      - go list ./... | grep -v integration | xargs go test
+    environment:
+      LOCAL: true
+      MPIEXEC_PATH: /usr/bin/mpiexec
+      NMQUAL: true
+      NMVERSION: nm74gf
+      NONMEMROOT: /opt/NONMEM
+      PATH: /usr/local/texlive/2019/bin/x86_64-linux:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/bin:/opt/amazon/openmpi/bin:/opt/amazon/efa/bin/:/usr/local/texlive/2019/bin/x86_64-linux:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/bin:/opt/amazon/openmpi/bin:/opt/amazon/efa/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+      POST_EXECUTION: true
+      SGE: true
+      SGE_ARCH: lx-amd64
+      SGE_CELL: default
+      SGE_CLUSTER_NAME: p6444
+      SGE_EXECD_PORT: 6445
+      SGE_QMASTER_PORT: 6444
+      SGE_ROOT: /opt/sge
+    volumes:
+      - name: nonmem
+        path: /opt/NONMEM
+      - name: tmp
+        path: /tmp
+      - name: data
+        path: /data
   - name: Integration Test
     commands:
       - if [ ! -d /data/${DRONE_BUILD_NUMBER}/apps ] ; then mkdir -p /data/${DRONE_BUILD_NUMBER}/apps; chmod -R 0755 /data/${DRONE_BUILD_NUMBER}/apps; cp bbi /data/${DRONE_BUILD_NUMBER}/apps; else cp bbi /data/${DRONE_BUILD_NUMBER}/apps; fi
@@ -61,36 +100,7 @@ steps:
       - name: data
         path: /data
 
-  - name: Unit Test
-    commands:
-      - if [ ! -d /data/${DRONE_BUILD_NUMBER}/apps ] ; then mkdir -p /data/${DRONE_BUILD_NUMBER}/apps; chmod -R 0755 /data/${DRONE_BUILD_NUMBER}/apps; cp bbi /data/${DRONE_BUILD_NUMBER}/apps; else cp bbi /data/${DRONE_BUILD_NUMBER}/apps; fi
-      - export PATH=$PATH:/data/${DRONE_BUILD_NUMBER}/apps
-      - export ROOT_EXECUTION_DIR=/data/${DRONE_BUILD_NUMBER}
-      - export BBI_GRID_NAME_PREFIX="drone_${DRONE_BUILD_NUMBER}"
-      - bbi init --dir /opt/NONMEM
-      - go list ./... | grep -v integration | xargs go test
-    environment:
-      LOCAL: true
-      MPIEXEC_PATH: /usr/bin/mpiexec
-      NMQUAL: true
-      NMVERSION: nm74gf
-      NONMEMROOT: /opt/NONMEM
-      PATH: /usr/local/texlive/2019/bin/x86_64-linux:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/bin:/opt/amazon/openmpi/bin:/opt/amazon/efa/bin/:/usr/local/texlive/2019/bin/x86_64-linux:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/bin:/opt/amazon/openmpi/bin:/opt/amazon/efa/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
-      POST_EXECUTION: true
-      SGE: true
-      SGE_ARCH: lx-amd64
-      SGE_CELL: default
-      SGE_CLUSTER_NAME: p6444
-      SGE_EXECD_PORT: 6445
-      SGE_QMASTER_PORT: 6444
-      SGE_ROOT: /opt/sge
-    volumes:
-      - name: nonmem
-        path: /opt/NONMEM
-      - name: tmp
-        path: /tmp
-      - name: data
-        path: /data
+
 
   - name: Cleanup on failure
     commands:
@@ -112,17 +122,7 @@ volumes:
   - name: data
     host:
       path: /data
----
-kind: pipeline
-type: docker
-name: lint
 
-steps:
-  - name: lint
-    image: golang:1.17
-    commands:
-      - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.42.1
-      - golangci-lint run
 ---
 kind: pipeline
 type: exec

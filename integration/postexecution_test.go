@@ -73,10 +73,7 @@ func TestPostExecutionSucceeds(tt *testing.T) {
 		}
 
 		for _, name := range []string{
-			"240",
 			"acop",
-			"ctl_test",
-			"metrum_std",
 		} {
 			scenario := InitializeScenario(t, name)
 			scenarios = append(scenarios, scenario)
