@@ -73,5 +73,4 @@ func setMissingValuesToDefault(results *SummaryOutput) {
 			results.ParameterNames.Sigma = GetBlockParameterNames("SIGMA", sigmaCount)
 		}
 	}
-
 }
