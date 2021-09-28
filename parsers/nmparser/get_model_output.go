@@ -153,7 +153,7 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (Su
 	// Extra heuristics
 	results.RunHeuristics.PRDERR, _ = utils.Exists(filepath.Join(dir, "PRDERR"), AppFs)
 
-	setMissingValuesToDefault(&results, etaCount, epsCount)
+	setMissingValuesToDefault(&results)
 
 	return results, nil
 }
