@@ -199,7 +199,7 @@ func parseGradient(lines []string) bool {
 			result[i] = n
 		}
 
-		return HasZeroGradient(result)
+		return utils.HasZero(result)
 	}
 
 	return false

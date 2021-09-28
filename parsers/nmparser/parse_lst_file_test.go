@@ -123,11 +123,6 @@ func TestParseGradient(tt *testing.T) {
 			hasZeroFinalGradient: true,
 			context:              "zero gradients and zero final gradient",
 		},
-		// {
-		// 	hasZeroGradient:      nil,
-		// 	hasZeroFinalGradient: nil,
-		// 	context:              "zero gradients and zero final gradient",
-		// },
 	}
 
 	for _, test := range tests {
