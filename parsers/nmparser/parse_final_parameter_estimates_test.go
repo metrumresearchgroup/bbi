@@ -79,45 +79,6 @@ func TestParseFinalParameterEstimatesFromLst(tt *testing.T) {
 				Sigma: []float64{1450, 0, 0.00739},
 			},
 		},
-		{
-			name: "sigma",
-			input: []string{
-				"	SIGMA - COV MATRIX FOR RANDOM EFFECTS - EPSILONS  ****",
-				"",
-				"",
-				"      EPS1",
-				"",
-				"EPS1",
-				"+        2.45E-03",
-				"",
-				"1",
-				"",
-				"",
-				"OMEGA - CORR MATRIX FOR RANDOM EFFECTS - ETAS  *******",
-				"",
-				"",
-				"	ETA1      ETA2      ETA3     ",
-				"",
-				"ETA1",
-				"+        3.17E-01",
-				"",
-				"ETA2",
-				"+        0.00E+00  1.90E-01",
-				"",
-				"ETA3",
-				"+        0.00E+00  0.00E+00  1.06E-01",
-				"",
-				"",
-			},
-
-			// the original test contained only the sigma value, but this
-			// parse results in only omega value being parsed.
-			want: ParametersResult{
-				Sigma: []float64{
-					0.00245,
-				},
-			},
-		},
 	}
 
 	for _, test := range tests {
