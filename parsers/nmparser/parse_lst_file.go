@@ -10,46 +10,6 @@ import (
 	"github.com/metrumresearchgroup/bbi/utils"
 )
 
-func parseShrinkage(line string, shrinkageDetails ShrinkageDetails) ShrinkageDetails {
-	if strings.Contains(line, "ETASHRINKSD(%)") {
-		shrinkageDetails.EtaSD = parseFloats(line, "ETASHRINKSD(%)")
-	} else if strings.Contains(line, "ETASHRINKVR(%)") {
-		shrinkageDetails.EtaVR = parseFloats(line, "ETASHRINKVR(%)")
-	} else if strings.Contains(line, "EBVSHRINKSD(%)") {
-		shrinkageDetails.EbvSD = parseFloats(line, "EBVSHRINKSD(%)")
-	} else if strings.Contains(line, "EBVSHRINKVR(%)") {
-		shrinkageDetails.EbvVR = parseFloats(line, "EBVSHRINKVR(%)")
-	} else if strings.Contains(line, "EPSSHRINKSD(%)") {
-		shrinkageDetails.EpsSD = parseFloats(line, "EPSSHRINKSD(%)")
-	} else if strings.Contains(line, "EPSSHRINKVR(%)") {
-		shrinkageDetails.EpsVR = parseFloats(line, "EPSSHRINKVR(%)")
-	} else if strings.Contains(line, "ETAshrink(%)") {
-		line = strings.Replace(line, ":", "", 1)
-		shrinkageDetails.EtaSD = parseFloats(line, "ETAshrink(%)")
-	} else if strings.Contains(line, "EBVshrink(%)") {
-		line = strings.Replace(line, ":", "", 1)
-		shrinkageDetails.EbvSD = parseFloats(line, "EBVshrink(%)")
-	} else if strings.Contains(line, "EPSshrink(%)") {
-		line = strings.Replace(line, ":", "", 1)
-		shrinkageDetails.EpsVR = parseFloats(line, "EPSshrink(%)")
-	}
-
-	return shrinkageDetails
-}
-
-func parseFloats(line, name string) []float64 {
-	var floats []float64
-	values := strings.Fields(strings.TrimSpace(strings.Replace(line, name, "", -1)))
-	for _, value := range values {
-		fvalue, err := strconv.ParseFloat(value, 64)
-		if err != nil {
-			fvalue = DefaultFloat64
-		}
-		floats = append(floats, fvalue)
-	}
-
-	return floats
-}
 
 func getMatrixData(lines []string, start int) MatrixData {
 	var matrix [][]float64

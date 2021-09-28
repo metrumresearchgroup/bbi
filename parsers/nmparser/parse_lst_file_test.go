@@ -76,67 +76,6 @@ func TestParTestParseOBJV3(tt *testing.T) {
 	t.A.Equal(expected, lstData.OFV)
 }
 
-func TestParTestParseShrinkage(tt *testing.T) {
-	t := wrapt.WrapT(tt)
-
-	var shrinkageDetails ShrinkageDetails
-	var expected ShrinkageDetails
-
-	expected.EtaSD = []float64{4.0774, 29.015, 11.401}
-	shrinkageDetails = parseShrinkage("ETASHRINKSD(%)  4.0774E+00  2.9015E+01  1.1401E+01", shrinkageDetails)
-	t.A.Equal(expected, shrinkageDetails)
-
-	expected.EtaVR = []float64{7.9885, 49.611, 21.502}
-	shrinkageDetails = parseShrinkage("ETASHRINKVR(%)  7.9885E+00  4.9611E+01  2.1502E+01", shrinkageDetails)
-	t.A.Equal(expected, shrinkageDetails)
-
-	expected.EbvSD = []float64{4.0725, 28.322, 12.255}
-	shrinkageDetails = parseShrinkage("EBVSHRINKSD(%)  4.0725E+00  2.8322E+01  1.2255E+01", shrinkageDetails)
-	t.A.Equal(expected, shrinkageDetails)
-
-	expected.EbvVR = []float64{7.9791, 48.623, 23.009}
-	shrinkageDetails = parseShrinkage("EBVSHRINKVR(%)  7.9791E+00  4.8623E+01  2.3009E+01", shrinkageDetails)
-	t.A.Equal(expected, shrinkageDetails)
-
-	expected.EpsSD = []float64{12.507, 12.507}
-	shrinkageDetails = parseShrinkage("EPSSHRINKSD(%)  1.2507E+01  1.2507E+01", shrinkageDetails)
-	t.A.Equal(expected, shrinkageDetails)
-
-	expected.EpsVR = []float64{23.451, 23.451}
-	shrinkageDetails = parseShrinkage("EPSSHRINKVR(%)  2.3451E+01  2.3451E+01", shrinkageDetails)
-	t.A.Equal(expected, shrinkageDetails)
-}
-
-// TODO: test represents something that the parser skips processing.
-func TestParTestParseShrinkage2(tt *testing.T) {
-	t := wrapt.WrapT(tt)
-
-	var lines = []string{
-		"ETASHRINKSD(%)  4.0774E+00  2.9015E+01  1.1401E+01",
-		"ETASHRINKVR(%)  7.9885E+00  4.9611E+01  2.1502E+01",
-		"EBVSHRINKSD(%)  4.0725E+00  2.8322E+01  1.2255E+01",
-		"EBVSHRINKVR(%)  7.9791E+00  4.8623E+01  2.3009E+01",
-		"EPSSHRINKSD(%)  1.2507E+01  1.2507E+01",
-		"EPSSHRINKVR(%)  2.3451E+01  2.3451E+01",
-	}
-	want := [][]ShrinkageDetails{
-		{
-			{
-				EtaSD: []float64{4.0774, 29.015, 11.401},
-				EtaVR: []float64{7.9885, 49.611, 21.502},
-
-				EbvSD: []float64{4.0725, 28.322, 12.255},
-				EbvVR: []float64{7.9791, 48.623, 23.009},
-
-				EpsSD: []float64{12.507, 12.507},
-				EpsVR: []float64{23.451, 23.451},
-			},
-		},
-	}
-	got := ParseLstEstimationFile(lines)
-
-	t.A.Equal(want, got.ShrinkageDetails)
-}
 
 func TestParseGradient(tt *testing.T) {
 	var tests = []struct {
