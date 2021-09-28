@@ -76,7 +76,6 @@ func TestParTestParseOBJV3(tt *testing.T) {
 	t.A.Equal(expected, lstData.OFV)
 }
 
-
 func TestParseGradient(tt *testing.T) {
 	var tests = []struct {
 		lines                []string

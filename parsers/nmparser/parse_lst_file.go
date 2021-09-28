@@ -10,7 +10,6 @@ import (
 	"github.com/metrumresearchgroup/bbi/utils"
 )
 
-
 func getMatrixData(lines []string, start int) MatrixData {
 	var matrix [][]float64
 	var thetaCount int

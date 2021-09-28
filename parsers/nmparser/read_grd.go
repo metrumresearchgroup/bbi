@@ -82,4 +82,3 @@ func ParseGrdData(ed ExtData) ([]ParametersData, ParameterNames) {
 		Theta: thetas,
 	}
 }
-
