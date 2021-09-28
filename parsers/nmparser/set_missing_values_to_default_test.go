@@ -55,6 +55,7 @@ func TestSetMissingValuesToDefaultParameterDataStdErrDimension(tt *testing.T) {
 				ParametersData: []ParametersData{ParametersData{
 					Estimates: ParametersResult{
 						Theta: []float64{1, 2, 4},
+						Omega: []float64{1, 2, 4},
 					},
 				}},
 			},
@@ -179,72 +180,6 @@ func TestSetMissingValuesToDefaultParameterNameValues(tt *testing.T) {
 			for i := range test.modelOutput.ParametersData[0].Estimates.Theta {
 				t.R.Equal(fmt.Sprintf("THETA%d", i+1), test.modelOutput.ParameterNames.Theta[i])
 			}
-		})
-	}
-}
-
-func TestSetMissingValuesToDefaultShrinkageEta(tt *testing.T) {
-	var tests = []struct {
-		name        string
-		modelOutput SummaryOutput
-		etaCount    int
-		epsCount    int
-		expected    int
-		context     string
-	}{
-		{
-			name: "test",
-			modelOutput: SummaryOutput{
-				ParametersData: []ParametersData{ParametersData{
-					Estimates: ParametersResult{},
-				}},
-				ShrinkageDetails: [][]ShrinkageDetails{{ShrinkageDetails{}}},
-			},
-			etaCount: 5,
-		},
-	}
-
-	for _, test := range tests {
-		tt.Run(test.name, func(tt *testing.T) {
-			t := wrapt.WrapT(tt)
-
-			setMissingValuesToDefault(&test.modelOutput)
-
-			t.R.Equal(test.etaCount, len(test.modelOutput.ShrinkageDetails[0][0].EtaBar))
-			t.R.Equal(DefaultFloat64, test.modelOutput.ShrinkageDetails[0][0].EtaBar[test.etaCount-1])
-		})
-	}
-}
-
-func TestSetMissingValuesToDefaultShrinkageEps(tt *testing.T) {
-	var tests = []struct {
-		name        string
-		modelOutput SummaryOutput
-		etaCount    int
-		epsCount    int
-		expected    int
-		context     string
-	}{
-		{
-			name: "test",
-			modelOutput: SummaryOutput{
-				ParametersData: []ParametersData{ParametersData{
-					Estimates: ParametersResult{},
-				}},
-				ShrinkageDetails: [][]ShrinkageDetails{{ShrinkageDetails{}}},
-			},
-			epsCount: 5,
-		},
-	}
-
-	for _, test := range tests {
-		tt.Run(test.name, func(tt *testing.T) {
-			t := wrapt.WrapT(tt)
-
-			setMissingValuesToDefault(&test.modelOutput)
-
-			t.R.Equal(test.epsCount, len(test.modelOutput.ShrinkageDetails[0][0].EpsVR))
-			t.R.Equal(DefaultFloat64, test.modelOutput.ShrinkageDetails[0][0].EpsVR[test.epsCount-1])
 		})
 	}
 }
