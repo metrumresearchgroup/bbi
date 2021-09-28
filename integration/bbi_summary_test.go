@@ -10,6 +10,12 @@ import (
 	"github.com/metrumresearchgroup/wrapt"
 )
 
+// Consider at some point whether we want to add the old models
+// in testdata/example-models/nonmem/ (formerly used in deprecated
+// parsers/nmparser/summary_test.go) to be tested here.
+// I haven't looked closely enough to see if they have any edge
+// cases that we're missing in integration/testdata/bbi_summary/
+
 type testConfig struct {
 	bbiOption string
 	goldenExt string
