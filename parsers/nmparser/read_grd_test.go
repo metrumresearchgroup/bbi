@@ -113,20 +113,17 @@ func TestReadParseGrdLines(tt *testing.T) {
 		tt.Run(test.context, func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
-			extData := ParseGrdLines(test.lines)
-			t.R.Equal(test.lines[0], extData.EstimationMethods[0], "Fail :"+test.context)
-			t.R.Equal("GRD(1)", extData.ParameterNames[1], "Fail :"+test.context)
-			t.R.Equal(strings.Trim(test.lines[2], "\t "), extData.EstimationLines[0][0], "Fail :"+test.context)
+			grdData := ParseGrdLines(test.lines)
+			t.R.Equal(test.lines[0], grdData.EstimationMethods[0], "Fail :"+test.context)
+			t.R.Equal("GRD(1)", grdData.ParameterNames[1], "Fail :"+test.context)
+			t.R.Equal(strings.Trim(test.lines[2], "\t "), grdData.EstimationLines[0][0], "Fail :"+test.context)
 
-			parametersData, parameterNames := ParseGrdData(extData)
+			parametersData, parameterNames := ParseGrdData(grdData)
 			t.R.Equal(test.lines[0], parametersData[0].Method, "Fail :"+test.context)
 			t.R.Equal("GRD(1)", parameterNames.Theta[0], "Fail :"+test.context)
 
 			hasZero := utils.HasZero(parametersData[len(parametersData)-1].Fixed.Theta)
 			t.R.Equal(test.expected, hasZero, "Fail :"+test.context)
-
-			hasZeroGradient := HasZeroGradient(parametersData[len(parametersData)-1].Fixed.Theta)
-			t.R.Equal(test.status, hasZeroGradient, "Fail :"+test.context)
 		})
 	}
 }

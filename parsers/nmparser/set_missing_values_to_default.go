@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func setMissingValuesToDefault(results *SummaryOutput, _ /*etaCount*/, _ /*epsCount*/ int) {
+func setMissingValuesToDefault(results *SummaryOutput) {
 	// method name
 	for i := range results.ParametersData {
 		if len(results.ParametersData[i].Method) == 0 {
@@ -73,76 +73,4 @@ func setMissingValuesToDefault(results *SummaryOutput, _ /*etaCount*/, _ /*epsCo
 			results.ParameterNames.Sigma = GetBlockParameterNames("SIGMA", sigmaCount)
 		}
 	}
-
-	// shrinkage eta's
-	// for methodIndex := range results.ShrinkageDetails {
-	// 	for subGroupIndex := range results.ShrinkageDetails[methodIndex] {
-	// 		if len(results.ShrinkageDetails[methodIndex][subGroupIndex].EtaSD) == 0 {
-	// 			results.ShrinkageDetails[methodIndex][subGroupIndex].EtaSD = make([]float64, etaCount)
-	// 			for i := range results.ShrinkageDetails[methodIndex][subGroupIndex].EtaSD {
-	// 				results.ShrinkageDetails[methodIndex][subGroupIndex].EtaSD[i] = DefaultFloat64
-	// 			}
-	// 		}
-	// 		if len(results.ShrinkageDetails[methodIndex][subGroupIndex].EtaVR) == 0 {
-	// 			results.ShrinkageDetails[methodIndex][subGroupIndex].EtaVR = make([]float64, etaCount)
-	// 			for i := range results.ShrinkageDetails[methodIndex][subGroupIndex].EtaVR {
-	// 				results.ShrinkageDetails[methodIndex][subGroupIndex].EtaVR[i] = DefaultFloat64
-	// 			}
-	// 		}
-	// 		if len(results.ShrinkageDetails[methodIndex][subGroupIndex].EbvSD) == 0 {
-	// 			results.ShrinkageDetails[methodIndex][subGroupIndex].EbvSD = make([]float64, etaCount)
-	// 			for i := range results.ShrinkageDetails[methodIndex][subGroupIndex].EbvSD {
-	// 				results.ShrinkageDetails[methodIndex][subGroupIndex].EbvSD[i] = DefaultFloat64
-	// 			}
-	// 		}
-	// 		if len(results.ShrinkageDetails[methodIndex][subGroupIndex].EbvVR) == 0 {
-	// 			results.ShrinkageDetails[methodIndex][subGroupIndex].EbvVR = make([]float64, etaCount)
-	// 			for i := range results.ShrinkageDetails[methodIndex][subGroupIndex].EbvVR {
-	// 				results.ShrinkageDetails[methodIndex][subGroupIndex].EbvVR[i] = DefaultFloat64
-	// 			}
-	// 		}
-	// 		if len(results.ShrinkageDetails[methodIndex][subGroupIndex].EtaBar) == 0 {
-	// 			results.ShrinkageDetails[methodIndex][subGroupIndex].EtaBar = make([]float64, etaCount)
-	// 			for i := range results.ShrinkageDetails[methodIndex][subGroupIndex].EtaBar {
-	// 				results.ShrinkageDetails[methodIndex][subGroupIndex].EtaBar[i] = DefaultFloat64
-	// 			}
-	// 		}
-	// 		if len(results.ShrinkageDetails[methodIndex][subGroupIndex].EtaBarSE) == 0 {
-	// 			results.ShrinkageDetails[methodIndex][subGroupIndex].EtaBarSE = make([]float64, etaCount)
-	// 			for i := range results.ShrinkageDetails[methodIndex][subGroupIndex].EtaBarSE {
-	// 				results.ShrinkageDetails[methodIndex][subGroupIndex].EtaBarSE[i] = DefaultFloat64
-	// 			}
-	// 		}
-	// 		if len(results.ShrinkageDetails[methodIndex][subGroupIndex].Pval) == 0 {
-	// 			results.ShrinkageDetails[methodIndex][subGroupIndex].Pval = make([]float64, etaCount)
-	// 			for i := range results.ShrinkageDetails[methodIndex][subGroupIndex].Pval {
-	// 				results.ShrinkageDetails[methodIndex][subGroupIndex].Pval[i] = DefaultFloat64
-	// 			}
-	// 		}
-	// 		if len(results.ShrinkageDetails[methodIndex][subGroupIndex].NumSubjects) == 0 {
-	// 			results.ShrinkageDetails[methodIndex][subGroupIndex].NumSubjects = make([]float64, etaCount)
-	// 			for i := range results.ShrinkageDetails[methodIndex][subGroupIndex].NumSubjects {
-	// 				results.ShrinkageDetails[methodIndex][subGroupIndex].NumSubjects[i] = DefaultFloat64
-	// 			}
-	// 		}
-	// 	}
-	// }
-
-	// // shrinkage eps's
-	// for methodIndex := range results.ShrinkageDetails {
-	// 	for subGroupIndex := range results.ShrinkageDetails[methodIndex] {
-	// 		if len(results.ShrinkageDetails[methodIndex][subGroupIndex].EpsSD) == 0 {
-	// 			results.ShrinkageDetails[methodIndex][subGroupIndex].EpsSD = make([]float64, epsCount)
-	// 			for i := range results.ShrinkageDetails[methodIndex][subGroupIndex].EpsSD {
-	// 				results.ShrinkageDetails[methodIndex][subGroupIndex].EpsSD[i] = DefaultFloat64
-	// 			}
-	// 		}
-	// 		if len(results.ShrinkageDetails[methodIndex][subGroupIndex].EpsVR) == 0 {
-	// 			results.ShrinkageDetails[methodIndex][subGroupIndex].EpsVR = make([]float64, epsCount)
-	// 			for i := range results.ShrinkageDetails[methodIndex][subGroupIndex].EpsVR {
-	// 				results.ShrinkageDetails[methodIndex][subGroupIndex].EpsVR[i] = DefaultFloat64
-	// 			}
-	// 		}
-	// 	}
-	// }
 }

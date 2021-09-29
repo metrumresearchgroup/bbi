@@ -117,7 +117,7 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (Su
 			return SummaryOutput{}, err
 		}
 		parametersData, _ := ParseGrdData(ParseGrdLines(grdLines))
-		results.RunHeuristics.HasFinalZeroGradient = HasZeroGradient(parametersData[len(parametersData)-1].Fixed.Theta)
+		results.RunHeuristics.HasFinalZeroGradient = utils.HasZero(parametersData[len(parametersData)-1].Fixed.Theta)
 		results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, filepath.Base(grdFilePath))
 	}
 
@@ -153,7 +153,7 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (Su
 	// Extra heuristics
 	results.RunHeuristics.PRDERR, _ = utils.Exists(filepath.Join(dir, "PRDERR"), AppFs)
 
-	setMissingValuesToDefault(&results, etaCount, epsCount)
+	setMissingValuesToDefault(&results)
 
 	return results, nil
 }

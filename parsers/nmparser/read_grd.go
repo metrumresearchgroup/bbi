@@ -3,8 +3,6 @@ package parser
 import (
 	"strconv"
 	"strings"
-
-	"github.com/metrumresearchgroup/bbi/utils"
 )
 
 // ParseGrdLines parses out the ext lines into a data structure for final parameter processing.
@@ -83,9 +81,4 @@ func ParseGrdData(ed ExtData) ([]ParametersData, ParameterNames) {
 	return allParametersData, ParameterNames{
 		Theta: thetas,
 	}
-}
-
-// HasZeroGradient returns Status.True if any float in the slice is zero.
-func HasZeroGradient(floats []float64) bool {
-	return utils.HasZero(floats)
 }
