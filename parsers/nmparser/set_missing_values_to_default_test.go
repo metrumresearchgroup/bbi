@@ -124,13 +124,13 @@ func TestSetMissingValuesToDefaultParameterDataValues(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			setMissingValuesToDefault(&test.modelOutput)
-			t.R.Equal(7, len(test.modelOutput.ParametersData[0].StdErr.Theta), "Fail :"+test.name)
-			t.R.Equal(2, len(test.modelOutput.ParametersData[0].RandomEffectSD.Sigma), "Fail :"+test.name)
-			t.R.Equal(3, len(test.modelOutput.ParametersData[0].RandomEffectSDSE.Omega), "Fail :"+test.name)
+			t.R.Equal(7, len(test.modelOutput.ParametersData[0].StdErr.Theta))
+			t.R.Equal(2, len(test.modelOutput.ParametersData[0].RandomEffectSD.Sigma))
+			t.R.Equal(3, len(test.modelOutput.ParametersData[0].RandomEffectSDSE.Omega))
 
-			t.R.Equal(DefaultFloat64, test.modelOutput.ParametersData[0].StdErr.Theta[0], "Fail :"+test.name)
-			t.R.Equal(DefaultFloat64, test.modelOutput.ParametersData[0].RandomEffectSD.Sigma[1], "Fail :"+test.name)
-			t.R.Equal(DefaultFloat64, test.modelOutput.ParametersData[0].RandomEffectSDSE.Omega[2], "Fail :"+test.name)
+			t.R.Equal(DefaultFloat64, test.modelOutput.ParametersData[0].StdErr.Theta[0])
+			t.R.Equal(DefaultFloat64, test.modelOutput.ParametersData[0].RandomEffectSD.Sigma[1])
+			t.R.Equal(DefaultFloat64, test.modelOutput.ParametersData[0].RandomEffectSDSE.Omega[2])
 		})
 	}
 }
