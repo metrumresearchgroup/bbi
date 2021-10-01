@@ -129,18 +129,3 @@ func TestParseRunDetails(tt *testing.T) {
 		})
 	}
 }
-
-// This was turned off Sept 2021 but
-// not sure why and if it should be deleted
-/*
-func TestParseRunDetailsFromFile(t *testing.T) {
-	OsFs := afero.NewOsFs()
-	var runDetails02, _ = afero.ReadFile(OsFs, RunDetails02)
-	lines := strings.Split(string(runDetails02), "\n")
-	parsedData := ParseRunDetails(lines)
-	parsedData.OutputFilesUsed = []string{""}
-	if !reflect.DeepEqual(parsedData, RunDetails02Results) {
-		t.Log("\nGOT: ", parsedData, "\n Expected: ", RunDetails02Results)
-		t.Fail()
-}
-}*/
