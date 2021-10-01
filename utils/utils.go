@@ -256,6 +256,6 @@ func AnyTrue(bools []bool) bool {
 	return false
 }
 func AddTestId(s, testId string) string {
-	return s + "[" + testId + "]"
+	return s + " [" + testId + "]"
 }
 
