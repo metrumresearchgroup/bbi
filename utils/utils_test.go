@@ -82,8 +82,9 @@ func TestDirExists(tt *testing.T) {
 		},
 	}
 
+	testId := "UNIT-UTL-001"
 	for _, test := range tests {
-		tt.Run(test.name, func(tt *testing.T) {
+		tt.Run(AddTestId(test.name, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			got, _ := DirExists(filepath.FromSlash(test.input), new(afero.OsFs))
@@ -121,8 +122,9 @@ func TestIsDir(tt *testing.T) {
 		},
 	}
 
+	testId := "UNIT-UTL-002"
 	for _, test := range tests {
-		tt.Run(test.name, func(tt *testing.T) {
+		tt.Run(AddTestId(test.name, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			got, _ := IsDir(test.input, new(afero.OsFs))
@@ -159,8 +161,9 @@ func TestFileAndExt(tt *testing.T) {
 		},
 	}
 
+	testId := "UNIT-UTL-003"
 	for _, test := range tests {
-		tt.Run(test.input, func(tt *testing.T) {
+		tt.Run(AddTestId(test.input, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			file, ext := FileAndExt(test.input)

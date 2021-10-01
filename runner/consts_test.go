@@ -2,28 +2,9 @@ package runner
 
 import (
 	"testing"
-
+	"github.com/metrumresearchgroup/bbi/utils"
 	"github.com/metrumresearchgroup/wrapt"
 )
-
-// TODO: remove initResults if we find no use
-/* func initResults() map[string]int {
-	var results01 = make(map[string]int)
-	results01["run001.clt"] = 1
-	results01["run001.coi"] = 1
-	results01["run001.cor"] = 1
-	results01["run001.cov"] = 1
-	results01["run001.cpu"] = 1
-	results01["run001.ext"] = 1
-	results01["run001.grd"] = 1
-	results01["run001.lst"] = 1
-	results01["run001.phi"] = 1
-	results01["run001.shk"] = 1
-	results01["run001.shm"] = 1
-	results01["run001.xml"] = 1
-
-	return results01
-} */
 
 func TestEstOutputFilesByRun(tt *testing.T) {
 	var tests = []struct {
@@ -48,8 +29,10 @@ func TestEstOutputFilesByRun(tt *testing.T) {
 			},
 		},
 	}
+
+	testId := "UNIT-RUN-001"
 	for _, test := range tests {
-		tt.Run(test.in, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(test.in, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			got := EstOutputFilesByRun(test.in)

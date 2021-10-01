@@ -7,7 +7,7 @@ import (
 	"github.com/metrumresearchgroup/wrapt"
 )
 
-func TestReadExt(tt *testing.T) {
+func TestReadParamsAndOutputFromExt(tt *testing.T) {
 	// simply check that reading in the entire file vs only the values that should be taken
 	// will change the number of rows present
 	tests := []struct {
@@ -27,8 +27,9 @@ func TestReadExt(tt *testing.T) {
 		},
 	}
 
+	testId := "UNIT-UTL-008"
 	for _, test := range tests {
-		tt.Run(test.input, func(tt *testing.T) {
+		tt.Run(AddTestId(test.input, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			fullLines, _ := ReadLines(test.input)
@@ -77,8 +78,9 @@ func TestHasZero(tt *testing.T) {
 		},
 	}
 
+	testId := "UNIT-UTL-009"
 	for _, test := range tests {
-		tt.Run(test.context, func(tt *testing.T) {
+		tt.Run(AddTestId(test.context, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			got := HasZero(test.floats)

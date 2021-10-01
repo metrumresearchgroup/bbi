@@ -33,8 +33,10 @@ func TestPadNum(tt *testing.T) {
 			expected: "1000",
 		},
 	}
+
+	testId := "UNIT-UTL-010"
 	for _, test := range tests {
-		tt.Run(test.name, func(tt *testing.T) {
+		tt.Run(AddTestId(test.name, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			got := PadNum(test.input, 3)

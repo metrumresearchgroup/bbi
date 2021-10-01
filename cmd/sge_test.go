@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/metrumresearchgroup/bbi/utils"
 	"testing"
 
 	"github.com/metrumresearchgroup/bbi/configlib"
@@ -40,8 +41,10 @@ func Test_gridengineJobName(t *testing.T) {
 			wantErr: false,
 		},
 	}
+
+	testId := "UNIT-CMD-005"
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+		t.Run(utils.AddTestId(tt.name, testId), func(t *testing.T) {
 			got, err := gridengineJobName(tt.args.model)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("gridengineJobName() error = %v, wantErr %v", err, tt.wantErr)

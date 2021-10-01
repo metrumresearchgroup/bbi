@@ -41,8 +41,10 @@ func TestExpandSequence(tt *testing.T) {
 		},
 	}
 
+	testId := "UNIT-UTL-007"
+
 	for _, test := range tests {
-		tt.Run(test.input, func(tt *testing.T) {
+		tt.Run(AddTestId(test.input, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			res, err := ExpandNameSequence(test.input)

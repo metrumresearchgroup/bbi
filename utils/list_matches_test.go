@@ -57,8 +57,9 @@ func TestListMatchesByRegex(tt *testing.T) {
 		},
 	}
 
+	testId := "UNIT-UTL-004"
 	for _, test := range tests {
-		tt.Run(test.input.Regex, func(tt *testing.T) {
+		tt.Run(AddTestId(test.input.Regex, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			glb, err := regexp.Compile(test.input.Regex)
@@ -119,8 +120,9 @@ func TestListMatchesByGlob(tt *testing.T) {
 		},
 	}
 
+	testId := "UNIT-UTL-005"
 	for _, test := range tests {
-		tt.Run(test.input.Glob, func(tt *testing.T) {
+		tt.Run(AddTestId(test.input.Glob, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			glb, err := glob.Compile(test.input.Glob)

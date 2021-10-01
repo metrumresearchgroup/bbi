@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/metrumresearchgroup/bbi/utils"
 	"os"
 	"path"
 	"path/filepath"
@@ -49,8 +50,11 @@ func Test_doesDirectoryContainOutputFiles(tt *testing.T) {
 			want: true,
 		},
 	}
+
+	testId := "UNIT-CMD-001"
 	for _, test := range tests {
-		tt.Run(test.name, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
+
 			t := wrapt.WrapT(tt)
 
 			got := doesDirectoryContainOutputFiles(test.args.path, test.args.modelname)
@@ -152,8 +156,9 @@ func Test_processNMFEOptions(tt *testing.T) {
 			},
 		},
 	}
+	testId := "UNIT-CMD-002"
 	for _, test := range tests {
-		tt.Run(test.name, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			got := processNMFEOptions(test.args.config)
@@ -198,8 +203,9 @@ func Test_modelDataFile(tt *testing.T) {
 			wantErr: true,
 		},
 	}
+	testId := "UNIT-CMD-003"
 	for _, test := range tests {
-		tt.Run(test.name, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			got, err := modelDataFile(test.args.modelLines)
@@ -248,8 +254,9 @@ func Test_dataFileIsPresent(tt *testing.T) {
 			wantErr: true,
 		},
 	}
+	testId := "UNIT-CMD-004"
 	for _, test := range tests {
-		tt.Run(test.name, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			err := dataFileIsPresent(test.args.datafile, test.args.modelpath)
