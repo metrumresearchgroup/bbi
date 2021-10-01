@@ -3,6 +3,7 @@ package bbitest
 import (
 	"context"
 	"fmt"
+	"github.com/metrumresearchgroup/bbi/utils"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -20,8 +21,9 @@ func TestHasValidDataPathForCTL(tt *testing.T) {
 	scenario.Prepare(t, context.Background())
 
 	// Directories et all should be prepared.
+	testId := "INT-DATA-001"
 	for _, m := range scenario.models {
-		t.Run(fmt.Sprintf("validPathCTL_%s", m.filename), func(t *wrapt.T) {
+		t.Run(utils.AddTestId(fmt.Sprintf("validPathCTL_%s", m.filename), testId), func(t *wrapt.T) {
 			args := []string{
 				"nonmem",
 				"run",
@@ -53,8 +55,9 @@ func TestHasInvalidDataPath(tt *testing.T) {
 	scenario.Prepare(t, context.Background())
 
 	// Directories et all should be prepared.
+	testId := "INT-DATA-002"
 	for _, m := range scenario.models {
-		t.Run(m.identifier, func(t *wrapt.T) {
+		t.Run(utils.AddTestId(m.identifier, testId), func(t *wrapt.T) {
 			// We need to manipulate the file to contain an invalid file reference
 			file, _ := os.Open(filepath.Join(scenario.Workpath, m.filename))
 			b, _ := ioutil.ReadAll(file)
@@ -114,8 +117,9 @@ func TestHasValidComplexPathCTLAndMod(tt *testing.T) {
 	intermediary.Workpath = filepath.Join(scenario.Workpath, "model", "nonmem", "test_suite_1")
 
 	// Directories et all should be prepared.
+	testId := "INT-DATA-003"
 	for _, m := range scenario.models {
-		t.Run(fmt.Sprintf("validComplexPathFor_%s", m.filename), func(t *wrapt.T) {
+		t.Run(utils.AddTestId(fmt.Sprintf("validComplexPathFor_%s", m.filename), testId), func(t *wrapt.T) {
 			args := []string{
 				"nonmem",
 				"run",

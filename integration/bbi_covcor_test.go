@@ -2,6 +2,7 @@ package bbitest
 
 import (
 	"context"
+	"github.com/metrumresearchgroup/bbi/utils"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -19,8 +20,9 @@ func TestCovCorHappyPath(tt *testing.T) {
 		{name: "1001"},
 	}
 
+	testId := "INT-COVCOR-001"
 	for _, mod := range models {
-		tt.Run(mod.name, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(mod.name, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			commandAndArgs := []string{
@@ -58,8 +60,9 @@ func TestCovCorErrors(tt *testing.T) {
 
 	rgx := regexp.MustCompile(noFilePresentError)
 
+	testId := "INT-COVCOR-002"
 	for _, mod := range models {
-		tt.Run(mod.name, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(mod.name, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			commandAndArgs := []string{

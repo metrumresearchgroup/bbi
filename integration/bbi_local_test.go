@@ -2,6 +2,7 @@ package bbitest
 
 import (
 	"context"
+	"github.com/metrumresearchgroup/bbi/utils"
 	"io"
 	"os"
 	"path/filepath"
@@ -22,8 +23,9 @@ func TestBbiCompletesLocalExecution(tt *testing.T) {
 		{name: "metrum_std"},
 	}
 
+	testId := "INT-LOCAL-001"
 	for _, test := range tests {
-		tt.Run(test.name, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			scenario := InitializeScenario(t, test.name)
@@ -80,8 +82,9 @@ func TestNMFEOptionsEndInScript(tt *testing.T) {
 		{name: "metrum_std"},
 	}
 
+	testId := "INT-LOCAL-002"
 	for _, test := range tests {
-		tt.Run(test.name, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			scenario := InitializeScenario(t, test.name)
@@ -149,8 +152,9 @@ func TestBbiParallelExecution(tt *testing.T) {
 		{name: "metrum_std"},
 	}
 
+	testId := "INT-LOCAL-003"
 	for _, test := range tests {
-		tt.Run(test.name, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 			scenario := InitializeScenario(t, test.name)
 
@@ -207,8 +211,9 @@ func TestDefaultConfigLoaded(tt *testing.T) {
 		{name: "240"},
 	}
 
+	testId := "INT-LOCAL-004"
 	for _, test := range tests {
-		tt.Run(test.name, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
@@ -245,23 +250,26 @@ func TestDefaultConfigLoaded(tt *testing.T) {
 func TestSpecifiedConfigByAbsPathLoaded(tt *testing.T) {
 	SkipIfNotEnabled(tt, "LOCAL")
 
+	testId := "INT-LOCAL-005"
 	func() {
-		t := wrapt.WrapT(tt)
+		tt.Run(testId, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-		fs := afero.NewOsFs()
+			fs := afero.NewOsFs()
 
-		if ok, _ := afero.DirExists(fs, filepath.Join(ROOT_EXECUTION_DIR, "meow")); ok {
-			t.R.NoError(fs.RemoveAll(filepath.Join(ROOT_EXECUTION_DIR, "meow")))
-		}
+			if ok, _ := afero.DirExists(fs, filepath.Join(ROOT_EXECUTION_DIR, "meow")); ok {
+				t.R.NoError(fs.RemoveAll(filepath.Join(ROOT_EXECUTION_DIR, "meow")))
+			}
 
-		t.R.NoError(fs.MkdirAll(filepath.Join(ROOT_EXECUTION_DIR, "meow"), 0755))
-		// Copy the bbi file here
-		source, _ := fs.Open("bbi.yaml")
-		defer t.R.NoError(source.Close())
-		dest, _ := fs.Create(filepath.Join(ROOT_EXECUTION_DIR, "meow", "bbi.yaml"))
-		defer t.R.NoError(dest.Close())
+			t.R.NoError(fs.MkdirAll(filepath.Join(ROOT_EXECUTION_DIR, "meow"), 0755))
+			// Copy the bbi file here
+			source, _ := fs.Open("bbi.yaml")
+			defer t.R.NoError(source.Close())
+			dest, _ := fs.Create(filepath.Join(ROOT_EXECUTION_DIR, "meow", "bbi.yaml"))
+			defer t.R.NoError(dest.Close())
 
-		_, _ = io.Copy(dest, source)
+			_, _ = io.Copy(dest, source)
+		})
 	}()
 
 	tests := []struct {
@@ -274,7 +282,7 @@ func TestSpecifiedConfigByAbsPathLoaded(tt *testing.T) {
 	}
 
 	for _, test := range tests {
-		tt.Run(test.name, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
@@ -314,53 +322,56 @@ func TestSpecifiedConfigByAbsPathLoaded(tt *testing.T) {
 func TestSpecifiedConfigByRelativePathLoaded(tt *testing.T) {
 	SkipIfNotEnabled(tt, "LOCAL")
 
-	t := wrapt.WrapT(tt)
+	testId := "INT-LOCAL-006"
+	tt.Run(testId, func(tt *testing.T) {
+		t := wrapt.WrapT(tt)
 
-	fs := afero.NewOsFs()
+		fs := afero.NewOsFs()
 
-	if ok, _ := afero.DirExists(fs, filepath.Join(ROOT_EXECUTION_DIR, "meow")); ok {
-		t.R.NoError(fs.RemoveAll(filepath.Join(ROOT_EXECUTION_DIR, "meow")))
-	}
+		if ok, _ := afero.DirExists(fs, filepath.Join(ROOT_EXECUTION_DIR, "meow")); ok {
+			t.R.NoError(fs.RemoveAll(filepath.Join(ROOT_EXECUTION_DIR, "meow")))
+		}
 
-	t.R.NoError(fs.MkdirAll(filepath.Join(ROOT_EXECUTION_DIR, "meow"), 0755))
-	// Copy the bbi file here
-	source, _ := fs.Open("bbi.yaml")
-	defer t.R.NoError(source.Close())
-	dest, _ := fs.Create(filepath.Join(ROOT_EXECUTION_DIR, "meow", "bbi.yaml"))
-	defer t.R.NoError(dest.Close())
+		t.R.NoError(fs.MkdirAll(filepath.Join(ROOT_EXECUTION_DIR, "meow"), 0755))
+		// Copy the bbi file here
+		source, _ := fs.Open("bbi.yaml")
+		defer t.R.NoError(source.Close())
+		dest, _ := fs.Create(filepath.Join(ROOT_EXECUTION_DIR, "meow", "bbi.yaml"))
+		defer t.R.NoError(dest.Close())
 
-	_, _ = io.Copy(dest, source)
+		_, _ = io.Copy(dest, source)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
-	defer cancel()
-	scenario := InitializeScenario(t, "240")
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+		defer cancel()
+		scenario := InitializeScenario(t, "240")
 
-	// Copy config to /${ROOT_EXECUTION_DIR}/meow/bbi.yaml
-	nonMemArguments := []string{
-		"-d",
-		"--config",
-		filepath.Join(ROOT_EXECUTION_DIR, "meow", "bbi.yaml"),
-		"nonmem",
-		"run",
-		"local",
-		"--nm_version",
-		os.Getenv("NMVERSION"),
-	}
+		// Copy config to /${ROOT_EXECUTION_DIR}/meow/bbi.yaml
+		nonMemArguments := []string{
+			"-d",
+			"--config",
+			filepath.Join(ROOT_EXECUTION_DIR, "meow", "bbi.yaml"),
+			"nonmem",
+			"run",
+			"local",
+			"--nm_version",
+			os.Getenv("NMVERSION"),
+		}
 
-	scenario.Prepare(t, ctx)
+		scenario.Prepare(t, ctx)
 
-	for _, v := range scenario.models {
-		t.Run(v.identifier, func(t *wrapt.T) {
-			out, _ := v.Execute(scenario, nonMemArguments...)
-			nmd := NonMemTestingDetails{
-				OutputDir: "",
-				Model:     v,
-				Output:    out,
-			}
+		for _, v := range scenario.models {
+			t.Run(utils.AddTestId(v.identifier, testId), func(t *wrapt.T) {
+				out, _ := v.Execute(scenario, nonMemArguments...)
+				nmd := NonMemTestingDetails{
+					OutputDir: "",
+					Model:     v,
+					Output:    out,
+				}
 
-			AssertSpecifiedConfigLoaded(t, nmd, filepath.Join(ROOT_EXECUTION_DIR, "meow", "bbi.yaml"))
-		})
-	}
+				AssertSpecifiedConfigLoaded(t, nmd, filepath.Join(ROOT_EXECUTION_DIR, "meow", "bbi.yaml"))
+			})
+		}
+	})
 }
 
 func SkipIfNotEnabled(t *testing.T, feature string) {

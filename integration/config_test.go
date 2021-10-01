@@ -3,6 +3,7 @@ package bbitest
 import (
 	"context"
 	"encoding/json"
+	"github.com/metrumresearchgroup/bbi/utils"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -25,8 +26,9 @@ func TestBBIConfigJSONCreated(tt *testing.T) {
 		{name: "metrum_std"},
 	}
 
+	testId := "INT-CFG-001"
 	for _, test := range tests {
-		tt.Run(test.name, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			scenario := InitializeScenario(t, test.name)
@@ -112,8 +114,9 @@ func TestConfigValuesAreCorrectInWrittenFile(tt *testing.T) {
 		os.Getenv("NMVERSION"),
 	}
 
+	testId := "INT-CFG-002"
 	for _, m := range scenario.models {
-		t.Run(m.identifier, func(tt *wrapt.T) {
+		t.Run(utils.AddTestId(m.identifier, testId), func(tt *wrapt.T) {
 			output, err := m.Execute(scenario, commandAndArgs...)
 
 			t.A.Nil(err)
