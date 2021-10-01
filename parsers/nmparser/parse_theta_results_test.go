@@ -38,6 +38,9 @@ func TestParseThetaResultsBlock(tt *testing.T) {
 
 	parsedData := ParseThetaResults(thetaResults01)
 
-	t := wrapt.WrapT(tt)
-	t.R.Equal(thetaResults01Parsed, parsedData)
+	testId := "UNIT-NMP-010"
+	tt.Run(testId, func(tt *testing.T) {
+		t := wrapt.WrapT(tt)
+		t.R.Equal(thetaResults01Parsed, parsedData)
+	})
 }

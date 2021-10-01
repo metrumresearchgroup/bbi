@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"github.com/metrumresearchgroup/bbi/utils"
 	"testing"
 
 	"github.com/metrumresearchgroup/wrapt"
@@ -86,8 +87,9 @@ func TestReadParseShkLines(tt *testing.T) {
 		},
 	}
 
+	testId := "UNIT-NMP-029"
 	for _, test := range tests {
-		tt.Run(test.context, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(test.context, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			ed := ParseShkLines(test.lines)
@@ -168,8 +170,9 @@ func TestReadParseShkLines2(tt *testing.T) {
 		},
 	}
 
+	testId := "UNIT-NMP-030"
 	for _, test := range tests {
-		tt.Run(test.context, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(test.context, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			ed := ParseShkLines(test.lines)

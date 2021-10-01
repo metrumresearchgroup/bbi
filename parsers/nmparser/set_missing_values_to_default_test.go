@@ -2,6 +2,7 @@ package parser
 
 import (
 	"fmt"
+	"github.com/metrumresearchgroup/bbi/utils"
 	"testing"
 
 	"github.com/metrumresearchgroup/wrapt"
@@ -27,8 +28,9 @@ func TestSetMissingValuesToDefaultParameterDataMethod(tt *testing.T) {
 			expected: "Test Method",
 		},
 	}
+	testId := "UNIT-NMP-001"
 	for _, test := range tests {
-		tt.Run(test.expected, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(test.expected, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			setMissingValuesToDefault(&test.modelOutput)
@@ -58,8 +60,9 @@ func TestSetMissingValuesToDefaultParameterDataStdErrDimension(tt *testing.T) {
 		},
 	}
 
+	testId := "UNIT-NMP-002"
 	for _, test := range tests {
-		tt.Run(test.name, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			setMissingValuesToDefault(&test.modelOutput)
@@ -88,8 +91,9 @@ func TestSetMissingValuesToDefaultParameterDataRESDDimension(tt *testing.T) {
 		},
 	}
 
+	testId := "UNIT-NMP-003"
 	for _, test := range tests {
-		tt.Run(test.name, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			setMissingValuesToDefault(&test.modelOutput)
@@ -119,8 +123,9 @@ func TestSetMissingValuesToDefaultParameterDataValues(tt *testing.T) {
 		},
 	}
 
+	testId := "UNIT-NMP-004"
 	for _, test := range tests {
-		tt.Run(test.name, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			setMissingValuesToDefault(&test.modelOutput)
@@ -153,8 +158,9 @@ func TestSetMissingValuesToDefaultParameterNameValues(tt *testing.T) {
 		},
 	}
 
+	testId := "UNIT-NMP-005"
 	for _, test := range tests {
-		tt.Run(test.name, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			setMissingValuesToDefault(&test.modelOutput)

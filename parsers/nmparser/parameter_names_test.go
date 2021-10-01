@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"github.com/metrumresearchgroup/bbi/utils"
 	"testing"
 
 	"github.com/metrumresearchgroup/wrapt"
@@ -40,8 +41,9 @@ func TestDefaultParameterNames(tt *testing.T) {
 			context: "multiple params",
 		},
 	}
+	testId := "UNIT-NMP-011"
 	for _, test := range tests {
-		tt.Run(test.context, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(test.context, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			pn := NewDefaultParameterNames(test.values["nTheta"], test.values["nOmega"], test.values["nSigma"])

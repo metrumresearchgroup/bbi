@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"github.com/metrumresearchgroup/bbi/utils"
 	"testing"
 
 	"github.com/metrumresearchgroup/wrapt"
@@ -43,8 +44,9 @@ func TestGetDiagonalIndices(tt *testing.T) {
 		// 	expected: []int{0, 2, 3},
 		// },
 	}
+	testId := "UNIT-NMP-031"
 	for _, test := range tests {
-		tt.Run(test.name, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			actual := GetDiagonalIndices(test.input)
@@ -91,8 +93,9 @@ func TestGetDiagonalIndices2(tt *testing.T) {
 			expected: []int{0, 2, 5, 9, 14, 20, 27, 35, 44},
 		},
 	}
+	testId := "UNIT-NMP-032"
 	for _, test := range tests {
-		tt.Run(test.name, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			var input []int
@@ -139,8 +142,9 @@ func TestGetBlockParameterNames(tt *testing.T) {
 			expected: []string{"SIGMA(1,1)", "SIGMA(2,1)", "SIGMA(2,2)"},
 		},
 	}
+	testId := "UNIT-NMP-033"
 	for _, test := range tests {
-		tt.Run(test.name, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			got := GetBlockParameterNames(test.function, test.length)

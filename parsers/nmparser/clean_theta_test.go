@@ -2,6 +2,7 @@ package parser
 
 import (
 	"bufio"
+	"github.com/metrumresearchgroup/bbi/utils"
 	"os"
 	"testing"
 
@@ -87,8 +88,9 @@ func TestCleaningThetaBlock(tt *testing.T) {
 			filename: "testdata/blocks/theta-block-03.lst",
 		},
 	}
+	testId := "UNIT-NMP-028"
 	for _, test := range tests {
-		tt.Run(test.name, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			testData, err := readLines(test.filename)

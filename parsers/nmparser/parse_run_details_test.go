@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"github.com/metrumresearchgroup/bbi/utils"
 	"testing"
 
 	"github.com/metrumresearchgroup/wrapt"
@@ -116,8 +117,9 @@ func TestParseRunDetails(tt *testing.T) {
 		},
 	}
 
+	testId := "UNIT-NMP-035"
 	for _, test := range tests {
-		tt.Run(test.name, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			got := ParseRunDetails(test.input)
@@ -127,6 +129,8 @@ func TestParseRunDetails(tt *testing.T) {
 	}
 }
 
+// This was turned off Sept 2021 but
+// not sure why and if it should be deleted
 /*
 func TestParseRunDetailsFromFile(t *testing.T) {
 	OsFs := afero.NewOsFs()

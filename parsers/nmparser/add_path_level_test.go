@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"github.com/metrumresearchgroup/bbi/utils"
 	"runtime"
 	"strconv"
 	"testing"
@@ -34,8 +35,10 @@ func TestAddingPathLevel(tt *testing.T) {
 			"$DATA ../modeling/data1.csv IGNORE=@ IGNORE=ID.GT.5",
 		}
 	}
+
+	testId := "UNIT-NMP-013"
 	for i, val := range originalPaths {
-		tt.Run("path "+strconv.Itoa(i), func(tt *testing.T) {
+		tt.Run(utils.AddTestId("path "+strconv.Itoa(i), testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			newPath := AddPathLevelToData(val)
