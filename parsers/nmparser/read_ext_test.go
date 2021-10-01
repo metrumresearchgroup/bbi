@@ -9,8 +9,8 @@ import (
 
 func TestReadExt(tt *testing.T) {
 	var tests = []struct {
-		name string
-		lines   []string
+		name  string
+		lines []string
 	}{
 		{
 			name: "ext test",
