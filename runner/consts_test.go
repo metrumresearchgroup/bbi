@@ -1,9 +1,11 @@
 package runner
 
 import (
-	"github.com/metrumresearchgroup/bbi/utils"
-	"github.com/metrumresearchgroup/wrapt"
 	"testing"
+
+	"github.com/metrumresearchgroup/wrapt"
+
+	"github.com/metrumresearchgroup/bbi/utils"
 )
 
 func TestEstOutputFilesByRun(tt *testing.T) {

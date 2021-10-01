@@ -3,11 +3,12 @@ package bbitest
 import (
 	"context"
 	"encoding/json"
-	"github.com/metrumresearchgroup/bbi/utils"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/metrumresearchgroup/bbi/utils"
 
 	"github.com/metrumresearchgroup/wrapt"
 	"gopkg.in/yaml.v2"

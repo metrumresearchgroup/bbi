@@ -1,11 +1,12 @@
 package cmd
 
 import (
-	"github.com/metrumresearchgroup/bbi/utils"
 	"os"
 	"path"
 	"path/filepath"
 	"testing"
+
+	"github.com/metrumresearchgroup/bbi/utils"
 
 	"github.com/metrumresearchgroup/bbi/configlib"
 
@@ -54,7 +55,6 @@ func Test_doesDirectoryContainOutputFiles(tt *testing.T) {
 	testId := "UNIT-CMD-001"
 	for _, test := range tests {
 		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
-
 			t := wrapt.WrapT(tt)
 
 			got := doesDirectoryContainOutputFiles(test.args.path, test.args.modelname)

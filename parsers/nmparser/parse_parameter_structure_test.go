@@ -22,7 +22,6 @@ func TestParseParameterStructure(tt *testing.T) {
 
 	testId := "UNIT-NMP-015"
 	tt.Run(testId, func(tt *testing.T) {
-
 		t := wrapt.WrapT(tt)
 
 		parsedDiagonal01 := parseParameterStructure(parameterDiagonal01)
@@ -53,7 +52,6 @@ func TestParseParameterStructures(tt *testing.T) {
 	}
 	testId := "UNIT-NMP-016"
 	tt.Run(testId, func(tt *testing.T) {
-
 		t := wrapt.WrapT(tt)
 
 		parsedNoBlock01 := ParseParameterStructures(noBlocks01)

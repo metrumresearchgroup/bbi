@@ -2,12 +2,13 @@ package bbitest
 
 import (
 	"context"
-	"github.com/metrumresearchgroup/bbi/utils"
 	"io"
 	"os"
 	"path/filepath"
 	"testing"
 	"time"
+
+	"github.com/metrumresearchgroup/bbi/utils"
 
 	"github.com/metrumresearchgroup/wrapt"
 	"github.com/spf13/afero"

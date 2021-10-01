@@ -3,11 +3,12 @@ package bbitest
 import (
 	"context"
 	"errors"
-	"github.com/metrumresearchgroup/bbi/utils"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/metrumresearchgroup/bbi/utils"
 
 	"github.com/metrumresearchgroup/wrapt"
 )
@@ -15,9 +16,7 @@ import (
 // Test that expansion works with 001-005 etc.
 func TestBBIExpandsWithoutPrefix(tt *testing.T) {
 	testId := "INT-EXP-001"
-
 	tt.Run(testId, func(tt *testing.T) {
-
 		//	lines :=`DEBU[0000] expanded models: [240/001.mod 240/002.mod 240/003.mod 240/004.mod 240/005.mod 240/006.mod 240/007.mod 240/008.mod 240/009.mod]
 		// INFO[0000] A total of 9 models have completed the initial preparation phase`
 		t := wrapt.WrapT(tt)

@@ -32,6 +32,7 @@ import (
 	"github.com/metrumresearchgroup/bbi/configlib"
 	parser "github.com/metrumresearchgroup/bbi/parsers/nmparser"
 	"github.com/metrumresearchgroup/bbi/runner"
+
 	"github.com/metrumresearchgroup/bbi/utils"
 
 	"github.com/metrumresearchgroup/turnstile"

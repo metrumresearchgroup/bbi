@@ -1,9 +1,10 @@
 package runner
 
 import (
-	"github.com/metrumresearchgroup/bbi/utils"
 	"runtime"
 	"testing"
+
+	"github.com/metrumresearchgroup/bbi/utils"
 
 	"github.com/metrumresearchgroup/wrapt"
 )

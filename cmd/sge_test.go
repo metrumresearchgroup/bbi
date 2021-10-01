@@ -1,8 +1,9 @@
 package cmd
 
 import (
-	"github.com/metrumresearchgroup/bbi/utils"
 	"testing"
+
+	"github.com/metrumresearchgroup/bbi/utils"
 
 	"github.com/metrumresearchgroup/bbi/configlib"
 )

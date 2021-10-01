@@ -1,10 +1,11 @@
 package parser
 
 import (
-	"github.com/metrumresearchgroup/bbi/utils"
 	"math"
 	"math/rand"
 	"testing"
+
+	"github.com/metrumresearchgroup/bbi/utils"
 
 	"github.com/metrumresearchgroup/wrapt"
 )

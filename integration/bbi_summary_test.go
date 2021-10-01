@@ -2,11 +2,12 @@ package bbitest
 
 import (
 	"context"
-	"github.com/metrumresearchgroup/bbi/utils"
 	"os"
 	"path/filepath"
 	"regexp"
 	"testing"
+
+	"github.com/metrumresearchgroup/bbi/utils"
 
 	"github.com/metrumresearchgroup/wrapt"
 )

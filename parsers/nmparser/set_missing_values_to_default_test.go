@@ -2,8 +2,9 @@ package parser
 
 import (
 	"fmt"
-	"github.com/metrumresearchgroup/bbi/utils"
 	"testing"
+
+	"github.com/metrumresearchgroup/bbi/utils"
 
 	"github.com/metrumresearchgroup/wrapt"
 )

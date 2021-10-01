@@ -24,6 +24,7 @@ import (
 	"github.com/gobwas/glob"
 
 	"github.com/metrumresearchgroup/bbi/runner"
+
 	"github.com/metrumresearchgroup/bbi/utils"
 
 	"github.com/spf13/afero"

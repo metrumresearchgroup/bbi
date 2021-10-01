@@ -3,11 +3,12 @@ package bbitest
 import (
 	"context"
 	"fmt"
-	"github.com/metrumresearchgroup/bbi/utils"
 	"os"
 	"path/filepath"
 	"testing"
 	"time"
+
+	"github.com/metrumresearchgroup/bbi/utils"
 
 	"github.com/metrumresearchgroup/gogridengine"
 	"github.com/metrumresearchgroup/wrapt"

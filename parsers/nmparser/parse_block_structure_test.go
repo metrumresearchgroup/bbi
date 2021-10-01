@@ -22,5 +22,4 @@ func TestParseParameterBlock(tt *testing.T) {
 		parsedData := ParseBlockStructure(input)
 		t.R.Equal(expected, parsedData)
 	})
-
 }

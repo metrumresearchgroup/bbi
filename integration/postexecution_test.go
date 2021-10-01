@@ -4,13 +4,14 @@ import (
 	"bufio"
 	"bytes"
 	"context"
-	"github.com/metrumresearchgroup/bbi/utils"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 	"text/template"
+
+	"github.com/metrumresearchgroup/bbi/utils"
 
 	"github.com/metrumresearchgroup/wrapt"
 	"github.com/spf13/afero"
@@ -49,7 +50,6 @@ func generatePostWorkEnvsString(content map[string]string) (string, error) {
 }
 
 func TestKVPExpansion(tt *testing.T) {
-
 	testId := "INT-POSTEX-001"
 	tt.Run(testId, func(tt *testing.T) {
 		t := wrapt.WrapT(tt)
@@ -70,7 +70,6 @@ func TestPostExecutionSucceeds(tt *testing.T) {
 	testId := "INT-POSTEX-002"
 
 	func() {
-
 		tt.Run(testId, func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 

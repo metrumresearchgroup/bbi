@@ -7,7 +7,6 @@ import (
 )
 
 func TestDefaultEstimateModel(tt *testing.T) {
-
 	testId := "UNIT-RUN-003"
 	tt.Run(testId, func(tt *testing.T) {
 		t := wrapt.WrapT(tt)
@@ -25,7 +24,6 @@ func TestDefaultEstimateModel(tt *testing.T) {
 }
 
 func TestCustomEstimateModel(tt *testing.T) {
-
 	testId := "UNIT-RUN-004"
 	tt.Run(testId, func(tt *testing.T) {
 		t := wrapt.WrapT(tt)

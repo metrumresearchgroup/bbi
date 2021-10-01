@@ -13,7 +13,6 @@ func TestOmega(tt *testing.T) {
 
 	testId := "UNIT-NMP-014"
 	tt.Run(testId, func(tt *testing.T) {
-
 		t := wrapt.WrapT(tt)
 
 		t.R.Equal(1275, len(got))

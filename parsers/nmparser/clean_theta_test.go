@@ -2,9 +2,10 @@ package parser
 
 import (
 	"bufio"
-	"github.com/metrumresearchgroup/bbi/utils"
 	"os"
 	"testing"
+
+	"github.com/metrumresearchgroup/bbi/utils"
 
 	"github.com/metrumresearchgroup/wrapt"
 )
