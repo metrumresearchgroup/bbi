@@ -253,7 +253,7 @@ func TestSpecifiedConfigByAbsPathLoaded(tt *testing.T) {
 
 	testId := "INT-LOCAL-005"
 	func() {
-		tt.Run(testId, func(tt *testing.T) {
+		tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			fs := afero.NewOsFs()
@@ -324,7 +324,7 @@ func TestSpecifiedConfigByRelativePathLoaded(tt *testing.T) {
 	SkipIfNotEnabled(tt, "LOCAL")
 
 	testId := "INT-LOCAL-006"
-	tt.Run(testId, func(tt *testing.T) {
+	tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
 		t := wrapt.WrapT(tt)
 
 		fs := afero.NewOsFs()

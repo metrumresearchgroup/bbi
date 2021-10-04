@@ -3,12 +3,13 @@ package runner
 import (
 	"testing"
 
+	"github.com/metrumresearchgroup/bbi/utils"
 	"github.com/metrumresearchgroup/wrapt"
 )
 
 func TestDefaultEstimateModel(tt *testing.T) {
 	testId := "UNIT-RUN-003"
-	tt.Run(testId, func(tt *testing.T) {
+	tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
 		t := wrapt.WrapT(tt)
 
 		r := RunSettings{
@@ -25,7 +26,7 @@ func TestDefaultEstimateModel(tt *testing.T) {
 
 func TestCustomEstimateModel(tt *testing.T) {
 	testId := "UNIT-RUN-004"
-	tt.Run(testId, func(tt *testing.T) {
+	tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
 		t := wrapt.WrapT(tt)
 		r := RunSettings{
 			OutputDir: "oh_{{ .Name }}_hai",
@@ -42,7 +43,7 @@ func TestCustomEstimateModel(tt *testing.T) {
 //Should just get back the provided output dir.
 func TestLogiclessTemplateForEstimateModel(tt *testing.T) {
 	testId := "UNIT-RUN-005"
-	tt.Run(testId, func(tt *testing.T) {
+	tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
 		t := wrapt.WrapT(tt)
 		r := RunSettings{
 			OutputDir: "notatemplate",

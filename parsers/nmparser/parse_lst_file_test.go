@@ -12,7 +12,7 @@ import (
 
 func TestParseOBJV(tt *testing.T) {
 	testId := "UNIT-NMP-019"
-	tt.Run(testId, func(tt *testing.T) {
+	tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
 		t := wrapt.WrapT(tt)
 
 		var ofvDetails = []OfvDetails{NewOfvDetails("dummy")}
@@ -38,7 +38,7 @@ func TestParseOBJV(tt *testing.T) {
 
 func TestParTestParseOBJV2(tt *testing.T) {
 	testId := "UNIT-NMP-020"
-	tt.Run(testId, func(tt *testing.T) {
+	tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
 		t := wrapt.WrapT(tt)
 
 		var lines = []string{
@@ -64,7 +64,7 @@ func TestParTestParseOBJV2(tt *testing.T) {
 
 func TestParTestParseOBJV3(tt *testing.T) {
 	testId := "UNIT-NMP-021"
-	tt.Run(testId, func(tt *testing.T) {
+	tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
 		t := wrapt.WrapT(tt)
 
 		var lines = []string{
@@ -551,7 +551,7 @@ func checkMatrix2(matrix [][]float64, limit float64) bool {
 
 func TestCheckMatrix(tt *testing.T) {
 	testId := "UNIT-NMP-025"
-	tt.Run(testId, func(tt *testing.T) {
+	tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
 		t := wrapt.WrapT(tt)
 		dim := 3
 		matrix := make([][]float64, dim)

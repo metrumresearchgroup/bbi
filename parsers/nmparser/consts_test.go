@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/metrumresearchgroup/bbi/utils"
 	"github.com/metrumresearchgroup/wrapt"
 )
 
@@ -12,7 +13,7 @@ func TestOmega(tt *testing.T) {
 	got := omega(50)
 
 	testId := "UNIT-NMP-014"
-	tt.Run(testId, func(tt *testing.T) {
+	tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
 		t := wrapt.WrapT(tt)
 
 		t.R.Equal(1275, len(got))

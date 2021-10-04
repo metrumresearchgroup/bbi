@@ -3,13 +3,14 @@ package runner
 import (
 	"testing"
 
+	"github.com/metrumresearchgroup/bbi/utils"
 	"github.com/metrumresearchgroup/wrapt"
 	"github.com/spf13/afero"
 )
 
 func TestReadCopiedFiles(tt *testing.T) {
 	testId := "UNIT-RUN-006"
-	tt.Run(testId, func(tt *testing.T) {
+	tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
 		t := wrapt.WrapT(tt)
 
 		results := []struct {
@@ -36,7 +37,7 @@ func TestReadCopiedFiles(tt *testing.T) {
 
 func TestGetCopiedFilenames(tt *testing.T) {
 	testId := "UNIT-RUN-007"
-	tt.Run(testId, func(tt *testing.T) {
+	tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
 		t := wrapt.WrapT(tt)
 
 		results := []struct {

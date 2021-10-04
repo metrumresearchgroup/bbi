@@ -51,7 +51,7 @@ func generatePostWorkEnvsString(content map[string]string) (string, error) {
 
 func TestKVPExpansion(tt *testing.T) {
 	testId := "INT-POSTEX-001"
-	tt.Run(testId, func(tt *testing.T) {
+	tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
 		t := wrapt.WrapT(tt)
 
 		mapdata := make(map[string]string)
@@ -70,7 +70,7 @@ func TestPostExecutionSucceeds(tt *testing.T) {
 	testId := "INT-POSTEX-002"
 
 	func() {
-		tt.Run(testId, func(tt *testing.T) {
+		tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			var err error

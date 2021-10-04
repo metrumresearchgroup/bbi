@@ -203,7 +203,7 @@ func TestSummaryErrors(tt *testing.T) {
 
 func TestSummaryHappyPathNoExtension(tt *testing.T) {
 	testId := "INT-SUM-004"
-	tt.Run(testId, func(tt *testing.T) {
+	tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
 		t := wrapt.WrapT(tt)
 
 		mod := "acop" // just testing one model
