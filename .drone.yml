@@ -27,7 +27,7 @@ steps:
       - # this is a hack around the current design; will clean up after passing a test or two
       - go build -o bbi cmd/bbi/main.go
       - ./bbi version
-      - rm test_output.json
+      - rm -f test_output.json
 
   - name: Copy commit hashes to s3
     commands:
