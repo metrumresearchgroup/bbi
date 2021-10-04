@@ -27,6 +27,7 @@ steps:
       - # this is a hack around the current design; will clean up after passing a test or two
       - go build -o bbi cmd/bbi/main.go
       - ./bbi version
+      - rm test_output.json
 
   - name: Copy commit hashes to s3
     commands:
@@ -41,7 +42,7 @@ steps:
       - export ROOT_EXECUTION_DIR=/data/${DRONE_BUILD_NUMBER}
       - export BBI_GRID_NAME_PREFIX="drone_${DRONE_BUILD_NUMBER}"
       - bbi init --dir /opt/NONMEM
-      - go list ./... | grep -v integration | xargs go test
+      - go list ./... | grep -v integration | xargs go test | tee test_output.json --append
     environment:
       LOCAL: true
       MPIEXEC_PATH: /usr/bin/mpiexec
@@ -72,7 +73,7 @@ steps:
       - export ROOT_EXECUTION_DIR=/data/${DRONE_BUILD_NUMBER}
       - export BBI_GRID_NAME_PREFIX="drone_${DRONE_BUILD_NUMBER}"
       - bbi init --dir /opt/NONMEM
-      - go test ./... -v --json -timeout 30m | tee test_output.json
+      - go test ./... -v --json -timeout 30m | tee test_output.json --append
       - aws s3 cp test_output.json s3://mrg-validation/bbi/${DRONE_BUILD_NUMBER}/results.json
       - chmod +x failure_detector.sh
       - ./failure_detector.sh test_output.json
