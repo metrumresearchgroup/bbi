@@ -41,7 +41,7 @@ steps:
       - export BBI_GRID_NAME_PREFIX="drone_${DRONE_BUILD_NUMBER}"
       - bbi init --dir /opt/NONMEM
       - rm -f /data/${DRONE_BUILD_NUMBER}/test_output.json
-      - go list ./... | grep -v integration | xargs go test | tee /data/${DRONE_BUILD_NUMBER}/test_output.json --append
+      - go list ./... | grep -v integration | xargs go test --json | tee /data/${DRONE_BUILD_NUMBER}/test_output.json --append
       - aws s3 cp /data/${DRONE_BUILD_NUMBER}/test_output.json s3://mrg-validation/bbi/${DRONE_BUILD_NUMBER}/results.json
     environment:
       LOCAL: true
