@@ -98,8 +98,8 @@ func params(cmd *cobra.Command, args []string) {
 		}
 
 		if len(modelDirs) == 0 {
-			log.Infof("found %s subdirectories", len(potentialModelDirs))
-			log.Infof("found %s models", len(modelsInDir.List()))
+			log.Infof("found %d subdirectories", len(potentialModelDirs))
+			log.Infof("found %d models", len(modelsInDir.List()))
 			log.Fatal("no subdirectories with corresponding ctl or mod files found")
 		}
 	}
