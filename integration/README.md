@@ -10,3 +10,4 @@ UPDATE_SUMMARY=true ROOT_EXECUTION_DIR=/tmp/ go test -v -run TestSum
 Several other tests use a similar pattern:
 
 * Tests in `integration/bbi_covcor_test.go` use `UPDATE_COVCOR`
+* Tests in `integration/bbi_params_test.go` use `UPDATE_PARAMS`
