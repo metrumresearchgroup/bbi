@@ -38,16 +38,16 @@ func ParseEstimatesFromExt(file string) (ExtFastData, error) {
 		} else if strings.HasPrefix(line, " ITER") {
 			if len(paramNames) == 0 {
 				fields := strings.Fields(line)
-				paramNames = fields[1:len(fields)-1]
+				paramNames = fields[1 : len(fields)-1]
 
 			}
 			continue
-		} else if strings.HasPrefix(line, "  -1000000000"){
+		} else if strings.HasPrefix(line, "  -1000000000") {
 			estLineDetected = true
 			// all lines minus the first which is the -100000000 and last which is OBJ
-			fields :=strings.Fields(line)
+			fields := strings.Fields(line)
 			estimationLines = append(estimationLines, fields[1:len(fields)-1])
-		} else if strings.HasPrefix(line, "  -1000000007"){
+		} else if strings.HasPrefix(line, "  -1000000007") {
 			fields := strings.Fields(line)
 			terminationCodes = append(terminationCodes, fields[1:len(fields)-1])
 		}
@@ -65,8 +65,7 @@ func ParseEstimatesFromExt(file string) (ExtFastData, error) {
 	return ExtFastData{
 		EstimationMethods: estimationMethods,
 		ParameterNames:    paramNames,
-		EstimationLines: estimationLines,
-		TerminationCodes: terminationCodes,
+		EstimationLines:   estimationLines,
+		TerminationCodes:  terminationCodes,
 	}, nil
 }
-

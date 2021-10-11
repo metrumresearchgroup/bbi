@@ -37,7 +37,7 @@ bbi nonmem params run001
 
 var (
 	noParamNames bool
-	dir string
+	dir          string
 )
 
 // helpers for making a set
@@ -107,7 +107,7 @@ func params(cmd *cobra.Command, args []string) {
 	if len(args) == 1 {
 		dir := args[0]
 		if extFile == "" {
-			extFile = strings.Join([]string{filepath.Base(dir), "ext"},".")
+			extFile = strings.Join([]string{filepath.Base(dir), "ext"}, ".")
 		}
 		results, err := parser.ParseEstimatesFromExt(filepath.Join(dir, extFile))
 
@@ -122,7 +122,7 @@ func params(cmd *cobra.Command, args []string) {
 				printParamHeader(results)
 			}
 
-			fmt.Println(extFile + "," + strings.Join(results.EstimationLines[len(results.EstimationLines) - 1], ","))
+			fmt.Println(extFile + "," + strings.Join(results.EstimationLines[len(results.EstimationLines)-1], ","))
 		}
 		return
 	}
@@ -143,7 +143,7 @@ func params(cmd *cobra.Command, args []string) {
 	}
 	type jsonParamResults struct {
 		Results []parser.ExtFastData
-		Errors []error
+		Errors  []error
 	}
 
 	workers := runtime.NumCPU()
@@ -221,7 +221,7 @@ func params(cmd *cobra.Command, args []string) {
 			}
 
 			var absolutePath string
-			if strings.HasSuffix(dir, "/"){
+			if strings.HasSuffix(dir, "/") {
 				absolutePath = dir + modelDirs[res.Index]
 			} else {
 				absolutePath = dir + "/" + modelDirs[res.Index]
@@ -240,7 +240,7 @@ func params(cmd *cobra.Command, args []string) {
 				fmt.Println(absolutePath + ",," + terminationCode + "," + strings.Join(s, ","))
 
 			} else if res.Outcome == ERROR {
-				errorMessage :=  res.Err.Error()
+				errorMessage := res.Err.Error()
 				fmt.Println(absolutePath + "," + errorMessage + ",," + strings.Join(s, ","))
 			}
 		}
@@ -265,8 +265,8 @@ func NewParamsCmd() *cobra.Command {
 	var cmd = &cobra.Command{
 		Use:   "params",
 		Short: "get the parameters of model(s)",
-		Long: paramsLongDescription,
-		Run: params,
+		Long:  paramsLongDescription,
+		Run:   params,
 	}
 
 	//Used for Summary
