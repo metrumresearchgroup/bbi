@@ -5,75 +5,86 @@ import (
 	"math/rand"
 	"testing"
 
+	"github.com/metrumresearchgroup/bbi/utils"
+
 	"github.com/metrumresearchgroup/wrapt"
 )
 
 func TestParseOBJV(tt *testing.T) {
-	t := wrapt.WrapT(tt)
+	testId := "UNIT-NMP-019"
+	tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
+		t := wrapt.WrapT(tt)
 
-	var ofvDetails = []OfvDetails{NewOfvDetails("dummy")}
-	var expected = []OfvDetails{NewOfvDetails("dummy")}
+		var ofvDetails = []OfvDetails{NewOfvDetails("dummy")}
+		var expected = []OfvDetails{NewOfvDetails("dummy")}
 
-	ofvDetails = parseOFV("OBJECTIVE FUNCTION VALUE WITHOUT CONSTANT: 821.705", ofvDetails)
-	expected[0].OFVNoConstant = 821.705
-	t.A.Equal(expected, ofvDetails)
+		ofvDetails = parseOFV("OBJECTIVE FUNCTION VALUE WITHOUT CONSTANT: 821.705", ofvDetails)
+		expected[0].OFVNoConstant = 821.705
+		t.A.Equal(expected, ofvDetails)
 
-	ofvDetails = parseOFV("OBJECTIVE FUNCTION VALUE WITH CONSTANT:       1639.561", ofvDetails)
-	expected[0].OFVWithConstant = 1639.561
-	t.A.Equal(expected, ofvDetails)
+		ofvDetails = parseOFV("OBJECTIVE FUNCTION VALUE WITH CONSTANT:       1639.561", ofvDetails)
+		expected[0].OFVWithConstant = 1639.561
+		t.A.Equal(expected, ofvDetails)
 
-	ofvDetails = parseOFV("N*LOG(2PI) CONSTANT TO OBJECTIVE FUNCTION:    817.855", ofvDetails)
-	expected[0].ConstantToOFV = 817.855
-	t.A.Equal(expected, ofvDetails)
+		ofvDetails = parseOFV("N*LOG(2PI) CONSTANT TO OBJECTIVE FUNCTION:    817.855", ofvDetails)
+		expected[0].ConstantToOFV = 817.855
+		t.A.Equal(expected, ofvDetails)
 
-	ofvDetails = parseOFV("#OBJV:********************************************    -7913.528       **************************************************", ofvDetails)
-	expected[0].OFVNoConstant = -7913.528
-	t.A.Equal(expected, ofvDetails)
+		ofvDetails = parseOFV("#OBJV:********************************************    -7913.528       **************************************************", ofvDetails)
+		expected[0].OFVNoConstant = -7913.528
+		t.A.Equal(expected, ofvDetails)
+	})
 }
 
 func TestParTestParseOBJV2(tt *testing.T) {
-	t := wrapt.WrapT(tt)
+	testId := "UNIT-NMP-020"
+	tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
+		t := wrapt.WrapT(tt)
 
-	var lines = []string{
-		"#METH: dummy",
-		"OBJECTIVE FUNCTION VALUE WITHOUT CONSTANT: 821.705",
-		"OBJECTIVE FUNCTION VALUE WITH CONSTANT:       1639.561",
-		"N*LOG(2PI) CONSTANT TO OBJECTIVE FUNCTION:    817.855",
-		"#OBJV:********************************************    -7913.528       **************************************************",
-	}
-	expected := []OfvDetails{
-		{
-			EstMethod:       "dummy",
-			ConstantToOFV:   817.855,
-			OFVWithConstant: 1639.561,
-			OFVNoConstant:   -7913.528,
-		},
-	}
+		var lines = []string{
+			"#METH: dummy",
+			"OBJECTIVE FUNCTION VALUE WITHOUT CONSTANT: 821.705",
+			"OBJECTIVE FUNCTION VALUE WITH CONSTANT:       1639.561",
+			"N*LOG(2PI) CONSTANT TO OBJECTIVE FUNCTION:    817.855",
+			"#OBJV:********************************************    -7913.528       **************************************************",
+		}
+		expected := []OfvDetails{
+			{
+				EstMethod:       "dummy",
+				ConstantToOFV:   817.855,
+				OFVWithConstant: 1639.561,
+				OFVNoConstant:   -7913.528,
+			},
+		}
 
-	lstData := ParseLstEstimationFile(lines)
-	t.A.Equal(lstData.OFV, expected)
+		lstData := ParseLstEstimationFile(lines)
+		t.A.Equal(lstData.OFV, expected)
+	})
 }
 
 func TestParTestParseOBJV3(tt *testing.T) {
-	t := wrapt.WrapT(tt)
+	testId := "UNIT-NMP-021"
+	tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
+		t := wrapt.WrapT(tt)
 
-	var lines = []string{
-		"#METH: dummy",
-		"#OBJV:********************************************    -7913.528       **************************************************",
-		"OBJECTIVE FUNCTION VALUE WITHOUT CONSTANT: 821.705",
-		"OBJECTIVE FUNCTION VALUE WITH CONSTANT:       1639.561",
-		"N*LOG(2PI) CONSTANT TO OBJECTIVE FUNCTION:    817.855",
-	}
-	expected := []OfvDetails{
-		{
-			EstMethod:       "dummy",
-			ConstantToOFV:   817.855,
-			OFVWithConstant: 1639.561,
-			OFVNoConstant:   821.705,
-		},
-	}
-	lstData := ParseLstEstimationFile(lines)
-	t.A.Equal(expected, lstData.OFV)
+		var lines = []string{
+			"#METH: dummy",
+			"#OBJV:********************************************    -7913.528       **************************************************",
+			"OBJECTIVE FUNCTION VALUE WITHOUT CONSTANT: 821.705",
+			"OBJECTIVE FUNCTION VALUE WITH CONSTANT:       1639.561",
+			"N*LOG(2PI) CONSTANT TO OBJECTIVE FUNCTION:    817.855",
+		}
+		expected := []OfvDetails{
+			{
+				EstMethod:       "dummy",
+				ConstantToOFV:   817.855,
+				OFVWithConstant: 1639.561,
+				OFVNoConstant:   821.705,
+			},
+		}
+		lstData := ParseLstEstimationFile(lines)
+		t.A.Equal(expected, lstData.OFV)
+	})
 }
 
 func TestParseGradient(tt *testing.T) {
@@ -124,8 +135,9 @@ func TestParseGradient(tt *testing.T) {
 		},
 	}
 
+	testId := "UNIT-NMP-022"
 	for _, test := range tests {
-		tt.Run(test.context, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(test.context, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			noZeroFinal := parseGradient(test.lines)
@@ -215,8 +227,9 @@ func TestConditionNumber(tt *testing.T) {
 		},
 	}
 
+	testId := "UNIT-NMP-023"
 	for _, test := range tests {
-		tt.Run(test.context, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(test.context, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			conditionNumber := mustCalculateConditionNumber(test.lines, test.n)
@@ -455,8 +468,9 @@ func TestSetCorrelationsOk(tt *testing.T) {
 		},
 	}
 
+	testId := "UNIT-NMP-024"
 	for _, test := range tests {
-		tt.Run(test.context, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(test.context, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			correlationsOk := getCorrelationStatus(test.lines, test.n, 0.90)
@@ -536,38 +550,41 @@ func checkMatrix2(matrix [][]float64, limit float64) bool {
 }
 
 func TestCheckMatrix(tt *testing.T) {
-	t := wrapt.WrapT(tt)
-	dim := 3
-	matrix := make([][]float64, dim)
-	for i := range matrix {
-		matrix[i] = make([]float64, dim)
-	}
-
-	count := 1.0
-	for j := range matrix {
-		for k := range matrix[j] {
-			matrix[j][k] = count
-			count++
+	testId := "UNIT-NMP-025"
+	tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
+		t := wrapt.WrapT(tt)
+		dim := 3
+		matrix := make([][]float64, dim)
+		for i := range matrix {
+			matrix[i] = make([]float64, dim)
 		}
-	}
 
-	count = 1.0
-	for j := range matrix {
-		for k := range matrix[j] {
-			t.A.Equal(matrix[j][k], count, "Fail")
-			count++
+		count := 1.0
+		for j := range matrix {
+			for k := range matrix[j] {
+				matrix[j][k] = count
+				count++
+			}
 		}
-	}
 
-	// change to column major
-	matrix = transpose(matrix)
-	count = 1.0
-	for k := range matrix {
-		for j := range matrix[k] {
-			t.A.Equal(matrix[j][k], count, "Fail")
-			count++
+		count = 1.0
+		for j := range matrix {
+			for k := range matrix[j] {
+				t.A.Equal(matrix[j][k], count, "Fail")
+				count++
+			}
 		}
-	}
+
+		// change to column major
+		matrix = transpose(matrix)
+		count = 1.0
+		for k := range matrix {
+			for j := range matrix[k] {
+				t.A.Equal(matrix[j][k], count, "Fail")
+				count++
+			}
+		}
+	})
 }
 
 func TestSetCov(tt *testing.T) {
@@ -650,8 +667,9 @@ func TestSetCov(tt *testing.T) {
 		},
 	}
 
+	testId := "UNIT-NMP-026"
 	for _, test := range tests {
-		tt.Run(test.context, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(test.context, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			covTheta := getThetaValues(test.lines, test.n)
@@ -683,8 +701,9 @@ func TestGetGradientLine(tt *testing.T) {
 		},
 	}
 
+	testId := "UNIT-NMP-027"
 	for _, test := range tests {
-		tt.Run(test.context, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(test.context, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			line := getGradientLine(test.lines, test.n)

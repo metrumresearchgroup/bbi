@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/metrumresearchgroup/bbi/utils"
+
 	"github.com/metrumresearchgroup/wrapt"
 )
 
@@ -20,8 +22,9 @@ func TestNMQUALExecutionSucceeds(tt *testing.T) {
 	scenario := InitializeScenario(t, "ctl_test")
 	scenario.Prepare(t, context.Background())
 
+	testId := "INT-NMQ-001"
 	for _, m := range scenario.models {
-		t.Run(m.identifier, func(tt *wrapt.T) {
+		t.Run(utils.AddTestId(m.identifier, testId), func(tt *wrapt.T) {
 			args := []string{
 				"nonmem",
 				"run",
@@ -63,8 +66,9 @@ func TestHashingForNMQualWorksWithOriginalModFile(tt *testing.T) {
 	scenario := InitializeScenario(t, "240")
 	scenario.Prepare(t, context.Background())
 
+	testId := "INT-NMQ-002"
 	for _, m := range scenario.models {
-		t.Run(m.identifier, func(t *wrapt.T) {
+		t.Run(utils.AddTestId(m.identifier, testId), func(t *wrapt.T) {
 			args := []string{
 				"nonmem",
 				"run",

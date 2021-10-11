@@ -3,6 +3,8 @@ package parser
 import (
 	"testing"
 
+	"github.com/metrumresearchgroup/bbi/utils"
+
 	"github.com/metrumresearchgroup/wrapt"
 )
 
@@ -116,8 +118,9 @@ func TestParseRunDetails(tt *testing.T) {
 		},
 	}
 
+	testId := "UNIT-NMP-035"
 	for _, test := range tests {
-		tt.Run(test.name, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			got := ParseRunDetails(test.input)
@@ -126,16 +129,3 @@ func TestParseRunDetails(tt *testing.T) {
 		})
 	}
 }
-
-/*
-func TestParseRunDetailsFromFile(t *testing.T) {
-	OsFs := afero.NewOsFs()
-	var runDetails02, _ = afero.ReadFile(OsFs, RunDetails02)
-	lines := strings.Split(string(runDetails02), "\n")
-	parsedData := ParseRunDetails(lines)
-	parsedData.OutputFilesUsed = []string{""}
-	if !reflect.DeepEqual(parsedData, RunDetails02Results) {
-		t.Log("\nGOT: ", parsedData, "\n Expected: ", RunDetails02Results)
-		t.Fail()
-}
-}*/

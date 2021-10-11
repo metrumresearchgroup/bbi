@@ -3,15 +3,18 @@ package parser
 import (
 	"testing"
 
+	"github.com/metrumresearchgroup/bbi/utils"
+
 	"github.com/metrumresearchgroup/wrapt"
 )
 
 func TestReadExt(tt *testing.T) {
 	var tests = []struct {
-		lines   []string
-		context string
+		name  string
+		lines []string
 	}{
 		{
+			name: "ext test",
 			lines: []string{
 				"TABLE NO.     1: First Order Conditional Estimation with Interaction: Goal Function=MINIMUM VALUE OF OBJECTIVE FUNCTION: Problem=1 Subproblem=0 Superproblem1=0 Iteration1=0 Superproblem2=0 Iteration2=0",
 				" ITERATION    THETA1       THETA2       THETA3       THETA4       THETA5       THETA6       THETA7       THETA8       THETA9       SIGMA(1,1)   OMEGA(1,1)   OMEGA(2,1)   OMEGA(2,2)   OMEGA(3,1)   OMEGA(3,2)   OMEGA(3,3)   OBJ",
@@ -45,12 +48,12 @@ func TestReadExt(tt *testing.T) {
 				"  -1000000007  8.00000E+00  3.70000E+01  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00    0.0000000000000000",
 				"  -1000000008  9.00000E+00  6.43530E-06 -3.23355E-05  5.31805E-04 -1.53493E-02  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  6.02637E-01  3.65275E-02  0.00000E+00  1.60995E-01  0.00000E+00  0.00000E+00  1.32073E-01    0.0000000000000000",
 			},
-			context: "ext test",
 		},
 	}
 
+	testId := "UNIT-NMP-018"
 	for _, test := range tests {
-		tt.Run(test.context, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			ext := ParseExtLines(test.lines)

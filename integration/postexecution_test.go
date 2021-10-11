@@ -11,6 +11,8 @@ import (
 	"testing"
 	"text/template"
 
+	"github.com/metrumresearchgroup/bbi/utils"
+
 	"github.com/metrumresearchgroup/wrapt"
 	"github.com/spf13/afero"
 )
@@ -48,43 +50,49 @@ func generatePostWorkEnvsString(content map[string]string) (string, error) {
 }
 
 func TestKVPExpansion(tt *testing.T) {
-	t := wrapt.WrapT(tt)
+	testId := "INT-POSTEX-001"
+	tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
+		t := wrapt.WrapT(tt)
 
-	mapdata := make(map[string]string)
-	mapdata["SCENARIO"] = "240"
-	mapdata["ROOT_EXECUTION_DIR"] = "/data/one"
+		mapdata := make(map[string]string)
+		mapdata["SCENARIO"] = "240"
+		mapdata["ROOT_EXECUTION_DIR"] = "/data/one"
 
-	generated, err := generatePostWorkEnvsString(mapdata)
+		generated, err := generatePostWorkEnvsString(mapdata)
 
-	t.R.NoError(err)
-	t.R.NotNil(generated)
+		t.R.NoError(err)
+		t.R.NotNil(generated)
+	})
 }
 
 func TestPostExecutionSucceeds(tt *testing.T) {
 	var scenarios []*Scenario
+	testId := "INT-POSTEX-002"
 
 	func() {
-		t := wrapt.WrapT(tt)
+		tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-		var err error
-		// Skip the test if the flag isn't enabled
-		if !FeatureEnabled("POST_EXECUTION") {
-			t.Skip("Post execution not enabled as far as testing is concerned")
-		}
+			var err error
+			// Skip the test if the flag isn't enabled
+			if !FeatureEnabled("POST_EXECUTION") {
+				t.Skip("Post execution not enabled as far as testing is concerned")
+			}
 
-		for _, name := range []string{
-			"acop",
-		} {
-			scenario := InitializeScenario(t, name)
-			scenarios = append(scenarios, scenario)
-		}
+			for _, name := range []string{
+				"acop",
+			} {
+				scenario := InitializeScenario(t, name)
+				scenarios = append(scenarios, scenario)
+			}
 
-		err = ioutil.WriteFile(filepath.Join(ROOT_EXECUTION_DIR, "post.sh"), []byte(postExecutionScriptString), 0755)
-		t.R.NoError(err)
+			err = ioutil.WriteFile(filepath.Join(ROOT_EXECUTION_DIR, "post.sh"), []byte(postExecutionScriptString), 0755)
+			t.R.NoError(err)
+		})
 	}()
 
 	for _, scenario := range scenarios {
-		tt.Run(scenario.identifier, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(scenario.identifier, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			scenario.Prepare(t, context.Background())
@@ -155,7 +163,7 @@ func TestPostExecutionSucceeds(tt *testing.T) {
 	}
 
 	// Test a scenario for the first scenario where we force failure. Model is deleted (not found)
-	tt.Run("verify_failure_results", func(tt *testing.T) {
+	tt.Run(utils.AddTestId("verify_failure_results", testId), func(tt *testing.T) {
 		t := wrapt.WrapT(tt)
 
 		scenario := scenarios[0]
@@ -176,7 +184,7 @@ func TestPostExecutionSucceeds(tt *testing.T) {
 
 		// Removing the model won't do anything. Execute with overwrite = false?
 		for _, v := range scenario.models {
-			tt.Run(v.identifier, func(tt *testing.T) {
+			tt.Run(utils.AddTestId(v.identifier, testId), func(tt *testing.T) {
 				t := wrapt.WrapT(tt)
 
 				var err error

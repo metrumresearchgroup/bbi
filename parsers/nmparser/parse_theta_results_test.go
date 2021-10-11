@@ -3,6 +3,7 @@ package parser
 import (
 	"testing"
 
+	"github.com/metrumresearchgroup/bbi/utils"
 	"github.com/metrumresearchgroup/wrapt"
 )
 
@@ -38,6 +39,9 @@ func TestParseThetaResultsBlock(tt *testing.T) {
 
 	parsedData := ParseThetaResults(thetaResults01)
 
-	t := wrapt.WrapT(tt)
-	t.R.Equal(thetaResults01Parsed, parsedData)
+	testId := "UNIT-NMP-010"
+	tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
+		t := wrapt.WrapT(tt)
+		t.R.Equal(thetaResults01Parsed, parsedData)
+	})
 }

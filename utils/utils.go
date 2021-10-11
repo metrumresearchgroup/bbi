@@ -255,3 +255,8 @@ func AnyTrue(bools []bool) bool {
 
 	return false
 }
+func AddTestId(s, testId string) string {
+	// no space between because go test --json turns the spaces into underscores
+	// which are ugly to parse out on the mrgvalprep side
+	return s + "[" + testId + "]"
+}

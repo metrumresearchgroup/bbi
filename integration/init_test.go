@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/metrumresearchgroup/bbi/utils"
+
 	"github.com/metrumresearchgroup/wrapt"
 	"gopkg.in/yaml.v2"
 
@@ -21,8 +23,9 @@ func TestInitialization(tt *testing.T) {
 		{name: "acop"},
 	}
 
+	testId := "INT-INIT-001"
 	for _, test := range tests {
-		tt.Run(test.name, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			scenario := InitializeScenario(t, test.name)

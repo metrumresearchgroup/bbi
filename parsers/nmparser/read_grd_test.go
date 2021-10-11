@@ -109,8 +109,9 @@ func TestReadParseGrdLines(tt *testing.T) {
 		},
 	}
 
+	testId := "UNIT-NMP-034"
 	for _, test := range tests {
-		tt.Run(test.context, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(test.context, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			grdData := ParseGrdLines(test.lines)

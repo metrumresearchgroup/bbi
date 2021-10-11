@@ -20,6 +20,7 @@ import (
 	"os"
 
 	"github.com/metrumresearchgroup/bbi/runner"
+
 	"github.com/metrumresearchgroup/bbi/utils"
 
 	"github.com/metrumresearchgroup/turnstile"

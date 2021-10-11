@@ -27,8 +27,9 @@ func TestListModelFiles(tt *testing.T) {
 		},
 	}
 
+	testId := "UNIT-UTL-006"
 	for _, test := range tests {
-		tt.Run(test.name, func(tt *testing.T) {
+		tt.Run(AddTestId(test.name, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			got := ListFilesByExt(test.input, ".mod")

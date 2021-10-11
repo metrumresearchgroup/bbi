@@ -26,6 +26,7 @@ import (
 	"strings"
 
 	parser "github.com/metrumresearchgroup/bbi/parsers/nmparser"
+
 	"github.com/metrumresearchgroup/bbi/utils"
 
 	"github.com/spf13/afero"

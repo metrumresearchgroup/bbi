@@ -7,6 +7,8 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/metrumresearchgroup/bbi/utils"
+
 	"github.com/metrumresearchgroup/wrapt"
 )
 
@@ -42,9 +44,9 @@ func TestSummaryHappyPath(tt *testing.T) {
 		"iovmm",            // Mixture model. Also has parameter_near_boundary and final_zero_gradient heuristics.
 		"acop-iov",         // fake model with 62 OMEGAS (fake iov)
 	}
-
+	testId := "INT-SUM-001"
 	for _, mod := range SummaryHappyPathTestMods {
-		tt.Run(mod, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(mod, testId), func(tt *testing.T) {
 			for _, tc := range testConfigs {
 				tt.Run(tc.goldenExt, func(tt *testing.T) {
 					t := wrapt.WrapT(tt)
@@ -104,8 +106,9 @@ func TestSummaryArgs(tt *testing.T) {
 		},
 	}
 
+	testId := "INT-SUM-002"
 	for _, tm := range SummaryArgsTestMods {
-		tt.Run(tm.mod, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(tm.mod, testId), func(tt *testing.T) {
 			for _, tc := range testConfigs {
 				tt.Run(tc.goldenExt, func(tt *testing.T) {
 					t := wrapt.WrapT(tt)
@@ -178,8 +181,9 @@ func TestSummaryErrors(tt *testing.T) {
 		},
 	}
 
+	testId := "INT-SUM-003"
 	for _, tc := range SummaryErrorCases {
-		tt.Run(tc.errorMsg, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(tc.errorMsg, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			commandAndArgs := []string{
@@ -198,25 +202,28 @@ func TestSummaryErrors(tt *testing.T) {
 }
 
 func TestSummaryHappyPathNoExtension(tt *testing.T) {
-	t := wrapt.WrapT(tt)
+	testId := "INT-SUM-004"
+	tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
+		t := wrapt.WrapT(tt)
 
-	mod := "acop" // just testing one model
+		mod := "acop" // just testing one model
 
-	commandAndArgs := []string{
-		"nonmem",
-		"summary",
-		filepath.Join(SUMMARY_TEST_DIR, mod, mod), // adding no extension should work
-	}
+		commandAndArgs := []string{
+			"nonmem",
+			"summary",
+			filepath.Join(SUMMARY_TEST_DIR, mod, mod), // adding no extension should work
+		}
 
-	output, err := executeCommand(context.Background(), "bbi", commandAndArgs...)
+		output, err := executeCommand(context.Background(), "bbi", commandAndArgs...)
 
-	t.R.NoError(err)
-	t.R.NotEmpty(output)
+		t.R.NoError(err)
+		t.R.NotEmpty(output)
 
-	gtd := GoldenFileTestingDetails{
-		outputString:   output,
-		goldenFilePath: filepath.Join(SUMMARY_TEST_DIR, SUMMARY_GOLD_DIR, mod+".golden.txt"),
-	}
+		gtd := GoldenFileTestingDetails{
+			outputString:   output,
+			goldenFilePath: filepath.Join(SUMMARY_TEST_DIR, SUMMARY_GOLD_DIR, mod+".golden.txt"),
+		}
 
-	RequireOutputMatchesGoldenFile(t, gtd)
+		RequireOutputMatchesGoldenFile(t, gtd)
+	})
 }

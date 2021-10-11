@@ -4,6 +4,8 @@ import (
 	"runtime"
 	"testing"
 
+	"github.com/metrumresearchgroup/bbi/utils"
+
 	"github.com/metrumresearchgroup/wrapt"
 )
 
@@ -75,8 +77,10 @@ func TestPrepareForExecution(tt *testing.T) {
 			},
 		}
 	}
+
+	testId := "UNIT-RUN-002"
 	for _, test := range tests {
-		tt.Run(test.name, func(tt *testing.T) {
+		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			res := PrepareForExecution(test.in)
