@@ -17,19 +17,20 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"path/filepath"
+	"runtime"
+	"strings"
+
 	parser "github.com/metrumresearchgroup/bbi/parsers/nmparser"
 	"github.com/metrumresearchgroup/bbi/utils"
 	"github.com/scylladb/go-set/strset"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"io/ioutil"
-	"path/filepath"
-	"runtime"
-	"strings"
 )
 
-const paramsLongDescription string = `summarize model(s), for example: 
+const paramsLongDescription string = `summarize model(s), for example:
 bbi nonmem params run001
 bbi nonmem params run001
 bbi nonmem params run001
@@ -40,13 +41,14 @@ var (
 	dir          string
 )
 
-// helpers for making a set
+// helpers for making a set.
 func index(slice []string, item string) int {
 	for i := range slice {
 		if slice[i] == item {
 			return i
 		}
 	}
+
 	return -1
 }
 
@@ -67,6 +69,7 @@ func removeDuplicateValues(stringSlice []string) []string {
 			list = append(list, entry)
 		}
 	}
+
 	return list
 }
 
@@ -105,11 +108,11 @@ func params(cmd *cobra.Command, args []string) {
 	}
 
 	if len(args) == 1 {
-		dir := args[0]
+		moddir := args[0]
 		if extFile == "" {
-			extFile = strings.Join([]string{filepath.Base(dir), "ext"}, ".")
+			extFile = strings.Join([]string{filepath.Base(moddir), "ext"}, ".")
 		}
-		results, err := parser.ParseEstimatesFromExt(filepath.Join(dir, extFile))
+		results, err := parser.ParseEstimatesFromExt(filepath.Join(moddir, extFile))
 
 		if err != nil {
 			log.Fatal(err)
@@ -124,6 +127,7 @@ func params(cmd *cobra.Command, args []string) {
 
 			fmt.Println(extFile + "," + strings.Join(results.EstimationLines[len(results.EstimationLines)-1], ","))
 		}
+
 		return
 	}
 
@@ -133,7 +137,7 @@ func params(cmd *cobra.Command, args []string) {
 	type result int
 	const (
 		SUCCESS result = 1
-		ERROR          = 2
+		ERROR   result = 2
 	)
 	type paramResult struct {
 		Index   int
@@ -161,16 +165,16 @@ func params(cmd *cobra.Command, args []string) {
 	var paramResults jsonParamResults
 
 	for w := 1; w <= workers; w++ {
-		go func(w int, modIndex <-chan int, results chan<- paramResult) {
+		go func(modIndex <-chan int, results chan<- paramResult) {
 			for i := range modIndex {
-				dir := filepath.Join(dir, modelDirs[i])
+				moddir := filepath.Join(dir, modelDirs[i])
 				var extFileName string
 				if extFile != "" {
 					extFileName = extFile
 				} else {
-					extFileName = strings.Join([]string{filepath.Base(dir), "ext"}, ".")
+					extFileName = strings.Join([]string{filepath.Base(moddir), "ext"}, ".")
 				}
-				r, err := parser.ParseEstimatesFromExt(filepath.Join(dir, extFileName))
+				r, err := parser.ParseEstimatesFromExt(filepath.Join(moddir, extFileName))
 
 				if err != nil {
 					results <- paramResult{
@@ -188,7 +192,7 @@ func params(cmd *cobra.Command, args []string) {
 					}
 				}
 			}
-		}(w, models, results)
+		}(models, results)
 	}
 
 	for m := 0; m < numModels; m++ {
@@ -201,7 +205,6 @@ func params(cmd *cobra.Command, args []string) {
 	}
 
 	if !Json {
-
 		paramSet := []string{}
 		for _, res := range orderedResults {
 			results := res.Result
@@ -216,7 +219,7 @@ func params(cmd *cobra.Command, args []string) {
 		fmt.Println("dir,error,termination," + strings.Join(paramSet, ","))
 		for _, res := range orderedResults {
 			s := make([]string, len(paramSet))
-			for i, _ := range s {
+			for i := range s {
 				s[i] = ""
 			}
 
@@ -238,7 +241,6 @@ func params(cmd *cobra.Command, args []string) {
 				// first code is the termination status
 				terminationCode := results.TerminationCodes[0][0]
 				fmt.Println(absolutePath + ",," + terminationCode + "," + strings.Join(s, ","))
-
 			} else if res.Outcome == ERROR {
 				errorMessage := res.Err.Error()
 				fmt.Println(absolutePath + "," + errorMessage + ",," + strings.Join(s, ","))
@@ -258,7 +260,6 @@ func params(cmd *cobra.Command, args []string) {
 
 	jsonRes, _ := json.MarshalIndent(paramResults, "", "\t")
 	fmt.Printf("%s\n", jsonRes)
-	return
 }
 
 func NewParamsCmd() *cobra.Command {

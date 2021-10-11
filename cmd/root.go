@@ -96,10 +96,10 @@ func NewRootCmd() *cobra.Command {
 	errpanic(viper.BindPFlag("json", cmd.PersistentFlags().Lookup("json"))) // Bind to viper
 
 	cmd.PersistentFlags().BoolVarP(&preview, "preview", "p", false, "preview action, but don't actually run command")
-	viper.BindPFlag("preview", cmd.PersistentFlags().Lookup("preview")) //Bind to viper
+	errpanic(viper.BindPFlag("preview", cmd.PersistentFlags().Lookup("preview"))) //Bind to viper
 
 	cmd.PersistentFlags().StringVarP(&output, "output", "o", "", "output file")
-	viper.BindPFlag("output", cmd.PersistentFlags().Lookup("output")) //Bind to viper
+	errpanic(viper.BindPFlag("output", cmd.PersistentFlags().Lookup("output"))) //Bind to viper
 
 	cmd.AddCommand(NewInitCmd())
 	cmd.AddCommand(NewNonmemCmd())

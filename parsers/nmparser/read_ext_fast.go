@@ -8,7 +8,7 @@ import (
 )
 
 // ParseEstimatesFromExt parses out the estimates, parameter names, and estimate values
-// from an ext file
+// from an ext file.
 func ParseEstimatesFromExt(file string) (ExtFastData, error) {
 	fl, err := os.Open(file)
 	if err != nil {
@@ -39,8 +39,8 @@ func ParseEstimatesFromExt(file string) (ExtFastData, error) {
 			if len(paramNames) == 0 {
 				fields := strings.Fields(line)
 				paramNames = fields[1 : len(fields)-1]
-
 			}
+
 			continue
 		} else if strings.HasPrefix(line, "  -1000000000") {
 			estLineDetected = true
@@ -62,6 +62,7 @@ func ParseEstimatesFromExt(file string) (ExtFastData, error) {
 	if !estLineDetected {
 		return ExtFastData{}, errors.New("no estimation output detected")
 	}
+
 	return ExtFastData{
 		EstimationMethods: estimationMethods,
 		ParameterNames:    paramNames,

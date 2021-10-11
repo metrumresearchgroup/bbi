@@ -113,7 +113,6 @@ func TestParseEstimatesFromExt(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-
 		res, err := ParseEstimatesFromExt(tt.path)
 		if err != nil {
 			assert.Fail(t, "error reading path", tt.path, err)
