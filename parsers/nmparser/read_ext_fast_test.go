@@ -3,10 +3,11 @@ package parser
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/metrumresearchgroup/bbi/utils"
+	"github.com/metrumresearchgroup/wrapt"
 )
 
-func TestParseEstimatesFromExt(t *testing.T) {
+func TestParseEstimatesFromExt(tt *testing.T) {
 	var tests = []struct {
 		path     string
 		expected ExtFastData
@@ -112,12 +113,17 @@ func TestParseEstimatesFromExt(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		res, err := ParseEstimatesFromExt(tt.path)
-		if err != nil {
-			assert.Fail(t, "error reading path", tt.path, err)
-		}
-		assert.Equal(t, tt.expected.ParameterNames, res.ParameterNames, "Fail :"+tt.context)
-		assert.Equal(t, tt.expected.EstimationLines, res.EstimationLines, "Fail :"+tt.context)
+	testId := "UNIT-NMP-036"
+	for _, test := range tests {
+		tt.Run(utils.AddTestId(test.context, testId), func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+			res, err := ParseEstimatesFromExt(test.path)
+
+			t.R.NoError(err)
+			t.R.NotEmpty(res)
+
+			t.R.Equal(test.expected.ParameterNames, res.ParameterNames)
+			t.R.Equal(test.expected.EstimationLines, res.EstimationLines)
+		})
 	}
 }
