@@ -34,17 +34,17 @@ steps:
       - printf "]\n" >> /tmp/${DRONE_BUILD_NUMBER}/commits.json
       - aws s3 cp /tmp/${DRONE_BUILD_NUMBER}/commits.json s3://mrg-validation/bbi/${DRONE_BUILD_NUMBER}/commits.json
   - name: Copy summary info for mrgvalidate to s3
-      commands:
-        - echo $SUMMARYJSON | base64 --decode > /tmp/${DRONE_BUILD_NUMBER}/summary.json
-        - datetime=$(date +"%D %T")
-        - sed -i "s@<DATETIME>@$datetime@g" /tmp/${DRONE_BUILD_NUMBER}/summary.json
-        - commit=$(git rev-parse HEAD)
-        - sed -i "s/<COMMIT>/$commit/g" /tmp/${DRONE_BUILD_NUMBER}/summary.json
-        - sed -i "s/<DRONE_TAG>/$DRONE_TAG/g" /tmp/${DRONE_BUILD_NUMBER}/summary.json
-        - sed -i "s/<DRONE_BUILD_NUMBER>/$DRONE_BUILD_NUMBER/g" /tmp/${DRONE_BUILD_NUMBER}/summary.json
-        - aws s3 cp /tmp/${DRONE_BUILD_NUMBER}/summary.json s3://mrg-validation/bbi/${DRONE_BUILD_NUMBER}/summary.json
-      environment:
-        SUMMARYJSON: ewogICJkYXRlIjogIjxEQVRFVElNRT4iLAogICJleGVjdXRvciI6ICJEcm9uZSBDSSIsCiAgImluZm8iOiB7CiAgICAiY29tbWl0IjogIjxDT01NSVQ+IiwKICAgICJkcm9uZV90YWciOiAiPERST05FX1RBRz4iLAogICAgImRyb25lX2J1aWxkX251bWJlciI6IjxEUk9ORV9CVUlMRF9OVU1CRVI+IgogIH0KfQ==
+    commands:
+      - echo $SUMMARYJSON | base64 --decode > /tmp/${DRONE_BUILD_NUMBER}/summary.json
+      - datetime=$(date +"%D %T")
+      - sed -i "s@<DATETIME>@$datetime@g" /tmp/${DRONE_BUILD_NUMBER}/summary.json
+      - commit=$(git rev-parse HEAD)
+      - sed -i "s/<COMMIT>/$commit/g" /tmp/${DRONE_BUILD_NUMBER}/summary.json
+      - sed -i "s/<DRONE_TAG>/$DRONE_TAG/g" /tmp/${DRONE_BUILD_NUMBER}/summary.json
+      - sed -i "s/<DRONE_BUILD_NUMBER>/$DRONE_BUILD_NUMBER/g" /tmp/${DRONE_BUILD_NUMBER}/summary.json
+      - aws s3 cp /tmp/${DRONE_BUILD_NUMBER}/summary.json s3://mrg-validation/bbi/${DRONE_BUILD_NUMBER}/summary.json
+    environment:
+      SUMMARYJSON: ewogICJkYXRlIjogIjxEQVRFVElNRT4iLAogICJleGVjdXRvciI6ICJEcm9uZSBDSSIsCiAgImluZm8iOiB7CiAgICAiY29tbWl0IjogIjxDT01NSVQ+IiwKICAgICJkcm9uZV90YWciOiAiPERST05FX1RBRz4iLAogICAgImRyb25lX2J1aWxkX251bWJlciI6IjxEUk9ORV9CVUlMRF9OVU1CRVI+IgogIH0KfQ==
   - name: Unit Test
     commands:
       - if [ ! -d /data/${DRONE_BUILD_NUMBER}/apps ] ; then mkdir -p /data/${DRONE_BUILD_NUMBER}/apps; chmod -R 0755 /data/${DRONE_BUILD_NUMBER}/apps; cp bbi /data/${DRONE_BUILD_NUMBER}/apps; else cp bbi /data/${DRONE_BUILD_NUMBER}/apps; fi
