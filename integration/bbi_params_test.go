@@ -2,11 +2,12 @@ package bbitest
 
 import (
 	"context"
-	"github.com/metrumresearchgroup/bbi/utils"
-	"github.com/metrumresearchgroup/wrapt"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/metrumresearchgroup/bbi/utils"
+	"github.com/metrumresearchgroup/wrapt"
 )
 
 var testConfigsParams = []testConfig{
@@ -23,7 +24,7 @@ var testConfigsParams = []testConfig{
 func TestParamsSingleModel(tt *testing.T) {
 	mod := "example2_bayes"
 	testId := "INT-PARAM-001"
-	for _, tc := range(testConfigsParams) {
+	for _, tc := range testConfigsParams {
 		tt.Run(utils.AddTestId(mod+tc.bbiOption, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
@@ -58,7 +59,7 @@ func TestParamsSingleModel(tt *testing.T) {
 
 func TestParamsDir(tt *testing.T) {
 	testId := "INT-PARAM-002"
-	for _, tc := range(testConfigsParams) {
+	for _, tc := range testConfigsParams {
 		tt.Run(utils.AddTestId(tc.bbiOption, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
