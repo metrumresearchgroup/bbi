@@ -35,15 +35,18 @@ steps:
       - aws s3 cp /tmp/${DRONE_BUILD_NUMBER}/commits.json s3://mrg-validation/bbi/${DRONE_BUILD_NUMBER}/commits.json
   - name: Copy summary info for mrgvalidate to s3
     commands:
-      - echo $SUMMARYJSON | base64 --decode > /tmp/${DRONE_BUILD_NUMBER}/summary.json
-      - datetime=$(date +"%D %T")
-      - sed -i "s@<DATETIME>@$datetime@g" /tmp/${DRONE_BUILD_NUMBER}/summary.json
-      - commit=$(git rev-parse HEAD)
-      - sed -i "s/<COMMIT>/$commit/g" /tmp/${DRONE_BUILD_NUMBER}/summary.json
-      - sed -i "s/<DRONE_BUILD_NUMBER>/$DRONE_BUILD_NUMBER/g" /tmp/${DRONE_BUILD_NUMBER}/summary.json
+      - |
+        cat > /tmp/${DRONE_BUILD_NUMBER}/summary.json <<EOF
+        {
+          "date": "$(date +"%D %T")",
+          "executor": "Drone CI",
+          "info": {
+            "commit": "$(git rev-parse HEAD)",
+            "drone_build_number": "$DRONE_BUILD_NUMBER"
+          }
+        }
+        EOF
       - aws s3 cp /tmp/${DRONE_BUILD_NUMBER}/summary.json s3://mrg-validation/bbi/${DRONE_BUILD_NUMBER}/summary.json
-    environment:
-      SUMMARYJSON: ewogICJkYXRlIjogIjxEQVRFVElNRT4iLAogICJleGVjdXRvciI6ICJEcm9uZSBDSSIsCiAgImluZm8iOiB7CiAgICAiY29tbWl0IjogIjxDT01NSVQ+IiwKICAgICJkcm9uZV9idWlsZF9udW1iZXIiOiI8RFJPTkVfQlVJTERfTlVNQkVSPiIKICB9Cn0=
   - name: Unit Test
     commands:
       - if [ ! -d /data/${DRONE_BUILD_NUMBER}/apps ] ; then mkdir -p /data/${DRONE_BUILD_NUMBER}/apps; chmod -R 0755 /data/${DRONE_BUILD_NUMBER}/apps; cp bbi /data/${DRONE_BUILD_NUMBER}/apps; else cp bbi /data/${DRONE_BUILD_NUMBER}/apps; fi
