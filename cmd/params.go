@@ -20,6 +20,8 @@ import (
 	"io/ioutil"
 	"path/filepath"
 	"runtime"
+	"sort"
+	"strconv"
 	"strings"
 
 	parser "github.com/metrumresearchgroup/bbi/parsers/nmparser"
@@ -71,6 +73,153 @@ func removeDuplicateValues(stringSlice []string) []string {
 	}
 
 	return list
+}
+
+// Parsed representation of a parameter name for sorting purposes.
+type parsedParam struct {
+	// raw parameter name (e.g., "OMEGA(1,2)")
+	FullName string
+	// name without string encoded index info (e.g., "OMEGA")
+	BaseName string
+	// position where BaseName first appears in a list of parameters
+	Position int
+	// parsed index information (e.g., `int[]{1,2}`)
+	SubIndex []int
+}
+
+type parsedParams []parsedParam
+
+func (xs parsedParams) Len() int {
+	return len(xs)
+}
+
+func (xs parsedParams) Swap(i, j int) {
+	xs[i], xs[j] = xs[j], xs[i]
+}
+
+func (xs parsedParams) Less(i, j int) bool {
+	xi, xj := xs[i], xs[j]
+
+	// If these aren't the same parameter, sort by their order in
+	// the parameter original list.
+	if xi.BaseName != xj.BaseName {
+		return xi.Position < xj.Position
+	}
+
+	// Otherwise, if they have different shapes, sort by the
+	// number of dimensions (fewer first).
+	ndimI := len(xi.SubIndex)
+	if ndimJ := len(xj.SubIndex); ndimI != ndimJ {
+		return ndimI < ndimJ
+	}
+
+	// If the number of dimensions match, sort by the first index
+	// value that differs, falling through to index values of the
+	// last dimension.
+	for i := 0; i < ndimI-1; i++ {
+		if xi.SubIndex[i] != xj.SubIndex[i] {
+			return xi.SubIndex[i] < xj.SubIndex[i]
+		}
+	}
+
+	return xi.SubIndex[ndimI-1] < xj.SubIndex[ndimI-1]
+}
+
+// parseSubIndex converts a string representation of indices (e.g.,
+// "(1,2,3)") into a list of ints (`[]int{1,2,3}`).
+func parseSubIndex(s string) ([]int, error) {
+	var idxs []int
+
+	if len(s) > 2 && s[0] == '(' {
+		strIdxs := strings.Split(s[1:len(s)-1], ",")
+		idxs = make([]int, len(strIdxs))
+		for i, strIdx := range strIdxs {
+			if idx, err := strconv.Atoi(strIdx); err == nil {
+				idxs[i] = idx
+			} else {
+				return nil, err
+			}
+		}
+	} else {
+		if idx, err := strconv.Atoi(s); err == nil {
+			idxs = []int{idx}
+		} else {
+			return nil, err
+		}
+	}
+
+	return idxs, nil
+}
+
+// splitParam splits a parameter that has encoded index information
+// (e.g., "OMEGA(1,2)") into a base name and indices (e.g., "OMEGA"
+// and `[]int{1,2}`).
+//
+// Note: This function is intended to be used only for sorting
+// purposes, where the failure mode for a bad split is just unideal
+// presentation.  As such, if parsing the index fails, this swallows
+// the error and treats the full name as the parameter.
+func splitParam(param string) (string, []int) {
+	delims := []rune{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '('}
+	sawNonDelim := false
+
+	for i, pchar := range param {
+		isDelim := false
+		for _, dchar := range delims {
+			if pchar == dchar {
+				isDelim = true
+				if sawNonDelim {
+					s, err := parseSubIndex(param[i:])
+					if err == nil {
+						return param[:i], s
+					}
+
+					return param, nil
+				}
+			}
+		}
+		sawNonDelim = !isDelim
+	}
+
+	return param, nil
+}
+
+func parseParams(params []string) parsedParams {
+	var pos int
+
+	parsed := make([]parsedParam, len(params))
+	baseIdxs := make(map[string]int)
+
+	for paramIdx, param := range params {
+		base, subindex := splitParam(param)
+		if baseIdx, known := baseIdxs[base]; known {
+			pos = baseIdx
+		} else {
+			pos = paramIdx
+			baseIdxs[base] = paramIdx
+		}
+
+		parsed[paramIdx] = parsedParam{
+			FullName: param,
+			BaseName: base,
+			Position: pos,
+			SubIndex: subindex,
+		}
+	}
+
+	return parsed
+}
+
+func sortParams(params []string) []string {
+	parsed := parseParams(params)
+	sort.Stable(parsed)
+
+	sorted := make([]string, len(params))
+	for i, p := range parsed {
+		sorted[i] = p.FullName
+	}
+
+	return sorted
 }
 
 func params(cmd *cobra.Command, args []string) {
@@ -211,7 +360,7 @@ func params(cmd *cobra.Command, args []string) {
 			paramSet = append(paramSet, results.ParameterNames...)
 		}
 
-		paramSet = removeDuplicateValues(paramSet)
+		paramSet = sortParams(removeDuplicateValues(paramSet))
 		for i, s := range paramSet {
 			paramSet[i] = strings.ReplaceAll(s, ",", "_")
 		}
