@@ -235,7 +235,7 @@ func params(cmd *cobra.Command, args []string) {
 				for i, name := range results.ParameterNames {
 					idx := index(paramSet, strings.ReplaceAll(name, ",", "_"))
 					values := results.EstimationLines
-					s[idx] = values[0][i]
+					s[idx] = values[len(values)-1][i]
 				}
 
 				// first code is the termination status
