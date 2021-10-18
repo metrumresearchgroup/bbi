@@ -140,48 +140,6 @@ volumes:
 
 ---
 kind: pipeline
-type: exec
-name: validation
-
-platform:
-  os: linux
-  arch: amd64
-
-workspace:
-  path: /tmp/drone
-
-steps:
-  - name: GoProjectValidator
-    commands:
-      - git clone https://github.com/metrumresearchgroup/goProjectValidator.git
-      - cd goProjectValidator/cmd/pvgo
-      - go build -o gpv main.go
-      - cp ../../../validation.json .
-      - ls -larth
-      - mkdir testoutput
-      - mkdir rendered
-      - aws s3 cp s3://mrg-validation/bbi/${DRONE_BUILD_NUMBER}/results.json testoutput/results.json
-      - aws s3 cp s3://mrg-validation/bbi/${DRONE_BUILD_NUMBER}/commits.json commits.json
-      - ./gpv --scenarioFile validation.json --commitsFile commits.json --testsDirectory testoutput --outputDirectory rendered
-      - aws s3 cp rendered/specification.md s3://mrg-validation/bbi/${DRONE_TAG}/specification.md
-      - aws s3 cp rendered/testing_and_validation.md s3://mrg-validation/bbi/${DRONE_TAG}/testing_and_validation.md
-      - aws s3 cp rendered/traceability_matrix.md s3://mrg-validation/bbi/${DRONE_TAG}/traceability_matrix.md
-      - pandoc -o specification.pdf -V geometry:"paperwidth=8in, paperheight=11in, margin=15pt" rendered/specification.md
-      - pandoc -o testing_and_validation.pdf -V geometry:"paperwidth=8in, paperheight=11in, margin=15pt" rendered/testing_and_validation.md
-      - pandoc -o traceability_matrix.pdf -V geometry:"paperwidth=22in, paperheight=210mm, margin=2cm" rendered/traceability_matrix.md
-      - aws s3 cp specification.pdf s3://mrg-validation/bbi/${DRONE_TAG}/specification.pdf
-      - aws s3 cp testing_and_validation.pdf s3://mrg-validation/bbi/${DRONE_TAG}/testing_and_validation.pdf
-      - aws s3 cp traceability_matrix.pdf s3://mrg-validation/bbi/${DRONE_TAG}/traceability_matrix.pdf
-
-trigger:
-  event:
-    - tag
-
-depends_on:
-  - testing
-
----
-kind: pipeline
 type: docker
 name: goreleaser
 
