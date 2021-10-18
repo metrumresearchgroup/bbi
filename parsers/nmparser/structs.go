@@ -166,6 +166,13 @@ type ExtData struct {
 	EstimationLines   [][]string
 }
 
+type ExtFastData struct {
+	EstimationMethods []string
+	ParameterNames    []string
+	EstimationLines   [][]string
+	TerminationCodes  [][]string
+}
+
 // MatrixData ...
 type MatrixData struct {
 	Values     [][]float64
