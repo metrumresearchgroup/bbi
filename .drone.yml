@@ -10,6 +10,7 @@ steps:
   - name: goreleaser
     image: goreleaser/goreleaser
     commands:
+      - mkdir -p /tmp/${DRONE_BUILD_NUMBER}
       - |
         cat > /tmp/${DRONE_BUILD_NUMBER}/summary.json <<EOF
         {
