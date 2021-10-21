@@ -37,8 +37,4 @@ steps:
       GITHUB_TOKEN:
         from_secret: GITHUB_TOKEN
       VERSION: ${DRONE_TAG}
-
-trigger:
-  event:
-    - tag
 ...
