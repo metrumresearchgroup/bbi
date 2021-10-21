@@ -31,6 +31,9 @@ builds:
       - windows
       - darwin
       - linux
+    goarch:
+      - amd64
+      - arm64
 
 release:
   github:
