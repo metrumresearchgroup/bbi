@@ -10,21 +10,24 @@ steps:
   - name: goreleaser
     image: goreleaser/goreleaser
     commands:
-      - mkdir -p /tmp/${DRONE_BUILD_NUMBER}
-      - |
-        cat > /tmp/${DRONE_BUILD_NUMBER}/summary.json <<EOF
-        {
-          "date": "$(date +"%D %T")",
-          "executor": "Drone CI",
-          "info": {
-            "commit": "$(git rev-parse HEAD)",
-            "drone_build_number": "$DRONE_BUILD_NUMBER",
-            "drone_tag": "$DRONE_TAG",
-            "version": "$VERSION"
-          }
-        }
-        EOF
-      - aws s3 cp /tmp/${DRONE_BUILD_NUMBER}/summary.json s3://mrg-validation/bbi/${DRONE_BUILD_NUMBER}/summary.json
+      #- mkdir -p /tmp/${DRONE_BUILD_NUMBER}
+      #- |
+      #  cat > /tmp/${DRONE_BUILD_NUMBER}/summary.json <<EOF
+      #  {
+      #    "date": "$(date +"%D %T")",
+      #    "executor": "Drone CI",
+      #    "info": {
+      #      "commit": "$(git rev-parse HEAD)",
+      #      "drone_build_number": "$DRONE_BUILD_NUMBER",
+      #      "drone_tag": "$DRONE_TAG",
+      #      "version": "$VERSION"
+      #    }
+      #  }
+      #  EOF
+      #- aws s3 cp /tmp/${DRONE_BUILD_NUMBER}/summary.json s3://mrg-validation/bbi/${DRONE_BUILD_NUMBER}/summary.json
+      - echo "drone build number $DRONE_BUILD_NUMBER"
+      - echo "drone tag $DRONE_TAG"
+      - echo "version $VERSION"
       #- git config --global user.email "drone@metrumrg.com"
       #- git config --global user.name "Drony"
       #- git fetch --tags
