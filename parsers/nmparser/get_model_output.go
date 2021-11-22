@@ -57,10 +57,21 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (Su
 	var readGrd bool
 	var readShk bool
 
-	// if the final method is one of these, don't look for .grd file
-	readGrd = grd && !CheckIfNotGradientBased(results)
-	// if the final method is one of these, don't look for .shk file
-	readShk = shk && !CheckIfBayesian(results)
+	if results.RunDetails.OnlySim {
+		if len(results.RunDetails.EstimationMethods) > 0 {
+			msg := "no estimation methods expected for ONLYSIM"
+
+			return SummaryOutput{}, errors.New(msg)
+		}
+
+		readGrd = false
+		readShk = false
+	} else {
+		// if the final method is one of these, don't look for .grd file
+		readGrd = grd && !CheckIfNotGradientBased(results)
+		// if the final method is one of these, don't look for .shk file
+		readShk = shk && !CheckIfBayesian(results)
+	}
 
 	cpuFilePath := filepath.Join(dir, runNum+".cpu")
 	cpuLines, err := utils.ReadLines(cpuFilePath)
@@ -79,7 +90,7 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (Su
 		results.RunDetails.CpuTime = cpuTime
 	}
 
-	if !ext.Exclude {
+	if !(ext.Exclude || results.RunDetails.OnlySim) {
 		if ext.Name == "" {
 			ext.Name = runNum + ".ext"
 		}

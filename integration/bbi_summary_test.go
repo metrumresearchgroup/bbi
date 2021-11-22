@@ -43,6 +43,7 @@ func TestSummaryHappyPath(tt *testing.T) {
 		"example2_bayes",   // Bayes (5 est methods, from NONMEM examples)
 		"iovmm",            // Mixture model. Also has parameter_near_boundary and final_zero_gradient heuristics.
 		"acop-iov",         // fake model with 62 OMEGAS (fake iov)
+		"onlysim",          // $SIM with ONLYSIM.
 	}
 	testId := "INT-SUM-001"
 	for _, mod := range SummaryHappyPathTestMods {

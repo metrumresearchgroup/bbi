@@ -1,0 +1,45 @@
+{
+	"run_details": {
+		"version": "7.3.0",
+		"run_start": "-999999999",
+		"run_end": "Wed Apr  8 14:24:28 EDT 2015",
+		"estimation_time": -999999999,
+		"covariance_time": -999999999,
+		"cpu_time": 0.022,
+		"function_evaluations": -999999999,
+		"significant_digits": -999999999,
+		"problem_text": "LEM    RUN# ecomp1_pkpd EFFECT COMP POPULATION PK-PD MODEL 1",
+		"mod_file": "-999999999",
+		"data_set": "dat1.csv",
+		"number_of_subjects": 2,
+		"number_of_obs": 98,
+		"number_of_data_records": 100,
+		"output_files_used": [
+			"onlysim.lst"
+		],
+		"only_sim": true
+	},
+	"run_heuristics": {
+		"covariance_step_aborted": false,
+		"large_condition_number": false,
+		"eigenvalue_issues": false,
+		"correlations_not_ok": false,
+		"parameter_near_boundary": false,
+		"hessian_reset": false,
+		"has_final_zero_gradient": false,
+		"minimization_terminated": false,
+		"eta_pval_significant": false,
+		"prderr": false
+	},
+	"parameters_data": [
+		{
+			"method": "METHOD NOT DETECTED",
+			"estimates": {},
+			"std_err": {},
+			"random_effect_sd": {},
+			"random_effect_sdse": {},
+			"fixed": {}
+		}
+	],
+	"parameter_names": {}
+}
