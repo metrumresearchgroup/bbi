@@ -80,6 +80,9 @@ func ParseRunDetails(lines []string) RunDetails {
 			runDetails.ProblemText = replaceTrim(line, "$PROB")
 		case strings.Contains(line, "#METH:"):
 			runDetails.EstimationMethods = append(runDetails.EstimationMethods, replaceTrim(line, "#METH:"))
+		case strings.HasPrefix(line, "$SIM"):
+			fields := strings.SplitN(line, ";", 2)
+			runDetails.OnlySim = strings.Contains(fields[0], "ONLYSIM")
 		case strings.Contains(line, "$DATA"):
 			runDetails.DataSet = parseLine(line, 1)
 		case strings.Contains(line, "TOT. NO. OF INDIVIDUALS:"):

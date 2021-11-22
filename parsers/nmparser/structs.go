@@ -77,6 +77,7 @@ type RunDetails struct {
 	NumberOfDataRecords int64    `json:"number_of_data_records,omitempty"`
 	OutputTables        []string `json:"output_tables,omitempty"`
 	OutputFilesUsed     []string `json:"output_files_used,omitempty"`
+	OnlySim             bool     `json:"only_sim,omitempty"`
 }
 
 // Shrinkage Types
@@ -216,6 +217,7 @@ func NewRunDetails() RunDetails {
 		NumberOfDataRecords: DefaultInt64,
 		OutputTables:        []string{},
 		OutputFilesUsed:     []string{},
+		OnlySim:             false,
 	}
 
 	return runDetails
