@@ -1,0 +1,27 @@
+{
+  "build": {
+    "image": "906087756158.dkr.ecr.us-east-1.amazonaws.com/nonmem-mpn:latest",
+    "dockerfile": "Dockerfile",
+    "args": {
+      // set vscode arg for Dockerfile
+      "vscode": "true"
+    }
+  },
+  "extensions": [
+    "ms-vscode.go",
+    "davidanson.vscode-markdownlint",
+    "shardulm94.trailing-spaces",
+],
+"settings": {
+    "go.useLanguageServer": true
+},
+"postCreateCommand": "go mod download",
+"runArgs": [
+    // map SSH keys for Git
+    "-v", "${env:HOME}/.ssh:/home/vscode/.ssh:ro"
+],
+"features": {
+    "golang": "latest"
+}
+
+}
