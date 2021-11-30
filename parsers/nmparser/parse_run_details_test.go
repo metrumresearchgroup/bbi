@@ -121,10 +121,26 @@ func TestParseRunDetails(tt *testing.T) {
 			expected: RunDetails01Results,
 		},
 		{
-			name: "RunDetailsOnlySim",
+			name: "RunDetailsOnlySimShort",
+			input: []string{
+				"$PROB Simulation",
+				"$SIMULATION ONLY (123456)",
+			},
+			expected: RunDetails02Results,
+		},
+		{
+			name: "RunDetailsOnlySimMid",
 			input: []string{
 				"$PROB Simulation",
 				"$SIMULATION ONLYSIM (123456)",
+			},
+			expected: RunDetails02Results,
+		},
+		{
+			name: "RunDetailsOnlySimLong",
+			input: []string{
+				"$PROB Simulation",
+				"$SIMULATION ONLYSIMULATION (123456)",
 			},
 			expected: RunDetails02Results,
 		},
