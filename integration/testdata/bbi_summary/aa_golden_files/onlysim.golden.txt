@@ -1,0 +1,5 @@
+LEM    RUN# ecomp1_pkpd EFFECT COMP POPULATION PK-PD MODEL 1
+Dataset: dat1.csv
+Records: 100   Observations: 98  Subjects: 2
+No Estimation Methods (ONLYSIM)
+No Heuristic Problems Detected

@@ -50,6 +50,10 @@ func TestParseRunDetails(tt *testing.T) {
 		OutputFilesUsed:     []string{},
 	}
 
+	RunDetails02Results := NewRunDetails()
+	RunDetails02Results.ProblemText = "Simulation"
+	RunDetails02Results.OnlySim = true
+
 	tests := []struct {
 		name     string
 		input    []string
@@ -115,6 +119,30 @@ func TestParseRunDetails(tt *testing.T) {
 				"$TABLE NOPRINT ONEHEADER FILE=./1.tab",
 			},
 			expected: RunDetails01Results,
+		},
+		{
+			name: "RunDetailsOnlySimShort",
+			input: []string{
+				"$PROB Simulation",
+				"$SIMULATION ONLY (123456)",
+			},
+			expected: RunDetails02Results,
+		},
+		{
+			name: "RunDetailsOnlySimMid",
+			input: []string{
+				"$PROB Simulation",
+				"$SIMULATION ONLYSIM (123456)",
+			},
+			expected: RunDetails02Results,
+		},
+		{
+			name: "RunDetailsOnlySimLong",
+			input: []string{
+				"$PROB Simulation",
+				"$SIMULATION ONLYSIMULATION (123456)",
+			},
+			expected: RunDetails02Results,
 		},
 	}
 
