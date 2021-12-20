@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/metrumresearchgroup/bbi/utils"
+
+	"github.com/metrumresearchgroup/wrapt"
 )
 
-func TestSetMissingValuesToDefaultParameterDataMethod(t *testing.T) {
+func TestSetMissingValuesToDefaultParameterDataMethod(tt *testing.T) {
 	var tests = []struct {
 		modelOutput SummaryOutput
-		etaCount    int
-		epsCount    int
 		expected    string
 	}{
 		{
@@ -29,49 +29,58 @@ func TestSetMissingValuesToDefaultParameterDataMethod(t *testing.T) {
 			expected: "Test Method",
 		},
 	}
-	for _, tt := range tests {
-		setMissingValuesToDefault(&tt.modelOutput, tt.etaCount, tt.epsCount)
-		assert.Equal(t, tt.expected, tt.modelOutput.ParametersData[0].Method, "Fail :"+tt.expected)
+	testId := "UNIT-NMP-001"
+	for _, test := range tests {
+		tt.Run(utils.AddTestId(test.expected, testId), func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+
+			setMissingValuesToDefault(&test.modelOutput)
+
+			t.R.Equal(test.expected, test.modelOutput.ParametersData[0].Method)
+		})
 	}
 }
 
-func TestSetMissingValuesToDefaultParameterDataStdErrDimension(t *testing.T) {
+func TestSetMissingValuesToDefaultParameterDataStdErrDimension(tt *testing.T) {
 	var tests = []struct {
+		name        string
 		modelOutput SummaryOutput
-		etaCount    int
-		epsCount    int
 		expected    int
-		context     string
 	}{
 		{
+			name: "3 thetas and 3 omegas",
 			modelOutput: SummaryOutput{
 				ParametersData: []ParametersData{ParametersData{
 					Estimates: ParametersResult{
 						Theta: []float64{1, 2, 4},
+						Omega: []float64{1, 2, 4},
 					},
 				}},
 			},
-			etaCount: 3,
 			expected: 3,
 		},
 	}
 
-	for _, tt := range tests {
-		setMissingValuesToDefault(&tt.modelOutput, tt.etaCount, tt.epsCount)
-		assert.Equal(t, tt.expected, len(tt.modelOutput.ParametersData[0].StdErr.Theta), "Fail :"+tt.context)
-		assert.NotEqual(t, tt.expected, len(tt.modelOutput.ParametersData[0].StdErr.Omega), "Fail :"+tt.context)
+	testId := "UNIT-NMP-002"
+	for _, test := range tests {
+		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+
+			setMissingValuesToDefault(&test.modelOutput)
+			t.R.Equal(test.expected, len(test.modelOutput.ParametersData[0].StdErr.Theta))
+			t.R.Equal(test.expected, len(test.modelOutput.ParametersData[0].StdErr.Omega))
+		})
 	}
 }
 
-func TestSetMissingValuesToDefaultParameterDataRESDDimension(t *testing.T) {
+func TestSetMissingValuesToDefaultParameterDataRESDDimension(tt *testing.T) {
 	var tests = []struct {
+		name        string
 		modelOutput SummaryOutput
-		etaCount    int
-		epsCount    int
 		expected    int
-		context     string
 	}{
 		{
+			name: "3 omegas",
 			modelOutput: SummaryOutput{
 				ParametersData: []ParametersData{ParametersData{
 					Estimates: ParametersResult{
@@ -79,27 +88,30 @@ func TestSetMissingValuesToDefaultParameterDataRESDDimension(t *testing.T) {
 					},
 				}},
 			},
-			etaCount: 3,
 			expected: 3,
 		},
 	}
 
-	for _, tt := range tests {
-		setMissingValuesToDefault(&tt.modelOutput, tt.etaCount, tt.epsCount)
-		assert.Equal(t, tt.expected, len(tt.modelOutput.ParametersData[0].RandomEffectSD.Omega), "Fail :"+tt.context)
-		assert.NotEqual(t, tt.expected, len(tt.modelOutput.ParametersData[0].RandomEffectSD.Sigma), "Fail :"+tt.context)
+	testId := "UNIT-NMP-003"
+	for _, test := range tests {
+		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+
+			setMissingValuesToDefault(&test.modelOutput)
+			t.R.Equal(test.expected, len(test.modelOutput.ParametersData[0].RandomEffectSD.Omega))
+			t.R.NotEqual(test.expected, len(test.modelOutput.ParametersData[0].RandomEffectSD.Sigma))
+		})
 	}
 }
 
-func TestSetMissingValuesToDefaultParameterDataValues(t *testing.T) {
+func TestSetMissingValuesToDefaultParameterDataValues(tt *testing.T) {
 	var tests = []struct {
+		name        string
 		modelOutput SummaryOutput
-		etaCount    int
-		epsCount    int
 		expected    int
-		context     string
 	}{
 		{
+			name: "7 thetas, 3 omegas, 2 sigmas",
 			modelOutput: SummaryOutput{
 				ParametersData: []ParametersData{ParametersData{
 					Estimates: ParametersResult{
@@ -109,31 +121,34 @@ func TestSetMissingValuesToDefaultParameterDataValues(t *testing.T) {
 					},
 				}},
 			},
-			etaCount: 3,
 		},
 	}
 
-	for _, tt := range tests {
-		setMissingValuesToDefault(&tt.modelOutput, tt.etaCount, tt.epsCount)
-		assert.Equal(t, 7, len(tt.modelOutput.ParametersData[0].StdErr.Theta), "Fail :"+tt.context)
-		assert.Equal(t, 2, len(tt.modelOutput.ParametersData[0].RandomEffectSD.Sigma), "Fail :"+tt.context)
-		assert.Equal(t, 3, len(tt.modelOutput.ParametersData[0].RandomEffectSDSE.Omega), "Fail :"+tt.context)
+	testId := "UNIT-NMP-004"
+	for _, test := range tests {
+		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-		assert.Equal(t, DefaultFloat64, tt.modelOutput.ParametersData[0].StdErr.Theta[0], "Fail :"+tt.context)
-		assert.Equal(t, DefaultFloat64, tt.modelOutput.ParametersData[0].RandomEffectSD.Sigma[1], "Fail :"+tt.context)
-		assert.Equal(t, DefaultFloat64, tt.modelOutput.ParametersData[0].RandomEffectSDSE.Omega[2], "Fail :"+tt.context)
+			setMissingValuesToDefault(&test.modelOutput)
+			t.R.Equal(7, len(test.modelOutput.ParametersData[0].StdErr.Theta))
+			t.R.Equal(2, len(test.modelOutput.ParametersData[0].RandomEffectSD.Sigma))
+			t.R.Equal(3, len(test.modelOutput.ParametersData[0].RandomEffectSDSE.Omega))
+
+			t.R.Equal(DefaultFloat64, test.modelOutput.ParametersData[0].StdErr.Theta[0])
+			t.R.Equal(DefaultFloat64, test.modelOutput.ParametersData[0].RandomEffectSD.Sigma[1])
+			t.R.Equal(DefaultFloat64, test.modelOutput.ParametersData[0].RandomEffectSDSE.Omega[2])
+		})
 	}
 }
 
-func TestSetMissingValuesToDefaultParameterNameValues(t *testing.T) {
+func TestSetMissingValuesToDefaultParameterNameValues(tt *testing.T) {
 	var tests = []struct {
+		name        string
 		modelOutput SummaryOutput
-		etaCount    int
-		epsCount    int
 		expected    int
-		context     string
 	}{
 		{
+			name: "3 thetas",
 			modelOutput: SummaryOutput{
 				ParametersData: []ParametersData{ParametersData{
 					Estimates: ParametersResult{
@@ -141,67 +156,18 @@ func TestSetMissingValuesToDefaultParameterNameValues(t *testing.T) {
 					},
 				}},
 			},
-			etaCount: 3,
-			epsCount: 3,
 		},
 	}
 
-	for _, tt := range tests {
-		setMissingValuesToDefault(&tt.modelOutput, tt.etaCount, tt.epsCount)
-		for i := range tt.modelOutput.ParametersData[0].Estimates.Theta {
-			assert.Equal(t, fmt.Sprintf("THETA%d", i+1), tt.modelOutput.ParameterNames.Theta[i], "Fail :"+tt.context)
-		}
-	}
-}
+	testId := "UNIT-NMP-005"
+	for _, test := range tests {
+		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-func TestSetMissingValuesToDefaultShrinkageEta(t *testing.T) {
-	var tests = []struct {
-		modelOutput SummaryOutput
-		etaCount    int
-		epsCount    int
-		expected    int
-		context     string
-	}{
-		{
-			modelOutput: SummaryOutput{
-				ParametersData: []ParametersData{ParametersData{
-					Estimates: ParametersResult{},
-				}},
-				ShrinkageDetails: [][]ShrinkageDetails{{ShrinkageDetails{}}},
-			},
-			etaCount: 5,
-		},
-	}
-
-	for _, tt := range tests {
-		setMissingValuesToDefault(&tt.modelOutput, tt.etaCount, tt.epsCount)
-		assert.Equal(t, tt.etaCount, len(tt.modelOutput.ShrinkageDetails[0][0].EtaBar), "Fail :"+tt.context)
-		assert.Equal(t, DefaultFloat64, tt.modelOutput.ShrinkageDetails[0][0].EtaBar[tt.etaCount-1], "Fail :"+tt.context)
-	}
-}
-
-func TestSetMissingValuesToDefaultShrinkageEps(t *testing.T) {
-	var tests = []struct {
-		modelOutput SummaryOutput
-		etaCount    int
-		epsCount    int
-		expected    int
-		context     string
-	}{
-		{
-			modelOutput: SummaryOutput{
-				ParametersData: []ParametersData{ParametersData{
-					Estimates: ParametersResult{},
-				}},
-				ShrinkageDetails: [][]ShrinkageDetails{{ShrinkageDetails{}}},
-			},
-			epsCount: 5,
-		},
-	}
-
-	for _, tt := range tests {
-		setMissingValuesToDefault(&tt.modelOutput, tt.etaCount, tt.epsCount)
-		assert.Equal(t, tt.epsCount, len(tt.modelOutput.ShrinkageDetails[0][0].EpsVR), "Fail :"+tt.context)
-		assert.Equal(t, DefaultFloat64, tt.modelOutput.ShrinkageDetails[0][0].EpsVR[tt.epsCount-1], "Fail :"+tt.context)
+			setMissingValuesToDefault(&test.modelOutput)
+			for i := range test.modelOutput.ParametersData[0].Estimates.Theta {
+				t.R.Equal(fmt.Sprintf("THETA%d", i+1), test.modelOutput.ParameterNames.Theta[i])
+			}
+		})
 	}
 }

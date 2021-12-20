@@ -2,32 +2,42 @@ package parser
 
 import (
 	"testing"
+
+	"github.com/metrumresearchgroup/bbi/utils"
+
+	"github.com/metrumresearchgroup/wrapt"
 )
 
-var parameterDiagonal01Results = []int{1}
-var parameterDiagonal02Results = []int{1, 0, 1}
-var parameterDiagonal03Results = []int{1, 0, 1, 0, 0, 1}
+func TestCreateDiagonalBlock(tt *testing.T) {
+	tests := []struct {
+		name     string
+		input    int
+		expected []int
+	}{
+		{
+			name:     "1-diagonal",
+			input:    1,
+			expected: []int{1},
+		},
+		{
+			name:     "2-diagonal",
+			input:    2,
+			expected: []int{1, 0, 1},
+		},
+		{
+			name:     "3-diagonal",
+			input:    3,
+			expected: []int{1, 0, 1, 0, 0, 1},
+		},
+	}
+	testId := "UNIT-NMP-006"
+	for _, test := range tests {
+		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-func TestCreateDiagonalBlock(t *testing.T) {
-	result1 := createDiagonalBlock(1)
-	result2 := createDiagonalBlock(2)
-	result3 := createDiagonalBlock(3)
-	for i, val := range result1 {
-		if val != parameterDiagonal01Results[i] {
-			t.Log("GOT: ", val, " EXPECTED: ", parameterDiagonal01Results[i], " at index: ", i)
-			t.Fail()
-		}
-	}
-	for i, val := range result2 {
-		if val != parameterDiagonal02Results[i] {
-			t.Log("GOT: ", val, " EXPECTED: ", parameterDiagonal02Results[i], " at index: ", i)
-			t.Fail()
-		}
-	}
-	for i, val := range result3 {
-		if val != parameterDiagonal03Results[i] {
-			t.Log("GOT: ", val, " EXPECTED: ", parameterDiagonal03Results[i], " at index: ", i)
-			t.Fail()
-		}
+			got := createDiagonalBlock(test.input)
+
+			t.R.Equal(test.expected, got)
+		})
 	}
 }

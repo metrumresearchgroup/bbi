@@ -3,15 +3,18 @@ package parser
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/metrumresearchgroup/bbi/utils"
+
+	"github.com/metrumresearchgroup/wrapt"
 )
 
-func TestReadExt(t *testing.T) {
+func TestReadExt(tt *testing.T) {
 	var tests = []struct {
-		lines   []string
-		context string
+		name  string
+		lines []string
 	}{
 		{
+			name: "ext test",
 			lines: []string{
 				"TABLE NO.     1: First Order Conditional Estimation with Interaction: Goal Function=MINIMUM VALUE OF OBJECTIVE FUNCTION: Problem=1 Subproblem=0 Superproblem1=0 Iteration1=0 Superproblem2=0 Iteration2=0",
 				" ITERATION    THETA1       THETA2       THETA3       THETA4       THETA5       THETA6       THETA7       THETA8       THETA9       SIGMA(1,1)   OMEGA(1,1)   OMEGA(2,1)   OMEGA(2,2)   OMEGA(3,1)   OMEGA(3,2)   OMEGA(3,3)   OBJ",
@@ -45,36 +48,39 @@ func TestReadExt(t *testing.T) {
 				"  -1000000007  8.00000E+00  3.70000E+01  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00    0.0000000000000000",
 				"  -1000000008  9.00000E+00  6.43530E-06 -3.23355E-05  5.31805E-04 -1.53493E-02  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  6.02637E-01  3.65275E-02  0.00000E+00  1.60995E-01  0.00000E+00  0.00000E+00  1.32073E-01    0.0000000000000000",
 			},
-			context: "ext test",
 		},
 	}
 
-	for _, tt := range tests {
+	testId := "UNIT-NMP-018"
+	for _, test := range tests {
+		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-		ext := ParseExtLines(tt.lines)
-		assert.Equal(t, 2, len(ext.EstimationMethods), "Fail :"+tt.context)
+			ext := ParseExtLines(test.lines)
+			t.A.Equal(2, len(ext.EstimationMethods))
 
-		pd, pn := ParseParamsExt(ext)
+			pd, pn := ParseParamsExt(ext)
 
-		assert.Equal(t, 2, len(pd), "Fail :"+tt.context)
-		assert.Equal(t, tt.lines[0], pd[0].Method, "Fail :"+tt.context)
-		assert.Equal(t, tt.lines[15], pd[1].Method, "Fail :"+tt.context)
+			t.A.Equal(2, len(pd))
+			t.A.Equal(test.lines[0], pd[0].Method)
+			t.A.Equal(test.lines[15], pd[1].Method)
 
-		assert.Equal(t, 9, len(pn.Theta), "Fail :"+tt.context)
-		assert.Equal(t, 26.4905, pd[0].Estimates.Theta[0], "Fail :"+tt.context)
-		assert.Equal(t, 0.75, pd[0].Estimates.Theta[len(pd[0].Estimates.Theta)-1], "Fail :"+tt.context)
+			t.A.Equal(9, len(pn.Theta))
+			t.A.Equal(26.4905, pd[0].Estimates.Theta[0])
+			t.A.Equal(0.75, pd[0].Estimates.Theta[len(pd[0].Estimates.Theta)-1])
 
-		assert.Equal(t, 6, len(pn.Omega), "Fail :"+tt.context)
-		assert.Equal(t, 0.100611, pd[0].Estimates.Omega[0], "Fail :"+tt.context)
-		assert.Equal(t, 0.0111726, pd[0].Estimates.Omega[len(pd[0].Estimates.Omega)-1], "Fail :"+tt.context)
+			t.A.Equal(6, len(pn.Omega))
+			t.A.Equal(0.100611, pd[0].Estimates.Omega[0])
+			t.A.Equal(0.0111726, pd[0].Estimates.Omega[len(pd[0].Estimates.Omega)-1])
 
-		assert.Equal(t, 1, len(pn.Sigma), "Fail :"+tt.context)
-		assert.Equal(t, 0.00245104, pd[0].Estimates.Sigma[0], "Fail :"+tt.context)
+			t.A.Equal(1, len(pn.Sigma))
+			t.A.Equal(0.00245104, pd[0].Estimates.Sigma[0])
 
-		assert.Equal(t, 1.0, pd[1].Estimates.Theta[0], "Fail :"+tt.context)
-		assert.Equal(t, 2.0, pd[1].StdErr.Theta[0], "Fail :"+tt.context)
-		assert.Equal(t, 0.317192, pd[1].RandomEffectSD.Omega[0], "Fail :"+tt.context)
-		assert.Equal(t, 0.0151246, pd[1].RandomEffectSDSE.Omega[0], "Fail :"+tt.context)
-		assert.Equal(t, 7.0, pd[1].Fixed.Theta[0], "Fail :"+tt.context)
+			t.A.Equal(1.0, pd[1].Estimates.Theta[0])
+			t.A.Equal(2.0, pd[1].StdErr.Theta[0])
+			t.A.Equal(0.317192, pd[1].RandomEffectSD.Omega[0])
+			t.A.Equal(0.0151246, pd[1].RandomEffectSDSE.Omega[0])
+			t.A.Equal(7.0, pd[1].Fixed.Theta[0])
+		})
 	}
 }

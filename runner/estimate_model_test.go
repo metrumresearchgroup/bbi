@@ -3,43 +3,56 @@ package runner
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/metrumresearchgroup/bbi/utils"
+	"github.com/metrumresearchgroup/wrapt"
 )
 
-func TestDefaultEstimateModel(t *testing.T) {
+func TestDefaultEstimateModel(tt *testing.T) {
+	testId := "UNIT-RUN-003"
+	tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
+		t := wrapt.WrapT(tt)
 
-	r := RunSettings{
-		OutputDir: "{{ .Name }}",
-	}
+		r := RunSettings{
+			OutputDir: "{{ .Name }}",
+		}
 
-	out, err := processDirectoryTemplate("cat", r)
+		out, err := processDirectoryTemplate("cat", r)
 
-	assert.Nil(t, err)
-	assert.NotEmpty(t, out)
-	assert.Equal(t, "cat", out)
+		t.A.Nil(err)
+		t.A.NotEmpty(out)
+		t.A.Equal("cat", out)
+	})
 }
 
-func TestCustomEstimateModel(t *testing.T) {
-	r := RunSettings{
-		OutputDir: "oh_{{ .Name }}_hai",
-	}
+func TestCustomEstimateModel(tt *testing.T) {
+	testId := "UNIT-RUN-004"
+	tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
+		t := wrapt.WrapT(tt)
+		r := RunSettings{
+			OutputDir: "oh_{{ .Name }}_hai",
+		}
 
-	out, err := processDirectoryTemplate("cat", r)
+		out, err := processDirectoryTemplate("cat", r)
 
-	assert.Nil(t, err)
-	assert.NotEmpty(t, out)
-	assert.Equal(t, out, "oh_cat_hai")
+		t.A.Nil(err)
+		t.A.NotEmpty(out)
+		t.A.Equal(out, "oh_cat_hai")
+	})
 }
 
-//Should just get back the provided output dir
-func TestLogiclessTemplateForEstimateModel(t *testing.T) {
-	r := RunSettings{
-		OutputDir: "notatemplate",
-	}
+//Should just get back the provided output dir.
+func TestLogiclessTemplateForEstimateModel(tt *testing.T) {
+	testId := "UNIT-RUN-005"
+	tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
+		t := wrapt.WrapT(tt)
+		r := RunSettings{
+			OutputDir: "notatemplate",
+		}
 
-	out, err := processDirectoryTemplate("cat", r)
+		out, err := processDirectoryTemplate("cat", r)
 
-	assert.NotEmpty(t, out)
-	assert.Equal(t, out, r.OutputDir)
-	assert.Nil(t, err)
+		t.A.NotEmpty(out)
+		t.A.Equal(out, r.OutputDir)
+		t.A.Nil(err)
+	})
 }

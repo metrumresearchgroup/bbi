@@ -1,0 +1,33 @@
+RUN# example2 (from sampc)
+Dataset: ../example2.csv
+Records: 2400   Observations: 2000  Subjects: 400
+Estimation Method(s):
+ - Iterative Two Stage (No Prior)
+ - Importance Sampling (No Prior)
+ - Stochastic Approximation Expectation-Maximization (No Prior)
+ - Objective Function Evaluation by Importance Sampling (No Prior)
+ - MCMC Bayesian Analysis
+No Heuristic Problems Detected
++-------+---------+------------+-------------------+
+| THETA |  NAME   |  ESTIMATE  |   STDERR (RSE)    |
++-------+---------+------------+-------------------+
+| TH 1  | THETA1  | 3.29985    | 0.0318766 (1.0%)  |
+| TH 2  | THETA2  | 3.25371    | 0.0281556 (0.9%)  |
+| TH 3  | THETA3  | -0.612185  | 0.00927873 (1.5%) |
+| TH 4  | THETA4  | -0.208483  | 0.0081354 (3.9%)  |
+| TH 5  | THETA5  | 0.736429   | 0.0383015 (5.2%)  |
+| TH 6  | THETA6  | 1.14018    | 0.0328733 (2.9%)  |
+| TH 7  | THETA7  | 0.334758   | 0.0111652 (3.3%)  |
+| TH 8  | THETA8  | 0.191257   | 0.00950874 (5.0%) |
+| TH 9  | THETA9  | 0.691017   | 0.0099531 (1.4%)  |
+| TH 10 | THETA10 | 2.29896    | 0.00819333 (0.4%) |
+| TH 11 | THETA11 | -0.0938344 | [31m0.0387836 (41.3%)[0m |
++-------+---------+------------+-------------------+
++------------+------+----------+
+|   OMEGA    | ETA  | ESTIMATE |
++------------+------+----------+
+| OMEGA(1,1) | ETA1 | 0.010259 |
+| OMEGA(2,2) | ETA2 | 0.007736 |
+| OMEGA(3,3) | ETA3 | 0.008544 |
+| OMEGA(4,4) | ETA4 | 0.008971 |
++------------+------+----------+

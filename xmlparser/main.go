@@ -45,7 +45,7 @@ func main() {
 	sigmas := getBlockValues(&m, "sigma")
 	omegasSE := getBlockValues(&m, "omegase")
 	sigmasSE := getBlockValues(&m, "sigmase")
-	//getBlockValues(&m, "covariance")
+	// getBlockValues(&m, "covariance")
 	//	fmt.Println(values)
 	fmt.Println("thetas: ", thetas)
 	fmt.Println("thetasSE: ", thetasSE)
@@ -71,8 +71,10 @@ func getValue(m *mxj.Map, key string) string {
 		fmt.Println("err parsing: ", err)
 	}
 	for _, val := range value {
-		results = val.(string)
+		// TODO: fix val !ok
+		results, _ = val.(string)
 	}
+
 	return results
 }
 func getBlockValues(m *mxj.Map, key string) []blockValue {
@@ -82,17 +84,22 @@ func getBlockValues(m *mxj.Map, key string) []blockValue {
 	// this could be different if multiple estimation steps run
 	if err != nil {
 		fmt.Println("error extracting values: ", err)
+
 		return results
 	}
 	for _, val := range value {
-		omegaRows := val.(map[string]interface{})
-		for _, val := range omegaRows {
-			vals := val.([]interface{})
-			for _, val := range vals {
-				rowVals := val.(map[string]interface{})
+		// TODO: solve val !ok
+		omegaRows, _ := val.(map[string]interface{})
+		for _, omegaRow := range omegaRows {
+			// TODO: solve omegaRow !ok
+			vals, _ := omegaRow.([]interface{})
+			for _, omegaVal := range vals {
+				// TODO: solve omegaVal !ok
+				rowVals, _ := omegaVal.(map[string]interface{})
 				colMap := rowVals["col"]
 				if rowVals["-rname"] == "1" || rowVals["-rname"] == "THETA1" {
-					colVals := colMap.(map[string]interface{})
+					// TODO: solve colMap !ok
+					colVals, _ := colMap.(map[string]interface{})
 					results = append(results, blockValue{
 						Value: colVals["#text"].(string),
 						Row:   rowVals["-rname"].(string),
@@ -100,19 +107,20 @@ func getBlockValues(m *mxj.Map, key string) []blockValue {
 					})
 				} else {
 					for _, m := range colMap.([]interface{}) {
-						colVals := m.(map[string]interface{})
+						// TODO: solve m !ok
+						colVals, _ := m.(map[string]interface{})
 						results = append(results, blockValue{
 							Value: colVals["#text"].(string),
 							Row:   rowVals["-rname"].(string),
 							Col:   colVals["-cname"].(string),
 						})
-						//fmt.Println(i, m["-cname"], m["#text"])
+						// fmt.Println(i, m["-cname"], m["#text"])
 					}
-
 				}
 			}
 		}
 	}
+
 	return results
 }
 func getThetas(m *mxj.Map, key string) []string {
@@ -122,19 +130,22 @@ func getThetas(m *mxj.Map, key string) []string {
 	// this could be different if multiple estimation steps run
 	if err != nil {
 		fmt.Println("error extracting values: ", err)
+
 		return output
 	}
 	for _, val := range values {
-		for _, val := range val.(map[string]interface{}) {
+		for _, v := range val.(map[string]interface{}) {
 			// You'd probably want to process the value, as appropriate.
 			// Here we just print it out.
-			thetaVals := val.([]interface{})
-			for _, val := range thetaVals {
-				vals := val.(map[string]interface{})
+			// TODO: solve thetaVals !ok
+			thetaVals, _ := v.([]interface{})
+			for _, tv := range thetaVals {
+				// TODO: solve tv !ok
+				vals, _ := tv.(map[string]interface{})
 				output = append(output, vals["#text"].(string))
 			}
 		}
 	}
-	return output
 
+	return output
 }

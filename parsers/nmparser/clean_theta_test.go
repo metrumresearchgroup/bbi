@@ -4,9 +4,14 @@ import (
 	"bufio"
 	"os"
 	"testing"
+
+	"github.com/metrumresearchgroup/bbi/utils"
+
+	"github.com/metrumresearchgroup/wrapt"
 )
 
-var uglyString = []string{
+// TODO: remove uglyString if we find no use...
+var _ = /*uglyString*/ []string{
 	"$THETA (0,2720) ; CL",
 	"$THETA(0,2650) ; V2",
 	" $THETA (0,7730) ; V3",
@@ -15,7 +20,8 @@ var uglyString = []string{
 	" 0.75 FIX ; allo-WT",
 }
 
-var rawThetaBlock02 = []string{
+// TODO: remove ratThetaBlock02 if we find no use...
+var _ = /*rawThetaBlock02*/ []string{
 	"$THETA  (0,5) ; CL",
 	"(0,97.2) ; V",
 	"(0,7.47,100) ; Q",
@@ -27,7 +33,8 @@ var rawThetaBlock02 = []string{
 	"(-0.038,0.00231,1000000) ; CLCRCL2",
 }
 
-var rawThetaBlock02Cleaned = []string{
+// TODO: remove rawThetaBlock02Cleaned if we find no use...
+var _ = /*rawThetaBlock02Cleaned*/ []string{
 	"(0,5) ; CL",
 	"(0,97.2) ; V",
 	"(0,7.47,100) ; Q",
@@ -51,6 +58,7 @@ func readLines(path string) ([]string, error) {
 	for scanner.Scan() {
 		lines = append(lines, scanner.Text())
 	}
+
 	return lines, nil
 }
 
@@ -63,63 +71,35 @@ var thetaSliceCleanedResult = []string{
 	"0.75 FIX ; allo-WT",
 }
 
-func TestCleaningThetaBlock01(t *testing.T) {
-	testData, err := readLines("testdata/blocks/theta-block-01.lst")
-	if err != nil {
-		t.Log("could not read testData with err: ", err)
-		t.Fail()
+func TestCleaningThetaBlock(tt *testing.T) {
+	tests := []struct {
+		name     string
+		filename string
+	}{
+		{
+			name:     "block-01",
+			filename: "testdata/blocks/theta-block-01.lst",
+		},
+		{
+			name:     "block-02",
+			filename: "testdata/blocks/theta-block-02.lst",
+		},
+		{
+			name:     "block-03",
+			filename: "testdata/blocks/theta-block-03.lst",
+		},
 	}
-	parsedData := CleanThetaBlock(testData)
-	if len(parsedData) != len(thetaSliceCleanedResult) {
-		t.Log("Mismatch between number of rows of cleaned and correct results")
-		// failNow as don't want to go to next check as go will panic since loops won't match
-		t.FailNow()
-	}
-	for i, val := range parsedData {
-		if val != thetaSliceCleanedResult[i] {
-			t.Log("GOT: ", val, " EXPECTED: ", thetaSliceCleanedResult[i])
-			t.Fail()
-		}
-	}
-}
+	testId := "UNIT-NMP-028"
+	for _, test := range tests {
+		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-func TestCleaningThetaBlock02(t *testing.T) {
-	testData, err := readLines("testdata/blocks/theta-block-02.lst")
-	if err != nil {
-		t.Log("could not read testData with err: ", err)
-		t.Fail()
-	}
-	parsedData := CleanThetaBlock(testData)
-	if len(parsedData) != len(thetaSliceCleanedResult) {
-		t.Log("Mismatch between number of rows of cleaned and correct results")
-		// failNow as don't want to go to next check as go will panic since loops won't match
-		t.FailNow()
-	}
-	for i, val := range parsedData {
-		if val != thetaSliceCleanedResult[i] {
-			t.Log("GOT: ", val, " EXPECTED: ", thetaSliceCleanedResult[i])
-			t.Fail()
-		}
-	}
-}
+			testData, err := readLines(test.filename)
+			t.R.NoError(err, "reading test data")
 
-func TestCleaningThetaBlock03(t *testing.T) {
-	testData, err := readLines("testdata/blocks/theta-block-03.lst")
-	if err != nil {
-		t.Log("could not read testData with err: ", err)
-		t.Fail()
-	}
+			parsedData := CleanThetaBlock(testData)
 
-	parsedData := CleanThetaBlock(testData)
-	if len(parsedData) != len(thetaSliceCleanedResult) {
-		t.Log("Mismatch between number of rows of cleaned and correct results")
-		// failNow as don't want to go to next check as go will panic since loops won't match
-		t.FailNow()
-	}
-	for i, val := range parsedData {
-		if val != thetaSliceCleanedResult[i] {
-			t.Log("GOT: ", val, " EXPECTED: ", thetaSliceCleanedResult[i])
-			t.Fail()
-		}
+			t.R.Equal(thetaSliceCleanedResult, parsedData)
+		})
 	}
 }

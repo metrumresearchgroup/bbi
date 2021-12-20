@@ -4,11 +4,12 @@ import (
 	"strings"
 	"testing"
 
-	"bbi/utils"
-	"github.com/stretchr/testify/assert"
+	"github.com/metrumresearchgroup/wrapt"
+
+	"github.com/metrumresearchgroup/bbi/utils"
 )
 
-func TestReadParseGrdLines(t *testing.T) {
+func TestReadParseGrdLines(tt *testing.T) {
 	var tests = []struct {
 		lines    []string
 		expected bool
@@ -108,20 +109,22 @@ func TestReadParseGrdLines(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		extData := ParseGrdLines(tt.lines)
-		assert.Equal(t, tt.lines[0], extData.EstimationMethods[0], "Fail :"+tt.context)
-		assert.Equal(t, "GRD(1)", extData.ParameterNames[1], "Fail :"+tt.context)
-		assert.Equal(t, strings.Trim(tt.lines[2], "\t "), extData.EstimationLines[0][0], "Fail :"+tt.context)
+	testId := "UNIT-NMP-034"
+	for _, test := range tests {
+		tt.Run(utils.AddTestId(test.context, testId), func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
 
-		parametersData, parameterNames := ParseGrdData(extData)
-		assert.Equal(t, tt.lines[0], parametersData[0].Method, "Fail :"+tt.context)
-		assert.Equal(t, "GRD(1)", parameterNames.Theta[0], "Fail :"+tt.context)
+			grdData := ParseGrdLines(test.lines)
+			t.R.Equal(test.lines[0], grdData.EstimationMethods[0], "Fail :"+test.context)
+			t.R.Equal("GRD(1)", grdData.ParameterNames[1], "Fail :"+test.context)
+			t.R.Equal(strings.Trim(test.lines[2], "\t "), grdData.EstimationLines[0][0], "Fail :"+test.context)
 
-		hasZero := utils.HasZero(parametersData[len(parametersData)-1].Fixed.Theta)
-		assert.Equal(t, tt.expected, hasZero, "Fail :"+tt.context)
+			parametersData, parameterNames := ParseGrdData(grdData)
+			t.R.Equal(test.lines[0], parametersData[0].Method, "Fail :"+test.context)
+			t.R.Equal("GRD(1)", parameterNames.Theta[0], "Fail :"+test.context)
 
-		hasZeroGradient := HasZeroGradient(parametersData[len(parametersData)-1].Fixed.Theta)
-		assert.Equal(t, tt.status, hasZeroGradient, "Fail :"+tt.context)
+			hasZero := utils.HasZero(parametersData[len(parametersData)-1].Fixed.Theta)
+			t.R.Equal(test.expected, hasZero, "Fail :"+test.context)
+		})
 	}
 }

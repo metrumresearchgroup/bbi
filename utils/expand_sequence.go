@@ -11,7 +11,7 @@ import (
 //  run[001:004].mod --> run001.mod run002.mod run003.mod run004.mod
 func ExpandNameSequence(fnp string) ([]string, error) {
 	var output []string
-	r := regexp.MustCompile("(.*)?\\[(.*)\\](.*)?")
+	r := regexp.MustCompile(`(.*)?\[(.*)](.*)?`)
 	grps := r.FindAllStringSubmatch(fnp, 1)
 	if len(grps) > 0 {
 		match := grps[0]
@@ -64,5 +64,6 @@ func ExpandSequence(seq string) ([]string, error) {
 			output = append(output, PadNum(i, padding))
 		}
 	}
+
 	return output, nil
 }

@@ -18,6 +18,7 @@ func NewDefaultParameterNames(nTheta int, nOmega int, nSigma int) ParameterNames
 	for i := 0; i < nSigma; i++ {
 		sigmaNames = append(sigmaNames, fmt.Sprintf("SIGMA%s", omegaIndices[i]))
 	}
+
 	return ParameterNames{
 		Theta: thetaNames,
 		Omega: omegaNames,

@@ -19,39 +19,29 @@ import (
 	"log"
 	"path/filepath"
 
-	"bbi/utils"
+	"github.com/metrumresearchgroup/bbi/utils"
+
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
-
-// scaffoldCmd represents the clean command
-var scaffoldCmd = &cobra.Command{
-	Use:   "scaffold",
-	Short: "scaffold directory structures",
-	Long: `
-	nmu scaffold --cacheDir=nmcache
-
-	nmu scaffold --cacheDir=../nmcache --preview // show where the cache dir would be created
- `,
-	RunE: scaffold,
-}
 
 func scaffold(cmd *cobra.Command, args []string) error {
 	if debug {
 		viper.Debug()
 	}
 
-	AppFs := afero.NewOsFs()
-
 	dir, _ := filepath.Abs(".")
 
 	if viper.GetString("cacheDir") != "" {
 		cache := filepath.Clean(filepath.Join(dir, viper.GetString("cacheDir")))
 		if preview {
-			fmt.Println(fmt.Sprintf("would create cache dir at: %s", cache))
+			fmt.Printf("would create cache dir at: %s\n", cache)
+
 			return nil
 		}
+
+		AppFs := afero.NewOsFs()
 
 		exists, err := afero.Exists(AppFs, cache)
 		if err != nil {
@@ -66,19 +56,33 @@ func scaffold(cmd *cobra.Command, args []string) error {
 			log.Fatalf("error creating cache directory: %s", err)
 		}
 		fmt.Println("adding .gitignore to cache directory...")
-		utils.WriteLinesFS(AppFs, []string{
+		if err = utils.WriteLinesFS(AppFs, []string{
 			"*",
 			"*/",
 			"!.gitignore",
 			"",
-		},
-			filepath.Join(cache, ".gitignore"))
+		}, filepath.Join(cache, ".gitignore")); err != nil {
+			return err
+		}
 	}
 
 	return nil
 }
-func init() {
-	nonmemCmd.AddCommand(scaffoldCmd)
-	scaffoldCmd.Flags().String("cacheDir", "", "create cache directory at path/name")
-	viper.BindPFlag("cacheDir", scaffoldCmd.Flags().Lookup("cacheDir"))
+
+func NewScaffoldCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "scaffold",
+		Short: "scaffold directory structures",
+		Long: `
+	nmu scaffold --cacheDir=nmcache
+
+	nmu scaffold --cacheDir=../nmcache --preview // show where the cache dir would be created
+ `,
+		RunE: scaffold,
+	}
+
+	cmd.Flags().String("cacheDir", "", "create cache directory at path/name")
+	errpanic(viper.BindPFlag("cacheDir", cmd.Flags().Lookup("cacheDir")))
+
+	return cmd
 }

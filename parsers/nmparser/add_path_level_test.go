@@ -2,10 +2,15 @@ package parser
 
 import (
 	"runtime"
+	"strconv"
 	"testing"
+
+	"github.com/metrumresearchgroup/bbi/utils"
+
+	"github.com/metrumresearchgroup/wrapt"
 )
 
-func TestAddingPathLevel(t *testing.T) {
+func TestAddingPathLevel(tt *testing.T) {
 	originalPaths := []string{
 		"$DATA modeling/data1.csv",
 		"$DATA /usr/modeling/data1.csv",
@@ -22,9 +27,7 @@ func TestAddingPathLevel(t *testing.T) {
 			"$DATA ..\\modeling\\data1.csv IGNORE=@",
 			"$DATA ..\\modeling\\data1.csv IGNORE=@ IGNORE=ID.GT.5",
 		}
-
 	} else {
-
 		newPaths = []string{
 			"$DATA ../modeling/data1.csv",
 			"$DATA /usr/modeling/data1.csv",
@@ -33,11 +36,15 @@ func TestAddingPathLevel(t *testing.T) {
 			"$DATA ../modeling/data1.csv IGNORE=@ IGNORE=ID.GT.5",
 		}
 	}
+
+	testId := "UNIT-NMP-013"
 	for i, val := range originalPaths {
-		newPath := AddPathLevelToData(val)
-		if newPath != newPaths[i] {
-			t.Log("GOT: ", newPath, " EXPECTED: ", newPaths[i])
-			t.Fail()
-		}
+		tt.Run(utils.AddTestId("path "+strconv.Itoa(i), testId), func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+
+			newPath := AddPathLevelToData(val)
+
+			t.R.Equal(newPaths[i], newPath)
+		})
 	}
 }

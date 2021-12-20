@@ -2,14 +2,14 @@ package parser
 
 import "strings"
 
-// InitialEstimates contains information about intitial estimates and boundary conditions
+// InitialEstimates contains information about intitial estimates and boundary conditions.
 type InitialEstimates struct {
 	Theta []IETheta
 	Omega []IERandomEffect
 	Sigma []IERandomEffect
 }
 
-// IETheta represents initial estimate for theta with boundaries and (guess) of whether fixed (all values same)
+// IETheta represents initial estimate for theta with boundaries and (guess) of whether fixed (all values same).
 type IETheta struct {
 	LB    string
 	IE    string
@@ -17,20 +17,22 @@ type IETheta struct {
 	Fixed bool
 }
 
-// IERandomEffect represents initial estimate for random effects for omega and sigma
+// IERandomEffect represents initial estimate for random effects for omega and sigma.
 type IERandomEffect struct {
 	Value string
 	Fixed bool
 }
 
-func parseInitialThetas(lines []string) []IETheta {
-	// skip Lower Initial Upper bound deliniation line
+// TODO: this function appears to deliver a result of zero despite
+// its input.
+func parseInitialThetas(_ /*lines*/ []string) []IETheta {
+	// skip Lower Initial Upper bound delineation line
 
 	// strip any annotations
 	return []IETheta{IETheta{"0", "0", "0", true}}
 }
 
-// ParseBlockStructure parses the structure of a parameter block
+// ParseBlockStructure parses the structure of a parameter block.
 func parseSimpleBlockStructure(lines []string) []IERandomEffect {
 	var combinedLines string
 	for _, line := range lines {
@@ -44,6 +46,7 @@ func parseSimpleBlockStructure(lines []string) []IERandomEffect {
 	for i, val := range values {
 		results[i] = IERandomEffect{val, false}
 	}
+
 	return results
 }
 
@@ -56,7 +59,7 @@ func parseInitialSigmas(lines []string) []IERandomEffect {
 	return parseSimpleBlockStructure(lines)
 }
 
-// ParseInitialEstimates parses the initial estimate lines of the lst file
+// ParseInitialEstimates parses the initial estimate lines of the lst file.
 func ParseInitialEstimates(lines []string) InitialEstimates {
 	var initialThetaIndex int
 	var initialOmegaIndex int
@@ -72,7 +75,6 @@ func ParseInitialEstimates(lines []string) InitialEstimates {
 		default:
 			continue
 		}
-
 	}
 
 	result := InitialEstimates{
@@ -80,5 +82,6 @@ func ParseInitialEstimates(lines []string) InitialEstimates {
 		parseInitialOmegas(lines[(initialOmegaIndex + 1):initialSigmaIndex]),
 		parseInitialSigmas(lines[(initialSigmaIndex + 1):]),
 	}
+
 	return result
 }

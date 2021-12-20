@@ -26,11 +26,14 @@ builds:
     env:
       - CGO_ENABLED=0
     ldflags:
-      - -s -w -extldflags "-static" -X 'bbi/cmd.VERSION={{ .Env.VERSION }}'
+      - -s -w -extldflags "-static" -X 'github.com/metrumresearchgroup/bbi/cmd.VERSION={{ .Env.VERSION }}'
     goos:
       - windows
       - darwin
       - linux
+    goarch:
+      - amd64
+      - arm64
 
 release:
   github:

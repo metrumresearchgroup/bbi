@@ -17,21 +17,12 @@ package cmd
 import (
 	"fmt"
 
-	"bbi/runner"
+	"github.com/metrumresearchgroup/bbi/runner"
+
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
-
-// cleanCmd represents the clean command
-var recleanCmd = &cobra.Command{
-	Use:   "reclean",
-	Short: "clean files in an estimation directory by clean level",
-	Long: `
-	bbi reclean run001_est_01
- `,
-	RunE: reclean,
-}
 
 func reclean(cmd *cobra.Command, args []string) error {
 	if debug {
@@ -42,12 +33,22 @@ func reclean(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		fmt.Printf("err: %v", err)
 	}
+
 	return nil
 }
-func init() {
-	nonmemCmd.AddCommand(recleanCmd)
 
-	recleanCmd.Flags().Int("recleanLvl", 0, "clean level to apply")
-	viper.BindPFlag("recleanLvl", recleanCmd.Flags().Lookup("recleanLvl"))
+func NewRecleanCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "reclean",
+		Short: "clean files in an estimation directory by clean level",
+		Long: `
+	bbi reclean run001_est_01
+ `,
+		RunE: reclean,
+	}
 
+	cmd.Flags().Int("recleanLvl", 0, "clean level to apply")
+	errpanic(viper.BindPFlag("recleanLvl", cmd.Flags().Lookup("recleanLvl")))
+
+	return cmd
 }

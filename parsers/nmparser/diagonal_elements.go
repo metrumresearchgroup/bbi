@@ -28,15 +28,14 @@ import (
 // lowerDiagonalLengthToDimension(3) => 2, true
 // lowerDiagonalLengthToDimension(4) => 0, false
 // lowerDiagonalLengthToDimension(5) => 0, false
-// lowerDiagonalLengthToDimension(6) => 3, true
+// lowerDiagonalLengthToDimension(6) => 3, true.
 func lowerDiagonalLengthToDimension(l int) (int, bool) {
-
 	// calculate the dimension
 	dim := int(math.Floor(math.Sqrt(2.0 * float64(l))))
 
 	// if not equal going back the other way then it's not a diagonal
-	check := (dim * (dim + 1)) / 2
-	if l != check {
+
+	if l != (dim*(dim+1))/2 {
 		return 0, false
 	}
 
@@ -45,6 +44,7 @@ func lowerDiagonalLengthToDimension(l int) (int, bool) {
 
 func IndexAndIsDiag(i int) (int, bool) {
 	res, isdiag := lowerDiagonalLengthToDimension(i + 1)
+
 	return res, isdiag
 }
 
@@ -59,7 +59,7 @@ func IndexAndIsDiag(i int) (int, bool) {
 // $OMEGA BLOCK(2)
 // 0.04
 // 0.001 0.04
-// and should return []int{0, 1, 3}
+// and should return []int{0, 1, 3}.
 func GetDiagonalIndices(el []int) []int {
 	if len(el) == 0 {
 		return []int{}
@@ -71,13 +71,14 @@ func GetDiagonalIndices(el []int) []int {
 			diagElements = append(diagElements, index)
 		}
 	}
+
 	return diagElements
 }
 
 // GetBlockParameterNames builds a slice of parameter names
 // len is the number of elements in a lower triangular matrix
 // len is converted to the dimension of the full matrix
-// dimension = n, of a nxn block matrix
+// dimension = n, of a nxn block matrix.
 func GetBlockParameterNames(name string, len int) []string {
 	var ret []string
 	dim, _ := lowerDiagonalLengthToDimension(len)
@@ -88,5 +89,6 @@ func GetBlockParameterNames(name string, len int) []string {
 			}
 		}
 	}
+
 	return ret
 }

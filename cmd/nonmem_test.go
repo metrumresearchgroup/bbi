@@ -4,21 +4,25 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"reflect"
 	"testing"
 
-	"bbi/configlib"
+	"github.com/metrumresearchgroup/bbi/utils"
+
+	"github.com/metrumresearchgroup/bbi/configlib"
+
 	"github.com/google/uuid"
+	"github.com/metrumresearchgroup/wrapt"
 	"github.com/spf13/afero"
 )
 
-func Test_doesDirectoryContainOutputFiles(t *testing.T) {
-
+func Test_doesDirectoryContainOutputFiles(tt *testing.T) {
 	good := uuid.New().String()
 	bad := uuid.New().String()
 
-	os.Mkdir(good, 0755)
-	os.Mkdir(bad, 0755)
+	t := wrapt.WrapT(tt)
+
+	t.R.NoError(os.Mkdir(good, 0755))
+	t.R.NoError(os.Mkdir(bad, 0755))
 	emptyFile(path.Join(bad, "meow.cov"))
 
 	type args struct {
@@ -47,15 +51,19 @@ func Test_doesDirectoryContainOutputFiles(t *testing.T) {
 			want: true,
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := doesDirectoryContainOutputFiles(tt.args.path, tt.args.modelname); got != tt.want {
-				t.Errorf("doesDirectoryContainOutputFiles() = %v, want %v", got, tt.want)
-			}
+
+	testId := "UNIT-CMD-001"
+	for _, test := range tests {
+		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+
+			got := doesDirectoryContainOutputFiles(test.args.path, test.args.modelname)
+
+			t.R.Equal(test.want, got)
 		})
 	}
 
-	//Cleanup the directories
+	// Cleanup the directories
 	os.RemoveAll(good)
 	os.RemoveAll(bad)
 }
@@ -65,8 +73,7 @@ func emptyFile(path string) {
 	empty.Close()
 }
 
-func Test_processNMFEOptions(t *testing.T) {
-
+func Test_processNMFEOptions(tt *testing.T) {
 	type args struct {
 		config configlib.Config
 	}
@@ -149,16 +156,19 @@ func Test_processNMFEOptions(t *testing.T) {
 			},
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := processNMFEOptions(tt.args.config); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("processNMFEOptions() = %v, want %v", got, tt.want)
-			}
+	testId := "UNIT-CMD-002"
+	for _, test := range tests {
+		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+
+			got := processNMFEOptions(test.args.config)
+
+			t.R.Equal(test.want, got)
 		})
 	}
 }
 
-func Test_modelDataFile(t *testing.T) {
+func Test_modelDataFile(tt *testing.T) {
 	type args struct {
 		modelLines []string
 	}
@@ -193,30 +203,31 @@ func Test_modelDataFile(t *testing.T) {
 			wantErr: true,
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := modelDataFile(tt.args.modelLines)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("modelDataFile() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if got != tt.want {
-				t.Errorf("modelDataFile() got = %v, want %v", got, tt.want)
-			}
+	testId := "UNIT-CMD-003"
+	for _, test := range tests {
+		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+
+			got, err := modelDataFile(test.args.modelLines)
+
+			t.R.WantError(test.wantErr, err)
+			t.R.Equal(test.want, got)
 		})
 	}
 }
 
-func Test_dataFileIsPresent(t *testing.T) {
+func Test_dataFileIsPresent(tt *testing.T) {
 	const testingDir string = "/tmp/testing/bbi"
 	const testingFile string = "test.txt"
-	//Temporary working directory
+
+	t := wrapt.WrapT(tt)
+	// Temporary working directory
 	fs := afero.NewOsFs()
-	fs.RemoveAll(testingDir)
-	fs.MkdirAll(testingDir, 0755)
+	t.R.NoError(fs.RemoveAll(testingDir))
+	t.R.NoError(fs.MkdirAll(testingDir, 0755))
 	file, _ := fs.Create(filepath.Join(testingDir, testingFile))
-	file.Sync()
-	file.Close()
+	t.R.NoError(file.Sync())
+	t.R.NoError(file.Close())
 
 	type args struct {
 		datafile  string
@@ -243,11 +254,14 @@ func Test_dataFileIsPresent(t *testing.T) {
 			wantErr: true,
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := dataFileIsPresent(tt.args.datafile, tt.args.modelpath); (err != nil) != tt.wantErr {
-				t.Errorf("dataFileIsPresent() error = %v, wantErr %v", err, tt.wantErr)
-			}
+	testId := "UNIT-CMD-004"
+	for _, test := range tests {
+		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+
+			err := dataFileIsPresent(test.args.datafile, test.args.modelpath)
+
+			t.R.WantError(test.wantErr, err)
 		})
 	}
 }

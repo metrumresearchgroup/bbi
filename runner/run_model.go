@@ -9,7 +9,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"bbi/utils"
+	"github.com/metrumresearchgroup/bbi/utils"
+
 	"github.com/spf13/afero"
 )
 
@@ -18,16 +19,18 @@ import (
 // modelDir is the name of the model directory to run the copied model
 // runName is the name of the run model file --> run001.mod
 // noBuild is whether to append --nobuild given a nonmem executable is in the run dir
-// nmExecutableOrPath is the name or absolute location of the nmfe executable
+// nmExecutableOrPath is the name or absolute location of the nmfe executable.
 func RunEstModel(fs afero.Fs,
 	modelDir string,
 	runName string,
 	noBuild bool,
 	nmExecutableOrPath string,
 ) error {
+
 	ok, err := utils.DirExists(modelDir, fs)
 	if !ok || err != nil {
 		log.Printf("could not find directory to run model %s, ERR: %s, ok: %v", modelDir, err, ok)
+
 		return err
 	}
 	runNum, fileExt := utils.FileAndExt(runName)
@@ -96,13 +99,16 @@ func RunEstModel(fs afero.Fs,
 	err = cmd.Start()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Error starting Cmd", err)
+
 		return err
 	}
 
 	err = cmd.Wait()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Error attempting to run model, check the lst file in the run directory for more details", err)
+
 		return err
 	}
+
 	return nil
 }

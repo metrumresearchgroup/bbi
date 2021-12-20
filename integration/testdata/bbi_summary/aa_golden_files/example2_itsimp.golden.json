@@ -1,0 +1,469 @@
+{
+	"run_details": {
+		"version": "7.4.4",
+		"run_start": "-999999999",
+		"run_end": "Tue May  4 16:33:46 EDT 2021",
+		"estimation_time": 22.53,
+		"cpu_time": 42.881,
+		"function_evaluations": -999999999,
+		"significant_digits": -999999999,
+		"problem_text": "RUN# example2 (from sampc)",
+		"mod_file": "-999999999",
+		"estimation_method": [
+			"Iterative Two Stage (No Prior)",
+			"Importance Sampling (No Prior)"
+		],
+		"data_set": "../example2.csv",
+		"number_of_subjects": 400,
+		"number_of_obs": 2000,
+		"number_of_data_records": 2400,
+		"output_files_used": [
+			"example2_itsimp.lst",
+			"example2_itsimp.cpu",
+			"example2_itsimp.ext",
+			"example2_itsimp.shk"
+		]
+	},
+	"run_heuristics": {
+		"covariance_step_aborted": false,
+		"large_condition_number": false,
+		"eigenvalue_issues": false,
+		"correlations_not_ok": false,
+		"parameter_near_boundary": false,
+		"hessian_reset": false,
+		"has_final_zero_gradient": false,
+		"minimization_terminated": false,
+		"eta_pval_significant": false,
+		"prderr": false
+	},
+	"parameters_data": [
+		{
+			"method": "TABLE NO.     1: Iterative Two Stage (No Prior): Goal Function=FINAL VALUE OF OBJECTIVE FUNCTION: Problem=1 Subproblem=0 Superproblem1=0 Iteration1=0 Superproblem2=0 Iteration2=0",
+			"estimates": {
+				"theta": [
+					3.30275,
+					3.25636,
+					-0.611284,
+					-0.208127,
+					0.728967,
+					1.13667,
+					0.337477,
+					0.191719,
+					0.691923,
+					2.2983,
+					0.0999153
+				],
+				"omega": [
+					0.0102808,
+					0.000165819,
+					0.00795601,
+					0.00120055,
+					-0.000360578,
+					0.00998908,
+					-0.000630844,
+					0.000453655,
+					0.00202238,
+					0.00973306
+				],
+				"sigma": [
+					1
+				]
+			},
+			"std_err": {
+				"theta": [
+					0.0380461,
+					0.028842,
+					0.0110937,
+					0.00842217,
+					0.048389,
+					0.0410429,
+					0.013422,
+					0.0118567,
+					0.010523,
+					0.00893687,
+					0.00298448
+				],
+				"omega": [
+					0.00100672,
+					0.000865131,
+					0.00149678,
+					0.00129208,
+					0.00143822,
+					0.00282721,
+					0.00111778,
+					0.00115593,
+					0.00198475,
+					0.00199998
+				],
+				"sigma": [
+					0
+				]
+			},
+			"random_effect_sd": {
+				"omega": [
+					0.101394,
+					0.0183347,
+					0.0891965,
+					0.118469,
+					-0.0404472,
+					0.0999454,
+					-0.0630644,
+					0.0515529,
+					0.205105,
+					0.0986563
+				],
+				"sigma": [
+					1
+				]
+			},
+			"random_effect_sdse": {
+				"omega": [
+					0.0049644,
+					0.0946735,
+					0.00839034,
+					0.120377,
+					0.164545,
+					0.0141438,
+					0.115913,
+					0.127887,
+					0.162351,
+					0.0101361
+				],
+				"sigma": [
+					10000000000
+				]
+			},
+			"fixed": {
+				"theta": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"omega": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"sigma": [
+					1
+				]
+			}
+		},
+		{
+			"method": "TABLE NO.     2: Importance Sampling (No Prior): Goal Function=FINAL VALUE OF OBJECTIVE FUNCTION: Problem=1 Subproblem=0 Superproblem1=0 Iteration1=0 Superproblem2=0 Iteration2=0",
+			"estimates": {
+				"theta": [
+					3.30073,
+					3.2541,
+					-0.61237,
+					-0.20862,
+					0.7376,
+					1.14159,
+					0.334262,
+					0.190709,
+					0.690655,
+					2.29873,
+					0.100015
+				],
+				"omega": [
+					0.0103243,
+					0.000195697,
+					0.00798982,
+					0.00119334,
+					-0.000232896,
+					0.00979714,
+					-0.000656799,
+					0.000505325,
+					0.00192836,
+					0.00972803
+				],
+				"sigma": [
+					1
+				]
+			},
+			"std_err": {
+				"theta": [
+					0.0291366,
+					0.0288953,
+					0.00848895,
+					0.00833274,
+					0.0332415,
+					0.0324709,
+					0.0100751,
+					0.00936532,
+					0.0106777,
+					0.00865098,
+					0.00262794
+				],
+				"omega": [
+					0.000965618,
+					0.000840977,
+					0.00127733,
+					0.00120549,
+					0.00134118,
+					0.00267236,
+					0.000882971,
+					0.00110316,
+					0.00184392,
+					0.00170672
+				],
+				"sigma": [
+					0
+				]
+			},
+			"random_effect_sd": {
+				"omega": [
+					0.101609,
+					0.0215469,
+					0.0893858,
+					0.118654,
+					-0.0263235,
+					0.0989805,
+					-0.0655374,
+					0.0573179,
+					0.197527,
+					0.0986308
+				],
+				"sigma": [
+					1
+				]
+			},
+			"random_effect_sdse": {
+				"omega": [
+					0.00475165,
+					0.091848,
+					0.00714505,
+					0.110187,
+					0.1523,
+					0.0134994,
+					0.0903827,
+					0.12318,
+					0.154374,
+					0.00865206
+				],
+				"sigma": [
+					10000000000
+				]
+			},
+			"fixed": {
+				"theta": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"omega": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"sigma": [
+					1
+				]
+			}
+		}
+	],
+	"parameter_names": {
+		"theta": [
+			"THETA1",
+			"THETA2",
+			"THETA3",
+			"THETA4",
+			"THETA5",
+			"THETA6",
+			"THETA7",
+			"THETA8",
+			"THETA9",
+			"THETA10",
+			"THETA11"
+		],
+		"omega": [
+			"OMEGA(1,1)",
+			"OMEGA(2,1)",
+			"OMEGA(2,2)",
+			"OMEGA(3,1)",
+			"OMEGA(3,2)",
+			"OMEGA(3,3)",
+			"OMEGA(4,1)",
+			"OMEGA(4,2)",
+			"OMEGA(4,3)",
+			"OMEGA(4,4)"
+		],
+		"sigma": [
+			"SIGMA(1,1)"
+		]
+	},
+	"ofv": [
+		{
+			"method": "Iterative Two Stage (No Prior)",
+			"ofv_no_constant": -10771.858,
+			"constant_to_ofv": 3675.754132818691,
+			"ofv_with_constant": -7096.103687996414
+		},
+		{
+			"method": "Importance Sampling (No Prior)",
+			"ofv_no_constant": -10784.644,
+			"constant_to_ofv": 3675.754132818691,
+			"ofv_with_constant": -7108.8897112213035
+		}
+	],
+	"condition_number": [
+		{
+			"method": "Iterative Two Stage (No Prior)",
+			"condition_number": 241.05
+		},
+		{
+			"method": "Importance Sampling (No Prior)",
+			"condition_number": 126.99
+		}
+	],
+	"shrinkage_details": [
+		[
+			{
+				"sub_pop": 1,
+				"eta_bar": [
+					-4.25284e-8,
+					-5.31037e-8,
+					-9.87707e-8,
+					-8.86959e-8
+				],
+				"ebv_bar_se": [
+					0.00471323,
+					0.00298829,
+					0.00294211,
+					0.00369138
+				],
+				"pval": [
+					0.999993,
+					0.999986,
+					0.999973,
+					0.999981
+				],
+				"eta_sd": [
+					6.91515,
+					32.9114,
+					41.052,
+					25.0731
+				],
+				"eps_sd": [
+					26.1873
+				],
+				"ebv_sd": [
+					6.91507,
+					32.9112,
+					41.0504,
+					25.0724
+				],
+				"num_subjects": [
+					400,
+					400,
+					400,
+					400
+				],
+				"eta_vr": [
+					13.3521,
+					54.9912,
+					65.2513,
+					43.8596
+				],
+				"eps_vr": [
+					45.5168
+				],
+				"ebv_vr": [
+					13.352,
+					54.991,
+					65.2494,
+					43.8586
+				]
+			}
+		],
+		[
+			{
+				"sub_pop": 1,
+				"eta_bar": [
+					-0.000173309,
+					0.000185832,
+					-0.000182834,
+					-0.000216587
+				],
+				"ebv_bar_se": [
+					0.00472073,
+					0.00297941,
+					0.00288863,
+					0.0037001
+				],
+				"pval": [
+					0.970714,
+					0.950266,
+					0.949532,
+					0.953322
+				],
+				"eta_sd": [
+					6.96378,
+					33.2524,
+					41.5592,
+					24.8767
+				],
+				"eps_sd": [
+					26.3813
+				],
+				"ebv_sd": [
+					6.95439,
+					33.0197,
+					41.4168,
+					25.1201
+				],
+				"num_subjects": [
+					400,
+					400,
+					400,
+					400
+				],
+				"eta_vr": [
+					13.4426,
+					55.4475,
+					65.8467,
+					43.5649
+				],
+				"eps_vr": [
+					45.8028
+				],
+				"ebv_vr": [
+					13.4251,
+					55.1364,
+					65.6801,
+					43.93
+				]
+			}
+		]
+	]
+}

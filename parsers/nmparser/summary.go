@@ -10,7 +10,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
-// Summary prints all results from the parsed LstData
+// Summary prints all results from the parsed LstData.
 func (results SummaryOutput) Summary() bool {
 	thetaTable := tablewriter.NewWriter(os.Stdout)
 	thetaTable.SetAlignment(tablewriter.ALIGN_LEFT)
@@ -42,7 +42,7 @@ func (results SummaryOutput) Summary() bool {
 		}
 
 		thetaTable.Append([]string{
-			string("TH " + strconv.Itoa(i+1)),
+			"TH " + strconv.Itoa(i+1),
 			results.ParameterNames.Theta[i],
 			strconv.FormatFloat(numResult, 'f', -1, 64),
 			s4})
@@ -52,62 +52,71 @@ func (results SummaryOutput) Summary() bool {
 	omegaTable.SetAlignment(tablewriter.ALIGN_LEFT)
 	omegaTable.SetColWidth(100)
 	omegaHeaders := []string{"Omega", "Eta", "Estimate"}
-	if shk {
-		// bayesian methods have no concept of shrinkage
-		nSubPopsForMixtureModels := len(results.ShrinkageDetails[len(results.RunDetails.EstimationMethods)-1])
-		if nSubPopsForMixtureModels > 1 {
-			for i := 0; i < nSubPopsForMixtureModels; i++ {
-				omegaHeaders = append(omegaHeaders, fmt.Sprintf("Pop%v Shrinkage (%%)", i+1))
-			}
-		} else {
-			// single population
-			omegaHeaders = append(omegaHeaders, "Shrinkage (%)")
-		}
-	}
-	omegaTable.SetHeader(omegaHeaders)
-	// required for color, prevents newline in row
-	thetaTable.SetAutoWrapText(false)
-
 	methodIndex := len(results.RunDetails.EstimationMethods) - 1
-	for n := range results.ParametersData[finalEstimationMethodIndex].Estimates.Omega {
-		diagIndex, isDiag := IndexAndIsDiag(n)
-		if !isDiag {
-			continue
+	onlySim := results.RunDetails.OnlySim
+
+	if !onlySim {
+		if shk {
+			// bayesian methods have no concept of shrinkage
+			nSubPopsForMixtureModels := len(results.ShrinkageDetails[methodIndex])
+			if nSubPopsForMixtureModels > 1 {
+				for i := 0; i < nSubPopsForMixtureModels; i++ {
+					omegaHeaders = append(omegaHeaders, fmt.Sprintf("Pop%v Shrinkage (%%)", i+1))
+				}
+			} else {
+				// single population
+				omegaHeaders = append(omegaHeaders, "Shrinkage (%)")
+			}
 		}
-		var shrinkageValues []string
-		etaName := "-"
-		val := results.ParametersData[finalEstimationMethodIndex].Estimates.Omega[n]
-		if isDiag {
-			etaName = fmt.Sprintf("ETA%v", diagIndex)
-			if shk {
-				for sp := range results.ShrinkageDetails[methodIndex] {
-					if len(results.ShrinkageDetails[methodIndex]) > 0 {
-						// get the data for the last method
-						shrinkageDetails := results.ShrinkageDetails[len(results.ShrinkageDetails)-1]
-						shrinkage := shrinkageDetails[sp].EtaSD[diagIndex-1]
-						if shrinkage > 30.0 {
-							shrinkageValues = append(shrinkageValues, aurora.Sprintf(aurora.Red("%s"), fmt.Sprintf("%f", shrinkage)))
-						} else {
-							shrinkageValues = append(shrinkageValues, fmt.Sprintf("%f", shrinkage))
+		omegaTable.SetHeader(omegaHeaders)
+		// required for color, prevents newline in row
+		thetaTable.SetAutoWrapText(false)
+
+		for n := range results.ParametersData[finalEstimationMethodIndex].Estimates.Omega {
+			diagIndex, isDiag := IndexAndIsDiag(n)
+			if !isDiag {
+				continue
+			}
+			var shrinkageValues []string
+			etaName := "-"
+			val := results.ParametersData[finalEstimationMethodIndex].Estimates.Omega[n]
+			if isDiag {
+				etaName = fmt.Sprintf("ETA%v", diagIndex)
+				if shk {
+					for sp := range results.ShrinkageDetails[methodIndex] {
+						if len(results.ShrinkageDetails[methodIndex]) > 0 {
+							// get the data for the last method
+							shrinkageDetails := results.ShrinkageDetails[len(results.ShrinkageDetails)-1]
+							shrinkage := shrinkageDetails[sp].EtaSD[diagIndex-1]
+							if shrinkage > 30.0 {
+								shrinkageValues = append(shrinkageValues, aurora.Sprintf(aurora.Red("%s"), fmt.Sprintf("%f", shrinkage)))
+							} else {
+								shrinkageValues = append(shrinkageValues, fmt.Sprintf("%f", shrinkage))
+							}
 						}
 					}
 				}
 			}
+			omegaTable.Append(append([]string{results.ParameterNames.Omega[n], etaName, fmt.Sprintf("%f", val)}, shrinkageValues...))
 		}
-		omegaTable.Append(append([]string{results.ParameterNames.Omega[n], etaName, fmt.Sprintf("%f", val)}, shrinkageValues...))
 	}
 
 	fmt.Println(results.RunDetails.ProblemText)
 	fmt.Println("Dataset: " + results.RunDetails.DataSet)
-	fmt.Println(fmt.Sprintf("Records: %v   Observations: %v  Subjects: %v",
+	fmt.Printf("Records: %v   Observations: %v  Subjects: %v\n",
 		results.RunDetails.NumberOfDataRecords,
 		results.RunDetails.NumberOfObs,
 		results.RunDetails.NumberOfSubjects,
-	))
-	fmt.Println("Estimation Method(s):")
-	for _, em := range results.RunDetails.EstimationMethods {
-		fmt.Println(" - " + em)
+	)
+	if onlySim {
+		fmt.Println("No Estimation Methods (ONLYSIM)")
+	} else {
+		fmt.Println("Estimation Method(s):")
+		for _, em := range results.RunDetails.EstimationMethods {
+			fmt.Println(" - " + em)
+		}
 	}
+
 	if results.RunHeuristics.AnyTrue() {
 		fmt.Println(aurora.Bold(aurora.Red("Heuristic Problems Detected: ")))
 		issues := results.RunHeuristics.ErrorStrings()
@@ -118,7 +127,10 @@ func (results SummaryOutput) Summary() bool {
 		fmt.Println("No Heuristic Problems Detected")
 	}
 
-	thetaTable.Render()
-	omegaTable.Render()
+	if !onlySim {
+		thetaTable.Render()
+		omegaTable.Render()
+	}
+
 	return true
 }

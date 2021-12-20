@@ -2,22 +2,25 @@ package parser
 
 import (
 	"testing"
+
+	"github.com/metrumresearchgroup/bbi/utils"
+	"github.com/metrumresearchgroup/wrapt"
 )
 
-var parameterBlock01 = []string{
-	" 1",
-	" 0  2",
-	" 0  2  2",
-	" 0  0  0  3",
-}
-var parameterBlock01Results = []int{1, 0, 2, 0, 2, 2, 0, 0, 0, 3}
-
-func TestParseParameterBlock(t *testing.T) {
-	parsedData := ParseBlockStructure(parameterBlock01)
-	for i, val := range parsedData {
-		if val != parameterBlock01Results[i] {
-			t.Log("GOT: ", val, " EXPECTED: ", parameterBlock01Results[i], " at index: ", i)
-			t.Fail()
-		}
+func TestParseParameterBlock(tt *testing.T) {
+	input := []string{
+		" 1",
+		" 0  2",
+		" 0  2  2",
+		" 0  0  0  3",
 	}
+	expected := []int{1, 0, 2, 0, 2, 2, 0, 0, 0, 3}
+
+	testId := "UNIT-NMP-008"
+	tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
+		t := wrapt.WrapT(tt)
+
+		parsedData := ParseBlockStructure(input)
+		t.R.Equal(expected, parsedData)
+	})
 }

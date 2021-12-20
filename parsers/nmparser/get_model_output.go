@@ -7,13 +7,14 @@ import (
 	"strconv"
 	"strings"
 
-	"bbi/utils"
+	"github.com/metrumresearchgroup/bbi/utils"
+
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 )
 
 // ModelOutputFile gives the name of the summary file and whether to include the data
-// in the model output
+// in the model output.
 type ModelOutputFile struct {
 	Exclude bool
 	Name    string
@@ -22,15 +23,14 @@ type ModelOutputFile struct {
 // NewModelOutputFile returns a ModelOutputFile with a name and exclusion
 // given no name is set, downstream code should expect standard naming conventions following root.extension syntax
 // for example given a model 100 and want to set the ext file
-// if ModelOutputFile.Name is "" should look for 100.ext
+// if ModelOutputFile.Name is "" should look for 100.ext.
 func NewModelOutputFile(name string, exclude bool) ModelOutputFile {
 	return ModelOutputFile{Name: name, Exclude: exclude}
 }
 
 // GetModelOutput populates and returns a SummaryOutput object by parsing files
-// if ext file is excluded, will attempt to parse the lst file for additional information traditionally available there
+// if ext file is excluded, will attempt to parse the lst file for additional information traditionally available there.
 func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (SummaryOutput, error) {
-
 	AppFs := afero.NewOsFs()
 	runNum, extension := utils.FileAndExt(lstPath)
 	if extension == "" {
@@ -40,6 +40,7 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (Su
 	if extension != ".lst" && extension != ".res" {
 		err_msg := fmt.Sprintf("Must provide path to .lst (or .res) file for summary but provided '%s'", lstPath)
 		err_msg += "\nCan also pass no extension and summary will infer .lst extension."
+
 		return SummaryOutput{}, errors.New(err_msg)
 	}
 
@@ -53,11 +54,24 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (Su
 	results := ParseLstEstimationFile(fileLines)
 	results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, filepath.Base(outputFilePath))
 
-	// if the final method is one of these, don't look for .grd file
-	isNotGradientBased := CheckIfNotGradientBased(results)
+	var readGrd bool
+	var readShk bool
 
-	// if the final method is one of these, don't look for .shk file
-	isBayesian := CheckIfBayesian(results)
+	if results.RunDetails.OnlySim {
+		if len(results.RunDetails.EstimationMethods) > 0 {
+			msg := "no estimation methods expected for ONLYSIM"
+
+			return SummaryOutput{}, errors.New(msg)
+		}
+
+		readGrd = false
+		readShk = false
+	} else {
+		// if the final method is one of these, don't look for .grd file
+		readGrd = grd && !CheckIfNotGradientBased(results)
+		// if the final method is one of these, don't look for .shk file
+		readShk = shk && !CheckIfBayesian(results)
+	}
 
 	cpuFilePath := filepath.Join(dir, runNum+".cpu")
 	cpuLines, err := utils.ReadLines(cpuFilePath)
@@ -76,7 +90,7 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (Su
 		results.RunDetails.CpuTime = cpuTime
 	}
 
-	if !ext.Exclude {
+	if !(ext.Exclude || results.RunDetails.OnlySim) {
 		if ext.Name == "" {
 			ext.Name = runNum + ".ext"
 		}
@@ -104,7 +118,7 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (Su
 		results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, filepath.Base(extFilePath))
 	}
 
-	if grd && !isNotGradientBased {
+	if readGrd {
 		name := runNum + ".grd"
 		grdFilePath := filepath.Join(dir, name)
 		err := errorIfNotExists(AppFs, grdFilePath, "--no-grd-file")
@@ -116,14 +130,14 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (Su
 			return SummaryOutput{}, err
 		}
 		parametersData, _ := ParseGrdData(ParseGrdLines(grdLines))
-		results.RunHeuristics.HasFinalZeroGradient = HasZeroGradient(parametersData[len(parametersData)-1].Fixed.Theta)
+		results.RunHeuristics.HasFinalZeroGradient = utils.HasZero(parametersData[len(parametersData)-1].Fixed.Theta)
 		results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, filepath.Base(grdFilePath))
 	}
 
 	etaCount, _ := lowerDiagonalLengthToDimension(len(results.ParametersData[len(results.ParametersData)-1].Estimates.Omega))
 	epsCount, _ := lowerDiagonalLengthToDimension(len(results.ParametersData[len(results.ParametersData)-1].Estimates.Sigma))
 	// bayesian model runs will never have shrinkage files
-	if shk && !isBayesian {
+	if readShk {
 		name := runNum + ".shk"
 		shkFilePath := filepath.Join(dir, name)
 		err := errorIfNotExists(AppFs, shkFilePath, "--no-shk-file")
@@ -152,29 +166,31 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (Su
 	// Extra heuristics
 	results.RunHeuristics.PRDERR, _ = utils.Exists(filepath.Join(dir, "PRDERR"), AppFs)
 
-	setMissingValuesToDefault(&results, etaCount, epsCount)
+	setMissingValuesToDefault(&results)
+
 	return results, nil
 }
 
 func errorIfNotExists(fs afero.Fs, path string, sFlag string) error {
 	exists, err := utils.Exists(path, fs)
 	if err != nil {
-		panic(fmt.Sprintf("unknown error checking file existence %s\n", err))
+		panic(fmt.Sprintf("unknown error checking file existence: %s\n", err.Error()))
 	}
 	if !exists {
 		suppressionFlagMsg := "\n"
 		if sFlag != "" {
 			suppressionFlagMsg = fmt.Sprintf("\nyou can suppress bbi searching for the file using %s\n", sFlag)
 		}
-		return errors.New(fmt.Sprintf("No file present at %s%s ", path, suppressionFlagMsg))
+
+		return fmt.Errorf("no file present at %s %s", path, suppressionFlagMsg)
 	}
+
 	return nil
 }
 
 // GetCovCorOutput
-// STILL UNDER CONSTRUCTION
+// STILL UNDER CONSTRUCTION.
 func GetCovCorOutput(lstPath string) (CovCorOutput, error) {
-
 	AppFs := afero.NewOsFs()
 	runNum, _ := utils.FileAndExt(lstPath)
 	dir, _ := filepath.Abs(filepath.Dir(lstPath))
@@ -205,5 +221,6 @@ func GetCovCorOutput(lstPath string) (CovCorOutput, error) {
 		CovarianceTheta:  covarianceTheta,
 		CorrelationTheta: correlationTheta,
 	}
+
 	return results, nil
 }

@@ -1,23 +1,47 @@
 package utils
 
-import "testing"
+import (
+	"testing"
 
-func TestPadNum(t *testing.T) {
-	type test struct {
+	"github.com/metrumresearchgroup/wrapt"
+)
+
+func TestPadNum(tt *testing.T) {
+	tests := []struct {
+		name     string
 		input    int
 		expected string
-	}
-	data := []test{
-		{1, "001"},
-		{10, "010"},
-		{100, "100"},
-		{1000, "1000"},
+	}{
+		{
+			name:     "001",
+			input:    1,
+			expected: "001",
+		},
+		{
+			name:     "010",
+			input:    10,
+			expected: "010",
+		},
+		{
+			name:     "100",
+			input:    100,
+			expected: "100",
+		},
+		{
+			name:     "1000",
+			input:    1000,
+			expected: "1000",
+		},
 	}
 
-	for i, d := range data {
-		res := PadNum(d.input, 3)
-		if d.expected != res {
-			t.Errorf("Test %d failed. Expected %s got %s", i, d.expected, res)
-		}
+	testId := "UNIT-UTL-010"
+	for _, test := range tests {
+		tt.Run(AddTestId(test.name, testId), func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+
+			got := PadNum(test.input, 3)
+
+			t.R.Equal(test.expected, got)
+		})
 	}
 }

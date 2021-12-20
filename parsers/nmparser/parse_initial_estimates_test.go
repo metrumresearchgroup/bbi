@@ -9,8 +9,9 @@ package parser
 // $OMEGA  BLOCK(1)
 //  0.03  ; 1 IOV BASE
 // $OMEGA  BLOCK(1) SAME
-// $OMEGA  BLOCK(1) SAME
-var omegaBlock01 = []string{
+// $OMEGA  BLOCK(1) SAME.
+// TODO: remove omegaBlock01 if we find no use.
+var _ = /*omegaBlock01*/ []string{
 	"0INITIAL ESTIMATE OF OMEGA:",
 	" BLOCK SET NO.   BLOCK                                                                    FIXED",
 	"        1                                                                                   NO ",

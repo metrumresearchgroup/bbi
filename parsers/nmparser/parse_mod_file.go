@@ -2,30 +2,30 @@ package parser
 
 import "strings"
 
-// Est represents information about an estimation step
+// Est represents information about an estimation step.
 type Est struct {
 	Method string
 }
 
-// Cov respresents information about the presence and settings for covariance step
+// Cov respresents information about the presence and settings for covariance step.
 type Cov struct {
 	Ok       bool
 	Settings string
 }
 
-// Sim represents information about the presence and settings for a simulation record
+// Sim represents information about the presence and settings for a simulation record.
 type Sim struct {
 	Ok       bool
 	Settings string
 }
 
-// Table represents information about an output table
+// Table represents information about an output table.
 type Table struct {
 	File     string
 	Settings string
 }
 
-// ModelInfo is the information about a model
+// ModelInfo is the information about a model.
 type ModelInfo struct {
 	Prob    string
 	Routine string
@@ -35,7 +35,7 @@ type ModelInfo struct {
 	Tables  []Table
 }
 
-// ParseModInfo parses the model file
+// ParseModInfo parses the model file.
 func ParseModInfo(lines []string) (result ModelInfo, err error) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -87,5 +87,6 @@ func ParseModInfo(lines []string) (result ModelInfo, err error) {
 		Sim:     sim,
 		Tables:  tables,
 	}
+
 	return result, nil
 }

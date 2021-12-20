@@ -1,16 +1,19 @@
 package utils
 
-import "testing"
+import (
+	"regexp"
+	"testing"
 
-func TestListMatchesByRegex(t *testing.T) {
+	"github.com/gobwas/glob"
+	"github.com/metrumresearchgroup/wrapt"
+)
+
+func TestListMatchesByRegex(tt *testing.T) {
 	type input struct {
 		Names []string
 		Regex string
 	}
-	type test struct {
-		input    input
-		expected []string
-	}
+
 	exData := []string{
 		"run001.mod",
 		"run002.lst",
@@ -18,32 +21,35 @@ func TestListMatchesByRegex(t *testing.T) {
 		"nota.run",
 	}
 
-	data := []test{
+	tests := []struct {
+		input    input
+		expected []string
+	}{
 		{
-			input{
+			input: input{
 				Names: exData,
 				Regex: "run00..mod",
 			},
-			[]string{
+			expected: []string{
 				"run001.mod",
 				"run003.mod",
 			},
 		},
 		{
-			input{
+			input: input{
 				Names: exData,
 				Regex: "run$",
 			},
-			[]string{
+			expected: []string{
 				"nota.run",
 			},
 		},
 		{
-			input{
+			input: input{
 				Names: exData,
 				Regex: "^run",
 			},
-			[]string{
+			expected: []string{
 				"run001.mod",
 				"run002.lst",
 				"run003.mod",
@@ -51,25 +57,26 @@ func TestListMatchesByRegex(t *testing.T) {
 		},
 	}
 
-	for i, d := range data {
-		res, _ := ListMatchesByRegex(d.input.Names, d.input.Regex)
-		for j, expected := range res {
-			if d.expected[j] != expected {
-				t.Errorf("Test %d failed. Expected %s got %s", i, d.expected[j], expected)
-			}
-		}
+	testId := "UNIT-UTL-004"
+	for _, test := range tests {
+		tt.Run(AddTestId(test.input.Regex, testId), func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+
+			glb, err := regexp.Compile(test.input.Regex)
+			t.R.NoError(err)
+
+			res := ListMatchesByRegex(test.input.Names, glb)
+
+			t.R.Equal(test.expected, res)
+		})
 	}
 }
 
-func TestListMatchesByGlob(t *testing.T) {
+func TestListMatchesByGlob(tt *testing.T) {
 	type input struct {
 		Names []string
 		Glob  string
 	}
-	type test struct {
-		input    input
-		expected []string
-	}
 	exData := []string{
 		"run001.mod",
 		"run002.lst",
@@ -77,32 +84,35 @@ func TestListMatchesByGlob(t *testing.T) {
 		"nota.run",
 	}
 
-	data := []test{
+	tests := []struct {
+		input    input
+		expected []string
+	}{
 		{
-			input{
+			input: input{
 				Names: exData,
 				Glob:  "run*.mod",
 			},
-			[]string{
+			expected: []string{
 				"run001.mod",
 				"run003.mod",
 			},
 		},
 		{
-			input{
+			input: input{
 				Names: exData,
 				Glob:  "*run",
 			},
-			[]string{
+			expected: []string{
 				"nota.run",
 			},
 		},
 		{
-			input{
+			input: input{
 				Names: exData,
 				Glob:  "run*",
 			},
-			[]string{
+			expected: []string{
 				"run001.mod",
 				"run002.lst",
 				"run003.mod",
@@ -110,12 +120,17 @@ func TestListMatchesByGlob(t *testing.T) {
 		},
 	}
 
-	for i, d := range data {
-		res, _ := ListMatchesByGlob(d.input.Names, d.input.Glob)
-		for j, expected := range res {
-			if d.expected[j] != expected {
-				t.Errorf("Test %d failed. Expected %s got %s", i, d.expected[j], expected)
-			}
-		}
+	testId := "UNIT-UTL-005"
+	for _, test := range tests {
+		tt.Run(AddTestId(test.input.Glob, testId), func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+
+			glb, err := glob.Compile(test.input.Glob)
+			t.R.NoError(err)
+
+			got := ListMatchesByGlob(test.input.Names, glb)
+
+			t.R.Equal(test.expected, got)
+		})
 	}
 }

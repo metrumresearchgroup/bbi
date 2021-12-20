@@ -7,7 +7,7 @@ import (
 
 // EstOutputFileCleanLevels gives a map of
 // information about the output of NONMEM estimations
-// to be used for cleaning and other manipulations
+// to be used for cleaning and other manipulations.
 func EstOutputFileCleanLevels(r string) map[string]int {
 	var EstOutputFiles = make(map[string]int)
 	EstOutputFiles["background.set"] = 1
@@ -81,7 +81,7 @@ func EstOutputFileCleanLevels(r string) map[string]int {
 	return EstOutputFiles
 }
 
-//CleanFilesByRun sets clean levels for files by run
+//CleanFilesByRun sets clean levels for files by run.
 func CleanFilesByRun(r string) map[string]int {
 	var EstOutputFiles = make(map[string]int)
 	// fileExtLvls are based on 1 = lowest priority -> n = highest priority
@@ -90,7 +90,7 @@ func CleanFilesByRun(r string) map[string]int {
 }
 
 // EstOutputFilesByRun creates a map of run specific file names
-// in the output directory
+// in the output directory.
 func EstOutputFilesByRun(r string) map[string]int {
 	var EstOutputFiles = make(map[string]int)
 	// fileExtLvls are based on 1 = lowest priority -> n = highest priority
@@ -144,6 +144,7 @@ func EstOutputFilesByRun(r string) map[string]int {
 	for _, f := range fileExtsLvl3 {
 		EstOutputFiles[fmt.Sprintf("%s%s", r, f)] = 3
 	}
+
 	return EstOutputFiles
 }
 

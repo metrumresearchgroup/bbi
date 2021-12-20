@@ -25,6 +25,7 @@ func ParseExtLines(lines []string) ExtData {
 				if len(paramNames) == 0 {
 					paramNames = strings.Fields(line)
 				}
+
 				continue
 			}
 			estimationStep = append(estimationStep, strings.TrimSpace(line))
@@ -90,6 +91,7 @@ func ParseParamsExt(ed ExtData) ([]ParametersData, ParameterNames) {
 				// to declare what is on the line
 				if i == 0 {
 					step, _ = strconv.Atoi(val)
+
 					continue
 				}
 				if i == len(fields)-1 {
@@ -139,6 +141,7 @@ func ParseParamsExt(ed ExtData) ([]ParametersData, ParameterNames) {
 		}
 		allParametersData = append(allParametersData, parametersData)
 	}
+
 	return allParametersData, ParameterNames{
 		Theta: thetas,
 		Omega: omegas,
@@ -149,7 +152,7 @@ func ParseParamsExt(ed ExtData) ([]ParametersData, ParameterNames) {
 //ParseConditionNumberExt returns the condition number for each estimation method from ExtData
 // per nonmem 7.4 the following information will be grabbed
 // Iteration -1000000003 indicates that this line contains the condition number , lowest, highest, Eigenvalues of the correlation matrix of the variances of the final parameters.
-// NONMEM Users Guide: Introduction to NONMEM 7.4.1
+// NONMEM Users Guide: Introduction to NONMEM 7.4.1.
 func ParseConditionNumberExt(ed ExtData) []ConditionNumDetails {
 	var allCondDetails []ConditionNumDetails
 
@@ -161,6 +164,7 @@ func ParseConditionNumberExt(ed ExtData) []ConditionNumDetails {
 			step, _ := strconv.Atoi(fields[0])
 			if step == -1000000003 {
 				condNum, _ = strconv.ParseFloat(fields[1], 64)
+
 				break
 			} else {
 				continue
@@ -168,5 +172,6 @@ func ParseConditionNumberExt(ed ExtData) []ConditionNumDetails {
 		}
 		allCondDetails = append(allCondDetails, NewConditionNumDetails(method, condNum))
 	}
+
 	return allCondDetails
 }

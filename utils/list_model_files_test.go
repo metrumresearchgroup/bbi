@@ -1,33 +1,40 @@
 package utils
 
-import "testing"
+import (
+	"testing"
 
-func TestListModelFiles(t *testing.T) {
-	type test struct {
-		input    []string
-		expected []string
-	}
-	data := []test{
+	"github.com/metrumresearchgroup/wrapt"
+)
+
+func TestListModelFiles(tt *testing.T) {
+	tests := []struct {
+		name  string
+		input []string
+		want  []string
+	}{
 		{
-			[]string{
+			name: "test",
+			input: []string{
 				"run001.mod",
 				"run002.lst",
 				"run003.mod",
 				"nota.run",
 			},
-			[]string{
+			want: []string{
 				"run001.mod",
 				"run003.mod",
 			},
 		},
 	}
 
-	for i, d := range data {
-		res := ListFilesByExt(d.input, ".mod")
-		for j, expected := range res {
-			if d.expected[j] != expected {
-				t.Errorf("Test %d failed. Expected %s got %s", i, d.expected[j], expected)
-			}
-		}
+	testId := "UNIT-UTL-006"
+	for _, test := range tests {
+		tt.Run(AddTestId(test.name, testId), func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+
+			got := ListFilesByExt(test.input, ".mod")
+
+			t.R.Equal(test.want, got)
+		})
 	}
 }
