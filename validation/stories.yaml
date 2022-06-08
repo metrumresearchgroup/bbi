@@ -1,0 +1,86 @@
+BBI-RUN-001:
+  name: Run NonMem jobs locally
+  description: As a user, I would like to be able to execute NonMem jobs locally,
+    without needing the grid, if NonMem is installed on the system.
+  ProductRisk: High
+  requirements:
+  - LOCAL-R001
+  - LOCAL-R003
+BBI-RUN-002:
+  name: Run NonMem jobs on the Grid
+  description: As a user, I would like to be able to submit NonMem jobs to be run
+    on a worker node in the SGE grid.
+  ProductRisk: High
+  requirements:
+  - SGE-R001
+  - SGE-R002
+BBI-RUN-003:
+  name: Notify about issues with the data referenced in the control stream
+  description: As a user, I would like to be notified, and have model execution stop,
+    if I target a NonMem control stream with bbi, but the data file referenced therein
+    cannot be located.
+  ProductRisk: Low
+  requirements:
+  - DATA-R001
+  - DATA-R002
+  - DATA-R003
+BBI-RUN-004:
+  name: Pass NMFE options directly to NonMem
+  description: As a user, I would like to be able to pass some specified options,
+    such as license or compilation options, directly to NonMem, such that they are
+    expressed in the final NMFE call.
+  ProductRisk: Low
+  requirements: LOCAL-R002
+BBI-RUN-005:
+  name: NonMem Execution via NMQual
+  description: As a user, I would like to have the option to execute NonMem the same
+    way that autolog.pl did so that NMQual can be used. I would like an option exposed
+    that will trigger bbi to specify autolog.pl syntax in its executable script, rather
+    than the typical calls directly to NMFE.
+  ProductRisk: Low
+  requirements: NMQ-R001
+BBI-RUN-006:
+  name: Capture all configurations and write to a file
+  description: As a user, I would like to have all configurations used for each run
+    captured in files that can be stored in version control, for the sake of reproducibility.
+    The files should contain the merged configurations between any flags provided,
+    configuration files and default values to indicate exactly how the model was executed.
+  ProductRisk: High
+  requirements: CFG-R001
+BBI-CFG-001:
+  name: Initialize a project with minimum configs required for execution
+  description: As a user, I would like to be able to initialize a project with bbi
+    without building the config `bbi.yaml` file from scratch. Allowing a command to
+    create this file with the minimum default configuration necessary.
+  ProductRisk: Medium
+  requirements: INIT-R001
+BBI-SUM-001:
+  name: Parse model output folder
+  description: As a user, I want to be able to parse a summary of the files in the
+    NonMem output folder into either a human-readable table, or a machine-readable
+    structure like `.json`.
+  ProductRisk: Medium
+  requirements:
+  - SUM-R001
+  - SUM-R002
+  - SUM-R003
+  - SUM-R004
+BBI-COV-001:
+  name: Parse .cov and .cor files
+  description: As a user, I want to be able to parse the `.cov` and `.cor` files in
+    the NonMem output folder into a machine-readable structure like `.json`.
+  ProductRisk: Low
+  requirements:
+  - COVCOR-R001
+  - COVCOR-R002
+BBI-SUM-002:
+  name: Parse batch parameter estimates
+  description: As a user, I would like to be able to parse the final parameter estimates
+    from multiple NONMEM model output directories as a batch.
+  ProductRisk: Low
+  requirements:
+  - PARAM-R001
+  - PARAM-R002
+  - NMP-R036
+  - PARAM-R001
+  - PARAM-R002
