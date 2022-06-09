@@ -91,11 +91,11 @@ POSTEX-R002:
   tests:
   - INT-POSTEX-002
 SGE-R001:
-  description: BbiCompletesSGEExecution
+  description: BBI completes SGE execution
   tests:
   - INT-SGE-001
 SGE-R002:
-  description: BBBI completes parallel SGE execution
+  description: BBI completes parallel SGE execution
   tests:
   - INT-SGE-002
 SUM-R001:
