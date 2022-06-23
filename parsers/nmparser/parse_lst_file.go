@@ -191,10 +191,7 @@ func parseGradient(lines []string) bool {
 	if len(fields) > 0 {
 		result := make([]float64, len(fields))
 		for i, val := range fields {
-			n, err := strconv.ParseFloat(val, 64)
-			if err != nil {
-				n = DefaultFloat64
-			}
+			n := strToFloat(val)
 			result[i] = n
 		}
 

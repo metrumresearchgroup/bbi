@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"strconv"
 	"strings"
 )
 
@@ -49,4 +50,14 @@ func CheckIfBayesian(results SummaryOutput) bool {
 	)
 
 	return isBayesian
+}
+
+func strToFloat(s string) float64 {
+	var f float64
+	f, err := strconv.ParseFloat(s, 64)
+	if err != nil {
+		f = DefaultFloat64
+	}
+
+	return f
 }
