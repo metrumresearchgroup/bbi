@@ -144,7 +144,7 @@ func PrintJSON(v interface{}) error {
 	if err != nil {
 		return err
 	}
-	_, err = fmt.Printf("%s\n", b)
+	_, err = os.Stdout.Write(append(b, '\n'))
 
 	return err
 }
