@@ -119,6 +119,11 @@ SUM-R005:
   tests:
   - INT-SUM-001
   - UNIT-NMP-035
+SUM-R006:
+  description: Correctly parse summary when OFV is NaN
+  tests:
+  - UNIT-NMP-019
+  - INT-SUM-001
 CMD-R001:
   description: Directory contains output files
   tests:

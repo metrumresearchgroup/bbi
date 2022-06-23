@@ -33,6 +33,16 @@ func TestParseOBJV(tt *testing.T) {
 		ofvDetails = parseOFV("#OBJV:********************************************    -7913.528       **************************************************", ofvDetails)
 		expected[0].OFVNoConstant = -7913.528
 		t.A.Equal(expected, ofvDetails)
+
+		ofvDetails = parseOFV("OBJECTIVE FUNCTION VALUE WITHOUT CONSTANT: NaN",
+			ofvDetails)
+		expected[0].OFVNoConstant = DefaultFloat64
+		t.A.Equal(expected, ofvDetails)
+
+		ofvDetails = parseOFV("OBJECTIVE FUNCTION VALUE WITH CONSTANT: NaN",
+			ofvDetails)
+		expected[0].OFVWithConstant = DefaultFloat64
+		t.A.Equal(expected, ofvDetails)
 	})
 }
 

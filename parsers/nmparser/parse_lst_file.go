@@ -340,9 +340,8 @@ func parseOFV(line string, allOfvDetails []OfvDetails) []OfvDetails {
 
 	if strings.Contains(line, "#OBJV:") {
 		result := strings.Replace(line, "*", "", -1)
-		ofvDetails.OFVNoConstant, _ = strconv.ParseFloat(
-			strings.TrimSpace(strings.Replace(result, "#OBJV:", "", -1)),
-			64)
+		ofvDetails.OFVNoConstant = strToFloat(
+			strings.TrimSpace(strings.Replace(result, "#OBJV:", "", -1)))
 	} else if strings.Contains(line, "CONSTANT TO OBJECTIVE FUNCTION") {
 		constantString := strings.TrimSpace(strings.Replace(line, "CONSTANT TO OBJECTIVE FUNCTION:", "", -1))
 		constantPrefixes := []string{
@@ -353,15 +352,13 @@ func parseOFV(line string, allOfvDetails []OfvDetails) []OfvDetails {
 		for _, cp := range constantPrefixes {
 			constantString = strings.TrimSpace(strings.Replace(constantString, cp, "", -1))
 		}
-		ofvDetails.ConstantToOFV, _ = strconv.ParseFloat(constantString, 64)
+		ofvDetails.ConstantToOFV = strToFloat(constantString)
 	} else if strings.Contains(line, "OBJECTIVE FUNCTION VALUE WITHOUT CONSTANT") {
-		ofvDetails.OFVNoConstant, _ = strconv.ParseFloat(
-			strings.TrimSpace(strings.Replace(line, "OBJECTIVE FUNCTION VALUE WITHOUT CONSTANT:", "", -1)),
-			64)
+		ofvDetails.OFVNoConstant = strToFloat(
+			strings.TrimSpace(strings.Replace(line, "OBJECTIVE FUNCTION VALUE WITHOUT CONSTANT:", "", -1)))
 	} else if strings.Contains(line, "OBJECTIVE FUNCTION VALUE WITH CONSTANT") {
-		ofvDetails.OFVWithConstant, _ = strconv.ParseFloat(
-			strings.TrimSpace(strings.Replace(line, "OBJECTIVE FUNCTION VALUE WITH CONSTANT:", "", -1)),
-			64)
+		ofvDetails.OFVWithConstant = strToFloat(
+			strings.TrimSpace(strings.Replace(line, "OBJECTIVE FUNCTION VALUE WITH CONSTANT:", "", -1)))
 	}
 
 	return allOfvDetails
