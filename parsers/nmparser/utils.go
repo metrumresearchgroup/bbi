@@ -53,7 +53,6 @@ func CheckIfBayesian(results SummaryOutput) bool {
 }
 
 func strToFloat(s string) float64 {
-	var f float64
 	f, err := strconv.ParseFloat(s, 64)
 	if err != nil {
 		f = DefaultFloat64
