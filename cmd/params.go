@@ -267,7 +267,10 @@ func params(cmd *cobra.Command, args []string) {
 			log.Fatal(err)
 		}
 		if Json {
-			jsonRes, _ := json.MarshalIndent(results, "", "\t")
+			jsonRes, err := json.MarshalIndent(results, "", "\t")
+			if err != nil {
+				log.Fatal(err)
+			}
 			fmt.Printf("%s\n", jsonRes)
 		} else {
 			if !noParamNames {
@@ -407,7 +410,10 @@ func params(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	jsonRes, _ := json.MarshalIndent(paramResults, "", "\t")
+	jsonRes, err := json.MarshalIndent(paramResults, "", "\t")
+	if err != nil {
+		log.Fatal(err)
+	}
 	fmt.Printf("%s\n", jsonRes)
 }
 

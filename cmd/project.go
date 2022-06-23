@@ -29,6 +29,7 @@ import (
 
 	"github.com/metrumresearchgroup/bbi/utils"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -60,7 +61,10 @@ func probs(_ *cobra.Command, args []string) error {
 	}
 	modelSummaries := modSummaries(AppFs, modelFiles)
 	if Json {
-		jsonRes, _ := json.MarshalIndent(modelSummaries, "", "\t")
+		jsonRes, err := json.MarshalIndent(modelSummaries, "", "\t")
+		if err != nil {
+			log.Fatal(err)
+		}
 		fmt.Printf("%s\n", jsonRes)
 	} else {
 		var probSummaries []modelSummary

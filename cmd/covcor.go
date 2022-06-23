@@ -41,7 +41,10 @@ func covcor(cmd *cobra.Command, args []string) {
 		log.Fatal(err)
 	}
 
-	jsonRes, _ := json.MarshalIndent(results, "", "\t")
+	jsonRes, err := json.MarshalIndent(results, "", "\t")
+	if err != nil {
+		log.Fatal(err)
+	}
 	fmt.Printf("%s\n", jsonRes)
 }
 

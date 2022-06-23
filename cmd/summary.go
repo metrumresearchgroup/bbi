@@ -56,7 +56,10 @@ func summary(_ *cobra.Command, args []string) {
 			log.Fatal(err)
 		}
 		if Json {
-			jsonRes, _ := json.MarshalIndent(results, "", "\t")
+			jsonRes, err := json.MarshalIndent(results, "", "\t")
+			if err != nil {
+				log.Fatal(err)
+			}
 			fmt.Printf("%s\n", jsonRes)
 		} else {
 			results.Summary()
@@ -132,7 +135,10 @@ func summary(_ *cobra.Command, args []string) {
 		}
 	}
 	if Json {
-		jsonRes, _ := json.MarshalIndent(modelResults, "", "\t")
+		jsonRes, err := json.MarshalIndent(modelResults, "", "\t")
+		if err != nil {
+			log.Fatal(err)
+		}
 		fmt.Printf("%s\n", jsonRes)
 
 		return
