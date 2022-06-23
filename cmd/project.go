@@ -15,7 +15,6 @@
 package cmd
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -61,11 +60,10 @@ func probs(_ *cobra.Command, args []string) error {
 	}
 	modelSummaries := modSummaries(AppFs, modelFiles)
 	if Json {
-		jsonRes, err := json.MarshalIndent(modelSummaries, "", "\t")
+		err = utils.PrintJSON(modelSummaries)
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Printf("%s\n", jsonRes)
 	} else {
 		var probSummaries []modelSummary
 		for _, ms := range modelSummaries {

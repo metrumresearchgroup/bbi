@@ -15,12 +15,12 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"runtime"
 
 	parser "github.com/metrumresearchgroup/bbi/parsers/nmparser"
+	"github.com/metrumresearchgroup/bbi/utils"
 
 	log "github.com/sirupsen/logrus"
 
@@ -56,11 +56,10 @@ func summary(_ *cobra.Command, args []string) {
 			log.Fatal(err)
 		}
 		if Json {
-			jsonRes, err := json.MarshalIndent(results, "", "\t")
+			err = utils.PrintJSON(results)
 			if err != nil {
 				log.Fatal(err)
 			}
-			fmt.Printf("%s\n", jsonRes)
 		} else {
 			results.Summary()
 		}
@@ -135,11 +134,10 @@ func summary(_ *cobra.Command, args []string) {
 		}
 	}
 	if Json {
-		jsonRes, err := json.MarshalIndent(modelResults, "", "\t")
+		err := utils.PrintJSON(modelResults)
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Printf("%s\n", jsonRes)
 
 		return
 	}
