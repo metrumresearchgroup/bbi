@@ -62,9 +62,9 @@ func ParseRunDetails(lines []string) RunDetails {
 			runDetails.SignificantDigits, _ = strconv.ParseFloat(replaceTrim(line, "NO. OF SIG. DIGITS IN FINAL EST.:"), 64)
 		case strings.Contains(line, "Elapsed estimation"):
 			runDetails.EstimationTime = parseFinalTime(line)
-		case strings.Contains(line, "Elapsed covariance time in seconds:"):
+		case strings.Contains(line, "Elapsed covariance"):
 			runDetails.CovarianceTime = parseFinalTime(line)
-		case strings.Contains(line, "Elapsed postprocess time in seconds:"):
+		case strings.Contains(line, "Elapsed postprocess"):
 			runDetails.PostprocessTime = parseFinalTime(line)
 		case strings.Contains(line, " #CPUT: Total CPU Time in Seconds,"):
 			runDetails.CpuTime, _ = strconv.ParseFloat(replaceTrim(line, " #CPUT: Total CPU Time in Seconds,"), 64)
