@@ -114,6 +114,11 @@ SUM-R004:
   description: BBI summary works with no extension
   tests:
   - INT-SUM-004
+SUM-R005:
+  description: BBI summary reports elapsed times for each method
+  tests:
+  - INT-SUM-001
+  - UNIT-NMP-035
 CMD-R001:
   description: Directory contains output files
   tests:

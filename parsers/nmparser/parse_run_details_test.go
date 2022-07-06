@@ -14,8 +14,8 @@ var _ = /* RunDetails02Results */ RunDetails{
 	Version:             "7.4.3",
 	RunStart:            "Fri Jul 12 09:27:14 EDT 2019",
 	RunEnd:              "Fri Jul 12 09:27:20 EDT 2019",
-	EstimationTime:      0.68,
-	CovarianceTime:      0.02,
+	EstimationTime:      []float64{0.68},
+	CovarianceTime:      []float64{0.02},
 	CpuTime:             10.5, // this is made up, not for an actual run output
 	FunctionEvaluations: 178,
 	SignificantDigits:   3.1,
@@ -34,8 +34,8 @@ func TestParseRunDetails(tt *testing.T) {
 		Version:             "7.2.0",
 		RunStart:            "Tue Dec 17 18:10:55 2013",
 		RunEnd:              "Tue Dec 17 18:11:32 2013",
-		EstimationTime:      6.84,
-		CovarianceTime:      3.34,
+		EstimationTime:      []float64{6.84},
+		CovarianceTime:      []float64{3.34},
 		PostprocessTime:     0.0,
 		CpuTime:             DefaultFloat64, // not specified in test RunDetails01
 		FunctionEvaluations: 352,
