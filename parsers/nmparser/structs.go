@@ -65,6 +65,7 @@ type RunDetails struct {
 	RunEnd              string   `json:"run_end,omitempty"`
 	EstimationTime      float64  `json:"estimation_time,omitempty"`
 	CovarianceTime      float64  `json:"covariance_time,omitempty"`
+	PostprocessTime     float64  `json:"postprocess_time,omitempty"`
 	CpuTime             float64  `json:"cpu_time,omitempty"`
 	FunctionEvaluations int64    `json:"function_evaluations,omitempty"`
 	SignificantDigits   float64  `json:"significant_digits,omitempty"`
@@ -205,6 +206,7 @@ func NewRunDetails() RunDetails {
 		RunEnd:              DefaultString,
 		EstimationTime:      DefaultFloat64,
 		CovarianceTime:      DefaultFloat64,
+		PostprocessTime:     DefaultFloat64,
 		CpuTime:             DefaultFloat64,
 		FunctionEvaluations: DefaultInt64,
 		SignificantDigits:   DefaultFloat64,

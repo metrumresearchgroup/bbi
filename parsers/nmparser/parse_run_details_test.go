@@ -36,6 +36,7 @@ func TestParseRunDetails(tt *testing.T) {
 		RunEnd:              "Tue Dec 17 18:11:32 2013",
 		EstimationTime:      6.84,
 		CovarianceTime:      3.34,
+		PostprocessTime:     0.0,
 		CpuTime:             DefaultFloat64, // not specified in test RunDetails01
 		FunctionEvaluations: 352,
 		SignificantDigits:   3.4,
@@ -73,6 +74,7 @@ func TestParseRunDetails(tt *testing.T) {
 				"#TERE:",
 				"Elapsed estimation time in seconds:     6.84",
 				"Elapsed covariance time in seconds:     3.34",
+				"Elapsed postprocess time in seconds:     0.0",
 				"This file was created using /opt/NONMEM/nm72g/run/nmfe72",
 				"Started  Tue Dec 17 18:10:55 2013",
 				"Finished Tue Dec 17 18:11:32 2013",
@@ -102,6 +104,7 @@ func TestParseRunDetails(tt *testing.T) {
 				"#TERE:",
 				"Elapsed estimation time in seconds:     6.84",
 				"Elapsed covariance time in seconds:     3.34",
+				"Elapsed postprocess time in seconds:     0.0",
 				"This file was created using /opt/NONMEM/nm72g/run/nmfe72",
 				"Started  Tue Dec 17 18:10:55 2013",
 				"Finished Tue Dec 17 18:11:32 2013",
