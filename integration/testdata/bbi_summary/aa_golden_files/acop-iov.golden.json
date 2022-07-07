@@ -3,7 +3,12 @@
 		"version": "7.4.4",
 		"run_start": "-999999999",
 		"run_end": "Tue Sep 22 08:49:19 EDT 2020",
-		"estimation_time": 2150.9,
+		"estimation_time": [
+			2150.9
+		],
+		"covariance_time": [
+			365.84
+		],
 		"cpu_time": 14595.976,
 		"function_evaluations": 457,
 		"significant_digits": 3.1,

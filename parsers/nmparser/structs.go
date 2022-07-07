@@ -60,24 +60,25 @@ type RunHeuristics struct {
 
 // RunDetails contains key information about logistics of the model run.
 type RunDetails struct {
-	Version             string   `json:"version,omitempty"`
-	RunStart            string   `json:"run_start,omitempty"`
-	RunEnd              string   `json:"run_end,omitempty"`
-	EstimationTime      float64  `json:"estimation_time,omitempty"`
-	CovarianceTime      float64  `json:"covariance_time,omitempty"`
-	CpuTime             float64  `json:"cpu_time,omitempty"`
-	FunctionEvaluations int64    `json:"function_evaluations,omitempty"`
-	SignificantDigits   float64  `json:"significant_digits,omitempty"`
-	ProblemText         string   `json:"problem_text,omitempty"`
-	ModFile             string   `json:"mod_file,omitempty"`
-	EstimationMethods   []string `json:"estimation_method,omitempty"`
-	DataSet             string   `json:"data_set,omitempty"`
-	NumberOfSubjects    int64    `json:"number_of_subjects,omitempty"`
-	NumberOfObs         int64    `json:"number_of_obs,omitempty"`
-	NumberOfDataRecords int64    `json:"number_of_data_records,omitempty"`
-	OutputTables        []string `json:"output_tables,omitempty"`
-	OutputFilesUsed     []string `json:"output_files_used,omitempty"`
-	OnlySim             bool     `json:"only_sim,omitempty"`
+	Version             string    `json:"version,omitempty"`
+	RunStart            string    `json:"run_start,omitempty"`
+	RunEnd              string    `json:"run_end,omitempty"`
+	EstimationTime      []float64 `json:"estimation_time,omitempty"`
+	CovarianceTime      []float64 `json:"covariance_time,omitempty"`
+	PostprocessTime     float64   `json:"postprocess_time,omitempty"`
+	CpuTime             float64   `json:"cpu_time,omitempty"`
+	FunctionEvaluations int64     `json:"function_evaluations,omitempty"`
+	SignificantDigits   float64   `json:"significant_digits,omitempty"`
+	ProblemText         string    `json:"problem_text,omitempty"`
+	ModFile             string    `json:"mod_file,omitempty"`
+	EstimationMethods   []string  `json:"estimation_method,omitempty"`
+	DataSet             string    `json:"data_set,omitempty"`
+	NumberOfSubjects    int64     `json:"number_of_subjects,omitempty"`
+	NumberOfObs         int64     `json:"number_of_obs,omitempty"`
+	NumberOfDataRecords int64     `json:"number_of_data_records,omitempty"`
+	OutputTables        []string  `json:"output_tables,omitempty"`
+	OutputFilesUsed     []string  `json:"output_files_used,omitempty"`
+	OnlySim             bool      `json:"only_sim,omitempty"`
 }
 
 // Shrinkage Types
@@ -203,8 +204,7 @@ func NewRunDetails() RunDetails {
 		Version:             DefaultString,
 		RunStart:            DefaultString,
 		RunEnd:              DefaultString,
-		EstimationTime:      DefaultFloat64,
-		CovarianceTime:      DefaultFloat64,
+		PostprocessTime:     DefaultFloat64,
 		CpuTime:             DefaultFloat64,
 		FunctionEvaluations: DefaultInt64,
 		SignificantDigits:   DefaultFloat64,

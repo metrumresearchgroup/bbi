@@ -3,8 +3,10 @@
 		"version": "7.4.4",
 		"run_start": "-999999999",
 		"run_end": "Tue Aug 25 16:50:27 EDT 2020",
-		"estimation_time": 131.73,
-		"covariance_time": 1.04,
+		"estimation_time": [
+			131.73
+		],
+		"postprocess_time": 1.04,
 		"cpu_time": 133.637,
 		"function_evaluations": 380,
 		"significant_digits": 3,
