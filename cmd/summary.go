@@ -47,12 +47,17 @@ type jsonResults struct {
 	Errors  []error
 }
 
+func summarizeModel(model string) (parser.SummaryOutput, error) {
+	return parser.GetModelOutput(model, parser.NewModelOutputFile(extFile, noExt),
+		!noGrd, !noShk)
+}
+
 func summary(_ *cobra.Command, args []string) {
 	if debug {
 		viper.Debug()
 	}
 	if len(args) == 1 {
-		results, err := parser.GetModelOutput(args[0], parser.NewModelOutputFile(extFile, noExt), !noGrd, !noShk)
+		results, err := summarizeModel(args[0])
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -100,7 +105,7 @@ func summary(_ *cobra.Command, args []string) {
 	for w := 1; w <= workers; w++ {
 		go func(modIndex <-chan int, results chan<- modelResult) {
 			for i := range modIndex {
-				r, err := parser.GetModelOutput(args[i], parser.NewModelOutputFile(extFile, noExt), !noGrd, !noShk)
+				r, err := summarizeModel(args[i])
 				if err != nil {
 					results <- modelResult{
 						Index:   i,
