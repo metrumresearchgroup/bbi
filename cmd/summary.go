@@ -35,7 +35,7 @@ var (
 	extFile string
 )
 
-const summaryLongDescription string = `summarize model(s), for example: 
+const summaryLongDescription string = `summarize model(s), for example:
 bbi nonmem summary run001/run001
 bbi nonmem summary run001/run001.lst
 bbi nonmem summary run001/run001.res
