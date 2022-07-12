@@ -135,30 +135,28 @@ func summary(_ *cobra.Command, args []string) {
 		}
 	}
 
+	nerrors := len(modelResults.Errors)
 	if Json {
 		err := utils.PrintJSON(modelResults)
 		if err != nil {
 			log.Fatal(err)
 		}
-
-		return
-	}
-
-	// not json lets print all successful models first then any errors
-	nerrors := len(modelResults.Errors)
-	nsuccessful := len(modelResults.Results) - nerrors
-	for i, res := range modelResults.Results {
-		if res.Success {
-			res.Summary()
-			// add some spacing between models
-			if i != nsuccessful-1 {
-				fmt.Println("")
-				fmt.Println("")
+	} else {
+		// not json lets print all successful models first then any errors
+		nsuccessful := len(modelResults.Results) - nerrors
+		for i, res := range modelResults.Results {
+			if res.Success {
+				res.Summary()
+				// add some spacing between models
+				if i != nsuccessful-1 {
+					fmt.Println("")
+					fmt.Println("")
+				}
 			}
 		}
-	}
-	for i := 0; i < nerrors; i++ {
-		log.Error(modelResults.Results[modelResults.Errors[i]].ErrorMsg)
+		for i := 0; i < nerrors; i++ {
+			log.Error(modelResults.Results[modelResults.Errors[i]].ErrorMsg)
+		}
 	}
 	if nerrors > 0 {
 		os.Exit(1)
