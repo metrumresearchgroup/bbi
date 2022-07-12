@@ -229,3 +229,39 @@ func TestSummaryHappyPathNoExtension(tt *testing.T) {
 		RequireOutputMatchesGoldenFile(t, gtd)
 	})
 }
+
+func TestSummaryHappyPathMultipleModels(tt *testing.T) {
+	testId := "INT-SUM-005"
+	tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
+		for _, tc := range testConfigs {
+			tt.Run(tc.goldenExt, func(tt *testing.T) {
+				t := wrapt.WrapT(tt)
+				commandAndArgs := []string{
+					"nonmem",
+					"summary",
+					filepath.Join(SUMMARY_TEST_DIR, "acop", "acop.lst"),
+					filepath.Join(SUMMARY_TEST_DIR, "12", "12.lst"),
+					filepath.Join(SUMMARY_TEST_DIR, "iovmm", "iovmm.lst"),
+				}
+
+				if tc.bbiOption != "" {
+					commandAndArgs = append(commandAndArgs, tc.bbiOption)
+				}
+				output, err := executeCommand(context.Background(), "bbi", commandAndArgs...)
+
+				gtd := GoldenFileTestingDetails{
+					outputString: output,
+					goldenFilePath: filepath.Join(SUMMARY_TEST_DIR, SUMMARY_GOLD_DIR,
+						"multiple-models.golden"+tc.goldenExt),
+				}
+				if os.Getenv("UPDATE_SUMMARY") == "true" {
+					UpdateGoldenFile(t, gtd)
+				}
+				RequireOutputMatchesGoldenFile(t, gtd)
+
+				t.R.NoError(err)
+				t.R.NotEmpty(output)
+			})
+		}
+	})
+}

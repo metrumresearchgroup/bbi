@@ -68,6 +68,7 @@ BBI-SUM-001:
   - SUM-R005
   - SUM-R006
   - SUM-R007
+  - SUM-R008
 BBI-COV-001:
   name: Parse .cov and .cor files
   description: As a user, I want to be able to parse the `.cov` and `.cor` files in
@@ -87,3 +88,11 @@ BBI-SUM-002:
   - NMP-R036
   - PARAM-R001
   - PARAM-R002
+BBI-SUM-003:
+  name: Summarize models in batch
+  description: As a user, I want to be able to parse a summary of NONMEM outputs
+    for multiple models in batch.
+  ProductRisk: High
+  requirements:
+  - SUM-R008
+  - SUM-R009

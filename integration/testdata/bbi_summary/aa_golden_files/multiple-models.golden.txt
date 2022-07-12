@@ -1,0 +1,77 @@
+LEM PK model 1 cmt base
+Dataset: ../../data/acop.csv
+Records: 799   Observations: 760  Subjects: 40
+Estimation Method(s):
+ - First Order Conditional Estimation with Interaction
+No Heuristic Problems Detected
++-------+--------+------------+-------------------+
+| THETA |  NAME  |  ESTIMATE  |   STDERR (RSE)    |
++-------+--------+------------+-------------------+
+| TH 1  | THETA1 | 2.31034    | 0.086147 (3.7%)   |
+| TH 2  | THETA2 | 54.9596    | 3.32914 (6.1%)    |
+| TH 3  | THETA3 | 464.659    | 29.6177 (6.4%)    |
+| TH 4  | THETA4 | -0.0805722 | [31m0.0555149 (68.9%)[0m |
+| TH 5  | THETA5 | 4.1303     | [31m1.35989 (32.9%)[0m   |
++-------+--------+------------+-------------------+
++------------+------+----------+---------------+
+|   OMEGA    | ETA  | ESTIMATE | SHRINKAGE (%) |
++------------+------+----------+---------------+
+| OMEGA(1,1) | ETA1 | 0.096441 | 17.511500     |
+| OMEGA(2,2) | ETA2 | 0.153571 | 2.059620      |
++------------+------+----------+---------------+
+
+
+LEM BS-12 106-104 + COV-effects(CRCL, AGE) on CL
+Dataset: ../data/12.csv
+Records: 4319   Observations: 3158  Subjects: 160
+Estimation Method(s):
+ - First Order Conditional Estimation with Interaction
+No Heuristic Problems Detected
++-------+--------+------------+--------------+
+| THETA |  NAME  |  ESTIMATE  | STDERR (RSE) |
++-------+--------+------------+--------------+
+| TH 1  | THETA1 | 0.422797   | -            |
+| TH 2  | THETA2 | 4.13924    | -            |
+| TH 3  | THETA3 | 1.18583    | -            |
+| TH 4  | THETA4 | 4.17865    | -            |
+| TH 5  | THETA5 | 1.29131    | -            |
+| TH 6  | THETA6 | 0.520889   | -            |
+| TH 7  | THETA7 | -0.0701583 | -            |
+| TH 8  | THETA8 | 0.340205   | -            |
++-------+--------+------------+--------------+
++------------+------+----------+---------------+
+|   OMEGA    | ETA  | ESTIMATE | SHRINKAGE (%) |
++------------+------+----------+---------------+
+| OMEGA(1,1) | ETA1 | 0.169074 | 5.213830      |
+| OMEGA(2,2) | ETA2 | 0.093091 | 4.169040      |
+| OMEGA(3,3) | ETA3 | 0.108270 | 0.861924      |
++------------+------+----------+---------------+
+
+
+LEM 10 mixture model and IOV on CL
+Dataset: ../MixSim.csv
+Records: 13500   Observations: 12600  Subjects: 300
+Estimation Method(s):
+ - First Order Conditional Estimation
+[1;31mHeuristic Problems Detected: [0m
+[31m - Parameter Near Boundary[0m
+[31m - Final Zero Gradient[0m
++-------+--------+----------+--------------+
+| THETA |  NAME  | ESTIMATE | STDERR (RSE) |
++-------+--------+----------+--------------+
+| TH 1  | THETA1 | 14.3605  | -            |
+| TH 2  | THETA2 | 100.521  | -            |
+| TH 3  | THETA3 | 0.822632 | -            |
+| TH 4  | THETA4 | 1.0446   | -            |
+| TH 5  | THETA5 | 1.67825  | -            |
+| TH 6  | THETA6 | 0.856771 | -            |
++-------+--------+----------+--------------+
++------------+------+----------+--------------------+--------------------+
+|   OMEGA    | ETA  | ESTIMATE | POP1 SHRINKAGE (%) | POP2 SHRINKAGE (%) |
++------------+------+----------+--------------------+--------------------+
+| OMEGA(1,1) | ETA1 | 0.048361 | 13.971700          | 21.355300          |
+| OMEGA(2,2) | ETA2 | 0.043812 | 4.730450           | 3.503360           |
+| OMEGA(3,3) | ETA3 | 0.038457 | 18.715100          | 18.301400          |
+| OMEGA(4,4) | ETA4 | 0.038457 | 16.893300          | 25.362100          |
+| OMEGA(5,5) | ETA5 | 0.038457 | 16.012100          | [31m34.828800[0m          |
++------------+------+----------+--------------------+--------------------+

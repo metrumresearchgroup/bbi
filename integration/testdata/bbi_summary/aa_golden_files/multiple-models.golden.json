@@ -1,0 +1,809 @@
+{
+	"Results": [
+		{
+			"run_details": {
+				"version": "7.4.4",
+				"run_start": "-999999999",
+				"run_end": "Wed May 20 16:45:38 EDT 2020",
+				"estimation_time": [
+					2
+				],
+				"covariance_time": [
+					0.56
+				],
+				"postprocess_time": 0,
+				"cpu_time": 2.543,
+				"function_evaluations": 366,
+				"significant_digits": 3.2,
+				"problem_text": "LEM PK model 1 cmt base",
+				"mod_file": "-999999999",
+				"estimation_method": [
+					"First Order Conditional Estimation with Interaction"
+				],
+				"data_set": "../../data/acop.csv",
+				"number_of_subjects": 40,
+				"number_of_obs": 760,
+				"number_of_data_records": 799,
+				"output_files_used": [
+					"acop.lst",
+					"acop.cpu",
+					"acop.ext",
+					"acop.grd",
+					"acop.shk"
+				]
+			},
+			"run_heuristics": {
+				"covariance_step_aborted": false,
+				"large_condition_number": false,
+				"eigenvalue_issues": false,
+				"correlations_not_ok": false,
+				"parameter_near_boundary": false,
+				"hessian_reset": false,
+				"has_final_zero_gradient": false,
+				"minimization_terminated": false,
+				"eta_pval_significant": false,
+				"prderr": false
+			},
+			"parameters_data": [
+				{
+					"method": "TABLE NO.     1: First Order Conditional Estimation with Interaction: Goal Function=MINIMUM VALUE OF OBJECTIVE FUNCTION: Problem=1 Subproblem=0 Superproblem1=0 Iteration1=0 Superproblem2=0 Iteration2=0",
+					"estimates": {
+						"theta": [
+							2.31034,
+							54.9596,
+							464.659,
+							-0.0805722,
+							4.1303
+						],
+						"omega": [
+							0.0964407,
+							0,
+							0.153571
+						],
+						"sigma": [
+							1
+						]
+					},
+					"std_err": {
+						"theta": [
+							0.086147,
+							3.32914,
+							29.6177,
+							0.0555149,
+							1.35989
+						],
+						"omega": [
+							0.0200146,
+							10000000000,
+							0.026733
+						],
+						"sigma": [
+							10000000000
+						]
+					},
+					"random_effect_sd": {
+						"omega": [
+							0.310549,
+							0,
+							0.391882
+						],
+						"sigma": [
+							1
+						]
+					},
+					"random_effect_sdse": {
+						"omega": [
+							0.0322245,
+							10000000000,
+							0.0341085
+						],
+						"sigma": [
+							10000000000
+						]
+					},
+					"fixed": {
+						"theta": [
+							0,
+							0,
+							0,
+							0,
+							0
+						],
+						"omega": [
+							0,
+							1,
+							0
+						],
+						"sigma": [
+							1
+						]
+					}
+				}
+			],
+			"parameter_names": {
+				"theta": [
+					"THETA1",
+					"THETA2",
+					"THETA3",
+					"THETA4",
+					"THETA5"
+				],
+				"omega": [
+					"OMEGA(1,1)",
+					"OMEGA(2,1)",
+					"OMEGA(2,2)"
+				],
+				"sigma": [
+					"SIGMA(1,1)"
+				]
+			},
+			"ofv": [
+				{
+					"method": "First Order Conditional Estimation with Interaction",
+					"ofv_no_constant": 2636.846,
+					"constant_to_ofv": 1396.7865704711026,
+					"ofv_with_constant": 4033.6323408001776
+				}
+			],
+			"condition_number": [
+				{
+					"method": "First Order Conditional Estimation with Interaction",
+					"condition_number": -999999999
+				}
+			],
+			"shrinkage_details": [
+				[
+					{
+						"sub_pop": 1,
+						"eta_bar": [
+							0.00179673,
+							-0.00738995
+						],
+						"ebv_bar_se": [
+							0.0399941,
+							0.0599224
+						],
+						"pval": [
+							0.964167,
+							0.901849
+						],
+						"eta_sd": [
+							17.5115,
+							2.05962
+						],
+						"eps_sd": [
+							4.09105
+						],
+						"ebv_sd": [
+							18.5247,
+							2.54114
+						],
+						"num_subjects": [
+							40,
+							40
+						],
+						"eta_vr": [
+							31.9565,
+							4.07682
+						],
+						"eps_vr": [
+							8.01472
+						],
+						"ebv_vr": [
+							33.6177,
+							5.0177
+						]
+					}
+				]
+			]
+		},
+		{
+			"run_details": {
+				"version": "7.4.4",
+				"run_start": "-999999999",
+				"run_end": "Wed Jul  8 17:32:01 EDT 2020",
+				"estimation_time": [
+					42.06
+				],
+				"postprocess_time": 0,
+				"cpu_time": 0,
+				"function_evaluations": 665,
+				"significant_digits": 3.8,
+				"problem_text": "LEM BS-12 106-104 + COV-effects(CRCL, AGE) on CL",
+				"mod_file": "-999999999",
+				"estimation_method": [
+					"First Order Conditional Estimation with Interaction"
+				],
+				"data_set": "../data/12.csv",
+				"number_of_subjects": 160,
+				"number_of_obs": 3158,
+				"number_of_data_records": 4319,
+				"output_files_used": [
+					"12.lst",
+					"12.cpu",
+					"12.ext",
+					"12.grd",
+					"12.shk"
+				]
+			},
+			"run_heuristics": {
+				"covariance_step_aborted": false,
+				"large_condition_number": false,
+				"eigenvalue_issues": false,
+				"correlations_not_ok": false,
+				"parameter_near_boundary": false,
+				"hessian_reset": false,
+				"has_final_zero_gradient": false,
+				"minimization_terminated": false,
+				"eta_pval_significant": false,
+				"prderr": false
+			},
+			"parameters_data": [
+				{
+					"method": "TABLE NO.     1: First Order Conditional Estimation with Interaction: Goal Function=MINIMUM VALUE OF OBJECTIVE FUNCTION: Problem=1 Subproblem=0 Superproblem1=0 Iteration1=0 Superproblem2=0 Iteration2=0",
+					"estimates": {
+						"theta": [
+							0.422797,
+							4.13924,
+							1.18583,
+							4.17865,
+							1.29131,
+							0.520889,
+							-0.0701583,
+							0.340205
+						],
+						"omega": [
+							0.169074,
+							0.0830623,
+							0.0930905,
+							0.128221,
+							0.072105,
+							0.10827
+						],
+						"sigma": [
+							0.0381873
+						]
+					},
+					"std_err": {
+						"theta": [
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999
+						],
+						"omega": [
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999
+						],
+						"sigma": [
+							-999999999
+						]
+					},
+					"random_effect_sd": {
+						"omega": [
+							0.411186,
+							0.662084,
+							0.305107,
+							0.94769,
+							0.718223,
+							0.329043
+						],
+						"sigma": [
+							0.195416
+						]
+					},
+					"random_effect_sdse": {
+						"omega": [
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999
+						],
+						"sigma": [
+							-999999999
+						]
+					},
+					"fixed": {
+						"theta": [
+							0,
+							0,
+							0,
+							0,
+							0,
+							0,
+							0,
+							0
+						],
+						"omega": [
+							0,
+							0,
+							0,
+							0,
+							0,
+							0
+						],
+						"sigma": [
+							0
+						]
+					}
+				}
+			],
+			"parameter_names": {
+				"theta": [
+					"THETA1",
+					"THETA2",
+					"THETA3",
+					"THETA4",
+					"THETA5",
+					"THETA6",
+					"THETA7",
+					"THETA8"
+				],
+				"omega": [
+					"OMEGA(1,1)",
+					"OMEGA(2,1)",
+					"OMEGA(2,2)",
+					"OMEGA(3,1)",
+					"OMEGA(3,2)",
+					"OMEGA(3,3)"
+				],
+				"sigma": [
+					"SIGMA(1,1)"
+				]
+			},
+			"ofv": [
+				{
+					"method": "First Order Conditional Estimation with Interaction",
+					"ofv_no_constant": 31470.725,
+					"constant_to_ofv": 5804.015775720713,
+					"ofv_with_constant": 37274.74040639444
+				}
+			],
+			"condition_number": [
+				{
+					"method": "First Order Conditional Estimation with Interaction",
+					"condition_number": -999999999
+				}
+			],
+			"shrinkage_details": [
+				[
+					{
+						"sub_pop": 1,
+						"eta_bar": [
+							-0.00013593,
+							0.00042796,
+							0.000997795
+						],
+						"ebv_bar_se": [
+							0.0307158,
+							0.0230429,
+							0.0257082
+						],
+						"pval": [
+							0.996469,
+							0.985182,
+							0.96904
+						],
+						"eta_sd": [
+							5.21383,
+							4.16904,
+							0.861924
+						],
+						"eps_sd": [
+							4.54321
+						],
+						"ebv_sd": [
+							5.55069,
+							4.41324,
+							1.1504
+						],
+						"num_subjects": [
+							160,
+							160,
+							160
+						],
+						"eta_vr": [
+							10.1558,
+							8.16426,
+							1.71642
+						],
+						"eps_vr": [
+							8.88001
+						],
+						"ebv_vr": [
+							10.7933,
+							8.63171,
+							2.28757
+						]
+					}
+				]
+			]
+		},
+		{
+			"run_details": {
+				"version": "7.4.4",
+				"run_start": "-999999999",
+				"run_end": "Tue Aug 25 16:50:27 EDT 2020",
+				"estimation_time": [
+					131.73
+				],
+				"postprocess_time": 1.04,
+				"cpu_time": 133.637,
+				"function_evaluations": 380,
+				"significant_digits": 3,
+				"problem_text": "LEM 10 mixture model and IOV on CL",
+				"mod_file": "-999999999",
+				"estimation_method": [
+					"First Order Conditional Estimation"
+				],
+				"data_set": "../MixSim.csv",
+				"number_of_subjects": 300,
+				"number_of_obs": 12600,
+				"number_of_data_records": 13500,
+				"output_files_used": [
+					"iovmm.lst",
+					"iovmm.cpu",
+					"iovmm.ext",
+					"iovmm.grd",
+					"iovmm.shk"
+				]
+			},
+			"run_heuristics": {
+				"covariance_step_aborted": false,
+				"large_condition_number": false,
+				"eigenvalue_issues": false,
+				"correlations_not_ok": false,
+				"parameter_near_boundary": true,
+				"hessian_reset": false,
+				"has_final_zero_gradient": true,
+				"minimization_terminated": false,
+				"eta_pval_significant": false,
+				"prderr": false
+			},
+			"parameters_data": [
+				{
+					"method": "TABLE NO.     1: First Order Conditional Estimation: Goal Function=MINIMUM VALUE OF OBJECTIVE FUNCTION: Problem=1 Subproblem=0 Superproblem1=0 Iteration1=0 Superproblem2=0 Iteration2=0",
+					"estimates": {
+						"theta": [
+							14.3605,
+							100.521,
+							0.822632,
+							1.0446,
+							1.67825,
+							0.856771
+						],
+						"omega": [
+							0.0483606,
+							0,
+							0.0438122,
+							0,
+							0,
+							0.0384572,
+							0,
+							0,
+							0,
+							0.0384572,
+							0,
+							0,
+							0,
+							0,
+							0.0384572
+						],
+						"sigma": [
+							0.0481582,
+							0,
+							0.001
+						]
+					},
+					"std_err": {
+						"theta": [
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999
+						],
+						"omega": [
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999
+						],
+						"sigma": [
+							-999999999,
+							-999999999,
+							-999999999
+						]
+					},
+					"random_effect_sd": {
+						"omega": [
+							0.219911,
+							0,
+							0.209314,
+							0,
+							0,
+							0.196105,
+							0,
+							0,
+							0,
+							0.196105,
+							0,
+							0,
+							0,
+							0,
+							0.196105
+						],
+						"sigma": [
+							0.21945,
+							0,
+							0.0316228
+						]
+					},
+					"random_effect_sdse": {
+						"omega": [
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999,
+							-999999999
+						],
+						"sigma": [
+							-999999999,
+							-999999999,
+							-999999999
+						]
+					},
+					"fixed": {
+						"theta": [
+							0,
+							0,
+							0,
+							0,
+							0,
+							0
+						],
+						"omega": [
+							0,
+							1,
+							0,
+							1,
+							1,
+							0,
+							1,
+							1,
+							1,
+							1,
+							1,
+							1,
+							1,
+							1,
+							1
+						],
+						"sigma": [
+							0,
+							1,
+							0
+						]
+					}
+				}
+			],
+			"parameter_names": {
+				"theta": [
+					"THETA1",
+					"THETA2",
+					"THETA3",
+					"THETA4",
+					"THETA5",
+					"THETA6"
+				],
+				"omega": [
+					"OMEGA(1,1)",
+					"OMEGA(2,1)",
+					"OMEGA(2,2)",
+					"OMEGA(3,1)",
+					"OMEGA(3,2)",
+					"OMEGA(3,3)",
+					"OMEGA(4,1)",
+					"OMEGA(4,2)",
+					"OMEGA(4,3)",
+					"OMEGA(4,4)",
+					"OMEGA(5,1)",
+					"OMEGA(5,2)",
+					"OMEGA(5,3)",
+					"OMEGA(5,4)",
+					"OMEGA(5,5)"
+				],
+				"sigma": [
+					"SIGMA(1,1)",
+					"SIGMA(2,1)",
+					"SIGMA(2,2)"
+				]
+			},
+			"ofv": [
+				{
+					"method": "First Order Conditional Estimation",
+					"ofv_no_constant": 14722.149,
+					"constant_to_ofv": 23157.251036757752,
+					"ofv_with_constant": 37879.40029810332
+				}
+			],
+			"condition_number": [
+				{
+					"method": "First Order Conditional Estimation",
+					"condition_number": -999999999
+				}
+			],
+			"shrinkage_details": [
+				[
+					{
+						"sub_pop": 1,
+						"eta_bar": [
+							0.0335571,
+							-0.0254748,
+							-0.00789954,
+							0.0132498,
+							0.0213349
+						],
+						"ebv_bar_se": [
+							0.0117781,
+							0.0124148,
+							0.00992398,
+							0.0101464,
+							0.010254
+						],
+						"pval": [
+							-1,
+							-1,
+							-1,
+							-1,
+							-1
+						],
+						"eta_sd": [
+							13.9717,
+							4.73045,
+							18.7151,
+							16.8933,
+							16.0121
+						],
+						"eps_sd": [
+							5.73109,
+							5.73109
+						],
+						"ebv_sd": [
+							12.2587,
+							4.12702,
+							16.4387,
+							16.6523,
+							16.6926
+						],
+						"num_subjects": [
+							257,
+							257,
+							257,
+							257,
+							257
+						],
+						"eta_vr": [
+							25.9914,
+							9.23713,
+							33.9276,
+							30.9328,
+							29.4603
+						],
+						"eps_vr": [
+							11.1337,
+							11.1337
+						],
+						"ebv_vr": [
+							23.0147,
+							8.08371,
+							30.1752,
+							30.5316,
+							30.5988
+						]
+					},
+					{
+						"sub_pop": 2,
+						"eta_bar": [
+							-0.0248427,
+							-0.0500264,
+							-0.0235087,
+							0.022875,
+							-0.0191217
+						],
+						"ebv_bar_se": [
+							0.0260658,
+							0.0304415,
+							0.0241468,
+							0.02206,
+							0.019262
+						],
+						"pval": [
+							-1,
+							-1,
+							-1,
+							-1,
+							-1
+						],
+						"eta_sd": [
+							21.3553,
+							3.50336,
+							18.3014,
+							25.3621,
+							34.8288
+						],
+						"eps_sd": [
+							4.90288,
+							4.90288
+						],
+						"ebv_sd": [
+							14.1556,
+							3.66952,
+							23.2258,
+							23.1938,
+							23.1651
+						],
+						"num_subjects": [
+							43,
+							43,
+							43,
+							43,
+							43
+						],
+						"eta_vr": [
+							38.1501,
+							6.88398,
+							33.2534,
+							44.2918,
+							57.5271
+						],
+						"eps_vr": [
+							9.56539,
+							9.56539
+						],
+						"ebv_vr": [
+							26.3074,
+							7.20439,
+							41.0572,
+							41.0081,
+							40.9641
+						]
+					}
+				]
+			]
+		}
+	],
+	"Errors": null
+}

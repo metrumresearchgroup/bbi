@@ -128,6 +128,15 @@ SUM-R007:
   description: BBI summary includes times that are zero
   tests:
   - INT-SUM-001
+SUM-R008:
+  description: Can take a list of model paths and parse summary for all models
+  tests:
+  - INT-SUM-005
+SUM-R009:
+  description: Should return a json array, with one top-level element for each
+    model being summarized, in the same order they were passed in.
+  tests:
+  - INT-SUM-005
 CMD-R001:
   description: Directory contains output files
   tests:
