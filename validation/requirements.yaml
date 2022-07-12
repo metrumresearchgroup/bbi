@@ -368,5 +368,3 @@ UTL-R010:
   description: Pad Num pads number with values
   tests:
   - UNIT-UTL-010
-
-
