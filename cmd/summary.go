@@ -44,7 +44,7 @@ bbi nonmem summary run001/run001 run002/run002
 
 type jsonResults struct {
 	Results []parser.SummaryOutput
-	Errors  []error
+	Errors  []int
 }
 
 func summarizeModel(model string) (parser.SummaryOutput, error) {
@@ -58,13 +58,22 @@ func summary(_ *cobra.Command, args []string) {
 	}
 	if len(args) == 1 {
 		results, err := summarizeModel(args[0])
-		if err != nil {
-			log.Fatal(err)
+		if err == nil {
+			results.Success = true
+		} else {
+			if Json {
+				results = parser.SummaryOutput{ErrorMsg: err.Error()}
+			} else {
+				log.Fatal(err)
+			}
 		}
 		if Json {
 			err = utils.PrintJSON(results)
 			if err != nil {
 				log.Fatal(err)
+			}
+			if !results.Success {
+				os.Exit(1)
 			}
 		} else {
 			results.Summary()
@@ -73,19 +82,9 @@ func summary(_ *cobra.Command, args []string) {
 		return
 	}
 
-	// if we are going to parse multiple models, we need to reasonably handle failures. The objective
-	// will be to always return a json object if its json, and if not, error as soon as it hits a printed issue.
-	// As such, the idea will be to store results such they can be filtered
-	type result int
-	const (
-		SUCCESS result = iota + 1
-		ERROR
-	)
 	type modelResult struct {
-		Index   int
-		Outcome result
-		Err     error
-		Result  parser.SummaryOutput
+		Index  int
+		Result parser.SummaryOutput
 	}
 
 	workers := runtime.NumCPU()
@@ -99,8 +98,10 @@ func summary(_ *cobra.Command, args []string) {
 	}
 	models := make(chan int, numModels)
 	results := make(chan modelResult, numModels)
-	orderedResults := make([]modelResult, numModels)
+
 	var modelResults jsonResults
+	modelResults.Results = make([]parser.SummaryOutput, numModels)
+	modelResults.Errors = []int{}
 
 	for w := 1; w <= workers; w++ {
 		go func(modIndex <-chan int, results chan<- modelResult) {
@@ -108,17 +109,14 @@ func summary(_ *cobra.Command, args []string) {
 				r, err := summarizeModel(args[i])
 				if err != nil {
 					results <- modelResult{
-						Index:   i,
-						Outcome: ERROR,
-						Err:     err,
-						Result:  r,
+						Index:  i,
+						Result: parser.SummaryOutput{ErrorMsg: err.Error()},
 					}
 				} else {
+					r.Success = true
 					results <- modelResult{
-						Index:   i,
-						Outcome: SUCCESS,
-						Err:     err,
-						Result:  r,
+						Index:  i,
+						Result: r,
 					}
 				}
 			}
@@ -130,15 +128,13 @@ func summary(_ *cobra.Command, args []string) {
 	close(models)
 	for r := 0; r < numModels; r++ {
 		res := <-results
-		orderedResults[res.Index] = res
-	}
-	for _, res := range orderedResults {
-		if res.Outcome == SUCCESS {
-			modelResults.Results = append(modelResults.Results, res.Result)
-		} else if res.Outcome == ERROR {
-			modelResults.Errors = append(modelResults.Errors, res.Err)
+
+		modelResults.Results[res.Index] = res.Result
+		if !res.Result.Success {
+			modelResults.Errors = append(modelResults.Errors, res.Index)
 		}
 	}
+
 	if Json {
 		err := utils.PrintJSON(modelResults)
 		if err != nil {
@@ -149,18 +145,22 @@ func summary(_ *cobra.Command, args []string) {
 	}
 
 	// not json lets print all successful models first then any errors
+	nerrors := len(modelResults.Errors)
+	nsuccessful := len(modelResults.Results) - nerrors
 	for i, res := range modelResults.Results {
-		res.Summary()
-		// add some spacing between models
-		if i != len(modelResults.Results)-1 {
-			fmt.Println("")
-			fmt.Println("")
+		if res.Success {
+			res.Summary()
+			// add some spacing between models
+			if i != nsuccessful-1 {
+				fmt.Println("")
+				fmt.Println("")
+			}
 		}
 	}
-	for _, res := range modelResults.Errors {
-		log.Error(res)
+	for i := 0; i < nerrors; i++ {
+		log.Error(modelResults.Results[modelResults.Errors[i]].ErrorMsg)
 	}
-	if len(modelResults.Errors) > 0 {
+	if nerrors > 0 {
 		os.Exit(1)
 	}
 }

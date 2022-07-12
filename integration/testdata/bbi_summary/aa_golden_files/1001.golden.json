@@ -204,5 +204,6 @@
 			"method": "MCMC Bayesian Analysis",
 			"condition_number": 4353.17
 		}
-	]
+	],
+	"success": true
 }

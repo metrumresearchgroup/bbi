@@ -195,7 +195,8 @@
 						]
 					}
 				]
-			]
+			],
+			"success": true
 		},
 		{
 			"run_details": {
@@ -427,7 +428,8 @@
 						]
 					}
 				]
-			]
+			],
+			"success": true
 		},
 		{
 			"run_details": {
@@ -802,8 +804,9 @@
 						]
 					}
 				]
-			]
+			],
+			"success": true
 		}
 	],
-	"Errors": null
+	"Errors": []
 }
