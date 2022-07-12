@@ -39,6 +39,7 @@ const summaryLongDescription string = `summarize model(s), for example:
 bbi nonmem summary run001/run001
 bbi nonmem summary run001/run001.lst
 bbi nonmem summary run001/run001.res
+bbi nonmem summary run001/run001 run002/run002
  `
 
 type jsonResults struct {
