@@ -110,6 +110,7 @@ SUM-R003:
   description: BBI summary fails with bad input
   tests:
   - INT-SUM-003
+  - INT-SUM-006
 SUM-R004:
   description: BBI summary works with no extension
   tests:
@@ -137,6 +138,11 @@ SUM-R009:
     model being summarized, in the same order they were passed in.
   tests:
   - INT-SUM-005
+SUM-R009:
+  description: If any of the models cannot be summarized, pass the relevant
+    error back in the relevant position in the json array.
+  tests:
+  - INT-SUM-006
 CMD-R001:
   description: Directory contains output files
   tests:
