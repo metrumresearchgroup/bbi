@@ -6,7 +6,6 @@
 		"estimation_time": [
 			42.06
 		],
-		"cpu_time": 39.23,
 		"function_evaluations": 665,
 		"significant_digits": 3.8,
 		"problem_text": "LEM BS-12 106-104 + COV-effects(CRCL, AGE) on CL",
