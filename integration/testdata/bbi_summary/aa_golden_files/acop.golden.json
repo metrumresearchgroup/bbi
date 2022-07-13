@@ -9,6 +9,7 @@
 		"covariance_time": [
 			0.56
 		],
+		"postprocess_time": 0,
 		"cpu_time": 2.543,
 		"function_evaluations": 366,
 		"significant_digits": 3.2,
