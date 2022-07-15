@@ -2,6 +2,7 @@ package utils
 
 import (
 	"bufio"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -135,4 +136,15 @@ func HasZero(floats []float64) bool {
 	}
 
 	return false
+}
+
+// PrintJSON prints the JSON encoding of v to standard output.
+func PrintJSON(v interface{}) error {
+	b, err := json.MarshalIndent(v, "", "\t")
+	if err != nil {
+		return err
+	}
+	_, err = os.Stdout.Write(append(b, '\n'))
+
+	return err
 }

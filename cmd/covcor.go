@@ -15,10 +15,8 @@
 package cmd
 
 import (
-	"encoding/json"
-	"fmt"
-
 	parser "github.com/metrumresearchgroup/bbi/parsers/nmparser"
+	"github.com/metrumresearchgroup/bbi/utils"
 
 	log "github.com/sirupsen/logrus"
 
@@ -41,8 +39,10 @@ func covcor(cmd *cobra.Command, args []string) {
 		log.Fatal(err)
 	}
 
-	jsonRes, _ := json.MarshalIndent(results, "", "\t")
-	fmt.Printf("%s\n", jsonRes)
+	err = utils.PrintJSON(results)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func NewCovcorCmd() *cobra.Command {

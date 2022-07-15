@@ -15,7 +15,6 @@
 package cmd
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -29,6 +28,7 @@ import (
 
 	"github.com/metrumresearchgroup/bbi/utils"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -60,8 +60,10 @@ func probs(_ *cobra.Command, args []string) error {
 	}
 	modelSummaries := modSummaries(AppFs, modelFiles)
 	if Json {
-		jsonRes, _ := json.MarshalIndent(modelSummaries, "", "\t")
-		fmt.Printf("%s\n", jsonRes)
+		err = utils.PrintJSON(modelSummaries)
+		if err != nil {
+			log.Fatal(err)
+		}
 	} else {
 		var probSummaries []modelSummary
 		for _, ms := range modelSummaries {

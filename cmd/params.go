@@ -15,7 +15,6 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
@@ -267,8 +266,10 @@ func params(cmd *cobra.Command, args []string) {
 			log.Fatal(err)
 		}
 		if Json {
-			jsonRes, _ := json.MarshalIndent(results, "", "\t")
-			fmt.Printf("%s\n", jsonRes)
+			err = utils.PrintJSON(results)
+			if err != nil {
+				log.Fatal(err)
+			}
 		} else {
 			if !noParamNames {
 				printParamHeader(results)
@@ -407,8 +408,10 @@ func params(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	jsonRes, _ := json.MarshalIndent(paramResults, "", "\t")
-	fmt.Printf("%s\n", jsonRes)
+	err := utils.PrintJSON(paramResults)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func NewParamsCmd() *cobra.Command {

@@ -2,7 +2,6 @@ package parser
 
 import (
 	"regexp"
-	"strconv"
 	"strings"
 )
 
@@ -18,10 +17,7 @@ func ParseThetaResults(lines []string) []float64 {
 	}
 	stringValues := strings.Fields(thetaLine)
 	for _, strVal := range stringValues {
-		parsedVal, err := strconv.ParseFloat(strVal, 64)
-		if err != nil {
-			parsedVal = DefaultFloat64
-		}
+		parsedVal := strToFloat(strVal)
 		thetaValues = append(thetaValues, parsedVal)
 	}
 

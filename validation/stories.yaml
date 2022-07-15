@@ -66,6 +66,7 @@ BBI-SUM-001:
   - SUM-R003
   - SUM-R004
   - SUM-R005
+  - SUM-R006
 BBI-COV-001:
   name: Parse .cov and .cor files
   description: As a user, I want to be able to parse the `.cov` and `.cor` files in

@@ -2,7 +2,6 @@ package parser
 
 import (
 	"regexp"
-	"strconv"
 	"strings"
 )
 
@@ -22,10 +21,7 @@ func ParseBlockResults(lines []string) []float64 {
 	}
 	stringValues := strings.Fields(omegaLine)
 	for _, strVal := range stringValues {
-		parsedVal, err := strconv.ParseFloat(strVal, 64)
-		if err != nil {
-			parsedVal = DefaultFloat64
-		}
+		parsedVal := strToFloat(strVal)
 		blockValues = append(blockValues, parsedVal)
 	}
 
