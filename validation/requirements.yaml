@@ -124,6 +124,10 @@ SUM-R006:
   tests:
   - UNIT-NMP-019
   - INT-SUM-001
+SUM-R007:
+  description: BBI summary includes times that are zero
+  tests:
+  - INT-SUM-001
 CMD-R001:
   description: Directory contains output files
   tests:

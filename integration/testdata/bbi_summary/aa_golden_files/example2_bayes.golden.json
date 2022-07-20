@@ -17,6 +17,7 @@
 			40.97,
 			0
 		],
+		"postprocess_time": 0,
 		"cpu_time": 408.523,
 		"function_evaluations": -999999999,
 		"significant_digits": -999999999,
