@@ -59,7 +59,6 @@ func Execute(build string) {
 	cmd := NewRootCmd()
 	cmd.Long = fmt.Sprintf("bbi cli version %s", VERSION)
 	if err := cmd.Execute(); err != nil {
-		fmt.Println(err)
 		os.Exit(-1)
 	}
 }
