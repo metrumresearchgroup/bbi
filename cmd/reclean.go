@@ -28,6 +28,10 @@ func reclean(cmd *cobra.Command, args []string) error {
 	if debug {
 		viper.Debug()
 	}
+	if len(args) != 1 {
+		return fmt.Errorf("must specify one positional argument, a directory")
+	}
+
 	AppFs := afero.NewOsFs()
 	err := runner.CleanEstFolder(AppFs, args[0], []string{}, viper.GetInt("clean_lvl"), verbose, debug, preview)
 	if err != nil {
