@@ -43,7 +43,7 @@ func reclean(cmd *cobra.Command, args []string) error {
 
 func NewRecleanCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "reclean",
+		Use:   "reclean [flags] <directory>",
 		Short: "clean files in an estimation directory by clean level",
 		Long: `
 	bbi reclean run001_est_01
