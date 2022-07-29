@@ -37,8 +37,7 @@ func replaceTrim(line string, replacement string) string {
 } */
 
 func parseLine(line string, n int) string {
-	tokens := strings.Fields(line)
-	if len(tokens) >= n {
+	if tokens := strings.Fields(line); len(tokens) >= n {
 		return tokens[n]
 	}
 
