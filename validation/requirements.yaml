@@ -138,7 +138,7 @@ SUM-R009:
     model being summarized, in the same order they were passed in.
   tests:
   - INT-SUM-005
-SUM-R009:
+SUM-R010:
   description: If any of the models cannot be summarized, pass the relevant
     error back in the relevant position in the json array.
   tests:
