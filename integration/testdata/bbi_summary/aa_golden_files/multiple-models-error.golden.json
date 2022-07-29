@@ -217,6 +217,27 @@
 			},
 			"parameter_names": {},
 			"success": false,
+			"error_msg": "lengths of parameter data (1) and estimation methods (0) differ. Incomplete run?"
+		},
+		{
+			"run_details": {
+				"postprocess_time": 0,
+				"cpu_time": 0
+			},
+			"run_heuristics": {
+				"covariance_step_aborted": false,
+				"large_condition_number": false,
+				"eigenvalue_issues": false,
+				"correlations_not_ok": false,
+				"parameter_near_boundary": false,
+				"hessian_reset": false,
+				"has_final_zero_gradient": false,
+				"minimization_terminated": false,
+				"eta_pval_significant": false,
+				"prderr": false
+			},
+			"parameter_names": {},
+			"success": false,
 			"error_msg": "Must provide path to .lst (or .res) file for summary but provided 'testdata/bbi_summary/12/12.lost'\nCan also pass no extension and summary will infer .lst extension."
 		},
 		{
@@ -597,6 +618,7 @@
 		}
 	],
 	"Errors": [
+		2,
 		1
 	]
 }

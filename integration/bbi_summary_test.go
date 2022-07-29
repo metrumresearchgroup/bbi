@@ -181,6 +181,10 @@ func TestSummaryErrors(tt *testing.T) {
 			"acop/acop.ext", // wrong (but existing) file
 			wrongExtensionError,
 		},
+		{
+			"acop-incomplete/acop-incomplete", // incomplete lst
+			"Incomplete run",
+		},
 	}
 
 	testId := "INT-SUM-003"
@@ -275,6 +279,7 @@ func TestSummaryPathMultipleModelsError(tt *testing.T) {
 					"nonmem",
 					"summary",
 					filepath.Join(SUMMARY_TEST_DIR, "acop", "acop.lst"),
+					filepath.Join(SUMMARY_TEST_DIR, "acop-incomplete", "acop-incomplete"),
 					filepath.Join(SUMMARY_TEST_DIR, "12", "12.lost"), // misspelled
 					filepath.Join(SUMMARY_TEST_DIR, "iovmm", "iovmm.lst"),
 				}

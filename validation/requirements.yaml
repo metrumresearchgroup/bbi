@@ -143,6 +143,12 @@ SUM-R010:
     error back in the relevant position in the json array.
   tests:
   - INT-SUM-006
+SUM-R011:
+  description: Attempt to identify when a model run is incomplete and
+    report an error to the caller.
+  tests:
+  - INT-SUM-003
+  - INT-SUM-006
 CMD-R001:
   description: Directory contains output files
   tests:
