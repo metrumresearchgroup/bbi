@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	rdebug "runtime/debug"
 
 	parser "github.com/metrumresearchgroup/bbi/parsers/nmparser"
 	"github.com/metrumresearchgroup/bbi/utils"
@@ -47,7 +48,13 @@ type jsonResults struct {
 	Errors  []int
 }
 
-func summarizeModel(model string) (parser.SummaryOutput, error) {
+func summarizeModel(model string) (sum parser.SummaryOutput, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("GetModelOutput: %v\n%v", r, string(rdebug.Stack()))
+		}
+	}()
+
 	return parser.GetModelOutput(model, parser.NewModelOutputFile(extFile, noExt),
 		!noGrd, !noShk)
 }
