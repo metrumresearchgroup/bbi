@@ -47,8 +47,9 @@ func TestInitialization(tt *testing.T) {
 				bytes, err := ioutil.ReadAll(configHandle)
 				t.R.NoError(err)
 
+				t.R.NotContains(bytes, []byte("bbi_binary"))
 				t.R.NoError(yaml.Unmarshal(bytes, &c))
-
+				t.A.Equal(c.BbiBinary, "")
 				t.A.Greater(len(c.Nonmem), 0)
 			})
 		})

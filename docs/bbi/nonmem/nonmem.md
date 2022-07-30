@@ -42,7 +42,6 @@ overwrite: false
 clean_lvl: 1
 copy_lvl: 0
 git: true
-bbi_binary: /data/apps/bbi
 save_config: false
 output_dir: '{{ .Name }}'
 threads: 4
