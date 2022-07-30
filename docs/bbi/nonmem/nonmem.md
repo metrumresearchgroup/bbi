@@ -4,7 +4,7 @@ Run (and other actions) against nonmem model(s)
 
 ### Synopsis
 
-Nonmem and its subcommands are all based around the execution and interpretation of nonmem models and more. 
+Nonmem and its subcommands are all based around the execution and interpretation of nonmem models and more.
 
 ### Options
 

@@ -22,8 +22,8 @@ This means that:
 * There is no difference in output / structure  between local or SGE execution
 
 In order for this to work, when building the script to send to SGE, we will need to know where bbi's binary is
-located. Thankfully this is handled automatically by bbi. When you initialize BBI, it'll automatically set the 
-`bbi_binary` value based on the location BBI was run from. No need to manually set this. 
+located. Thankfully this is handled automatically by bbi. When you initialize BBI, it'll automatically set the
+`bbi_binary` value based on the location BBI was run from. No need to manually set this.
 
 ### Options
 
