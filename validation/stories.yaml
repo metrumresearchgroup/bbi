@@ -30,7 +30,9 @@ BBI-RUN-004:
     such as license or compilation options, directly to NonMem, such that they are
     expressed in the final NMFE call.
   ProductRisk: Low
-  requirements: LOCAL-R002
+  requirements:
+  - CMD-R002
+  - LOCAL-R002
 BBI-RUN-005:
   name: NonMem Execution via NMQual
   description: As a user, I would like to have the option to execute NonMem the same
