@@ -148,6 +148,11 @@ CMD-R005:
   description: SGE Job Name
   tests:
   - UNIT-CMD-005
+CMD-R006:
+  description: Pass -maxeval=2 to NMFE by default
+  tests:
+  - INT-INIT-001
+  - UNIT-CMD-002
 NMP-R001:
   description: Set missing values to default parameter data method
   tests:

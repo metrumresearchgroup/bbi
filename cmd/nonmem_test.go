@@ -167,6 +167,17 @@ func Test_processNMFEOptions(tt *testing.T) {
 			want: nil,
 		},
 		{
+			name: "maxlim=2",
+			args: args{
+				config: configlib.Config{
+					NMFEOptions: configlib.NMFEOptions{
+						MaxLim: 2,
+					},
+				},
+			},
+			want: []string{"-maxlim=2"},
+		},
+		{
 			name: "maxlim=0",
 			args: args{
 				config: configlib.Config{

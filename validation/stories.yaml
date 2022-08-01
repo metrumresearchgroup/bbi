@@ -32,6 +32,7 @@ BBI-RUN-004:
   ProductRisk: Low
   requirements:
   - CMD-R002
+  - CMD-R006
   - LOCAL-R002
 BBI-RUN-005:
   name: NonMem Execution via NMQual

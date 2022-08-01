@@ -50,7 +50,7 @@ func TestInitialization(tt *testing.T) {
 				t.R.NoError(yaml.Unmarshal(bytes, &c))
 
 				t.A.Greater(len(c.Nonmem), 0)
-				t.A.Equal(100, c.NMFEOptions.MaxLim)
+				t.A.Equal(2, c.NMFEOptions.MaxLim)
 			})
 		})
 	}
