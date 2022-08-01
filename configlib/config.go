@@ -67,7 +67,7 @@ type NMFEOptions struct {
 	PRDefault   bool   `mapstructure:"prdefault" yaml:"prdefault" json:"prdefault,omitempty"`
 	TPRDefault  bool   `mapstructure:"tprdefault" yaml:"tprdefault" json:"tprdefault,omitempty"`
 	NoBuild     bool   `mapstructure:"nobuild" yaml:"nobuild" json:"nobuild,omitempty"`
-	MaxLim      int    `mapstructure:"maxlim" yaml:"maxlim" json:"maxlim,omitempty"` // Default (empty value) is 3
+	MaxLim      int    `mapstructure:"maxlim" yaml:"maxlim" json:"maxlim,omitempty"`
 }
 
 func (c Config) RenderYamlToFile(path string) error {
