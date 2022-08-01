@@ -166,6 +166,17 @@ func Test_processNMFEOptions(tt *testing.T) {
 			},
 			want: nil,
 		},
+		{
+			name: "maxlim=0",
+			args: args{
+				config: configlib.Config{
+					NMFEOptions: configlib.NMFEOptions{
+						MaxLim: 0,
+					},
+				},
+			},
+			want: nil,
+		},
 	}
 	testId := "UNIT-CMD-002"
 	for _, test := range tests {

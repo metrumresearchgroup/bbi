@@ -1018,11 +1018,11 @@ func processNMFEOptions(config configlib.Config) []string {
 
 	// Valid values are 1 through 3.  Defaults to 100.
 	//
-	// 100 is treated as a special value that indicates to _not_ pass
-	// -maxlim.
+	// 100 and 0 are treated as special values that indicate to _not_
+	// pass -maxlim.
 	if config.NMFEOptions.MaxLim > 0 && config.NMFEOptions.MaxLim < 4 {
 		output = append(output, "-maxlim="+strconv.Itoa(config.NMFEOptions.MaxLim))
-	} else if config.NMFEOptions.MaxLim != 100 {
+	} else if !(config.NMFEOptions.MaxLim == 0 || config.NMFEOptions.MaxLim == 100) {
 		log.Warnf("ignoring invalid maxlim value: %v", config.NMFEOptions.MaxLim)
 	}
 
