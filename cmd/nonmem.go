@@ -1016,9 +1016,14 @@ func processNMFEOptions(config configlib.Config) []string {
 		output = append(output, "-nobuild")
 	}
 
-	// Only goes to 3, defaults to 100. Just a quick way to check for "empty" setting
-	if config.NMFEOptions.MaxLim < 50 {
+	// Valid values are 1 through 3.  Defaults to 100.
+	//
+	// 100 is treated as a special value that indicates to _not_ pass
+	// -maxlim.
+	if config.NMFEOptions.MaxLim > 0 && config.NMFEOptions.MaxLim < 4 {
 		output = append(output, "-maxlim="+strconv.Itoa(config.NMFEOptions.MaxLim))
+	} else if config.NMFEOptions.MaxLim != 100 {
+		log.Warnf("ignoring invalid maxlim value: %v", config.NMFEOptions.MaxLim)
 	}
 
 	return output
