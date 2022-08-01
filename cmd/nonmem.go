@@ -227,7 +227,8 @@ func NewNonmemCmd() *cobra.Command {
 	errpanic(viper.BindPFlag(nmfeGroup+"."+noBuildIdentifier, cmd.PersistentFlags().Lookup(noBuildIdentifier)))
 
 	const maxLimIdentifier string = "maxlim"
-	cmd.PersistentFlags().Int(maxLimIdentifier, 100, "RAW NMFE OPTION - Set the maximum values set for the buffers used by Nonmem")
+	cmd.PersistentFlags().Int(maxLimIdentifier, 100,
+		"RAW NMFE OPTION - Set the maximum values for the buffers used by Nonmem")
 	errpanic(viper.BindPFlag(nmfeGroup+"."+maxLimIdentifier, cmd.PersistentFlags().Lookup(maxLimIdentifier)))
 
 	cmd.AddCommand(NewCleanCmd())
