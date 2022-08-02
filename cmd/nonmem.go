@@ -222,6 +222,14 @@ func NewNonmemCmd() *cobra.Command {
 	cmd.PersistentFlags().Bool(prCompileIdentifier, false, "RAW NMFE OPTION - Forces PREDPP compilation")
 	errpanic(viper.BindPFlag(nmfeGroup+"."+prCompileIdentifier, cmd.PersistentFlags().Lookup(prCompileIdentifier)))
 
+	const prDefaultIdentifier string = "prdefault"
+	cmd.PersistentFlags().Bool(prDefaultIdentifier, false, "RAW NMFE OPTION - Do not recompile any routines other than FSUBS")
+	errpanic(viper.BindPFlag(nmfeGroup+"."+prDefaultIdentifier, cmd.PersistentFlags().Lookup(prDefaultIdentifier)))
+
+	const tprDefaultIdentifier string = "tprdefault"
+	cmd.PersistentFlags().Bool(tprDefaultIdentifier, false, "RAW NMFE OPTION - Test if is okay to do -prdefault")
+	errpanic(viper.BindPFlag(nmfeGroup+"."+tprDefaultIdentifier, cmd.PersistentFlags().Lookup(tprDefaultIdentifier)))
+
 	const noBuildIdentifier string = "nobuild"
 	cmd.PersistentFlags().Bool(noBuildIdentifier, false, "RAW NMFE OPTION - Skips recompiling and rebuilding on nonmem executable")
 	errpanic(viper.BindPFlag(nmfeGroup+"."+noBuildIdentifier, cmd.PersistentFlags().Lookup(noBuildIdentifier)))
