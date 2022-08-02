@@ -174,5 +174,6 @@
 			"method": "First Order Conditional Estimation with Interaction",
 			"condition_number": -999999999
 		}
-	]
+	],
+	"success": true
 }

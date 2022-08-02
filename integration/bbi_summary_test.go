@@ -181,6 +181,10 @@ func TestSummaryErrors(tt *testing.T) {
 			"acop/acop.ext", // wrong (but existing) file
 			wrongExtensionError,
 		},
+		{
+			"acop-incomplete/acop-incomplete", // incomplete lst
+			"Incomplete run",
+		},
 	}
 
 	testId := "INT-SUM-003"
@@ -194,7 +198,6 @@ func TestSummaryErrors(tt *testing.T) {
 				filepath.Join(SUMMARY_TEST_DIR, tc.testPath),
 			}
 
-			// try without flag and get error
 			output, err := executeCommandNoErrorCheck(context.Background(), "bbi", commandAndArgs...)
 			t.R.NotNil(err)
 			errorMatch, _ := regexp.MatchString(tc.errorMsg, output)
@@ -227,5 +230,86 @@ func TestSummaryHappyPathNoExtension(tt *testing.T) {
 		}
 
 		RequireOutputMatchesGoldenFile(t, gtd)
+	})
+}
+
+func TestSummaryHappyPathMultipleModels(tt *testing.T) {
+	testId := "INT-SUM-005"
+	tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
+		for _, tc := range testConfigs {
+			tt.Run(tc.goldenExt, func(tt *testing.T) {
+				t := wrapt.WrapT(tt)
+				commandAndArgs := []string{
+					"nonmem",
+					"summary",
+					filepath.Join(SUMMARY_TEST_DIR, "acop", "acop.lst"),
+					filepath.Join(SUMMARY_TEST_DIR, "12", "12.lst"),
+					filepath.Join(SUMMARY_TEST_DIR, "iovmm", "iovmm.lst"),
+				}
+
+				if tc.bbiOption != "" {
+					commandAndArgs = append(commandAndArgs, tc.bbiOption)
+				}
+				output, err := executeCommand(context.Background(), "bbi", commandAndArgs...)
+
+				gtd := GoldenFileTestingDetails{
+					outputString: output,
+					goldenFilePath: filepath.Join(SUMMARY_TEST_DIR, SUMMARY_GOLD_DIR,
+						"multiple-models.golden"+tc.goldenExt),
+				}
+				if os.Getenv("UPDATE_SUMMARY") == "true" {
+					UpdateGoldenFile(t, gtd)
+				}
+				RequireOutputMatchesGoldenFile(t, gtd)
+
+				t.R.NoError(err)
+				t.R.NotEmpty(output)
+			})
+		}
+	})
+}
+
+func TestSummaryPathMultipleModelsError(tt *testing.T) {
+	testId := "INT-SUM-006"
+	tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
+		for _, tc := range testConfigs {
+			tt.Run(tc.goldenExt, func(tt *testing.T) {
+				t := wrapt.WrapT(tt)
+				commandAndArgs := []string{
+					"nonmem",
+					"summary",
+					filepath.Join(SUMMARY_TEST_DIR, "acop", "acop.lst"),
+					filepath.Join(SUMMARY_TEST_DIR, "acop-incomplete", "acop-incomplete"),
+					filepath.Join(SUMMARY_TEST_DIR, "12", "12.lost"), // misspelled
+					filepath.Join(SUMMARY_TEST_DIR, "iovmm", "iovmm.lst"),
+				}
+
+				if tc.bbiOption != "" {
+					commandAndArgs = append(commandAndArgs, tc.bbiOption)
+				}
+				output, err := executeCommandNoErrorCheck(context.Background(),
+					"bbi", commandAndArgs...)
+
+				// Avoid testing plain output with golden file due to
+				// timestamps.
+				if tc.bbiOption == "--json" {
+					gtd := GoldenFileTestingDetails{
+						outputString: output,
+						goldenFilePath: filepath.Join(SUMMARY_TEST_DIR, SUMMARY_GOLD_DIR,
+							"multiple-models-error.golden"+tc.goldenExt),
+					}
+					if os.Getenv("UPDATE_SUMMARY") == "true" {
+						UpdateGoldenFile(t, gtd)
+					}
+					RequireOutputMatchesGoldenFile(t, gtd)
+				}
+
+				t.R.NotEmpty(output)
+				t.R.NotNil(err)
+
+				errorMatch, _ := regexp.MatchString("Must provide path to \\.lst", output)
+				t.R.True(errorMatch)
+			})
+		}
 	})
 }

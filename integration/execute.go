@@ -39,6 +39,7 @@ func executeCommand(ctx context.Context, command string, args ...string) (string
 	return outputString, nil
 }
 
+// nolint:unparam
 func executeCommandNoErrorCheck(ctx context.Context, command string, args ...string) (string, error) {
 	binary, _ := exec.LookPath(command)
 	cmd := exec.CommandContext(ctx, binary, args...)

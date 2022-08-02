@@ -107,6 +107,14 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (Su
 
 		// Parse parameters from .ext
 		extData, parameterNames := ParseParamsExt(extLinesParsed)
+		lenData := len(extData)
+		lenMethods := len(results.RunDetails.EstimationMethods)
+		if lenData != lenMethods {
+			return results, fmt.Errorf(
+				"lengths of parameter data (%d) and estimation methods (%d) differ. Incomplete run?",
+				lenData, lenMethods)
+		}
+
 		results.ParametersData = extData
 		results.ParameterNames.Omega = parameterNames.Omega
 		results.ParameterNames.Sigma = parameterNames.Sigma

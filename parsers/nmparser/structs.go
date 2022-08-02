@@ -152,6 +152,8 @@ type SummaryOutput struct {
 	OFV              []OfvDetails          `json:"ofv,omitempty"`
 	ConditionNumber  []ConditionNumDetails `json:"condition_number,omitempty"`
 	ShrinkageDetails [][]ShrinkageDetails  `json:"shrinkage_details,omitempty"`
+	Success          bool                  `json:"success"`
+	ErrorMsg         string                `json:"error_msg,omitempty"`
 }
 
 // CovCorOutput is the output from parsing the .cov and .cor file.
