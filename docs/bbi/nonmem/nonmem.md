@@ -4,7 +4,7 @@ Run (and other actions) against nonmem model(s)
 
 ### Synopsis
 
-Nonmem and its subcommands are all based around the execution and interpretation of nonmem models and more. 
+Nonmem and its subcommands are all based around the execution and interpretation of nonmem models and more.
 
 ### Options
 
@@ -42,7 +42,6 @@ overwrite: false
 clean_lvl: 1
 copy_lvl: 0
 git: true
-bbi_binary: /data/apps/bbi
 save_config: false
 output_dir: '{{ .Name }}'
 threads: 4

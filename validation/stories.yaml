@@ -14,6 +14,7 @@ BBI-RUN-002:
   requirements:
   - SGE-R001
   - SGE-R002
+  - SGE-R003
 BBI-RUN-003:
   name: Notify about issues with the data referenced in the control stream
   description: As a user, I would like to be notified, and have model execution stop,

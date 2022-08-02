@@ -3,6 +3,7 @@ package cmd
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"os/exec"
 	"path"
 	"path/filepath"
@@ -168,14 +169,9 @@ func NewSgeCmd() *cobra.Command {
 		Run:   sge,
 	}
 
-	bbi, err := os.Executable()
-
-	if err != nil {
-		log.Errorf("Unable to get the path to the executed binary for some reason: %s", err)
-	}
-
 	//String Variables
-	cmd.PersistentFlags().String("bbi_binary", bbi, "directory path for bbi to be called in goroutines (SGE Execution)")
+	cmd.PersistentFlags().String("bbi_binary", "",
+		"path to bbi executable to be called in goroutines (SGE Execution)")
 	errpanic(viper.BindPFlag("bbi_binary", cmd.PersistentFlags().Lookup("bbi_binary")))
 
 	const gridNamePrefixIdentifier string = "grid_name_prefix"
@@ -375,8 +371,15 @@ func generateBbiScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 		Command          string
 	}
 
+	binary := l.Configuration.BbiBinary
+	if binary == "" {
+		binary, err = os.Executable()
+		if err != nil {
+			return nil, fmt.Errorf("unable to get path to executed binary: %w", err)
+		}
+	}
 	commandComponents := []string{
-		l.Configuration.BbiBinary,
+		binary,
 		"nonmem",
 		"run",
 	}

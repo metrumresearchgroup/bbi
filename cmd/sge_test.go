@@ -3,9 +3,10 @@ package cmd
 import (
 	"testing"
 
+	"github.com/metrumresearchgroup/bbi/configlib"
 	"github.com/metrumresearchgroup/bbi/utils"
 
-	"github.com/metrumresearchgroup/bbi/configlib"
+	"github.com/metrumresearchgroup/wrapt"
 )
 
 func Test_gridengineJobName(t *testing.T) {
@@ -57,4 +58,23 @@ func Test_gridengineJobName(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestBbiBinaryOverride(tt *testing.T) {
+	id := "UNIT-CMD-006"
+	tt.Run(utils.AddTestId("", id), func(tt *testing.T) {
+		t := wrapt.WrapT(tt)
+
+		model := NonMemModel{
+			FileName:  "foo",
+			OutputDir: "bar",
+			Configuration: configlib.Config{
+				BbiBinary: "fakebbi",
+			},
+		}
+
+		content, err := generateBbiScript(nonMemExecutionTemplate, model)
+		t.R.NoError(err)
+		t.R.Contains(string(content), "fakebbi nonmem run")
+	})
 }

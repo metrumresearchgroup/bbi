@@ -98,6 +98,12 @@ SGE-R002:
   description: BBI completes parallel SGE execution
   tests:
   - INT-SGE-002
+SGE-R003:
+  description: SGE execution uses same BBI executable as the main
+    process by default.
+  tests:
+  - INT-INIT-001
+  - UNIT-CMD-006
 SUM-R001:
   description: BBI summary works with default settings
   tests:
