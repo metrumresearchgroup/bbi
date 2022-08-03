@@ -192,6 +192,16 @@ func TestSummaryErrors(tt *testing.T) {
 			nil,
 			"Incomplete run",
 		},
+		{
+			"12-invalid-lst/12-invalid-lst",
+			nil,
+			"no DATA",
+		},
+		{
+			"12-invalid-lst/12-invalid-lst",
+			[]string{"--no-ext-file"},
+			"no DATA",
+		},
 	}
 
 	testId := "INT-SUM-003"
@@ -288,6 +298,7 @@ func TestSummaryPathMultipleModelsError(tt *testing.T) {
 					filepath.Join(SUMMARY_TEST_DIR, "acop-incomplete", "acop-incomplete"),
 					filepath.Join(SUMMARY_TEST_DIR, "12", "12.lost"), // misspelled
 					filepath.Join(SUMMARY_TEST_DIR, "iovmm", "iovmm.lst"),
+					filepath.Join(SUMMARY_TEST_DIR, "12-invalid-lst", "12-invalid-lst"),
 				}
 
 				if tc.bbiOption != "" {

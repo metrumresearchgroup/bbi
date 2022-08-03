@@ -150,8 +150,8 @@ SUM-R010:
   tests:
   - INT-SUM-006
 SUM-R011:
-  description: Attempt to identify when a model run is incomplete and
-    report an error to the caller.
+  description: Attempt to identify when a model run is incomplete or
+    invalid, and report an error to the caller.
   tests:
   - INT-SUM-003
   - INT-SUM-006
