@@ -615,10 +615,32 @@
 				]
 			],
 			"success": true
+		},
+		{
+			"run_details": {
+				"postprocess_time": 0,
+				"cpu_time": 0
+			},
+			"run_heuristics": {
+				"covariance_step_aborted": false,
+				"large_condition_number": false,
+				"eigenvalue_issues": false,
+				"correlations_not_ok": false,
+				"parameter_near_boundary": false,
+				"hessian_reset": false,
+				"has_final_zero_gradient": false,
+				"minimization_terminated": false,
+				"eta_pval_significant": false,
+				"prderr": false
+			},
+			"parameter_names": {},
+			"success": false,
+			"error_msg": "no DATA line found in testdata/bbi_summary/12-invalid-lst/12-invalid-lst"
 		}
 	],
 	"Errors": [
+		1,
 		2,
-		1
+		4
 	]
 }

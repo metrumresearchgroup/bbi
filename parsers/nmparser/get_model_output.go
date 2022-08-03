@@ -52,6 +52,9 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (Su
 		return SummaryOutput{}, err
 	}
 	results := ParseLstEstimationFile(fileLines)
+	if results.RunDetails.DataSet == DefaultString {
+		return results, fmt.Errorf("no DATA line found in %v", lstPath)
+	}
 	results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, filepath.Base(outputFilePath))
 
 	var readGrd bool

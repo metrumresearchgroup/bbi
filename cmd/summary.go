@@ -19,6 +19,7 @@ import (
 	"os"
 	"runtime"
 	rdebug "runtime/debug"
+	"sort"
 
 	parser "github.com/metrumresearchgroup/bbi/parsers/nmparser"
 	"github.com/metrumresearchgroup/bbi/utils"
@@ -142,6 +143,7 @@ func summary(_ *cobra.Command, args []string) {
 		}
 	}
 
+	sort.Ints(modelResults.Errors)
 	nerrors := len(modelResults.Errors)
 	if Json {
 		err := utils.PrintJSON(modelResults)
