@@ -159,30 +159,37 @@ func TestSummaryArgs(tt *testing.T) {
 func TestSummaryErrors(tt *testing.T) {
 	var SummaryErrorCases = []struct {
 		testPath string
+		bbiArgs  []string
 		errorMsg string
 	}{
 		{
 			"acop", // points to directory instead of file
+			nil,
 			noSuchFileError,
 		},
 		{
 			"acop/aco", // misspelled filename
+			nil,
 			noSuchFileError,
 		},
 		{
 			"aco", // non-existing directory
+			nil,
 			noSuchFileError,
 		},
 		{
 			"acop/acop.ls", // no file at that extension
+			nil,
 			wrongExtensionError,
 		},
 		{
 			"acop/acop.ext", // wrong (but existing) file
+			nil,
 			wrongExtensionError,
 		},
 		{
 			"acop-incomplete/acop-incomplete", // incomplete lst
+			nil,
 			"Incomplete run",
 		},
 	}
@@ -192,13 +199,12 @@ func TestSummaryErrors(tt *testing.T) {
 		tt.Run(utils.AddTestId(tc.errorMsg, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
-			commandAndArgs := []string{
-				"nonmem",
-				"summary",
-				filepath.Join(SUMMARY_TEST_DIR, tc.testPath),
+			args := []string{"nonmem", "summary"}
+			if len(tc.bbiArgs) > 0 {
+				args = append(args, tc.bbiArgs...)
 			}
-
-			output, err := executeCommandNoErrorCheck(context.Background(), "bbi", commandAndArgs...)
+			args = append(args, filepath.Join(SUMMARY_TEST_DIR, tc.testPath))
+			output, err := executeCommandNoErrorCheck(context.Background(), "bbi", args...)
 			t.R.NotNil(err)
 			errorMatch, _ := regexp.MatchString(tc.errorMsg, output)
 			t.R.True(errorMatch)
