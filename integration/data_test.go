@@ -44,6 +44,7 @@ func TestHasValidDataPathForCTL(tt *testing.T) {
 			t.R.NoError(err)
 			AssertNonMemCompleted(t, ntd)
 			AssertNonMemCreatedOutputFiles(t, ntd)
+			AssertNonMemCleanedUpFiles(t, ntd)
 		})
 	}
 }
@@ -142,6 +143,7 @@ func TestHasValidComplexPathCTLAndMod(tt *testing.T) {
 			t.R.NoError(err)
 			AssertNonMemCompleted(t, ntd)
 			AssertNonMemCreatedOutputFiles(t, ntd)
+			AssertNonMemCleanedUpFiles(t, ntd)
 		})
 	}
 }

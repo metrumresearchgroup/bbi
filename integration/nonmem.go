@@ -50,6 +50,18 @@ func AssertNonMemCreatedOutputFiles(t *wrapt.T, details NonMemTestingDetails) {
 	}
 }
 
+func AssertNonMemCleanedUpFiles(t *wrapt.T, details NonMemTestingDetails) {
+	t.Helper()
+
+	expectMissing := []string{
+		"FDATA",
+	}
+
+	for _, f := range expectMissing {
+		t.A.NoFileExists(filepath.Join(details.OutputDir, f))
+	}
+}
+
 func AssertBBIConfigJSONCreated(t *wrapt.T, details NonMemTestingDetails) {
 	t.Helper()
 

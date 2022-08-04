@@ -127,6 +127,7 @@ func TestPostExecutionSucceeds(tt *testing.T) {
 
 					AssertNonMemCompleted(t, nmd)
 					AssertNonMemCreatedOutputFiles(t, nmd)
+					AssertNonMemCleanedUpFiles(t, nmd)
 
 					var exists bool
 					exists, err = afero.Exists(afero.NewOsFs(), filepath.Join(ROOT_EXECUTION_DIR, "working", scenario.identifier, m.identifier+".out"))
