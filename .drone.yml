@@ -60,7 +60,7 @@ steps:
     environment:
       LOCAL: true
       MPIEXEC_PATH: /usr/bin/mpiexec
-      NMQUAL: true
+      NMVERSION_NMQUAL: nm74gf
       NMVERSION: nm74gf
       NONMEMROOT: /opt/NONMEM
       PATH: /usr/local/texlive/2019/bin/x86_64-linux:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/bin:/opt/amazon/openmpi/bin:/opt/amazon/efa/bin/:/usr/local/texlive/2019/bin/x86_64-linux:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/bin:/opt/amazon/openmpi/bin:/opt/amazon/efa/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
@@ -95,7 +95,7 @@ steps:
     environment:
       LOCAL: true
       MPIEXEC_PATH: /usr/bin/mpiexec
-      NMQUAL: true
+      NMVERSION_NMQUAL: nm74gf
       NMVERSION: nm74gf
       NONMEMROOT: /opt/NONMEM
       PATH: /usr/local/texlive/2019/bin/x86_64-linux:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/bin:/opt/amazon/openmpi/bin:/opt/amazon/efa/bin/:/usr/local/texlive/2019/bin/x86_64-linux:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/bin:/opt/amazon/openmpi/bin:/opt/amazon/efa/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin

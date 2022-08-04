@@ -13,7 +13,8 @@ import (
 )
 
 func TestNMQUALExecutionSucceeds(tt *testing.T) {
-	if !FeatureEnabled("NMQUAL") {
+	nmversion := os.Getenv("NMVERSION_NMQUAL")
+	if nmversion == "" {
 		tt.Skip("Testing for NMQUAL not enabled")
 	}
 
@@ -28,8 +29,7 @@ func TestNMQUALExecutionSucceeds(tt *testing.T) {
 			args := []string{
 				"nonmem",
 				"run",
-				"--nm_version",
-				os.Getenv("NMVERSION"),
+				"--nm_version", nmversion,
 				"--nmqual=true",
 				"local",
 			}
@@ -57,7 +57,8 @@ func TestNMQUALExecutionSucceeds(tt *testing.T) {
 // After cloning and re-creating as a .ctl, that the application
 // knows to look for what was originally there; the .mod file.
 func TestHashingForNMQualWorksWithOriginalModFile(tt *testing.T) {
-	if !FeatureEnabled("NMQUAL") {
+	nmversion := os.Getenv("NMVERSION_NMQUAL")
+	if nmversion == "" {
 		tt.Skip("Testing for NMQUAL not enabled")
 	}
 
@@ -72,8 +73,7 @@ func TestHashingForNMQualWorksWithOriginalModFile(tt *testing.T) {
 			args := []string{
 				"nonmem",
 				"run",
-				"--nm_version",
-				os.Getenv("NMVERSION"),
+				"--nm_version", nmversion,
 				"--nmqual=true",
 				"local",
 			}
