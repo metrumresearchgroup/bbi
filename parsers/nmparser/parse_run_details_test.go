@@ -79,8 +79,7 @@ func TestParseRunDetails(tt *testing.T) {
 				"Started  Tue Dec 17 18:10:55 2013",
 				"Finished Tue Dec 17 18:11:32 2013",
 				"$PROB 3.mod, double inital estimates",
-				"", // TODO, pass full path control stream file name into ParseRunDetails
-				// 3.mod; initial estimate of inter-subject variability (matrix). also ETA
+				"",
 				"#METH: First Order Conditional Estimation with Interaction",
 				"$DATA ../../derived/mock1.csv IGNORE=C",
 				"TOT. NO. OF INDIVIDUALS:       50",
@@ -109,8 +108,7 @@ func TestParseRunDetails(tt *testing.T) {
 				"Started  Tue Dec 17 18:10:55 2013",
 				"Finished Tue Dec 17 18:11:32 2013",
 				"$PROB 3.mod, double inital estimates",
-				"", // TODO, pass full path control stream file name into ParseRunDetails
-				// 3.mod; initial estimate of inter-subject variability (matrix). also ETA
+				"",
 				"#METH: First Order Conditional Estimation with Interaction",
 				"$DATA ../../derived/mock1.csv IGNORE=C",
 				"TOT. NO. OF INDIVIDUALS:       50",
