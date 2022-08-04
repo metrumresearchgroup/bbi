@@ -30,6 +30,36 @@ var _ = /* RunDetails02Results */ RunDetails{
 }
 
 func TestParseRunDetails(tt *testing.T) {
+	baseInput := []string{
+		"Days until program expires : 122",
+		"1NONLINEAR MIXED EFFECTS MODEL PROGRAM (NONMEM) VERSION 7.2.0",
+		" ORIGINALLY DEVELOPED BY STUART BEAL, LEWIS SHEINER, AND ALISON BOECKMANN",
+		" #TERM:",
+		"0MINIMIZATION SUCCESSFUL",
+		" NO. OF FUNCTION EVALUATIONS USED:      352",
+		" NO. OF SIG. DIGITS IN FINAL EST.:  3.4",
+		"",
+		"#TERE:",
+		"Elapsed estimation  time in seconds:     6.84",
+		"Elapsed covariance  time in seconds:     3.34",
+		"Elapsed postprocess time in seconds:     0.0",
+		"This file was created using /opt/NONMEM/nm72g/run/nmfe72",
+		"Started  Tue Dec 17 18:10:55 2013",
+		"Finished Tue Dec 17 18:11:32 2013",
+		"$PROB 3.mod, double inital estimates",
+		"",
+		"#METH: First Order Conditional Estimation with Interaction",
+		"$DATA ../../derived/mock1.csv IGNORE=C",
+		"TOT. NO. OF INDIVIDUALS:       50",
+		"TOT. NO. OF OBS RECS:      442",
+		"NO. OF DATA RECS IN DATA SET:      492",
+		"$TABLE NOPRINT ONEHEADER FILE=./1.tab",
+	}
+
+	infInput := make([]string, len(baseInput))
+	copy(infInput, baseInput)
+	infInput[21] = "TOT. NO. OF DATA RECS:      492"
+
 	RunDetails01Results := RunDetails{
 		Version:             "7.2.0",
 		RunStart:            "Tue Dec 17 18:10:55 2013",
@@ -61,64 +91,13 @@ func TestParseRunDetails(tt *testing.T) {
 		expected RunDetails
 	}{
 		{
-			name: "RunDetails01",
-			input: []string{
-				"Days until program expires : 122",
-				"1NONLINEAR MIXED EFFECTS MODEL PROGRAM (NONMEM) VERSION 7.2.0",
-				" ORIGINALLY DEVELOPED BY STUART BEAL, LEWIS SHEINER, AND ALISON BOECKMANN",
-				" #TERM:",
-				"0MINIMIZATION SUCCESSFUL",
-				" NO. OF FUNCTION EVALUATIONS USED:      352",
-				" NO. OF SIG. DIGITS IN FINAL EST.:  3.4",
-				"",
-				"#TERE:",
-				"Elapsed estimation  time in seconds:     6.84",
-				"Elapsed covariance  time in seconds:     3.34",
-				"Elapsed postprocess time in seconds:     0.0",
-				"This file was created using /opt/NONMEM/nm72g/run/nmfe72",
-				"Started  Tue Dec 17 18:10:55 2013",
-				"Finished Tue Dec 17 18:11:32 2013",
-				"$PROB 3.mod, double inital estimates",
-				"",
-				"#METH: First Order Conditional Estimation with Interaction",
-				"$DATA ../../derived/mock1.csv IGNORE=C",
-				"TOT. NO. OF INDIVIDUALS:       50",
-				"TOT. NO. OF OBS RECS:      442",
-				"NO. OF DATA RECS IN DATA SET:      492",
-				"$TABLE NOPRINT ONEHEADER FILE=./1.tab",
-			},
+			name:     "RunDetails01",
+			input:    baseInput,
 			expected: RunDetails01Results,
 		},
 		{
-			name: "RunDetailsInfn",
-			input: []string{
-				"Days until program expires : 122",
-				"1NONLINEAR MIXED EFFECTS MODEL PROGRAM (NONMEM) VERSION 7.2.0",
-				" ORIGINALLY DEVELOPED BY STUART BEAL, LEWIS SHEINER, AND ALISON BOECKMANN",
-				" #TERM:",
-				"0MINIMIZATION SUCCESSFUL",
-				" NO. OF FUNCTION EVALUATIONS USED:      352",
-				" NO. OF SIG. DIGITS IN FINAL EST.:  3.4",
-				"",
-				"#TERE:",
-				"Elapsed estimation  time in seconds:     6.84",
-				"Elapsed covariance  time in seconds:     3.34",
-				"Elapsed postprocess time in seconds:     0.0",
-				"This file was created using /opt/NONMEM/nm72g/run/nmfe72",
-				"Started  Tue Dec 17 18:10:55 2013",
-				"Finished Tue Dec 17 18:11:32 2013",
-				"$PROB 3.mod, double inital estimates",
-				"",
-				"#METH: First Order Conditional Estimation with Interaction",
-				"$DATA ../../derived/mock1.csv IGNORE=C",
-				"TOT. NO. OF INDIVIDUALS:       50",
-				"TOT. NO. OF OBS RECS:      442",
-				// Difference with RunDetails01Results: Drop "NO. OF DATA RECS
-				// IN DATA SET:" line and add the one below to mimic $INFN
-				// output.
-				"TOT. NO. OF DATA RECS:      492",
-				"$TABLE NOPRINT ONEHEADER FILE=./1.tab",
-			},
+			name:     "RunDetailsInfn",
+			input:    infInput,
 			expected: RunDetails01Results,
 		},
 		{
