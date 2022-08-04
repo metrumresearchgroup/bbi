@@ -1,4 +1,4 @@
-LEM PK model 1 cmt base
+PK model 1 cmt base
 Dataset: ../../data/acop.csv
 Records: 799   Observations: 760  Subjects: 40
 Estimation Method(s):

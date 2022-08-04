@@ -1,4 +1,4 @@
-LEM PK model 1 cmt base with IOV on CL
+PK model 1 cmt base with IOV on CL
 Dataset: ../acop_iov.csv
 Records: 7566   Observations: 6396  Subjects: 39
 Estimation Method(s):

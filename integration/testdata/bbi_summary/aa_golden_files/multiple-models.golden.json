@@ -15,7 +15,7 @@
 				"cpu_time": 2.543,
 				"function_evaluations": 366,
 				"significant_digits": 3.2,
-				"problem_text": "LEM PK model 1 cmt base",
+				"problem_text": "PK model 1 cmt base",
 				"mod_file": "-999999999",
 				"estimation_method": [
 					"First Order Conditional Estimation with Interaction"
@@ -210,7 +210,7 @@
 				"cpu_time": 0,
 				"function_evaluations": 665,
 				"significant_digits": 3.8,
-				"problem_text": "LEM BS-12 106-104 + COV-effects(CRCL, AGE) on CL",
+				"problem_text": "BS-12 106-104 + COV-effects(CRCL, AGE) on CL",
 				"mod_file": "-999999999",
 				"estimation_method": [
 					"First Order Conditional Estimation with Interaction"
@@ -443,7 +443,7 @@
 				"cpu_time": 133.637,
 				"function_evaluations": 380,
 				"significant_digits": 3,
-				"problem_text": "LEM 10 mixture model and IOV on CL",
+				"problem_text": "10 mixture model and IOV on CL",
 				"mod_file": "-999999999",
 				"estimation_method": [
 					"First Order Conditional Estimation"

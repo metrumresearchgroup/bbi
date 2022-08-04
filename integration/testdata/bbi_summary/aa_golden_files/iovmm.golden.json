@@ -10,7 +10,7 @@
 		"cpu_time": 133.637,
 		"function_evaluations": 380,
 		"significant_digits": 3,
-		"problem_text": "LEM 10 mixture model and IOV on CL",
+		"problem_text": "10 mixture model and IOV on CL",
 		"mod_file": "-999999999",
 		"estimation_method": [
 			"First Order Conditional Estimation"

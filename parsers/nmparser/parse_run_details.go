@@ -20,6 +20,8 @@ func parseNMVersion(line string) string {
 	return res
 }
 
+var problemRe = regexp.MustCompile(`^\s*\$PROB(?:LEM)?\s+`)
+
 func replaceTrim(line string, replacement string) string {
 	return strings.TrimSpace(strings.Replace(line, replacement, "", -1))
 }
@@ -74,8 +76,8 @@ func ParseRunDetails(lines []string) RunDetails {
 			if i+1 < len(lines) {
 				runDetails.RunEnd = lines[i+1]
 			}
-		case strings.Contains(line, "$PROB"):
-			runDetails.ProblemText = replaceTrim(line, "$PROB")
+		case problemRe.MatchString(line):
+			runDetails.ProblemText = problemRe.ReplaceAllString(line, "")
 		case strings.Contains(line, "#METH:"):
 			runDetails.EstimationMethods = append(runDetails.EstimationMethods, replaceTrim(line, "#METH:"))
 		case strings.HasPrefix(line, "$SIM"):

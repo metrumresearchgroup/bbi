@@ -13,7 +13,7 @@
 		"cpu_time": 2.543,
 		"function_evaluations": 366,
 		"significant_digits": 3.2,
-		"problem_text": "LEM PK model 1 cmt base",
+		"problem_text": "PK model 1 cmt base",
 		"mod_file": "-999999999",
 		"estimation_method": [
 			"First Order Conditional Estimation with Interaction"

@@ -60,6 +60,10 @@ func TestParseRunDetails(tt *testing.T) {
 	copy(infInput, baseInput)
 	infInput[21] = "TOT. NO. OF DATA RECS:      492"
 
+	fullProbInput := make([]string, len(baseInput))
+	copy(fullProbInput, baseInput)
+	fullProbInput[15] = "$PROBLEM 3.mod, double inital estimates"
+
 	RunDetails01Results := RunDetails{
 		Version:             "7.2.0",
 		RunStart:            "Tue Dec 17 18:10:55 2013",
@@ -98,6 +102,11 @@ func TestParseRunDetails(tt *testing.T) {
 		{
 			name:     "RunDetailsInfn",
 			input:    infInput,
+			expected: RunDetails01Results,
+		},
+		{
+			name:     "RunDetailFullProb",
+			input:    fullProbInput,
 			expected: RunDetails01Results,
 		},
 		{

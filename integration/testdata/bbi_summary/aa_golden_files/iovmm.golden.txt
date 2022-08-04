@@ -1,4 +1,4 @@
-LEM 10 mixture model and IOV on CL
+10 mixture model and IOV on CL
 Dataset: ../MixSim.csv
 Records: 13500   Observations: 12600  Subjects: 300
 Estimation Method(s):

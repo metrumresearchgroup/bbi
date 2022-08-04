@@ -10,7 +10,7 @@
 		"cpu_time": 0,
 		"function_evaluations": 665,
 		"significant_digits": 3.8,
-		"problem_text": "LEM BS-12 106-104 + COV-effects(CRCL, AGE) on CL",
+		"problem_text": "BS-12 106-104 + COV-effects(CRCL, AGE) on CL",
 		"mod_file": "-999999999",
 		"estimation_method": [
 			"First Order Conditional Estimation with Interaction"

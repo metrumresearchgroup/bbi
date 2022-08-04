@@ -7,7 +7,7 @@
 		"cpu_time": 0.022,
 		"function_evaluations": -999999999,
 		"significant_digits": -999999999,
-		"problem_text": "LEM    RUN# ecomp1_pkpd EFFECT COMP POPULATION PK-PD MODEL 1",
+		"problem_text": "RUN# ecomp1_pkpd EFFECT COMP POPULATION PK-PD MODEL 1",
 		"mod_file": "-999999999",
 		"data_set": "dat1.csv",
 		"number_of_subjects": 2,

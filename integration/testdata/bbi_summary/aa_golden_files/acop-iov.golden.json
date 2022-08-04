@@ -13,7 +13,7 @@
 		"cpu_time": 14595.976,
 		"function_evaluations": 457,
 		"significant_digits": 3.1,
-		"problem_text": "LEM PK model 1 cmt base with IOV on CL",
+		"problem_text": "PK model 1 cmt base with IOV on CL",
 		"mod_file": "-999999999",
 		"estimation_method": [
 			"First Order Conditional Estimation with Interaction"

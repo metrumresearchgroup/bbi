@@ -1,4 +1,4 @@
-LEM PK model 1 cmt base
+PK model 1 cmt base
 Dataset: ../../data/acop.csv
 Records: 799   Observations: 760  Subjects: 40
 Estimation Method(s):
@@ -21,7 +21,7 @@ No Heuristic Problems Detected
 +------------+------+----------+---------------+
 
 
-LEM BS-12 106-104 + COV-effects(CRCL, AGE) on CL
+BS-12 106-104 + COV-effects(CRCL, AGE) on CL
 Dataset: ../data/12.csv
 Records: 4319   Observations: 3158  Subjects: 160
 Estimation Method(s):
@@ -48,7 +48,7 @@ No Heuristic Problems Detected
 +------------+------+----------+---------------+
 
 
-LEM 10 mixture model and IOV on CL
+10 mixture model and IOV on CL
 Dataset: ../MixSim.csv
 Records: 13500   Observations: 12600  Subjects: 300
 Estimation Method(s):
