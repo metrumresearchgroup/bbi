@@ -14,6 +14,7 @@ func EstOutputFileCleanLevels(r string) map[string]int {
 	EstOutputFiles["compile.lnk"] = 1
 	EstOutputFiles["FCON"] = 1
 	EstOutputFiles["FDATA"] = 1
+	EstOutputFiles["FDATA.csv"] = 1
 	EstOutputFiles["FMSG"] = 1
 	EstOutputFiles["FREPORT"] = 1
 	EstOutputFiles["FSIZES"] = 1

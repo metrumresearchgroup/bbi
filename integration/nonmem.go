@@ -55,6 +55,7 @@ func AssertNonMemCleanedUpFiles(t *wrapt.T, details NonMemTestingDetails) {
 
 	expectMissing := []string{
 		"FDATA",
+		"FDATA.csv",
 	}
 
 	for _, f := range expectMissing {

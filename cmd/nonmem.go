@@ -76,6 +76,7 @@ var nonMemTemporaryFiles []string = []string{
 	"compile.lnk",
 	"FCON",
 	"FDATA",
+	"FDATA.csv",
 	"FMSG",
 	"FREPORT",
 	"FSIZES",

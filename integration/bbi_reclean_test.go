@@ -15,14 +15,19 @@ func TestBBIRecleanBasic(tt *testing.T) {
 
 	dir := t.TempDir()
 	fdata := filepath.Join(dir, "FDATA")
+	fdataCSV := filepath.Join(dir, "FDATA.csv")
+
 	_ = ioutil.WriteFile(fdata, []byte("fake"), 0644)
 	t.A.FileExists(fdata)
+	_ = ioutil.WriteFile(fdataCSV, []byte("fake"), 0644)
+	t.A.FileExists(fdataCSV)
 
 	output, err := executeCommand(context.Background(),
 		"bbi", "nonmem", "reclean", "--recleanLvl=1", "-v", dir)
 	t.R.NoError(err)
 	t.R.NotEmpty(output)
 	t.A.NoFileExists(fdata)
+	t.A.NoFileExists(fdataCSV)
 }
 
 func TestBBIRecleanError(tt *testing.T) {
