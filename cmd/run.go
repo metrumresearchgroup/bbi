@@ -76,7 +76,7 @@ func NewRunCmd() *cobra.Command {
 	// cmd.PersistentFlags().String("saveExe", "", "what to name the executable when stored in cache")
 	// viper.BindPFlag("saveExe", cmd.PersistentFlags().Lookup("saveExe"))
 
-	cmd.PersistentFlags().String("output_dir", "{{ .Name }}", "Go template for the output directory to use for storging details of each executed model")
+	cmd.PersistentFlags().String("output_dir", "{{ .Name }}", "Go template for the output directory to use for storing details of each executed model")
 	errpanic(viper.BindPFlag("output_dir", cmd.PersistentFlags().Lookup("output_dir")))
 	viper.SetDefault("output_dir", "{{ .Name }}")
 
