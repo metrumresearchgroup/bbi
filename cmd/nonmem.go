@@ -201,7 +201,7 @@ func NewNonmemCmd() *cobra.Command {
 	errpanic(viper.BindPFlag(parafileIdentifier, cmd.PersistentFlags().Lookup(parafileIdentifier)))
 
 	const nmQualIdentifier string = "nmqual"
-	cmd.PersistentFlags().Bool(nmQualIdentifier, false, "Whether or not to execute with nmqual (autolog.pl")
+	cmd.PersistentFlags().Bool(nmQualIdentifier, false, "Whether or not to execute with nmqual (autolog.pl)")
 	errpanic(viper.BindPFlag(nmQualIdentifier, cmd.PersistentFlags().Lookup(nmQualIdentifier)))
 
 	// NMFE Options

@@ -36,7 +36,7 @@ The run command collects a series of flags necessary to define the behavior for:
       --git                 whether git is used
   -h, --help                help for run
       --log_file string     If populated, specifies the file into which to store the output / logging details from bbi
-      --output_dir string   Go template for the output directory to use for storging details of each executed model (default "{{ .Name }}")
+      --output_dir string   Go template for the output directory to use for storing details of each executed model (default "{{ .Name }}")
       --overwrite           Whether or not to remove existing output directories if they are present
       --save_config         Whether or not to save the existing configuration to a file with the model (default true)
 ```
