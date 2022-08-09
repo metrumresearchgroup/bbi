@@ -1,4 +1,4 @@
-LEM BS-66 106-104 + COV-effects(CRCL, AGE) on CL
+BS-66 106-104 + COV-effects(CRCL, AGE) on CL
 Dataset: ../data/66.csv
 Records: 4359   Observations: 3176  Subjects: 160
 Estimation Method(s):

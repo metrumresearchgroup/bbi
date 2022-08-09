@@ -324,6 +324,11 @@ NMP-R036:
   description: Parse Estimates From Ext
   tests:
   - UNIT-NMP-036
+NMP-R037:
+  description: Correctly parses problem text when either short or long-form
+    keyword is used.
+  tests:
+  - UNIT-NMP-035
 PARAM-R003:
   description: Split Param
   tests:
