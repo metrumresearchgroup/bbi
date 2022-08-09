@@ -62,6 +62,7 @@ func TestBbiCompletesLocalExecution(tt *testing.T) {
 
 					AssertNonMemCompleted(t, testingDetails)
 					AssertNonMemCreatedOutputFiles(t, testingDetails)
+					AssertNonMemCleanedUpFiles(t, testingDetails)
 					AssertContainsBBIScript(t, testingDetails)
 					AssertDataSourceIsHashedAndCorrect(t, testingDetails)
 					AssertModelIsHashedAndCorrect(t, testingDetails)
@@ -118,16 +119,20 @@ func TestNMFEOptionsEndInScript(tt *testing.T) {
 					_, err = m.Execute(scenario, nonMemArguments...)
 					t.R.NoError(err)
 
+					testingDetails := NonMemTestingDetails{
+						OutputDir: filepath.Join(scenario.Workpath, m.identifier),
+						Model:     m,
+					}
+
+					AssertNonMemCompleted(t, testingDetails)
+					AssertNonMemCreatedOutputFiles(t, testingDetails)
+					AssertNonMemCleanedUpFiles(t, testingDetails)
+
 					// Now let's run the script that was generated
 					t.R.NoError(os.Chdir(filepath.Join(scenario.Workpath, m.identifier)))
 					_, err = executeCommand(ctx, filepath.Join(scenario.Workpath, m.identifier, m.identifier+".sh"))
 					t.R.NoError(os.Chdir(whereami))
 					t.R.NoError(err)
-
-					testingDetails := NonMemTestingDetails{
-						OutputDir: filepath.Join(scenario.Workpath, m.identifier),
-						Model:     m,
-					}
 
 					AssertNonMemCompleted(t, testingDetails)
 					AssertNonMemCreatedOutputFiles(t, testingDetails)
@@ -193,6 +198,7 @@ func TestBbiParallelExecution(tt *testing.T) {
 
 					AssertNonMemCompleted(t, testingDetails)
 					AssertNonMemCreatedOutputFiles(t, testingDetails)
+					AssertNonMemCleanedUpFiles(t, testingDetails)
 					AssertContainsBBIScript(t, testingDetails)
 					AssertNonMemOutputContainsParafile(t, testingDetails)
 					AssertDataSourceIsHashedAndCorrect(t, testingDetails)

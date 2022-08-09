@@ -58,6 +58,7 @@ func TestBBIConfigJSONCreated(tt *testing.T) {
 
 					AssertNonMemCompleted(t, nmd)
 					AssertNonMemCreatedOutputFiles(t, nmd)
+					AssertNonMemCleanedUpFiles(t, nmd)
 					AssertBBIConfigJSONCreated(t, nmd)
 					AssertBBIConfigContainsSpecifiedNMVersion(t, nmd, os.Getenv("NMVERSION"))
 				})
@@ -131,6 +132,7 @@ func TestConfigValuesAreCorrectInWrittenFile(tt *testing.T) {
 
 			AssertNonMemCompleted(t, nmd)
 			AssertNonMemCreatedOutputFiles(t, nmd)
+			AssertNonMemCleanedUpFiles(t, nmd)
 			AssertNonMemOutputContainsParafile(t, nmd)
 
 			// Now read the Config Lib

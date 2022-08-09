@@ -64,6 +64,7 @@ func TestBbiCompletesSGEExecution(tt *testing.T) {
 
 					AssertNonMemCompleted(t, testingDetails)
 					AssertNonMemCreatedOutputFiles(t, testingDetails)
+					AssertNonMemCleanedUpFiles(t, testingDetails)
 					AssertContainsBBIScript(t, testingDetails)
 				})
 			}
@@ -127,6 +128,7 @@ func TestBbiCompletesParallelSGEExecution(tt *testing.T) {
 
 					AssertNonMemCompleted(t, testingDetails)
 					AssertNonMemCreatedOutputFiles(t, testingDetails)
+					AssertNonMemCleanedUpFiles(t, testingDetails)
 					AssertContainsBBIScript(t, testingDetails)
 					AssertNonMemOutputContainsParafile(t, testingDetails)
 				})

@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/metrumresearchgroup/bbi/runner"
+
 	"github.com/metrumresearchgroup/wrapt"
 	"github.com/spf13/afero"
 )
@@ -47,6 +49,16 @@ func AssertNonMemCreatedOutputFiles(t *wrapt.T, details NonMemTestingDetails) {
 	for _, v := range expected {
 		ok, _ := afero.Exists(fs, filepath.Join(details.OutputDir, details.Model.identifier+v))
 		t.R.True(ok, "Unable to locate expected file %s", v)
+	}
+}
+
+func AssertNonMemCleanedUpFiles(t *wrapt.T, details NonMemTestingDetails) {
+	t.Helper()
+
+	for f, level := range runner.EstOutputFileCleanLevels(details.Model.identifier) {
+		if level == 1 {
+			t.A.NoFileExists(filepath.Join(details.OutputDir, f))
+		}
 	}
 }
 

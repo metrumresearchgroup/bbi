@@ -76,6 +76,7 @@ func TestBBIExpandsWithoutPrefix(tt *testing.T) {
 
 				AssertNonMemCompleted(t, nmd)
 				AssertNonMemCreatedOutputFiles(t, nmd)
+				AssertNonMemCleanedUpFiles(t, nmd)
 			})
 		}
 	})
@@ -141,6 +142,7 @@ func TestBBIExpandsWithPrefix(tt *testing.T) {
 
 				AssertNonMemCompleted(t, nmd)
 				AssertNonMemCreatedOutputFiles(t, nmd)
+				AssertNonMemCleanedUpFiles(t, nmd)
 			})
 		}
 	})
@@ -210,6 +212,7 @@ func TestBBIExpandsWithPrefixToPartialMatch(tt *testing.T) {
 
 					AssertNonMemCompleted(t, nmd)
 					AssertNonMemCreatedOutputFiles(t, nmd)
+					AssertNonMemCleanedUpFiles(t, nmd)
 				})
 			}
 		})
