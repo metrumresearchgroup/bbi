@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/metrumresearchgroup/bbi/runner"
+
 	"github.com/metrumresearchgroup/wrapt"
 	"github.com/spf13/afero"
 )
@@ -53,13 +55,10 @@ func AssertNonMemCreatedOutputFiles(t *wrapt.T, details NonMemTestingDetails) {
 func AssertNonMemCleanedUpFiles(t *wrapt.T, details NonMemTestingDetails) {
 	t.Helper()
 
-	expectMissing := []string{
-		"FDATA",
-		"FDATA.csv",
-	}
-
-	for _, f := range expectMissing {
-		t.A.NoFileExists(filepath.Join(details.OutputDir, f))
+	for f, level := range runner.EstOutputFileCleanLevels(details.Model.identifier) {
+		if level == 1 {
+			t.A.NoFileExists(filepath.Join(details.OutputDir, f))
+		}
 	}
 }
 
