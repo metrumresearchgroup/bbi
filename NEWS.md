@@ -1,4 +1,68 @@
 
+# bbi 3.2.0
+
+## New features and changes
+
+* `-maxlim=2` is now passed to `nmfe` by default.  To disable passing
+  `-maxlim` to `nmfe` (the old default), set the value to 0 via the
+  `--maxlim` option of `bbi nonmem` or with a `bbi.yaml` entry:
+
+      nmfe_options:
+        maxlim: 0
+
+  Note that the `maxlim` value set in an existing `bbi.yaml` will be
+  respected, and that, for compatibility reasons, 100 is treated the
+  same as 0.  (#279)
+
+* To make `bbi.yaml` more portable across users, `bbi init` no longer
+  writes the resolved path of the bbi binary in `bbi.yaml`.  Instead
+  it's resolved when generating the SGE submission script.  Note that
+  any `bbi_binary` values in existing `bbi.yaml` files will still be
+  honored.  (#278)
+
+* As of v7.5, NONMEM generates an FDATA.csv file.  bbi now gives this
+  the same clean-up treatment as FDATA.  (#282)
+
+* The "Errors" field in the `bbi nonmem summary --json` output is now
+  an array of integers that identify which, if any, items in the
+  "Results" array were unable to be summarized.  Each item in the
+  "Results" array now includes a "success" field, and, for failures,
+  an "error_msg" field.  (#272)
+
+* `bbi nonmem summary --json` no longer omits elapsed time values
+  (`estimation_time`, `covariance_time`, and `cpu_time`) when they are
+  zero. (#270, #274)
+
+## Bug fixes
+
+* `bbi nonmem summary`  (#272, #281)
+  - gained more safeguards to catch incomplete `.lst` files.
+  - tries harder to channel underlying failures into error messages
+    that are propagated to JSON consumers.
+  - reliably exits with a non-zero status on failure.
+
+* The `.lst` parser didn't consider that "$PROB" could also be spelled
+  as "$PROBLEM", leading to "LEM" sneaking into rendered problem
+  descriptions.  (#283)
+
+* The `.lst` parser failed when it encountered `NaN` objective
+  function values.  (#268)
+
+* Commands that support a `--json` flag did not consistently relay
+  failures to encode the JSON output.  (#268)
+
+* Several issues around parsing elapsed time metadata
+  (`estimation_time`, `covariance_time`, and `postprocess_time`) have
+  been fixed.  (#270)
+
+* `bbi nonmem` was supposed to accept `--prdefault` and `--tprdefault`
+  options and relay those to `nmfe` as `-prdefault` and `-tprdefault`,
+  but the options on bbi's side weren't exposed. (#280)
+
+* Calling `bbi nonmem reclean` with no positional arguments triggered
+  an indexing error rather than showing the help message.  (#276)
+
+
 # bbi 3.1.1
 
 * Teach `bbi nonmem summary` how to handle `ONLYSIM` runs.  (#224)
