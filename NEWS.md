@@ -196,7 +196,7 @@ bubbling up to store in the database with an ERROR status for failed
 run.
 
 For execution, the ability to specify a custom directory has been
-implimented through the --runDir flag via the CLI or through the
+implemented through the --runDir flag via the CLI or through the
 ProposedRunDir run setting through the server structure.
 
 
