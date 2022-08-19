@@ -2,10 +2,6 @@ CFG-R001:
   description: BBI config JSON gets created
   tests:
   - INT-CFG-001
-CFG-R002:
-  description: Config values are correct in written file
-  tests:
-  - INT-CFG-002
 COVCOR-R001:
   description: CovCor parses .cov and .cor files
   tests:
@@ -26,18 +22,6 @@ DATA-R003:
   description: Has valid complex path CTL And Mod
   tests:
   - INT-DATA-003
-EXP-R001:
-  description: BBI expands without prefix
-  tests:
-  - INT-EXP-001
-EXP-R002:
-  description: BBI expands with prefix
-  tests:
-  - INT-EXP-002
-EXP-R003:
-  description: BBI expands with prefix to partial match
-  tests:
-  - INT-EXP-003
 INIT-R001:
   description: BBI can initialize
   tests:
@@ -54,26 +38,10 @@ LOCAL-R003:
   description: BBI can execute in parallel
   tests:
   - INT-LOCAL-003
-LOCAL-R004:
-  description: BBI loads default config
-  tests:
-  - INT-LOCAL-004
-LOCAL-R005:
-  description: BBI loads config specified by absolute path
-  tests:
-  - INT-LOCAL-005
-LOCAL-R006:
-  description: BBI loads config specified by relative path
-  tests:
-  - INT-LOCAL-006
 NMQ-R001:
   description: NMQUAL execution succeeds
   tests:
   - INT-NMQ-001
-NMQ-R002:
-  description: Hashing for NMQual works with original Mod file
-  tests:
-  - INT-NMQ-002
 PARAM-R001:
   description: Parse params for single model
   tests:
@@ -82,14 +50,6 @@ PARAM-R002:
   description: Parse params for directory of models
   tests:
   - INT-PARAM-002
-POSTEX-R001:
-  description: KVP expansion works
-  tests:
-  - INT-POSTEX-001
-POSTEX-R002:
-  description: Post execution succeeds
-  tests:
-  - INT-POSTEX-002
 SGE-R001:
   description: BBI completes SGE execution
   tests:
@@ -155,171 +115,15 @@ SUM-R011:
   tests:
   - INT-SUM-003
   - INT-SUM-006
-CMD-R001:
-  description: Directory contains output files
-  tests:
-  - UNIT-CMD-001
 CMD-R002:
   description: Process NMFE options
   tests:
   - UNIT-CMD-002
-CMD-R003:
-  description: Model data file
-  tests:
-  - UNIT-CMD-003
-CMD-R004:
-  description: Data file is present
-  tests:
-  - UNIT-CMD-004
-CMD-R005:
-  description: SGE Job Name
-  tests:
-  - UNIT-CMD-005
 CMD-R006:
   description: Pass -maxeval=2 to NMFE by default
   tests:
   - INT-INIT-001
   - UNIT-CMD-002
-NMP-R001:
-  description: Set missing values to default parameter data method
-  tests:
-  - UNIT-NMP-001
-NMP-R002:
-  description: Set missing values to default parameter data StdErrDimension
-  tests:
-  - UNIT-NMP-002
-NMP-R003:
-  description: Set missing values to default parameter data RESDDimension/3_omegas
-  tests:
-  - UNIT-NMP-003
-NMP-R004:
-  description: Set missing values to default parameter data values
-  tests:
-  - UNIT-NMP-004
-NMP-R005:
-  description: Set missing values to default parameter name values
-  tests:
-  - UNIT-NMP-005
-NMP-R006:
-  description: Create diagonal block
-  tests:
-  - UNIT-NMP-006
-NMP-R007:
-  description: Parse Block Results
-  tests:
-  - UNIT-NMP-007
-NMP-R008:
-  description: Parse Parameter Block
-  tests:
-  - UNIT-NMP-008
-NMP-R009:
-  description: Formatting Theta Block
-  tests:
-  - UNIT-NMP-009
-NMP-R010:
-  description: Parse Theta Results Block
-  tests:
-  - UNIT-NMP-010
-NMP-R011:
-  description: Default Parameter Names
-  tests:
-  - UNIT-NMP-011
-NMP-R012:
-  description: Read Parse Cov Lines
-  tests:
-  - UNIT-NMP-012
-NMP-R013:
-  description: Path level is parsed correctly
-  tests:
-  - UNIT-NMP-013
-NMP-R014:
-  description: Omega block is parsed correctly
-  tests:
-  - UNIT-NMP-014
-NMP-R015:
-  description: Parse Parameter Structure
-  tests:
-  - UNIT-NMP-015
-NMP-R016:
-  description: Parse Parameter Structures
-  tests:
-  - UNIT-NMP-016
-NMP-R017:
-  description: Parse Final Parameter Estimates From Lst
-  tests:
-  - UNIT-NMP-017
-NMP-R018:
-  description: Read Ext
-  tests:
-  - UNIT-NMP-018
-NMP-R019:
-  description: Parse OBJV
-  tests:
-  - UNIT-NMP-019
-NMP-R020:
-  description: Par Test Parse OBJV2
-  tests:
-  - UNIT-NMP-020
-NMP-R021:
-  description: Par Test Parse OBJV3
-  tests:
-  - UNIT-NMP-021
-NMP-R022:
-  description: Parse Gradient
-  tests:
-  - UNIT-NMP-022
-NMP-R023:
-  description: Parse Condition Number
-  tests:
-  - UNIT-NMP-023
-NMP-R024:
-  description: Set Correlations Ok
-  tests:
-  - UNIT-NMP-024
-NMP-R025:
-  description: Check Matrix
-  tests:
-  - UNIT-NMP-025
-NMP-R026:
-  description: Set Cov
-  tests:
-  - UNIT-NMP-026
-NMP-R027:
-  description: Get Gradient Line
-  tests:
-  - UNIT-NMP-027
-NMP-R028:
-  description: Cleaning Theta Block
-  tests:
-  - UNIT-NMP-028
-NMP-R029:
-  description: Read Parse Shk Lines
-  tests:
-  - UNIT-NMP-029
-NMP-R030:
-  description: Read Parse Shk Lines
-  tests:
-  - UNIT-NMP-030
-NMP-R031:
-  description: GetDiagonalIndices
-  tests:
-  - UNIT-NMP-031
-NMP-R032:
-  description: Get Diagonal Indices 2
-  tests:
-  - UNIT-NMP-032
-NMP-R033:
-  description: Get Block Parameter Names
-  tests:
-  - UNIT-NMP-033
-NMP-R034:
-  description: Read Parse Grd Lines
-  tests:
-  - UNIT-NMP-034
-NMP-R035:
-  description: Parse Run Details
-  tests:
-  - UNIT-NMP-035
 NMP-R036:
   description: Parse Estimates From Ext
   tests:
@@ -329,79 +133,3 @@ NMP-R037:
     keyword is used.
   tests:
   - UNIT-NMP-035
-PARAM-R003:
-  description: Split Param
-  tests:
-  - UNIT-PARAM-001
-PARAM-R004:
-  description: Sort Param
-  tests:
-  - UNIT-PARAM-002
-RUN-R001:
-  description: Est Output Files By Run
-  tests:
-  - UNIT-RUN-001
-RUN-R002:
-  description: Prepare For Execution
-  tests:
-  - UNIT-RUN-002
-RUN-R003:
-  description: Default Estimate Model
-  tests:
-  - UNIT-RUN-003
-RUN-R004:
-  description: Custom Estimate Model
-  tests:
-  - UNIT-RUN-004
-RUN-R005:
-  description: Logicless Template For Estimate Model
-  tests:
-  - UNIT-RUN-005
-RUN-R006:
-  description: Read Copied Files
-  tests:
-  - UNIT-RUN-006
-RUN-R007:
-  description: Get Copied Filenames
-  tests:
-  - UNIT-RUN-007
-UTL-R001:
-  description: Dir Exists confirms directory is present
-  tests:
-  - UNIT-UTL-001
-UTL-R002:
-  description: Is Dir confirms in a directory
-  tests:
-  - UNIT-UTL-002
-UTL-R003:
-  description: File And Ext build file path
-  tests:
-  - UNIT-UTL-003
-UTL-R004:
-  description: List Matches By Regex
-  tests:
-  - UNIT-UTL-004
-UTL-R005:
-  description: List Matches By Glob
-  tests:
-  - UNIT-UTL-005
-UTL-R006:
-  description: List Model Files
-  tests:
-  - UNIT-UTL-006
-UTL-R007:
-  description: Expand Sequence converts sequence to array of numbers
-  tests:
-  - UNIT-UTL-007
-UTL-R008:
-  description: Read Params And Output From Ext
-  tests:
-  - UNIT-UTL-008
-UTL-R009:
-  description: Has Zero confirms a zero
-  tests:
-  - UNIT-UTL-009
-UTL-R010:
-  description: Pad Num pads number with values
-  tests:
-  - UNIT-UTL-010
