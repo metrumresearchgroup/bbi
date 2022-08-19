@@ -32,8 +32,8 @@ BBI-RUN-004:
     expressed in the final NMFE call.
   ProductRisk: Low
   requirements:
+  - CMD-R001
   - CMD-R002
-  - CMD-R006
   - LOCAL-R002
 BBI-RUN-005:
   name: NonMem Execution via NMQual
@@ -79,7 +79,7 @@ BBI-SUM-001:
   - SUM-R009
   - SUM-R010
   - SUM-R011
-  - NMP-R037
+  - NMP-R002
 BBI-COV-001:
   name: Parse .cov and .cor files
   description: As a user, I want to be able to parse the `.cov` and `.cor` files in
@@ -96,7 +96,7 @@ BBI-SUM-002:
   requirements:
   - PARAM-R001
   - PARAM-R002
-  - NMP-R036
+  - NMP-R001
   - PARAM-R001
   - PARAM-R002
 BBI-SUM-003:

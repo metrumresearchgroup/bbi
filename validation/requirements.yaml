@@ -115,20 +115,20 @@ SUM-R011:
   tests:
   - INT-SUM-003
   - INT-SUM-006
-CMD-R002:
+CMD-R001:
   description: Process NMFE options
   tests:
   - UNIT-CMD-002
-CMD-R006:
+CMD-R002:
   description: Pass -maxeval=2 to NMFE by default
   tests:
   - INT-INIT-001
   - UNIT-CMD-002
-NMP-R036:
+NMP-R001:
   description: Parse Estimates From Ext
   tests:
   - UNIT-NMP-036
-NMP-R037:
+NMP-R002:
   description: Correctly parses problem text when either short or long-form
     keyword is used.
   tests:
