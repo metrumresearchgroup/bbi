@@ -42,7 +42,8 @@ BBI-RUN-005:
     that will trigger bbi to specify autolog.pl syntax in its executable script, rather
     than the typical calls directly to NMFE.
   ProductRisk: Low
-  requirements: NMQ-R001
+  requirements:
+  - NMQ-R001
 BBI-RUN-006:
   name: Capture all configurations and write to a file
   description: As a user, I would like to have all configurations used for each run
@@ -50,14 +51,16 @@ BBI-RUN-006:
     The files should contain the merged configurations between any flags provided,
     configuration files and default values to indicate exactly how the model was executed.
   ProductRisk: High
-  requirements: CFG-R001
+  requirements:
+  - CFG-R001
 BBI-CFG-001:
   name: Initialize a project with minimum configs required for execution
   description: As a user, I would like to be able to initialize a project with bbi
     without building the config `bbi.yaml` file from scratch. Allowing a command to
     create this file with the minimum default configuration necessary.
   ProductRisk: Medium
-  requirements: INIT-R001
+  requirements:
+  - INIT-R001
 BBI-SUM-001:
   name: Parse model output folder
   description: As a user, I want to be able to parse a summary of the files in the
