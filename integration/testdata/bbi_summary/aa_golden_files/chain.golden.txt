@@ -1,0 +1,25 @@
+From bbr: see 1001.yaml for details
+Dataset: ../analysis3.csv
+Records: 4292   Observations: 3142  Subjects: 160
+Estimation Method(s):
+ - Chain Method Processing
+ - NUTS Bayesian Analysis
+No Heuristic Problems Detected
++-------+--------+----------+-------------------+
+| THETA |  NAME  | ESTIMATE |   STDERR (RSE)    |
++-------+--------+----------+-------------------+
+| TH 1  | THETA1 | 0.470618 | 0.0638986 (13.6%) |
+| TH 2  | THETA2 | 4.10242  | 0.026217 (0.6%)   |
+| TH 3  | THETA3 | 1.1025   | 0.0333884 (3.0%)  |
+| TH 4  | THETA4 | 4.23064  | 0.0251615 (0.6%)  |
+| TH 5  | THETA5 | 1.29277  | 0.0384095 (3.0%)  |
++-------+--------+----------+-------------------+
++------------+------+----------+
+|   OMEGA    | ETA  | ESTIMATE |
++------------+------+----------+
+| OMEGA(1,1) | ETA1 | 0.241954 |
+| OMEGA(2,2) | ETA2 | 0.083582 |
+| OMEGA(3,3) | ETA3 | 0.169657 |
+| OMEGA(4,4) | ETA4 | 0.025000 |
+| OMEGA(5,5) | ETA5 | 0.025000 |
++------------+------+----------+

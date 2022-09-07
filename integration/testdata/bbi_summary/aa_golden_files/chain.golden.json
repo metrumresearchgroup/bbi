@@ -1,0 +1,229 @@
+{
+	"run_details": {
+		"version": "7.5.0",
+		"run_start": "-999999999",
+		"run_end": "Wed Sep  7 16:59:58 EDT 2022",
+		"estimation_time": [
+			1979.94
+		],
+		"covariance_time": [
+			0
+		],
+		"postprocess_time": 2.7,
+		"cpu_time": 1983.445,
+		"function_evaluations": -999999999,
+		"significant_digits": -999999999,
+		"problem_text": "From bbr: see 1001.yaml for details",
+		"mod_file": "-999999999",
+		"estimation_method": [
+			"Chain Method Processing",
+			"NUTS Bayesian Analysis"
+		],
+		"data_set": "../analysis3.csv",
+		"number_of_subjects": 160,
+		"number_of_obs": 3142,
+		"number_of_data_records": 4292,
+		"output_files_used": [
+			"chain.lst",
+			"chain.ext"
+		]
+	},
+	"run_heuristics": {
+		"covariance_step_aborted": false,
+		"large_condition_number": false,
+		"eigenvalue_issues": false,
+		"correlations_not_ok": false,
+		"parameter_near_boundary": false,
+		"hessian_reset": false,
+		"has_final_zero_gradient": false,
+		"minimization_terminated": false,
+		"eta_pval_significant": false,
+		"prderr": false
+	},
+	"parameters_data": [
+		{
+			"method": "TABLE NO.     1: NUTS Bayesian Analysis: Goal Function=AVERAGE VALUE OF LIKELIHOOD FUNCTION: Problem=1 Subproblem=0 Superproblem1=0 Iteration1=0 Superproblem2=0 Iteration2=0",
+			"estimates": {
+				"theta": [
+					0.470618,
+					4.10242,
+					1.1025,
+					4.23064,
+					1.29277
+				],
+				"omega": [
+					0.241954,
+					0.0676271,
+					0.0835823,
+					0.136379,
+					0.071658,
+					0.169657,
+					0,
+					0,
+					0,
+					0.025,
+					0,
+					0,
+					0,
+					0,
+					0.025
+				],
+				"sigma": [
+					0.0394781
+				]
+			},
+			"std_err": {
+				"theta": [
+					0.0638986,
+					0.026217,
+					0.0333884,
+					0.0251615,
+					0.0384095
+				],
+				"omega": [
+					0.0579455,
+					0.0197198,
+					0.0112318,
+					0.026272,
+					0.0119755,
+					0.0199576,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"sigma": [
+					0.00111854
+				]
+			},
+			"random_effect_sd": {
+				"omega": [
+					0.488502,
+					0.472796,
+					0.288468,
+					0.676661,
+					0.601117,
+					0.411183,
+					0,
+					0,
+					0,
+					0.158114,
+					0,
+					0,
+					0,
+					0,
+					0.158114
+				],
+				"sigma": [
+					0.198671
+				]
+			},
+			"random_effect_sdse": {
+				"omega": [
+					0.0576737,
+					0.0891029,
+					0.019219,
+					0.0739301,
+					0.0591388,
+					0.024227,
+					0,
+					0,
+					0,
+					9.61096e-9,
+					0,
+					0,
+					0,
+					0,
+					9.61096e-9
+				],
+				"sigma": [
+					0.00281738
+				]
+			},
+			"fixed": {
+				"theta": [
+					0,
+					0,
+					0,
+					0,
+					0
+				],
+				"omega": [
+					0,
+					0,
+					0,
+					0,
+					0,
+					0,
+					1,
+					1,
+					1,
+					1,
+					1,
+					1,
+					1,
+					1,
+					1
+				],
+				"sigma": [
+					0
+				]
+			}
+		}
+	],
+	"parameter_names": {
+		"theta": [
+			"THETA1",
+			"THETA2",
+			"THETA3",
+			"THETA4",
+			"THETA5"
+		],
+		"omega": [
+			"OMEGA(1,1)",
+			"OMEGA(2,1)",
+			"OMEGA(2,2)",
+			"OMEGA(3,1)",
+			"OMEGA(3,2)",
+			"OMEGA(3,3)",
+			"OMEGA(4,1)",
+			"OMEGA(4,2)",
+			"OMEGA(4,3)",
+			"OMEGA(4,4)",
+			"OMEGA(5,1)",
+			"OMEGA(5,2)",
+			"OMEGA(5,3)",
+			"OMEGA(5,4)",
+			"OMEGA(5,5)"
+		],
+		"sigma": [
+			"SIGMA(1,1)"
+		]
+	},
+	"ofv": [
+		{
+			"method": "Chain Method Processing",
+			"ofv_no_constant": -999999999,
+			"constant_to_ofv": -999999999,
+			"ofv_with_constant": -999999999
+		},
+		{
+			"method": "NUTS Bayesian Analysis",
+			"ofv_no_constant": 30686.426,
+			"constant_to_ofv": 32.28051801246267,
+			"ofv_with_constant": 30718.70648355601
+		}
+	],
+	"condition_number": [
+		{
+			"method": "NUTS Bayesian Analysis",
+			"condition_number": -999999999
+		}
+	],
+	"success": true
+}

@@ -28,6 +28,18 @@ func NewModelOutputFile(name string, exclude bool) ModelOutputFile {
 	return ModelOutputFile{Name: name, Exclude: exclude}
 }
 
+func expectedDataLen(methods []string) int {
+	i := 0
+	for _, method := range methods {
+		// CHAIN method doesn't involve ext data. See #288.
+		if !strings.Contains(strings.ToLower(method), "chain") {
+			i++
+		}
+	}
+
+	return i
+}
+
 // GetModelOutput populates and returns a SummaryOutput object by parsing files
 // if ext file is excluded, will attempt to parse the lst file for additional information traditionally available there.
 func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (SummaryOutput, error) {
@@ -111,11 +123,11 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (Su
 		// Parse parameters from .ext
 		extData, parameterNames := ParseParamsExt(extLinesParsed)
 		lenData := len(extData)
-		lenMethods := len(results.RunDetails.EstimationMethods)
-		if lenData != lenMethods {
+		lenExpected := expectedDataLen(results.RunDetails.EstimationMethods)
+		if lenData != lenExpected {
 			return results, fmt.Errorf(
-				"lengths of parameter data (%d) and estimation methods (%d) differ. Incomplete run?",
-				lenData, lenMethods)
+				"lengths of parameter data (%d) and non-chain estimation methods (%d) differ. Incomplete run?",
+				lenData, lenExpected)
 		}
 
 		results.ParametersData = extData
