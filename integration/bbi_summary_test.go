@@ -45,6 +45,7 @@ func TestSummaryHappyPath(tt *testing.T) {
 		"acop-iov",         // fake model with 62 OMEGAS (fake iov)
 		"acop-nan",         // NaN values for objective function
 		"onlysim",          // $SIM with ONLYSIM.
+		"chain",            // CHAIN method that lacks estimation data.
 	}
 	testId := "INT-SUM-001"
 	for _, mod := range SummaryHappyPathTestMods {
