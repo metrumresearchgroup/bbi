@@ -50,7 +50,7 @@ steps:
   - name: Unit Test
     commands:
       - if [ ! -d /data/${DRONE_BUILD_NUMBER}/apps ] ; then mkdir -p /data/${DRONE_BUILD_NUMBER}/apps; chmod -R 0755 /data/${DRONE_BUILD_NUMBER}/apps; cp bbi /data/${DRONE_BUILD_NUMBER}/apps; else cp bbi /data/${DRONE_BUILD_NUMBER}/apps; fi
-      - export PATH=$PATH:/data/${DRONE_BUILD_NUMBER}/apps
+      - export PATH=/data/${DRONE_BUILD_NUMBER}/apps:$PATH
       - export ROOT_EXECUTION_DIR=/data/${DRONE_BUILD_NUMBER}
       - export BBI_GRID_NAME_PREFIX="drone_${DRONE_BUILD_NUMBER}"
       - bbi init --dir /opt/NONMEM
@@ -82,7 +82,7 @@ steps:
   - name: Integration Test
     commands:
       - if [ ! -d /data/${DRONE_BUILD_NUMBER}/apps ] ; then mkdir -p /data/${DRONE_BUILD_NUMBER}/apps; chmod -R 0755 /data/${DRONE_BUILD_NUMBER}/apps; cp bbi /data/${DRONE_BUILD_NUMBER}/apps; else cp bbi /data/${DRONE_BUILD_NUMBER}/apps; fi
-      - export PATH=$PATH:/data/${DRONE_BUILD_NUMBER}/apps
+      - export PATH=/data/${DRONE_BUILD_NUMBER}/apps:$PATH
       - cd integration
       - export ROOT_EXECUTION_DIR=/data/${DRONE_BUILD_NUMBER}
       - export BBI_GRID_NAME_PREFIX="drone_${DRONE_BUILD_NUMBER}"
