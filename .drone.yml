@@ -51,13 +51,13 @@ steps:
     commands:
       - go install github.com/haveyoudebuggedit/gotestfmt/v2/cmd/gotestfmt@latest
       - if [ ! -d /data/${DRONE_BUILD_NUMBER}/apps ] ; then mkdir -p /data/${DRONE_BUILD_NUMBER}/apps; chmod -R 0755 /data/${DRONE_BUILD_NUMBER}/apps; cp bbi /data/${DRONE_BUILD_NUMBER}/apps; else cp bbi /data/${DRONE_BUILD_NUMBER}/apps; fi
-      - export PATH=$PATH:/data/${DRONE_BUILD_NUMBER}/apps:~/go/bin
+      - export PATH=$PATH:/data/${DRONE_BUILD_NUMBER}/apps
       - export ROOT_EXECUTION_DIR=/data/${DRONE_BUILD_NUMBER}
       - export BBI_GRID_NAME_PREFIX="drone_${DRONE_BUILD_NUMBER}"
       - bbi init --dir /opt/NONMEM
       - rm -f /data/${DRONE_BUILD_NUMBER}/test_output.json
       -
-      - go list ./... | grep -v integration | xargs go test --json 2>&1 | tee /data/${DRONE_BUILD_NUMBER}/test_output.json --append | gotestfmt --hide empty-packages
+      - go list ./... | grep -v integration | xargs go test --json 2>&1 | tee /data/${DRONE_BUILD_NUMBER}/test_output.json --append | ~/go/bin/gotestfmt --hide empty-packages
       - aws s3 cp /data/${DRONE_BUILD_NUMBER}/test_output.json s3://mrg-validation/bbi/${DRONE_BUILD_NUMBER}/results.json
     environment:
       LOCAL: true
