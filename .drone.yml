@@ -57,7 +57,7 @@ steps:
       - bbi init --dir /opt/NONMEM
       - rm -f /data/${DRONE_BUILD_NUMBER}/test_output.json
       -
-      - go list ./... | grep -v integration | xargs go test --json 2>&1 | tee /data/${DRONE_BUILD_NUMBER}/test_output.json --append | ~/go/bin/gotestfmt --hide empty-packages
+      - go list ./... | grep -v integration | xargs go test --json  | tee /data/${DRONE_BUILD_NUMBER}/test_output.json --append | ~/go/bin/gotestfmt --hide empty-packages
       - aws s3 cp /data/${DRONE_BUILD_NUMBER}/test_output.json s3://mrg-validation/bbi/${DRONE_BUILD_NUMBER}/results.json
     environment:
       LOCAL: true
@@ -89,7 +89,7 @@ steps:
       - export ROOT_EXECUTION_DIR=/data/${DRONE_BUILD_NUMBER}
       - export BBI_GRID_NAME_PREFIX="drone_${DRONE_BUILD_NUMBER}"
       - bbi init --dir /opt/NONMEM
-      - go test ./... -v --json -timeout 30m | tee /data/${DRONE_BUILD_NUMBER}/test_output.json --append
+      - go test ./... -v --json -timeout 30m | tee /data/${DRONE_BUILD_NUMBER}/test_output.json --append | ~/go/bin/gotestfmt --hide empty-packages
       - aws s3 cp /data/${DRONE_BUILD_NUMBER}/test_output.json s3://mrg-validation/bbi/${DRONE_BUILD_NUMBER}/results.json
       - chmod +x failure_detector.sh
       - ./failure_detector.sh /data/${DRONE_BUILD_NUMBER}/test_output.json
