@@ -1,4 +1,13 @@
 
+# bbi 3.2.1
+
+## Bug fixes
+
+* In v3.2.0, `bbi nonmem summary` gained a check for incomplete `.lst`
+  files.  This check was inappropriately triggered by models that
+  specify an estimation record with `METHOD=CHAIN`.  (#289)
+
+
 # bbi 3.2.0
 
 ## New features and changes
