@@ -89,6 +89,9 @@ func TestParseRunDetails(tt *testing.T) {
 	RunDetails02Results.ProblemText = "Simulation"
 	RunDetails02Results.OnlySim = true
 
+	RunDetails03Results := RunDetails01Results
+	RunDetails03Results.RunEnd = "Wed Jul  8 17:32:01 EDT 2020"
+
 	tests := []struct {
 		name     string
 		input    []string
@@ -132,6 +135,13 @@ func TestParseRunDetails(tt *testing.T) {
 				"$SIMULATION ONLYSIMULATION (123456)",
 			},
 			expected: RunDetails02Results,
+		},
+		{
+			name: "RunDetailsStopTime",
+			input: append(baseInput,
+				"Stop Time:",
+				"Wed Jul  8 17:32:01 EDT 2020"),
+			expected: RunDetails03Results,
 		},
 	}
 
