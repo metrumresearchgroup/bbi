@@ -51,6 +51,7 @@ func ParseRunDetails(lines []string) RunDetails {
 	runDetails := NewRunDetails()
 
 	for i, line := range lines {
+		lineTrimmed := strings.TrimSpace(line)
 		switch {
 		case strings.Contains(line, "1NONLINEAR MIXED EFFECTS MODEL PROGRAM (NONMEM) VERSION"):
 			runDetails.Version = parseNMVersion(line)
@@ -70,9 +71,9 @@ func ParseRunDetails(lines []string) RunDetails {
 			runDetails.CpuTime, _ = strconv.ParseFloat(replaceTrim(line, " #CPUT: Total CPU Time in Seconds,"), 64)
 		case strings.Contains(line, "Started"):
 			runDetails.RunStart = replaceTrim(line, "Started")
-		case strings.Contains(line, "Finished"):
-			runDetails.RunEnd = replaceTrim(line, "Finished")
-		case strings.Contains(line, "Stop Time:"):
+		case strings.HasPrefix(lineTrimmed, "Finished "):
+			runDetails.RunEnd = strings.TrimPrefix(lineTrimmed, "Finished ")
+		case lineTrimmed == "Stop Time:":
 			if i+1 < len(lines) {
 				runDetails.RunEnd = lines[i+1]
 			}

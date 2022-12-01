@@ -143,6 +143,18 @@ func TestParseRunDetails(tt *testing.T) {
 				"Wed Jul  8 17:32:01 EDT 2020"),
 			expected: RunDetails03Results,
 		},
+		{
+			name:     "RunDetailsInvalidFinished",
+			input:    append(baseInput, "invalid Finished"),
+			expected: RunDetails01Results,
+		},
+		{
+			name: "RunDetails01InvliadStopTime",
+			input: append(baseInput,
+				"invalid Stop Time:",
+				"Wed Jul  8 17:32:01 EDT 2020"),
+			expected: RunDetails01Results,
+		},
 	}
 
 	testId := "UNIT-NMP-035"
