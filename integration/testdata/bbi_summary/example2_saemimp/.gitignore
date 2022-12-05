@@ -2,6 +2,7 @@ background.set
 compile.lnk
 FCON
 FDATA
+FDATA.csv
 FMSG
 FREPORT
 FSIZES
