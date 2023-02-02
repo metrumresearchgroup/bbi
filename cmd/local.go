@@ -443,7 +443,16 @@ func executeLocalJob(model *NonMemModel) turnstile.ConcurrentError {
 
 	log.Debugf("Script location is pegged at %s", scriptLocation)
 
-	command := exec.Command(scriptLocation)
+	bash, err := exec.LookPath("bash")
+	if err != nil {
+		return turnstile.ConcurrentError{
+			Error:         err,
+			RunIdentifier: model.FileName,
+			Notes:         fmt.Sprintf("bash is required: %v", err),
+		}
+	}
+
+	command := exec.Command(bash, scriptLocation)
 	command.Dir = model.OutputDir
 	command.Env = os.Environ() // Take in OS Environment
 

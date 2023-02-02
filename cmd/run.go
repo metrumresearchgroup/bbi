@@ -287,8 +287,13 @@ func ExecutePostWorkDirectivesWithEnvironment(worker PostWorkExecutor) (string, 
 		return "", err
 	}
 
+	bash, err := exec.LookPath("bash")
+	if err != nil {
+		return "", err
+	}
+
 	// Needs to be the processed value, not the config template.
-	cmd := exec.Command(filepath.Join(worker.GetWorkingPath(), "post_processing.sh"))
+	cmd := exec.Command(bash, filepath.Join(worker.GetWorkingPath(), "post_processing.sh"))
 
 	// Set the environment for the binary.
 	cmd.Env = environment
