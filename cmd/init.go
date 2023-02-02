@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
 
 	"github.com/metrumresearchgroup/bbi/configlib"
@@ -26,6 +27,13 @@ func initializer(cmd *cobra.Command, _ []string) error {
 	dir, err := cmd.Flags().GetStringSlice("dir")
 	if err != nil {
 		return fmt.Errorf("get dir string: %w", err)
+	}
+
+	var find_nm func(string) (string, error)
+	if runtime.GOOS == "windows" {
+		find_nm = findNonMemBinaryWindows
+	} else {
+		find_nm = findNonMemBinary
 	}
 
 	for _, l := range dir {
@@ -51,7 +59,7 @@ func initializer(cmd *cobra.Command, _ []string) error {
 
 		for _, v := range locations {
 			var nm string
-			nm, err = findNonMemBinary(v)
+			nm, err = find_nm(v)
 			if err != nil {
 				log.Println(err)
 
@@ -133,6 +141,12 @@ func isPathNonMemmy(path string) bool {
 		return false
 	}
 
+	// That rest of this function (checking for an executable bit in
+	// file mode bits) isn't relevant for Windows.
+	if runtime.GOOS == "windows" {
+		return true
+	}
+
 	// Are any of them executable?
 	fails := 0
 
@@ -186,6 +200,35 @@ func findNonMemBinary(path string) (string, error) {
 	}
 
 	return "", errors.New("No nonmem binary could be located in the given path. Please check again or try another directory")
+}
+
+// findNonMemBinaryWindows is a Windows-specific variant of
+// findNonMemBinary.  The key differences are that 1) it expects
+// ".bat" at the end of the binary and 2) it doesn't expect an
+// executable bit to be set.
+func findNonMemBinaryWindows(path string) (string, error) {
+	rdir := filepath.Join(path, "run")
+	fd, err := os.Open(rdir)
+	if err != nil {
+		return "", err
+	}
+	defer fd.Close()
+
+	re := regexp.MustCompile(`^nmfe[0-9]{2}\.bat$`)
+	files, err := fd.Readdirnames(-1)
+	if err != nil {
+		return "", err
+	}
+
+	for _, fname := range files {
+		// Follow findNonMemBinary() and take the first match (rather
+		// than, e.g., returning an error if multiple files match).
+		if re.MatchString(fname) {
+			return fname, nil
+		}
+	}
+
+	return "", fmt.Errorf("nmfe .bat file not found in %s", rdir)
 }
 
 func hasNMQual(path string) bool {
