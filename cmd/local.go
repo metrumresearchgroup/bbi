@@ -448,7 +448,7 @@ func executeLocalJob(model *NonMemModel) turnstile.ConcurrentError {
 		return turnstile.ConcurrentError{
 			Error:         err,
 			RunIdentifier: model.FileName,
-			Notes:         fmt.Sprintf("bash is required: %v", err),
+			Notes:         "bash is required to run bbi. Please install bash and then try running this again.",
 		}
 	}
 
