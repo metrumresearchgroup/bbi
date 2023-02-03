@@ -443,7 +443,16 @@ func executeLocalJob(model *NonMemModel) turnstile.ConcurrentError {
 
 	log.Debugf("Script location is pegged at %s", scriptLocation)
 
-	command := exec.Command(scriptLocation)
+	bash, err := exec.LookPath("bash")
+	if err != nil {
+		return turnstile.ConcurrentError{
+			Error:         err,
+			RunIdentifier: model.FileName,
+			Notes:         "bash is required to run bbi. Please install bash and then try running this again.",
+		}
+	}
+
+	command := exec.Command(bash, scriptLocation)
 	command.Dir = model.OutputDir
 	command.Env = os.Environ() // Take in OS Environment
 
