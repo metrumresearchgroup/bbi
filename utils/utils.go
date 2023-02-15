@@ -10,6 +10,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/spf13/afero"
@@ -259,4 +260,23 @@ func AddTestId(s, testId string) string {
 	// no space between because go test --json turns the spaces into underscores
 	// which are ugly to parse out on the mrgvalprep side
 	return s + "[" + testId + "]"
+}
+
+// needsQuoteRe matches when a token contains a character that would
+// need quoted for a shell command. This value follows Python's
+// shlex._find_unsafe().
+var needsQuoteRe = regexp.MustCompile(`[^A-Za-z0-9_@%+=:,./-]`)
+
+// ShQuote quotes s, if needed, for use as a token in a
+// POSIX-compliant shell command.
+func ShQuote(s string) string {
+	if len(s) == 0 {
+		return "''"
+	}
+
+	if !needsQuoteRe.MatchString(s) {
+		return s
+	}
+
+	return "'" + strings.Replace(s, "'", `'"'"'`, -1) + "'"
 }

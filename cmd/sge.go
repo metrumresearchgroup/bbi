@@ -379,14 +379,14 @@ func generateBbiScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 		}
 	}
 	commandComponents := []string{
-		binary,
+		utils.ShQuote(binary),
 		"nonmem",
 		"run",
 	}
 
 	commandComponents = append(commandComponents, []string{
 		"local",
-		filename,
+		utils.ShQuote(filename),
 	}...)
 
 	if !l.Configuration.Local.CreateChildDirs {
@@ -400,7 +400,7 @@ func generateBbiScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 
 	err = t.Execute(buf, content{
 		Command:          generatedCommand,
-		WorkingDirectory: l.OutputDir,
+		WorkingDirectory: utils.ShQuote(l.OutputDir),
 	})
 
 	if err != nil {

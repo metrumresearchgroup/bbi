@@ -330,7 +330,7 @@ func generateScript(fileTemplate string, l *NonMemModel) ([]byte, error) {
 	}
 
 	cont := content{
-		WorkingDirectory: l.OutputDir,
+		WorkingDirectory: utils.ShQuote(l.OutputDir),
 		Command:          buildNonMemCommandString(l),
 	}
 
@@ -432,23 +432,24 @@ func buildNonMemCommandString(l *NonMemModel) string {
 	}
 
 	// TODO: Implement cache
-	nmExecutable := path.Join(nmHome, "run", nmBinary)
+	nmExecutable := utils.ShQuote(path.Join(nmHome, "run", nmBinary))
 
 	// Are values present for raw options?
 	nmfeOptions := processNMFEOptions(l.Configuration)
 
 	var cmdArgs []string
 
+	filename := utils.ShQuote(l.FileName)
 	cmdArgs = append(cmdArgs, []string{
-		l.Model,
+		utils.ShQuote(l.Model),
 		"",
-		l.FileName + ".lst",
+		filename + ".lst",
 		"",
 	}...)
 
 	// Section for Appending the parafile command
 	if l.Configuration.Parallel {
-		cmdArgs = append(cmdArgs, "-parafile="+l.FileName+".pnm")
+		cmdArgs = append(cmdArgs, "-parafile="+filename+".pnm")
 	}
 
 	if len(nmfeOptions) > 0 {
@@ -461,15 +462,16 @@ func buildNonMemCommandString(l *NonMemModel) string {
 func buildAutologCommandString(l *NonMemModel) string {
 	// `perl  -S /opt/NONMEM/nm74gf/nmqual/autolog.pl /opt/NONMEM/nm74gf/nmqual/log.xml para ce /data/tmp/001 001`
 	nm := l.Configuration.Nonmem[l.Configuration.NMVersion]
+	home := utils.ShQuote(nm.Home)
 	commandComponents := []string{
 		"perl",
 		"-S",
-		filepath.Join(nm.Home, "nmqual", "autolog.pl"),
-		filepath.Join(nm.Home, "nmqual", "log.xml"),
+		filepath.Join(home, "nmqual", "autolog.pl"),
+		filepath.Join(home, "nmqual", "log.xml"),
 		"para",
 		"ce",
-		l.OutputDir,
-		l.FileName,
+		utils.ShQuote(l.OutputDir),
+		utils.ShQuote(l.FileName),
 	}
 
 	return strings.TrimSpace(strings.Join(commandComponents, " "))
