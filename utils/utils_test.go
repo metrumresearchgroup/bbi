@@ -173,3 +173,50 @@ func TestFileAndExt(tt *testing.T) {
 		})
 	}
 }
+
+func TestShQuote(tt *testing.T) {
+	tests := []struct {
+		input string
+		want  string
+	}{
+		{
+			input: "",
+			want:  "''",
+		},
+		{
+			input: "foo",
+			want:  "foo",
+		},
+		{
+			input: "/foo/bar",
+			want:  "/foo/bar",
+		},
+		{
+			input: "09_@%+=:,./-",
+			want:  "09_@%+=:,./-",
+		},
+		{
+			input: `\foo\bar`,
+			want:  `'\foo\bar'`,
+		},
+		{
+			input: "foo bar",
+			want:  "'foo bar'",
+		},
+		{
+			input: "foo bar",
+			want:  "'foo bar'",
+		},
+		{
+			input: "foo'bar",
+			want:  `'foo'"'"'bar'`,
+		},
+	}
+
+	for _, test := range tests {
+		tt.Run(test.input, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+			t.R.Equal(ShQuote(test.input), test.want)
+		})
+	}
+}

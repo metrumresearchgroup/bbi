@@ -25,6 +25,7 @@ func TestBbiCompletesSGEExecution(tt *testing.T) {
 	}{
 		{name: "acop"},
 		{name: "ctl_test"},
+		{name: "leading-path-with space"},
 	}
 
 	testId := "INT-SGE-001"
@@ -83,6 +84,7 @@ func TestBbiCompletesParallelSGEExecution(tt *testing.T) {
 		{name: "240"},
 		{name: "acop"},
 		{name: "ctl_test"},
+		{name: "leading-path-with space"},
 	}
 
 	testId := "INT-SGE-002"

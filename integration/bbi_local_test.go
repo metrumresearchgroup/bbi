@@ -22,6 +22,8 @@ func TestBbiCompletesLocalExecution(tt *testing.T) {
 	}{
 		{name: "acop"},
 		{name: "metrum_std"},
+		{name: "leading-path-with space"},
+		{name: "modquote"},
 	}
 
 	testId := "INT-LOCAL-001"
@@ -82,6 +84,8 @@ func TestNMFEOptionsEndInScript(tt *testing.T) {
 		{name: "acop"},
 		{name: "ctl_test"},
 		{name: "metrum_std"},
+		{name: "leading-path-with space"},
+		{name: "modquote"},
 	}
 
 	testId := "INT-LOCAL-002"
@@ -156,6 +160,8 @@ func TestBbiParallelExecution(tt *testing.T) {
 		{name: "acop"},
 		{name: "ctl_test"},
 		{name: "metrum_std"},
+		{name: "leading-path-with space"},
+		{name: "modquote"},
 	}
 
 	testId := "INT-LOCAL-003"
