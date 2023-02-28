@@ -69,7 +69,7 @@ type RunDetails struct {
 	CpuTime             float64   `json:"cpu_time"`
 	FunctionEvaluations int64     `json:"function_evaluations,omitempty"`
 	SignificantDigits   float64   `json:"significant_digits,omitempty"`
-	ProblemText         string    `json:"problem_text,omitempty"`
+	ProblemText         string    `json:"problem_text"`
 	ModFile             string    `json:"mod_file,omitempty"`
 	EstimationMethods   []string  `json:"estimation_method,omitempty"`
 	DataSet             string    `json:"data_set,omitempty"`

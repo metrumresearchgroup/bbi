@@ -1,0 +1,25 @@
+
+Dataset: ../data/12.csv
+Records: 4319   Observations: 3158  Subjects: 160
+Estimation Method(s):
+ - First Order Conditional Estimation with Interaction
+No Heuristic Problems Detected
++-------+--------+------------+--------------+
+| THETA |  NAME  |  ESTIMATE  | STDERR (RSE) |
++-------+--------+------------+--------------+
+| TH 1  | THETA1 | 0.422797   | -            |
+| TH 2  | THETA2 | 4.13924    | -            |
+| TH 3  | THETA3 | 1.18583    | -            |
+| TH 4  | THETA4 | 4.17865    | -            |
+| TH 5  | THETA5 | 1.29131    | -            |
+| TH 6  | THETA6 | 0.520889   | -            |
+| TH 7  | THETA7 | -0.0701583 | -            |
+| TH 8  | THETA8 | 0.340205   | -            |
++-------+--------+------------+--------------+
++------------+------+----------+---------------+
+|   OMEGA    | ETA  | ESTIMATE | SHRINKAGE (%) |
++------------+------+----------+---------------+
+| OMEGA(1,1) | ETA1 | 0.169074 | 5.213830      |
+| OMEGA(2,2) | ETA2 | 0.093091 | 4.169040      |
+| OMEGA(3,3) | ETA3 | 0.108270 | 0.861924      |
++------------+------+----------+---------------+

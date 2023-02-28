@@ -46,6 +46,7 @@ func TestSummaryHappyPath(tt *testing.T) {
 		"acop-nan",         // NaN values for objective function
 		"onlysim",          // $SIM with ONLYSIM.
 		"chain",            // CHAIN method that lacks estimation data.
+		"12-empty-problem", // $PROBLEM is an empty string
 	}
 	testId := "INT-SUM-001"
 	for _, mod := range SummaryHappyPathTestMods {
