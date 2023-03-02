@@ -137,6 +137,14 @@ func TestParseRunDetails(tt *testing.T) {
 			expected: RunDetails02Results,
 		},
 		{
+			name: "RunDetailsOnlySimLeadSpace",
+			input: []string{
+				"$PROB Simulation",
+				"  $SIMULATION ONLYSIM",
+			},
+			expected: RunDetails02Results,
+		},
+		{
 			name: "RunDetailsStopTime",
 			input: append(baseInput,
 				"Stop Time:",
