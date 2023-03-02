@@ -84,7 +84,7 @@ func ParseRunDetails(lines []string) RunDetails {
 		case strings.HasPrefix(lineTrimmed, "$SIM"):
 			fields := strings.SplitN(line, ";", 2)
 			runDetails.OnlySim = strings.Contains(fields[0], "ONLY")
-		case strings.Contains(line, "$DATA"):
+		case strings.HasPrefix(lineTrimmed, "$DATA"):
 			runDetails.DataSet = parseLine(line, 1)
 		case strings.Contains(line, "TOT. NO. OF INDIVIDUALS:"):
 			runDetails.NumberOfSubjects, _ = strconv.ParseInt(replaceTrim(line, "TOT. NO. OF INDIVIDUALS:"), 10, 64)

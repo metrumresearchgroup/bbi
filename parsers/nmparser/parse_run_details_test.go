@@ -163,6 +163,12 @@ func TestParseRunDetails(tt *testing.T) {
 				"Wed Jul  8 17:32:01 EDT 2020"),
 			expected: RunDetails01Results,
 		},
+		{
+			name: "RunDetails01DataComment",
+			input: append(baseInput,
+				"; $DATA foo"),
+			expected: RunDetails01Results,
+		},
 	}
 
 	testId := "UNIT-NMP-035"
