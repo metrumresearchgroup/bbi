@@ -81,10 +81,10 @@ func ParseRunDetails(lines []string) RunDetails {
 			runDetails.ProblemText = problemRe.ReplaceAllString(line, "")
 		case strings.Contains(line, "#METH:"):
 			runDetails.EstimationMethods = append(runDetails.EstimationMethods, replaceTrim(line, "#METH:"))
-		case strings.HasPrefix(line, "$SIM"):
+		case strings.HasPrefix(lineTrimmed, "$SIM"):
 			fields := strings.SplitN(line, ";", 2)
 			runDetails.OnlySim = strings.Contains(fields[0], "ONLY")
-		case strings.Contains(line, "$DATA"):
+		case strings.HasPrefix(lineTrimmed, "$DATA"):
 			runDetails.DataSet = parseLine(line, 1)
 		case strings.Contains(line, "TOT. NO. OF INDIVIDUALS:"):
 			runDetails.NumberOfSubjects, _ = strconv.ParseInt(replaceTrim(line, "TOT. NO. OF INDIVIDUALS:"), 10, 64)

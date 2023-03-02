@@ -137,6 +137,14 @@ func TestParseRunDetails(tt *testing.T) {
 			expected: RunDetails02Results,
 		},
 		{
+			name: "RunDetailsOnlySimLeadSpace",
+			input: []string{
+				"$PROB Simulation",
+				"  $SIMULATION ONLYSIM",
+			},
+			expected: RunDetails02Results,
+		},
+		{
 			name: "RunDetailsStopTime",
 			input: append(baseInput,
 				"Stop Time:",
@@ -153,6 +161,12 @@ func TestParseRunDetails(tt *testing.T) {
 			input: append(baseInput,
 				"invalid Stop Time:",
 				"Wed Jul  8 17:32:01 EDT 2020"),
+			expected: RunDetails01Results,
+		},
+		{
+			name: "RunDetails01DataComment",
+			input: append(baseInput,
+				"; $DATA foo"),
 			expected: RunDetails01Results,
 		},
 	}

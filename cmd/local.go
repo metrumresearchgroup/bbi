@@ -214,7 +214,7 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 	log.Debugf("%s Beginning hash calculation operations for data file", l.Nonmem.LogIdentifier())
 
 	for _, line := range sourceLines {
-		if strings.Contains(line, "$DATA") {
+		if strings.HasPrefix(strings.TrimSpace(line), "$DATA") {
 			// extract out data path
 			l.Nonmem.DataPath = filepath.Clean(strings.Fields(line)[1])
 		}
