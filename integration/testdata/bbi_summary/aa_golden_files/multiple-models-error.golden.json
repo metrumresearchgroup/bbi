@@ -201,7 +201,8 @@
 		{
 			"run_details": {
 				"postprocess_time": 0,
-				"cpu_time": 0
+				"cpu_time": 0,
+				"problem_text": ""
 			},
 			"run_heuristics": {
 				"covariance_step_aborted": false,
@@ -222,7 +223,8 @@
 		{
 			"run_details": {
 				"postprocess_time": 0,
-				"cpu_time": 0
+				"cpu_time": 0,
+				"problem_text": ""
 			},
 			"run_heuristics": {
 				"covariance_step_aborted": false,
@@ -619,7 +621,8 @@
 		{
 			"run_details": {
 				"postprocess_time": 0,
-				"cpu_time": 0
+				"cpu_time": 0,
+				"problem_text": ""
 			},
 			"run_heuristics": {
 				"covariance_step_aborted": false,

@@ -115,6 +115,11 @@ SUM-R011:
   tests:
   - INT-SUM-003
   - INT-SUM-006
+SUM-R012:
+  description: BBI summary includes problem_text key in JSON output
+    even if lst defines $PROBLEM as an empty stirng.
+  tests:
+  - INT-SUM-001
 CMD-R001:
   description: Process NMFE options
   tests:

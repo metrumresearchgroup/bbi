@@ -79,6 +79,7 @@ BBI-SUM-001:
   - SUM-R009
   - SUM-R010
   - SUM-R011
+  - SUM-R012
   - NMP-R002
 BBI-COV-001:
   name: Parse .cov and .cor files
