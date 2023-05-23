@@ -6,6 +6,7 @@ import (
 	"runtime"
 	"testing"
 
+	"github.com/metrumresearchgroup/bbi/configlib"
 	"github.com/metrumresearchgroup/bbi/utils"
 
 	"github.com/metrumresearchgroup/wrapt"
@@ -108,5 +109,46 @@ func TestInitMakeNonmemEntriesMultiple(tt *testing.T) {
 		t.R.NoError(err)
 		t.R.Equal(es[names[0]].Home, filepath.Join(d1, names[0]))
 		t.R.Equal(es[names[1]].Home, filepath.Join(d2, names[1]))
+	})
+}
+
+func keys(m map[string]configlib.NonMemDetail) []string {
+	ks := make([]string, len(m))
+	i := 0
+	for k := range m {
+		ks[i] = k
+		i++
+	}
+
+	return ks
+}
+
+func TestInitMakeNonmemEntriesCollisionAcrossDirs(tt *testing.T) {
+	id := "UNIT-INIT-003"
+	tt.Run(utils.AddTestId("", id), func(tt *testing.T) {
+		t := wrapt.WrapT(tt)
+		tdir := t.TempDir()
+
+		d1 := filepath.Join(tdir, "d1")
+		if err := os.Mkdir(d1, 0777); err != nil {
+			t.Fatal(err)
+		}
+
+		d2 := filepath.Join(tdir, "d2")
+		if err := os.Mkdir(d2, 0777); err != nil {
+			t.Fatal(err)
+		}
+
+		name := "nm75"
+		dirs := []string{d1, d2}
+		for _, d := range dirs {
+			if err := setupDir(filepath.Join(d, name)); err != nil {
+				t.Fatal(err)
+			}
+		}
+
+		es, err := makeNonmemEntries(dirs)
+		t.R.NoError(err)
+		t.R.Equal(keys(es), []string{name})
 	})
 }

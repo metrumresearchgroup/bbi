@@ -3,7 +3,6 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -13,6 +12,7 @@ import (
 	"github.com/metrumresearchgroup/bbi/configlib"
 
 	"github.com/ghodss/yaml"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
@@ -81,8 +81,9 @@ func makeNonmemEntries(dirs []string) (map[string]configlib.NonMemDetail, error)
 		findNM = findNonMemBinary
 	}
 
+	ids := makeIdentifiers(locations)
 	entries := make(map[string]configlib.NonMemDetail)
-	for _, v := range locations {
+	for id, v := range ids {
 		var nm string
 		nm, err = findNM(v)
 		if err != nil {
@@ -91,8 +92,7 @@ func makeNonmemEntries(dirs []string) (map[string]configlib.NonMemDetail, error)
 			continue
 		}
 
-		identifier := filepath.Base(v)
-		entries[identifier] = configlib.NonMemDetail{
+		entries[id] = configlib.NonMemDetail{
 			Default:    len(locations) == 1,
 			Executable: nm,
 			Home:       v,
@@ -260,4 +260,19 @@ func hasNMQual(path string) bool {
 	}
 
 	return false
+}
+
+func makeIdentifiers(locs []string) map[string]string {
+	ids := make(map[string]string)
+	for _, loc := range locs {
+		id := filepath.Base(loc)
+		if loc1, exists := ids[id]; exists {
+			log.Warnf("Ignoring %q because its key collides with %q\n", loc1, loc)
+
+			continue
+		}
+		ids[id] = loc
+	}
+
+	return ids
 }
