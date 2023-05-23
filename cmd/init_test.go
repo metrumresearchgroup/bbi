@@ -22,6 +22,7 @@ func TestFindNonMemBinaryWindows(tt *testing.T) {
 	}
 
 	_, err := findNonMemBinaryWindows(dir)
+	t.R.Error(err)
 	t.R.Contains(err.Error(), ".bat file not found")
 
 	nmfe := filepath.Join(rdir, "nmfe23.bat")
