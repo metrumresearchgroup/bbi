@@ -27,39 +27,16 @@ func initializer(cmd *cobra.Command, _ []string) error {
 		return fmt.Errorf("get dir string: %w", err)
 	}
 
-	var findNM func(string) (string, error)
-	if runtime.GOOS == "windows" {
-		findNM = findNonMemBinaryWindows
-	} else {
-		findNM = findNonMemBinary
-	}
-
-	locations, err := findInstallDirs(dir)
+	nmEntries, err := makeNonmemEntries(dir)
 	if err != nil {
-		return err
-	}
-
-	for _, v := range locations {
-		var nm string
-		nm, err = findNM(v)
-		if err != nil {
-			log.Println(err)
-
-			continue
-		}
-
-		identifier := filepath.Base(v)
-
-		viper.Set("nonmem."+identifier+".default", len(locations) == 1)
-		viper.Set("nonmem."+identifier+".executable", nm)
-		viper.Set("nonmem."+identifier+".home", v)
-		viper.Set("nonmem."+identifier+".nmqual", hasNMQual(v))
+		return nil
 	}
 
 	c := configlib.Config{}
 	if err = viper.Unmarshal(&c); err != nil {
 		return err
 	}
+	c.Nonmem = nmEntries
 
 	yamlString, err := yaml.Marshal(c)
 	if err != nil {
@@ -87,6 +64,43 @@ func NewInitCmd() *cobra.Command {
 	cmd.Flags().StringSlice(directory, []string{}, "A directory in which to look for NonMem Installations")
 
 	return cmd
+}
+
+// makeConfigEntries returns a NonMemDetail entry for each NONMEM
+// installation directory found under dirs.
+func makeNonmemEntries(dirs []string) (map[string]configlib.NonMemDetail, error) {
+	locations, err := findInstallDirs(dirs)
+	if err != nil {
+		return nil, err
+	}
+
+	var findNM func(string) (string, error)
+	if runtime.GOOS == "windows" {
+		findNM = findNonMemBinaryWindows
+	} else {
+		findNM = findNonMemBinary
+	}
+
+	entries := make(map[string]configlib.NonMemDetail)
+	for _, v := range locations {
+		var nm string
+		nm, err = findNM(v)
+		if err != nil {
+			log.Println(err)
+
+			continue
+		}
+
+		identifier := filepath.Base(v)
+		entries[identifier] = configlib.NonMemDetail{
+			Default:    len(locations) == 1,
+			Executable: nm,
+			Home:       v,
+			Nmqual:     hasNMQual(v),
+		}
+	}
+
+	return entries, nil
 }
 
 // findInstallDirs returns all subdirectories under dirs that look
