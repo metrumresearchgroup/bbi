@@ -22,8 +22,6 @@ import (
 func initializer(cmd *cobra.Command, _ []string) error {
 	fs := afero.NewOsFs()
 
-	locations := []string{}
-
 	dir, err := cmd.Flags().GetStringSlice("dir")
 	if err != nil {
 		return fmt.Errorf("get dir string: %w", err)
@@ -36,43 +34,26 @@ func initializer(cmd *cobra.Command, _ []string) error {
 		findNM = findNonMemBinary
 	}
 
-	for _, l := range dir {
-		var files []os.FileInfo
-		// For each directory underneath the dir provided. Let's see if it's nonmemmy
-		files, err = afero.ReadDir(fs, l)
+	locations, err := findInstallDirs(dir)
+	if err != nil {
+		return err
+	}
+
+	for _, v := range locations {
+		var nm string
+		nm, err = findNM(v)
 		if err != nil {
-			return fmt.Errorf("list directory: %w", err)
+			log.Println(err)
+
+			continue
 		}
 
-		for _, v := range files {
-			// If it's a dir
-			if ok, _ := afero.IsDir(fs, filepath.Join(l, v.Name())); ok {
-				// And nonmem-ish
-				if isPathNonMemmy(filepath.Join(l, v.Name())) {
-					// Add it to the list
-					locations = append(locations, filepath.Join(l, v.Name()))
-				}
-			}
-		}
+		identifier := filepath.Base(v)
 
-		// Let's iterate over the found locations and create the viper objects
-
-		for _, v := range locations {
-			var nm string
-			nm, err = findNM(v)
-			if err != nil {
-				log.Println(err)
-
-				continue
-			}
-
-			identifier := filepath.Base(v)
-
-			viper.Set("nonmem."+identifier+".default", len(locations) == 1) // If there's only one location, true
-			viper.Set("nonmem."+identifier+".executable", nm)
-			viper.Set("nonmem."+identifier+".home", v)
-			viper.Set("nonmem."+identifier+".nmqual", hasNMQual(v))
-		}
+		viper.Set("nonmem."+identifier+".default", len(locations) == 1)
+		viper.Set("nonmem."+identifier+".executable", nm)
+		viper.Set("nonmem."+identifier+".home", v)
+		viper.Set("nonmem."+identifier+".nmqual", hasNMQual(v))
 	}
 
 	c := configlib.Config{}
@@ -106,6 +87,30 @@ func NewInitCmd() *cobra.Command {
 	cmd.Flags().StringSlice(directory, []string{}, "A directory in which to look for NonMem Installations")
 
 	return cmd
+}
+
+// findInstallDirs returns all subdirectories under dirs that look
+// like the top-level directory of a NONMEM installation path.
+func findInstallDirs(dirs []string) ([]string, error) {
+	locations := []string{}
+	fs := afero.NewOsFs()
+	for _, l := range dirs {
+		var files []os.FileInfo
+		files, err := afero.ReadDir(fs, l)
+		if err != nil {
+			return nil, fmt.Errorf("list directory: %w", err)
+		}
+
+		for _, v := range files {
+			if ok, _ := afero.IsDir(fs, filepath.Join(l, v.Name())); ok {
+				if isPathNonMemmy(filepath.Join(l, v.Name())) {
+					locations = append(locations, filepath.Join(l, v.Name()))
+				}
+			}
+		}
+	}
+
+	return locations, nil
 }
 
 // Evaluates if a specific directory path is nonmem-ish.
