@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -150,5 +151,31 @@ func TestInitMakeNonmemEntriesCollisionAcrossDirs(tt *testing.T) {
 		es, err := makeNonmemEntries(dirs)
 		t.R.NoError(err)
 		t.R.Equal(keys(es), []string{name})
+	})
+}
+
+func TestInitMakeNonmemEntriesCollisionCase(tt *testing.T) {
+	id := "UNIT-INIT-004"
+	tt.Run(utils.AddTestId("", id), func(tt *testing.T) {
+		t := wrapt.WrapT(tt)
+		tdir := t.TempDir()
+
+		if err := setupDir(filepath.Join(tdir, "NM75")); err != nil {
+			t.Fatal(err)
+		}
+
+		if _, err := os.Stat(filepath.Join(tdir, "nm75")); err == nil {
+			t.Skip("Cannot test on case-insensitive file system")
+		} else if !errors.Is(err, os.ErrNotExist) {
+			t.Fatal(err)
+		}
+
+		if err := setupDir(filepath.Join(tdir, "nm75")); err != nil {
+			t.Fatal(err)
+		}
+
+		es, err := makeNonmemEntries([]string{tdir})
+		t.R.NoError(err)
+		t.R.Equal(keys(es), []string{"nm75"})
 	})
 }

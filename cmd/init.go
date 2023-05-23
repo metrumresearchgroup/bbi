@@ -265,7 +265,8 @@ func hasNMQual(path string) bool {
 func makeIdentifiers(locs []string) map[string]string {
 	ids := make(map[string]string)
 	for _, loc := range locs {
-		id := filepath.Base(loc)
+		// Viper keys are case insensitive.
+		id := strings.ToLower(filepath.Base(loc))
 		if loc1, exists := ids[id]; exists {
 			log.Warnf("Ignoring %q because its key collides with %q\n", loc1, loc)
 

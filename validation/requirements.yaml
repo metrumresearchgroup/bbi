@@ -29,6 +29,7 @@ INIT-R001:
   - UNIT-INIT-001
   - UNIT-INIT-002
   - UNIT-INIT-003
+  - UNIT-INIT-004
 LOCAL-R001:
   description: BBI completes local execution
   tests:
