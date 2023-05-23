@@ -70,6 +70,7 @@ func NewInitCmd() *cobra.Command {
 // installation directory found under dirs.
 func makeNonmemEntries(dirs []string) (map[string]configlib.NonMemDetail, error) {
 	locations, err := findInstallDirs(dirs)
+	log.Infof("Found %d NONMEM installation directories under %q:\n%q\n", len(locations), dirs, locations)
 	if err != nil {
 		return nil, err
 	}
@@ -84,6 +85,7 @@ func makeNonmemEntries(dirs []string) (map[string]configlib.NonMemDetail, error)
 	ids := makeIdentifiers(locations)
 	entries := make(map[string]configlib.NonMemDetail)
 	for id, v := range ids {
+		log.Infof("Making entry for %q (%q)\n", id, v)
 		var nm string
 		nm, err = findNM(v)
 		if err != nil {
@@ -110,6 +112,7 @@ func findInstallDirs(dirs []string) ([]string, error) {
 	fs := afero.NewOsFs()
 	for _, l := range dirs {
 		var files []os.FileInfo
+		log.Infof("Looking under %q for NONMEM installation subdirectories\n", l)
 		files, err := afero.ReadDir(fs, l)
 		if err != nil {
 			return nil, fmt.Errorf("list directory: %w", err)
@@ -117,7 +120,9 @@ func findInstallDirs(dirs []string) ([]string, error) {
 
 		for _, v := range files {
 			if ok, _ := afero.IsDir(fs, filepath.Join(l, v.Name())); ok {
+				log.Infof("Checking whether directory %q looks like NONMEM installation\n", v.Name())
 				if isPathNonMemmy(filepath.Join(l, v.Name())) {
+					log.Infof("%q looks like NONMEM installation directory\n", v.Name())
 					locations = append(locations, filepath.Join(l, v.Name()))
 				}
 			}
@@ -143,6 +148,7 @@ func isPathNonMemmy(path string) bool {
 		if ok, _ := afero.DirExists(fs, filepath.Join(path, v)); !ok {
 			return false
 		}
+		log.Infof("%q has %q subdirectory\n", path, v)
 	}
 
 	// 2 Does it contain nonmem.lic?
@@ -150,6 +156,7 @@ func isPathNonMemmy(path string) bool {
 	if ok, _ := afero.Exists(fs, filepath.Join(path, "license", "nonmem.lic")); !ok {
 		return false
 	}
+	log.Infof("%q has expected license file\n", path)
 
 	// 3 Does it contain a nonmem executable
 	located, err := afero.Glob(fs, filepath.Join(path, "run", "nmfe*"))
@@ -157,6 +164,8 @@ func isPathNonMemmy(path string) bool {
 	if err != nil {
 		return false
 	}
+
+	log.Infof("%q: located binaries under run/: %q\n", path, located)
 
 	if len(located) == 0 {
 		return false
@@ -179,10 +188,11 @@ func isPathNonMemmy(path string) bool {
 
 		executable := strings.Contains(info.Mode().String(), "x")
 		if !executable {
+			log.Infof("%q is NOT executable\n", v)
 			fails++
 		}
 	}
-
+	log.Infof("%v: %d binaries discarded because not marked as executable\n", path, fails)
 	// If none of the located files are executable, this isn't a nonmem folder
 	return fails != len(located)
 }
