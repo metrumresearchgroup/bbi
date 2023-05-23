@@ -29,11 +29,11 @@ func initializer(cmd *cobra.Command, _ []string) error {
 		return fmt.Errorf("get dir string: %w", err)
 	}
 
-	var find_nm func(string) (string, error)
+	var findNM func(string) (string, error)
 	if runtime.GOOS == "windows" {
-		find_nm = findNonMemBinaryWindows
+		findNM = findNonMemBinaryWindows
 	} else {
-		find_nm = findNonMemBinary
+		findNM = findNonMemBinary
 	}
 
 	for _, l := range dir {
@@ -59,7 +59,7 @@ func initializer(cmd *cobra.Command, _ []string) error {
 
 		for _, v := range locations {
 			var nm string
-			nm, err = find_nm(v)
+			nm, err = findNM(v)
 			if err != nil {
 				log.Println(err)
 
