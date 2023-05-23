@@ -179,3 +179,28 @@ func TestInitMakeNonmemEntriesCollisionCase(tt *testing.T) {
 		t.R.Equal(keys(es), []string{"nm75"})
 	})
 }
+
+func TestInitMakeNonmemEntriesKeySanitization(tt *testing.T) {
+	id := "UNIT-INIT-005"
+	tt.Run(utils.AddTestId("", id), func(tt *testing.T) {
+		t := wrapt.WrapT(tt)
+		tdir := t.TempDir()
+
+		name := "nm.75"
+		if err := setupDir(filepath.Join(tdir, name)); err != nil {
+			t.Fatal(err)
+		}
+
+		es, err := makeNonmemEntries([]string{tdir})
+		t.R.NoError(err)
+		t.R.Equal(es["nm-75"].Home, filepath.Join(tdir, name))
+
+		if err = setupDir(filepath.Join(tdir, "nm-75")); err != nil {
+			t.Fatal(err)
+		}
+
+		es, err = makeNonmemEntries([]string{tdir})
+		t.R.NoError(err)
+		t.R.Equal(keys(es), []string{"nm-75"})
+	})
+}
