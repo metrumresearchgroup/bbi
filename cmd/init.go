@@ -76,7 +76,9 @@ func initializer(cmd *cobra.Command, _ []string) error {
 	}
 
 	c := configlib.Config{}
-	errpanic(viper.Unmarshal(&c))
+	if err = viper.Unmarshal(&c); err != nil {
+		return err
+	}
 
 	yamlString, err := yaml.Marshal(c)
 	if err != nil {
