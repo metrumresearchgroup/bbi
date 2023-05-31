@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/metrumresearchgroup/bbi/utils"
@@ -55,4 +57,47 @@ func TestInitialization(tt *testing.T) {
 			})
 		})
 	}
+}
+
+func TestInitializationSanitization(tt *testing.T) {
+	id := "INT-INIT-002"
+	tt.Run(utils.AddTestId("", id), func(tt *testing.T) {
+		t := wrapt.WrapT(tt)
+		tdir := t.TempDir()
+		dir := filepath.Join(tdir, "x.y")
+		for _, d := range []string{"license", "run", "util", "source"} {
+			sdir := filepath.Join(dir, d)
+			if err := os.MkdirAll(sdir, 0777); err != nil {
+				t.Fatal(err)
+			}
+		}
+
+		lic := filepath.Join(dir, "license", "nonmem.lic")
+		if err := os.WriteFile(lic, []byte(""), 0666); err != nil {
+			t.Fatal(err)
+		}
+
+		nmfe := filepath.Join(dir, "run", "nmfe12")
+		if runtime.GOOS == "windows" {
+			nmfe = nmfe + ".bat"
+		}
+
+		if err := os.WriteFile(nmfe, []byte(""), 0777); err != nil {
+			t.Fatal(err)
+		}
+
+		cmd := exec.Command("bbi", "init", "--dir", tdir)
+		cmd.Dir = tdir
+		t.R.NoError(cmd.Run())
+
+		c := configlib.Config{}
+		fh, err := os.Open(filepath.Join(tdir, "bbi.yaml"))
+		t.R.NoError(err)
+		defer fh.Close()
+
+		bytes, err := ioutil.ReadAll(fh)
+		t.R.NoError(err)
+		t.R.NoError(yaml.Unmarshal(bytes, &c))
+		t.R.Equal(c.Nonmem["x-y"].Home, filepath.Join(tdir, "x.y"))
+	})
 }

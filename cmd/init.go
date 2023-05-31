@@ -3,7 +3,6 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -13,6 +12,7 @@ import (
 	"github.com/metrumresearchgroup/bbi/configlib"
 
 	"github.com/ghodss/yaml"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
@@ -22,61 +22,21 @@ import (
 func initializer(cmd *cobra.Command, _ []string) error {
 	fs := afero.NewOsFs()
 
-	locations := []string{}
-
 	dir, err := cmd.Flags().GetStringSlice("dir")
 	if err != nil {
 		return fmt.Errorf("get dir string: %w", err)
 	}
 
-	var find_nm func(string) (string, error)
-	if runtime.GOOS == "windows" {
-		find_nm = findNonMemBinaryWindows
-	} else {
-		find_nm = findNonMemBinary
-	}
-
-	for _, l := range dir {
-		var files []os.FileInfo
-		// For each directory underneath the dir provided. Let's see if it's nonmemmy
-		files, err = afero.ReadDir(fs, l)
-		if err != nil {
-			return fmt.Errorf("list directory: %w", err)
-		}
-
-		for _, v := range files {
-			// If it's a dir
-			if ok, _ := afero.IsDir(fs, filepath.Join(l, v.Name())); ok {
-				// And nonmem-ish
-				if isPathNonMemmy(filepath.Join(l, v.Name())) {
-					// Add it to the list
-					locations = append(locations, filepath.Join(l, v.Name()))
-				}
-			}
-		}
-
-		// Let's iterate over the found locations and create the viper objects
-
-		for _, v := range locations {
-			var nm string
-			nm, err = find_nm(v)
-			if err != nil {
-				log.Println(err)
-
-				continue
-			}
-
-			identifier := filepath.Base(v)
-
-			viper.Set("nonmem."+identifier+".default", len(locations) == 1) // If there's only one location, true
-			viper.Set("nonmem."+identifier+".executable", nm)
-			viper.Set("nonmem."+identifier+".home", v)
-			viper.Set("nonmem."+identifier+".nmqual", hasNMQual(v))
-		}
+	nmEntries, err := makeNonmemEntries(dir)
+	if err != nil {
+		return nil
 	}
 
 	c := configlib.Config{}
-	errpanic(viper.Unmarshal(&c))
+	if err = viper.Unmarshal(&c); err != nil {
+		return err
+	}
+	c.Nonmem = nmEntries
 
 	yamlString, err := yaml.Marshal(c)
 	if err != nil {
@@ -104,6 +64,67 @@ func NewInitCmd() *cobra.Command {
 	cmd.Flags().StringSlice(directory, []string{}, "A directory in which to look for NonMem Installations")
 
 	return cmd
+}
+
+// makeConfigEntries returns a NonMemDetail entry for each NONMEM
+// installation directory found under dirs.
+func makeNonmemEntries(dirs []string) (map[string]configlib.NonMemDetail, error) {
+	locations, err := findInstallDirs(dirs)
+	if err != nil {
+		return nil, err
+	}
+
+	var findNM func(string) (string, error)
+	if runtime.GOOS == "windows" {
+		findNM = findNonMemBinaryWindows
+	} else {
+		findNM = findNonMemBinary
+	}
+
+	ids := makeIdentifiers(locations)
+	entries := make(map[string]configlib.NonMemDetail)
+	for id, v := range ids {
+		var nm string
+		nm, err = findNM(v)
+		if err != nil {
+			log.Println(err)
+
+			continue
+		}
+
+		entries[id] = configlib.NonMemDetail{
+			Default:    len(locations) == 1,
+			Executable: nm,
+			Home:       v,
+			Nmqual:     hasNMQual(v),
+		}
+	}
+
+	return entries, nil
+}
+
+// findInstallDirs returns all subdirectories under dirs that look
+// like the top-level directory of a NONMEM installation path.
+func findInstallDirs(dirs []string) ([]string, error) {
+	locations := []string{}
+	fs := afero.NewOsFs()
+	for _, l := range dirs {
+		var files []os.FileInfo
+		files, err := afero.ReadDir(fs, l)
+		if err != nil {
+			return nil, fmt.Errorf("list directory: %w", err)
+		}
+
+		for _, v := range files {
+			if ok, _ := afero.IsDir(fs, filepath.Join(l, v.Name())); ok {
+				if isPathNonMemmy(filepath.Join(l, v.Name())) {
+					locations = append(locations, filepath.Join(l, v.Name()))
+				}
+			}
+		}
+	}
+
+	return locations, nil
 }
 
 // Evaluates if a specific directory path is nonmem-ish.
@@ -239,4 +260,20 @@ func hasNMQual(path string) bool {
 	}
 
 	return false
+}
+
+func makeIdentifiers(locs []string) map[string]string {
+	ids := make(map[string]string)
+	for _, loc := range locs {
+		// Viper keys are case insensitive and delimited by periods.
+		id := strings.ReplaceAll(strings.ToLower(filepath.Base(loc)), ".", "-")
+		if loc1, exists := ids[id]; exists {
+			log.Warnf("Ignoring %q because its key collides with %q\n", loc1, loc)
+
+			continue
+		}
+		ids[id] = loc
+	}
+
+	return ids
 }
