@@ -1,4 +1,26 @@
 
+# bbi 3.2.3
+
+## Bug fixes
+
+* `bbi nonmem summary` omitted the `problem_text` key from its JSON
+  output when a model's `$PROBLEM` was empty, breaking the expectation
+  of `bbr`.  (#299)
+
+* `bbi nonmem summary` did not permit leading whitespace before a
+  `$SIM` directive despite that being valid NONMEM syntax.  (#301)
+
+* `bbi nonmmem run` and `bbi nonmem summary` did not ignore commented
+  `$DATA` lines.  (#301)
+
+* `bbi init` now warns the user if there is a collision when
+  generating identifiers under the "nonmem" entry of `bbi.yaml`.
+  (#304)
+
+* `bbi init` now support NONMEM installation directories that include
+  a period in their name.  (#304)
+
+
 # bbi 3.2.2
 
 ## Bug fixes
