@@ -512,6 +512,13 @@ func filesToCleanup(model *NonMemModel, exceptions ...string) runner.FileCleanIn
 				}
 			}
 		}
+
+		re_wk := regexp.MustCompile("^WK_[0-9]+")
+		for _, f := range files {
+			if f.Size() == 0 && !f.IsDir() && re_wk.MatchString(f.Name()) {
+				fci.FilesToRemove = append(fci.FilesToRemove, newTargetFile(f.Name(), model.Configuration.CleanLvl))
+			}
+		}
 	}
 
 	return fci
