@@ -273,9 +273,11 @@ func copyConfig(t *wrapt.T) string {
 
 	t.R.NoError(fs.MkdirAll(dir, 0755))
 	source, _ := fs.Open("bbi.yaml")
-	defer t.R.NoError(source.Close())
+	defer source.Close()
 	dest, _ := fs.Create(config)
-	defer t.R.NoError(dest.Close())
+	defer func() {
+		t.R.NoError(dest.Close())
+	}()
 
 	_, _ = io.Copy(dest, source)
 
