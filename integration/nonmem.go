@@ -60,6 +60,13 @@ func AssertNonMemCleanedUpFiles(t *wrapt.T, details NonMemTestingDetails) {
 			t.A.NoFileExists(filepath.Join(details.OutputDir, f))
 		}
 	}
+
+	// Parallelization-related files handled by nonmem.filesToCleanup().
+	files, err := os.ReadDir(details.OutputDir)
+	t.R.NoError(err)
+	for _, fi := range files {
+		t.R.NotRegexp("^WK_", fi.Name())
+	}
 }
 
 func AssertBBIConfigJSONCreated(t *wrapt.T, details NonMemTestingDetails) {

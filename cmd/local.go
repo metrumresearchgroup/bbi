@@ -516,6 +516,7 @@ func createNewGitIgnoreFile(m *NonMemModel) error {
 
 	// Force level one per initial discussions
 	linesToAddToGitignore := getCleanableFileList(m.FileName, 1)
+	linesToAddToGitignore = append(linesToAddToGitignore, "WK_[0-9]*")
 
 	err := utils.WriteLines(linesToAddToGitignore, path.Join(m.OutputDir, ".gitignore"))
 

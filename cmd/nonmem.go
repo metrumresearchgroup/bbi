@@ -497,19 +497,26 @@ func filesToCleanup(model *NonMemModel, exceptions ...string) runner.FileCleanIn
 
 	if model.Configuration.Parallel {
 		fs := afero.NewOsFs()
+		files, err := afero.ReadDir(fs, model.OutputDir)
+
+		if err != nil {
+			log.Printf("Error trying to read directory %s for parallel files to cleanup", model.OutputDir)
+		}
+
 		for _, variant := range parallelRegexesToRemove {
 			r := regexp.MustCompile(variant)
-
-			files, err := afero.ReadDir(fs, model.OutputDir)
-
-			if err != nil {
-				log.Printf("Error trying to read directory %s for parallel files to cleanup", model.OutputDir)
-			}
 
 			for _, f := range files {
 				if r.MatchString(f.Name()) {
 					fci.FilesToRemove = append(fci.FilesToRemove, newTargetFile(f.Name(), model.Configuration.CleanLvl))
 				}
+			}
+		}
+
+		re_wk := regexp.MustCompile("^WK_[0-9]+")
+		for _, f := range files {
+			if f.Size() == 0 && !f.IsDir() && re_wk.MatchString(f.Name()) {
+				fci.FilesToRemove = append(fci.FilesToRemove, newTargetFile(f.Name(), model.Configuration.CleanLvl))
 			}
 		}
 	}
