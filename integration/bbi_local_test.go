@@ -259,22 +259,27 @@ func TestDefaultConfigLoaded(tt *testing.T) {
 	}
 }
 
-func copyConfig(t *wrapt.T) {
+func copyConfig(t *wrapt.T) string {
 	t.Helper()
 
 	fs := afero.NewOsFs()
 
-	if ok, _ := afero.DirExists(fs, filepath.Join(ROOT_EXECUTION_DIR, "meow")); ok {
-		t.R.NoError(fs.RemoveAll(filepath.Join(ROOT_EXECUTION_DIR, "meow")))
+	dir := filepath.Join(ROOT_EXECUTION_DIR, "meow")
+	config := filepath.Join(dir, "bbi.yaml")
+
+	if ok, _ := afero.DirExists(fs, dir); ok {
+		t.R.NoError(fs.RemoveAll(dir))
 	}
 
-	t.R.NoError(fs.MkdirAll(filepath.Join(ROOT_EXECUTION_DIR, "meow"), 0755))
+	t.R.NoError(fs.MkdirAll(dir, 0755))
 	source, _ := fs.Open("bbi.yaml")
 	defer t.R.NoError(source.Close())
-	dest, _ := fs.Create(filepath.Join(ROOT_EXECUTION_DIR, "meow", "bbi.yaml"))
+	dest, _ := fs.Create(config)
 	defer t.R.NoError(dest.Close())
 
 	_, _ = io.Copy(dest, source)
+
+	return config
 }
 
 func TestSpecifiedConfigByAbsPathLoaded(tt *testing.T) {
@@ -292,7 +297,7 @@ func TestSpecifiedConfigByAbsPathLoaded(tt *testing.T) {
 	for _, test := range tests {
 		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
-			copyConfig(t)
+			config := copyConfig(t)
 
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 			defer cancel()
@@ -302,7 +307,7 @@ func TestSpecifiedConfigByAbsPathLoaded(tt *testing.T) {
 			nonMemArguments := []string{
 				"-d",
 				"--config",
-				filepath.Join(ROOT_EXECUTION_DIR, "meow", "bbi.yaml"),
+				config,
 				"nonmem",
 				"run",
 				"local",
@@ -321,7 +326,7 @@ func TestSpecifiedConfigByAbsPathLoaded(tt *testing.T) {
 						Output:    out,
 					}
 
-					AssertSpecifiedConfigLoaded(t, nmd, filepath.Join(ROOT_EXECUTION_DIR, "meow", "bbi.yaml"))
+					AssertSpecifiedConfigLoaded(t, nmd, config)
 				})
 			}
 		})
@@ -334,7 +339,7 @@ func TestSpecifiedConfigByRelativePathLoaded(tt *testing.T) {
 	testId := "INT-LOCAL-006"
 	tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
 		t := wrapt.WrapT(tt)
-		copyConfig(t)
+		config := copyConfig(t)
 
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 		defer cancel()
@@ -343,7 +348,7 @@ func TestSpecifiedConfigByRelativePathLoaded(tt *testing.T) {
 		nonMemArguments := []string{
 			"-d",
 			"--config",
-			filepath.Join(ROOT_EXECUTION_DIR, "meow", "bbi.yaml"),
+			config,
 			"nonmem",
 			"run",
 			"local",
@@ -362,7 +367,7 @@ func TestSpecifiedConfigByRelativePathLoaded(tt *testing.T) {
 					Output:    out,
 				}
 
-				AssertSpecifiedConfigLoaded(t, nmd, filepath.Join(ROOT_EXECUTION_DIR, "meow", "bbi.yaml"))
+				AssertSpecifiedConfigLoaded(t, nmd, config)
 			})
 		}
 	})
