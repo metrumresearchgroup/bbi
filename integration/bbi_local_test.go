@@ -269,7 +269,6 @@ func copyConfig(t *wrapt.T) {
 	}
 
 	t.R.NoError(fs.MkdirAll(filepath.Join(ROOT_EXECUTION_DIR, "meow"), 0755))
-	// Copy the bbi file here
 	source, _ := fs.Open("bbi.yaml")
 	defer t.R.NoError(source.Close())
 	dest, _ := fs.Create(filepath.Join(ROOT_EXECUTION_DIR, "meow", "bbi.yaml"))
@@ -347,7 +346,6 @@ func TestSpecifiedConfigByRelativePathLoaded(tt *testing.T) {
 		defer cancel()
 		scenario := InitializeScenario(t, "acop")
 
-		// Copy config to /${ROOT_EXECUTION_DIR}/meow/bbi.yaml
 		nonMemArguments := []string{
 			"-d",
 			"--config",
