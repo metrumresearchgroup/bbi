@@ -281,13 +281,6 @@ func TestSpecifiedConfigByAbsPathLoaded(tt *testing.T) {
 	SkipIfNotEnabled(tt, "LOCAL")
 
 	testId := "INT-LOCAL-005"
-	func() {
-		tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
-			t := wrapt.WrapT(tt)
-			copyConfig(t)
-		})
-	}()
-
 	tests := []struct {
 		name string
 	}{
@@ -299,6 +292,7 @@ func TestSpecifiedConfigByAbsPathLoaded(tt *testing.T) {
 	for _, test := range tests {
 		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
+			copyConfig(t)
 
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 			defer cancel()
