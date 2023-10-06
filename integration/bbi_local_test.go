@@ -259,31 +259,38 @@ func TestDefaultConfigLoaded(tt *testing.T) {
 	}
 }
 
+func copyConfig(t *wrapt.T) string {
+	t.Helper()
+
+	fs := afero.NewOsFs()
+
+	dir := filepath.Join(ROOT_EXECUTION_DIR, "meow")
+	config := filepath.Join(dir, "bbi.yaml")
+
+	if ok, _ := afero.DirExists(fs, dir); ok {
+		t.R.NoError(fs.RemoveAll(dir))
+	}
+
+	t.R.NoError(fs.MkdirAll(dir, 0755))
+	source, err := fs.Open("bbi.yaml")
+	t.R.NoError(err)
+	defer source.Close()
+	dest, err := fs.Create(config)
+	t.R.NoError(err)
+	defer func() {
+		t.R.NoError(dest.Close())
+	}()
+
+	_, err = io.Copy(dest, source)
+	t.R.NoError(err)
+
+	return config
+}
+
 func TestSpecifiedConfigByAbsPathLoaded(tt *testing.T) {
 	SkipIfNotEnabled(tt, "LOCAL")
 
 	testId := "INT-LOCAL-005"
-	func() {
-		tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
-			t := wrapt.WrapT(tt)
-
-			fs := afero.NewOsFs()
-
-			if ok, _ := afero.DirExists(fs, filepath.Join(ROOT_EXECUTION_DIR, "meow")); ok {
-				t.R.NoError(fs.RemoveAll(filepath.Join(ROOT_EXECUTION_DIR, "meow")))
-			}
-
-			t.R.NoError(fs.MkdirAll(filepath.Join(ROOT_EXECUTION_DIR, "meow"), 0755))
-			// Copy the bbi file here
-			source, _ := fs.Open("bbi.yaml")
-			defer t.R.NoError(source.Close())
-			dest, _ := fs.Create(filepath.Join(ROOT_EXECUTION_DIR, "meow", "bbi.yaml"))
-			defer t.R.NoError(dest.Close())
-
-			_, _ = io.Copy(dest, source)
-		})
-	}()
-
 	tests := []struct {
 		name string
 	}{
@@ -295,6 +302,7 @@ func TestSpecifiedConfigByAbsPathLoaded(tt *testing.T) {
 	for _, test := range tests {
 		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
+			config := copyConfig(t)
 
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 			defer cancel()
@@ -304,7 +312,7 @@ func TestSpecifiedConfigByAbsPathLoaded(tt *testing.T) {
 			nonMemArguments := []string{
 				"-d",
 				"--config",
-				filepath.Join(ROOT_EXECUTION_DIR, "meow", "bbi.yaml"),
+				config,
 				"nonmem",
 				"run",
 				"local",
@@ -323,7 +331,7 @@ func TestSpecifiedConfigByAbsPathLoaded(tt *testing.T) {
 						Output:    out,
 					}
 
-					AssertSpecifiedConfigLoaded(t, nmd, filepath.Join(ROOT_EXECUTION_DIR, "meow", "bbi.yaml"))
+					AssertSpecifiedConfigLoaded(t, nmd, config)
 				})
 			}
 		})
@@ -336,31 +344,16 @@ func TestSpecifiedConfigByRelativePathLoaded(tt *testing.T) {
 	testId := "INT-LOCAL-006"
 	tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
 		t := wrapt.WrapT(tt)
-
-		fs := afero.NewOsFs()
-
-		if ok, _ := afero.DirExists(fs, filepath.Join(ROOT_EXECUTION_DIR, "meow")); ok {
-			t.R.NoError(fs.RemoveAll(filepath.Join(ROOT_EXECUTION_DIR, "meow")))
-		}
-
-		t.R.NoError(fs.MkdirAll(filepath.Join(ROOT_EXECUTION_DIR, "meow"), 0755))
-		// Copy the bbi file here
-		source, _ := fs.Open("bbi.yaml")
-		defer t.R.NoError(source.Close())
-		dest, _ := fs.Create(filepath.Join(ROOT_EXECUTION_DIR, "meow", "bbi.yaml"))
-		defer t.R.NoError(dest.Close())
-
-		_, _ = io.Copy(dest, source)
+		config := copyConfig(t)
 
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 		defer cancel()
 		scenario := InitializeScenario(t, "acop")
 
-		// Copy config to /${ROOT_EXECUTION_DIR}/meow/bbi.yaml
 		nonMemArguments := []string{
 			"-d",
 			"--config",
-			filepath.Join(ROOT_EXECUTION_DIR, "meow", "bbi.yaml"),
+			config,
 			"nonmem",
 			"run",
 			"local",
@@ -379,7 +372,7 @@ func TestSpecifiedConfigByRelativePathLoaded(tt *testing.T) {
 					Output:    out,
 				}
 
-				AssertSpecifiedConfigLoaded(t, nmd, filepath.Join(ROOT_EXECUTION_DIR, "meow", "bbi.yaml"))
+				AssertSpecifiedConfigLoaded(t, nmd, config)
 			})
 		}
 	})
