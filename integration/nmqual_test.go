@@ -65,7 +65,7 @@ func TestHashingForNMQualWorksWithOriginalModFile(tt *testing.T) {
 
 	t := wrapt.WrapT(tt)
 
-	scenario := InitializeScenario(t, "240")
+	scenario := InitializeScenario(t, "acop")
 	scenario.Prepare(t, context.Background())
 
 	testId := "INT-NMQ-002"

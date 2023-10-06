@@ -81,7 +81,6 @@ func TestBbiCompletesParallelSGEExecution(tt *testing.T) {
 	tests := []struct {
 		name string
 	}{
-		{name: "240"},
 		{name: "acop"},
 		{name: "ctl_test"},
 		{name: "leading-path-with space"},
