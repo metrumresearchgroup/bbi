@@ -259,6 +259,25 @@ func TestDefaultConfigLoaded(tt *testing.T) {
 	}
 }
 
+func copyConfig(t *wrapt.T) {
+	t.Helper()
+
+	fs := afero.NewOsFs()
+
+	if ok, _ := afero.DirExists(fs, filepath.Join(ROOT_EXECUTION_DIR, "meow")); ok {
+		t.R.NoError(fs.RemoveAll(filepath.Join(ROOT_EXECUTION_DIR, "meow")))
+	}
+
+	t.R.NoError(fs.MkdirAll(filepath.Join(ROOT_EXECUTION_DIR, "meow"), 0755))
+	// Copy the bbi file here
+	source, _ := fs.Open("bbi.yaml")
+	defer t.R.NoError(source.Close())
+	dest, _ := fs.Create(filepath.Join(ROOT_EXECUTION_DIR, "meow", "bbi.yaml"))
+	defer t.R.NoError(dest.Close())
+
+	_, _ = io.Copy(dest, source)
+}
+
 func TestSpecifiedConfigByAbsPathLoaded(tt *testing.T) {
 	SkipIfNotEnabled(tt, "LOCAL")
 
@@ -266,21 +285,7 @@ func TestSpecifiedConfigByAbsPathLoaded(tt *testing.T) {
 	func() {
 		tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
-
-			fs := afero.NewOsFs()
-
-			if ok, _ := afero.DirExists(fs, filepath.Join(ROOT_EXECUTION_DIR, "meow")); ok {
-				t.R.NoError(fs.RemoveAll(filepath.Join(ROOT_EXECUTION_DIR, "meow")))
-			}
-
-			t.R.NoError(fs.MkdirAll(filepath.Join(ROOT_EXECUTION_DIR, "meow"), 0755))
-			// Copy the bbi file here
-			source, _ := fs.Open("bbi.yaml")
-			defer t.R.NoError(source.Close())
-			dest, _ := fs.Create(filepath.Join(ROOT_EXECUTION_DIR, "meow", "bbi.yaml"))
-			defer t.R.NoError(dest.Close())
-
-			_, _ = io.Copy(dest, source)
+			copyConfig(t)
 		})
 	}()
 
@@ -336,21 +341,7 @@ func TestSpecifiedConfigByRelativePathLoaded(tt *testing.T) {
 	testId := "INT-LOCAL-006"
 	tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {
 		t := wrapt.WrapT(tt)
-
-		fs := afero.NewOsFs()
-
-		if ok, _ := afero.DirExists(fs, filepath.Join(ROOT_EXECUTION_DIR, "meow")); ok {
-			t.R.NoError(fs.RemoveAll(filepath.Join(ROOT_EXECUTION_DIR, "meow")))
-		}
-
-		t.R.NoError(fs.MkdirAll(filepath.Join(ROOT_EXECUTION_DIR, "meow"), 0755))
-		// Copy the bbi file here
-		source, _ := fs.Open("bbi.yaml")
-		defer t.R.NoError(source.Close())
-		dest, _ := fs.Create(filepath.Join(ROOT_EXECUTION_DIR, "meow", "bbi.yaml"))
-		defer t.R.NoError(dest.Close())
-
-		_, _ = io.Copy(dest, source)
+		copyConfig(t)
 
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 		defer cancel()
