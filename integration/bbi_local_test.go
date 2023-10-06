@@ -24,6 +24,7 @@ func TestBbiCompletesLocalExecution(tt *testing.T) {
 		{name: "metrum_std"},
 		{name: "leading-path-with space"},
 		{name: "modquote"},
+		{name: "period_test"},
 		{name: "datacomment"},
 	}
 
