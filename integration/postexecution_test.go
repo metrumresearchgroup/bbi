@@ -55,7 +55,7 @@ func TestKVPExpansion(tt *testing.T) {
 		t := wrapt.WrapT(tt)
 
 		mapdata := make(map[string]string)
-		mapdata["SCENARIO"] = "240"
+		mapdata["SCENARIO"] = "acop"
 		mapdata["ROOT_EXECUTION_DIR"] = "/data/one"
 
 		generated, err := generatePostWorkEnvsString(mapdata)

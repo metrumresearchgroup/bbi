@@ -2,6 +2,7 @@ $PROBLEM PK model 1 cmt base
 
 $INPUT ID TIME MDV EVID DV AMT  SEX WT ETN
 $DATA ../acop.csv IGNORE=@
+; $DATA      ../idontexist.csv IGNORE=@
 $SUBROUTINES ADVAN2 TRANS2
 
 $PK

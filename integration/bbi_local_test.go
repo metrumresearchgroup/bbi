@@ -81,7 +81,6 @@ func TestNMFEOptionsEndInScript(tt *testing.T) {
 	tests := []struct {
 		name string
 	}{
-		{name: "240"},
 		{name: "acop"},
 		{name: "ctl_test"},
 		{name: "metrum_std"},
@@ -157,7 +156,6 @@ func TestBbiParallelExecution(tt *testing.T) {
 	tests := []struct {
 		name string
 	}{
-		{name: "240"},
 		{name: "acop"},
 		{name: "ctl_test"},
 		{name: "metrum_std"},
@@ -222,7 +220,7 @@ func TestDefaultConfigLoaded(tt *testing.T) {
 	tests := []struct {
 		name string
 	}{
-		{name: "240"},
+		{name: "acop"},
 	}
 
 	testId := "INT-LOCAL-004"
@@ -289,10 +287,9 @@ func TestSpecifiedConfigByAbsPathLoaded(tt *testing.T) {
 	tests := []struct {
 		name string
 	}{
-		{name: "240"},
-		// {name: "acop"},
-		// {name: "ctl_test"},
-		// {name: "metrum_std"},
+		{name: "acop"},
+		{name: "ctl_test"},
+		{name: "metrum_std"},
 	}
 
 	for _, test := range tests {
@@ -357,7 +354,7 @@ func TestSpecifiedConfigByRelativePathLoaded(tt *testing.T) {
 
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 		defer cancel()
-		scenario := InitializeScenario(t, "240")
+		scenario := InitializeScenario(t, "acop")
 
 		// Copy config to /${ROOT_EXECUTION_DIR}/meow/bbi.yaml
 		nonMemArguments := []string{

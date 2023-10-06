@@ -21,7 +21,6 @@ func TestBBIConfigJSONCreated(tt *testing.T) {
 	tests := []struct {
 		name string
 	}{
-		{name: "240"},
 		{name: "acop"},
 		{name: "ctl_test"},
 		{name: "metrum_std"},
@@ -97,7 +96,7 @@ func TestConfigValuesAreCorrectInWrittenFile(tt *testing.T) {
 		--mpi_exec_path
 	*/
 
-	scenario := InitializeScenario(t, "240")
+	scenario := InitializeScenario(t, "acop")
 	scenario.Prepare(t, context.Background())
 
 	commandAndArgs := []string{
