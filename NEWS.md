@@ -1,4 +1,11 @@
 
+# bbi 3.3.0
+
+## New features
+
+* `bbi nonmem run` now cleans up empty `WK_*` files.  (#306)
+
+
 # bbi 3.2.3
 
 ## Bug fixes
