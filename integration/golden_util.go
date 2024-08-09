@@ -2,7 +2,7 @@ package bbitest
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	"github.com/metrumresearchgroup/wrapt"
 )
@@ -16,7 +16,7 @@ type GoldenFileTestingDetails struct {
 func RequireOutputMatchesGoldenFile(t *wrapt.T, details GoldenFileTestingDetails) {
 	t.Helper()
 
-	gb, err := ioutil.ReadFile(details.goldenFilePath)
+	gb, err := os.ReadFile(details.goldenFilePath)
 	if err != nil {
 		err = fmt.Errorf("failed reading %s: %w", details.goldenFilePath, err)
 	}
@@ -35,7 +35,7 @@ func UpdateGoldenFile(t *wrapt.T, details GoldenFileTestingDetails) {
 
 	t.Logf("updating golden file %s", details.goldenFilePath)
 
-	err := ioutil.WriteFile(details.goldenFilePath, []byte(details.outputString), 0644)
+	err := os.WriteFile(details.goldenFilePath, []byte(details.outputString), 0644)
 	if err != nil {
 		err = fmt.Errorf("failed to update %s: %w", details.goldenFilePath, err)
 	}

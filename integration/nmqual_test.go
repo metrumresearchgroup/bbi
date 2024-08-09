@@ -2,7 +2,7 @@ package bbitest
 
 import (
 	"context"
-	"io/ioutil"
+	"io"
 	"os"
 	"path/filepath"
 	"testing"
@@ -103,7 +103,7 @@ func AssertScriptContainsAutologReference(t *wrapt.T, details NonMemTestingDetai
 	t.Helper()
 
 	scriptFile, _ := os.Open(filepath.Join(details.OutputDir, details.Model.identifier+".sh"))
-	bytes, _ := ioutil.ReadAll(scriptFile)
+	bytes, _ := io.ReadAll(scriptFile)
 	err := scriptFile.Close()
 	t.R.NoError(err)
 

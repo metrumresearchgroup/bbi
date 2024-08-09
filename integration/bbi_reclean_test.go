@@ -2,7 +2,7 @@ package bbitest
 
 import (
 	"context"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"regexp"
 	"testing"
@@ -17,9 +17,9 @@ func TestBBIRecleanBasic(tt *testing.T) {
 	fdata := filepath.Join(dir, "FDATA")
 	fdataCSV := filepath.Join(dir, "FDATA.csv")
 
-	_ = ioutil.WriteFile(fdata, []byte("fake"), 0644)
+	_ = os.WriteFile(fdata, []byte("fake"), 0644)
 	t.A.FileExists(fdata)
-	_ = ioutil.WriteFile(fdataCSV, []byte("fake"), 0644)
+	_ = os.WriteFile(fdataCSV, []byte("fake"), 0644)
 	t.A.FileExists(fdataCSV)
 
 	output, err := executeCommand(context.Background(),

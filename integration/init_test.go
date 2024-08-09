@@ -3,7 +3,7 @@ package bbitest
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -46,7 +46,7 @@ func TestInitialization(tt *testing.T) {
 				t.R.NoError(err)
 				defer func() { t.R.NoError(configHandle.Close()) }()
 
-				bytes, err := ioutil.ReadAll(configHandle)
+				bytes, err := io.ReadAll(configHandle)
 				t.R.NoError(err)
 
 				t.R.NotContains(bytes, []byte("bbi_binary"))
@@ -95,7 +95,7 @@ func TestInitializationSanitization(tt *testing.T) {
 		t.R.NoError(err)
 		defer fh.Close()
 
-		bytes, err := ioutil.ReadAll(fh)
+		bytes, err := io.ReadAll(fh)
 		t.R.NoError(err)
 		t.R.NoError(yaml.Unmarshal(bytes, &c))
 		t.R.Equal(c.Nonmem["x-y"].Home, filepath.Join(tdir, "x.y"))

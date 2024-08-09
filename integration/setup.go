@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -481,7 +480,7 @@ func FeatureEnabled(key string) bool {
 
 func GetScenarioDetailsFromFile(r io.Reader) (ScenarioDetails, error) {
 	var s ScenarioDetails
-	contents, _ := ioutil.ReadAll(r)
+	contents, _ := io.ReadAll(r)
 	err := json.Unmarshal(contents, &s)
 
 	return s, err
@@ -489,7 +488,7 @@ func GetScenarioDetailsFromFile(r io.Reader) (ScenarioDetails, error) {
 
 func GetBBIConfigJSONHashedValues(r io.Reader) (Hashes, error) {
 	var h Hashes
-	contents, _ := ioutil.ReadAll(r)
+	contents, _ := io.ReadAll(r)
 	err := json.Unmarshal(contents, &h)
 
 	return h, err

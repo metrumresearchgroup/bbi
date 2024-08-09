@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 
 	"bytes"
 
@@ -19,7 +18,7 @@ func main() {
 	if os.IsNotExist(err) {
 		fmt.Println("could not find specified file or resolve path")
 	}
-	xmlDataRaw, err := ioutil.ReadFile(file)
+	xmlDataRaw, err := os.ReadFile(file)
 	if err != nil {
 		fmt.Println("error reading")
 		fmt.Println(err)

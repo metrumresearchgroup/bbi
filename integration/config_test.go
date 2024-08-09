@@ -3,7 +3,7 @@ package bbitest
 import (
 	"context"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"os"
 	"path/filepath"
 	"testing"
@@ -70,7 +70,7 @@ func AssertBBIConfigContainsSpecifiedNMVersion(t *wrapt.T, details NonMemTesting
 	t.Helper()
 
 	configFile, _ := os.Open(filepath.Join(details.OutputDir, "bbi_config.json"))
-	cbytes, _ := ioutil.ReadAll(configFile)
+	cbytes, _ := io.ReadAll(configFile)
 	configFile.Close() // Go ahead and close the file handle
 
 	nm := cmd.NonMemModel{}
@@ -138,7 +138,7 @@ func TestConfigValuesAreCorrectInWrittenFile(tt *testing.T) {
 			configFile := filepath.Join(scenario.Workpath, m.identifier, "bbi.yaml")
 			file, _ := os.Open(configFile)
 			Config := configlib.Config{}
-			bytes, _ := ioutil.ReadAll(file)
+			bytes, _ := io.ReadAll(file)
 			err = yaml.Unmarshal(bytes, &Config)
 
 			t.A.Nil(err)

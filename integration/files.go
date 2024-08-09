@@ -1,7 +1,7 @@
 package bbitest
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 	"strings"
 )
@@ -15,7 +15,7 @@ func fileLines(path string) ([]string, error) {
 
 	defer file.Close()
 
-	contentBytes, err := ioutil.ReadAll(file)
+	contentBytes, err := io.ReadAll(file)
 
 	if err != nil {
 		return []string{}, err

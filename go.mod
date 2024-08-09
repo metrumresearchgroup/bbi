@@ -1,6 +1,6 @@
 module github.com/metrumresearchgroup/bbi
 
-go 1.15
+go 1.16
 
 require (
 	github.com/clbanning/mxj v1.8.4
