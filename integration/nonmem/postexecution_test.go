@@ -1,4 +1,4 @@
-package bbitest
+package nonmem
 
 import (
 	"bufio"

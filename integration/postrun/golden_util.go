@@ -1,4 +1,4 @@
-package bbitest
+package postrun
 
 import (
 	"fmt"

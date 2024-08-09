@@ -1,4 +1,4 @@
-package bbitest
+package postrun
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	. "github.com/metrumresearchgroup/bbi/integration"
 	"github.com/metrumresearchgroup/bbi/utils"
 	"github.com/metrumresearchgroup/wrapt"
 )
@@ -38,7 +39,7 @@ func TestParamsSingleModel(tt *testing.T) {
 				commandAndArgs = append(commandAndArgs, tc.bbiOption)
 			}
 
-			output, err := executeCommand(context.Background(), "bbi", commandAndArgs...)
+			output, err := ExecuteCommand(context.Background(), "bbi", commandAndArgs...)
 
 			t.R.NoError(err)
 			t.R.NotEmpty(output)
@@ -74,7 +75,7 @@ func TestParamsDir(tt *testing.T) {
 				commandAndArgs = append(commandAndArgs, tc.bbiOption)
 			}
 
-			output, err := executeCommand(context.Background(), "bbi", commandAndArgs...)
+			output, err := ExecuteCommand(context.Background(), "bbi", commandAndArgs...)
 
 			t.R.NoError(err)
 			t.R.NotEmpty(output)

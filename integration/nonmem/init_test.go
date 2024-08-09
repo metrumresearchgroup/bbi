@@ -1,4 +1,4 @@
-package bbitest
+package nonmem
 
 import (
 	"context"
@@ -10,6 +10,7 @@ import (
 	"runtime"
 	"testing"
 
+	. "github.com/metrumresearchgroup/bbi/integration"
 	"github.com/metrumresearchgroup/bbi/utils"
 
 	"github.com/metrumresearchgroup/wrapt"
@@ -34,7 +35,7 @@ func TestInitialization(tt *testing.T) {
 			scenario.Prepare(t, context.Background())
 
 			t.Run(fmt.Sprintf("init_%s", scenario.identifier), func(t *wrapt.T) {
-				_, err := executeCommand(context.Background(), "bbi", "init", "--dir", os.Getenv("NONMEMROOT"))
+				_, err := ExecuteCommand(context.Background(), "bbi", "init", "--dir", os.Getenv("NONMEMROOT"))
 				t.R.NoError(err)
 
 				t.A.FileExists(filepath.Join(scenario.Workpath, "bbi.yaml"))
