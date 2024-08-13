@@ -37,16 +37,13 @@ run:
 
 linters:
   enable:
-    - deadcode
     - errcheck
     - gosimple
     - govet
     - ineffassign
     - staticcheck
-    - structcheck
     - typecheck
     - unused
-    - varcheck
 #    - gosec
     - unparam
     - unconvert
@@ -58,5 +55,4 @@ linters:
     - whitespace
     - rowserrcheck
     - godot
-    - ifshort
     - nakedret
