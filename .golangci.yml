@@ -12,7 +12,7 @@ linters-settings:
   errcheck:
     check-type-assertions: true
   govet:
-    check-shadowing: true
+    shadow: true
   unparam:
     check-exported: true
   unused:
