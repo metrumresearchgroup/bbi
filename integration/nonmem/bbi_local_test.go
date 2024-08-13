@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	. "github.com/metrumresearchgroup/bbi/integration"
+	bi "github.com/metrumresearchgroup/bbi/integration"
 	"github.com/metrumresearchgroup/bbi/utils"
 
 	"github.com/metrumresearchgroup/wrapt"
@@ -136,7 +136,7 @@ func TestNMFEOptionsEndInScript(tt *testing.T) {
 
 					// Now let's run the script that was generated
 					t.R.NoError(os.Chdir(filepath.Join(scenario.Workpath, m.identifier)))
-					_, err = ExecuteCommand(ctx, filepath.Join(scenario.Workpath, m.identifier, m.identifier+".sh"))
+					_, err = bi.ExecuteCommand(ctx, filepath.Join(scenario.Workpath, m.identifier, m.identifier+".sh"))
 					t.R.NoError(os.Chdir(whereami))
 					t.R.NoError(err)
 

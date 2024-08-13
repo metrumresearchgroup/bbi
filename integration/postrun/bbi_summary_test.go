@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"testing"
 
-	. "github.com/metrumresearchgroup/bbi/integration"
+	bi "github.com/metrumresearchgroup/bbi/integration"
 	"github.com/metrumresearchgroup/bbi/utils"
 
 	"github.com/metrumresearchgroup/wrapt"
@@ -65,7 +65,7 @@ func TestSummaryHappyPath(tt *testing.T) {
 						commandAndArgs = append(commandAndArgs, tc.bbiOption)
 					}
 
-					output, err := ExecuteCommand(context.Background(), "bbi", commandAndArgs...)
+					output, err := bi.ExecuteCommand(context.Background(), "bbi", commandAndArgs...)
 
 					t.R.NoError(err)
 					t.R.NotEmpty(output)
@@ -131,14 +131,14 @@ func TestSummaryArgs(tt *testing.T) {
 					}
 
 					// try without flag and get error
-					output, err := ExecuteCommandNoErrorCheck(context.Background(), "bbi", commandAndArgs...)
+					output, err := bi.ExecuteCommandNoErrorCheck(context.Background(), "bbi", commandAndArgs...)
 					t.R.NotNil(err)
 					errorMatch, _ := regexp.MatchString(tm.errorRegEx, output)
 					t.R.True(errorMatch)
 
 					// append flag and get success
 					commandAndArgs = append(commandAndArgs, tm.bbiArg)
-					output, err = ExecuteCommand(context.Background(), "bbi", commandAndArgs...)
+					output, err = bi.ExecuteCommand(context.Background(), "bbi", commandAndArgs...)
 
 					t.R.NoError(err)
 					t.R.NotEmpty(output)
@@ -217,7 +217,7 @@ func TestSummaryErrors(tt *testing.T) {
 				args = append(args, tc.bbiArgs...)
 			}
 			args = append(args, filepath.Join(SUMMARY_TEST_DIR, tc.testPath))
-			output, err := ExecuteCommandNoErrorCheck(context.Background(), "bbi", args...)
+			output, err := bi.ExecuteCommandNoErrorCheck(context.Background(), "bbi", args...)
 			t.R.NotNil(err)
 			errorMatch, _ := regexp.MatchString(tc.errorMsg, output)
 			t.R.True(errorMatch)
@@ -238,7 +238,7 @@ func TestSummaryHappyPathNoExtension(tt *testing.T) {
 			filepath.Join(SUMMARY_TEST_DIR, mod, mod), // adding no extension should work
 		}
 
-		output, err := ExecuteCommand(context.Background(), "bbi", commandAndArgs...)
+		output, err := bi.ExecuteCommand(context.Background(), "bbi", commandAndArgs...)
 
 		t.R.NoError(err)
 		t.R.NotEmpty(output)
@@ -269,7 +269,7 @@ func TestSummaryHappyPathMultipleModels(tt *testing.T) {
 				if tc.bbiOption != "" {
 					commandAndArgs = append(commandAndArgs, tc.bbiOption)
 				}
-				output, err := ExecuteCommand(context.Background(), "bbi", commandAndArgs...)
+				output, err := bi.ExecuteCommand(context.Background(), "bbi", commandAndArgs...)
 
 				gtd := GoldenFileTestingDetails{
 					outputString: output,
@@ -307,7 +307,7 @@ func TestSummaryPathMultipleModelsError(tt *testing.T) {
 				if tc.bbiOption != "" {
 					commandAndArgs = append(commandAndArgs, tc.bbiOption)
 				}
-				output, err := ExecuteCommandNoErrorCheck(context.Background(),
+				output, err := bi.ExecuteCommandNoErrorCheck(context.Background(),
 					"bbi", commandAndArgs...)
 
 				// Avoid testing plain output with golden file due to

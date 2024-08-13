@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"testing"
 
-	. "github.com/metrumresearchgroup/bbi/integration"
+	bi "github.com/metrumresearchgroup/bbi/integration"
 	"github.com/metrumresearchgroup/wrapt"
 )
 
@@ -23,7 +23,7 @@ func TestBBIRecleanBasic(tt *testing.T) {
 	_ = os.WriteFile(fdataCSV, []byte("fake"), 0644)
 	t.A.FileExists(fdataCSV)
 
-	output, err := ExecuteCommand(context.Background(),
+	output, err := bi.ExecuteCommand(context.Background(),
 		"bbi", "nonmem", "reclean", "--recleanLvl=1", "-v", dir)
 	t.R.NoError(err)
 	t.R.NotEmpty(output)
@@ -34,7 +34,7 @@ func TestBBIRecleanBasic(tt *testing.T) {
 func TestBBIRecleanError(tt *testing.T) {
 	t := wrapt.WrapT(tt)
 
-	output, err := ExecuteCommandNoErrorCheck(context.Background(),
+	output, err := bi.ExecuteCommandNoErrorCheck(context.Background(),
 		"bbi", "nonmem", "reclean")
 
 	t.R.NotNil(err)
