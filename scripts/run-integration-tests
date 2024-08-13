@@ -1,0 +1,65 @@
+#!/bin/sh
+
+set -eu
+
+test -n "${METWORX_VERSION-}" || {
+    printf >&2 'Metworx is required to run integration tests\n'
+    exit 1
+}
+
+test -d integration || {
+    printf >&2 '%s must be executed from top-level directory of bbi repo\n' "$0"
+    exit 1
+}
+
+# Note: BBI_TEST_ROOT must be under /data.
+root=${BBI_TEST_ROOT-/data/bbi-tests}
+mkdir -p "$root"
+tdir=$(mktemp -d "$root"/run-XXXXX)
+trap 'rm -rf "$tdir"' 0
+
+BBI_GRID_NAME_PREFIX=$(basename "$tdir")
+export BBI_GRID_NAME_PREFIX
+export LOCAL=true
+export MPIEXEC_PATH=/usr/bin/mpiexec
+export NMQUAL=false
+export NMVERSION=nm75
+export NMVERSION_NMQUAL=nm74gf
+export NONMEMROOT=/opt/NONMEM
+export POST_EXECUTION=true
+export ROOT_EXECUTION_DIR="$tdir"
+export SGE=true
+export SGE_ARCH=lx-amd64
+export SGE_CELL=default
+export SGE_CLUSTER_NAME=p6444
+export SGE_EXECD_PORT=6445
+export SGE_QMASTER_PORT=6444
+export SGE_ROOT=/opt/sge
+
+bin=$tdir/bin
+mkdir "$bin"
+
+if test -n "${GOCOVERDIR-}"
+then
+    printf >&2 'building binary with -cover\n'
+    coverarg=-cover
+else
+    coverarg=
+fi
+
+version=$(git describe --always --dirty)
+
+# shellcheck disable=SC2086
+go build $coverarg \
+   -ldflags "-X github.com/metrumresearchgroup/bbi/cmd.VERSION=$version" \
+   -o "$bin/bbi" cmd/bbi/main.go
+
+export PATH="$bin:$PATH"
+
+printf >&2 'bbi path: %s\nbbi version: %s\n' \
+       "$(command -v bbi)" "$(bbi version)"
+
+cd integration
+bbi init --dir /opt/NONMEM --threads 2
+
+go test -count 1 "$@" ./...
