@@ -1,10 +1,9 @@
-package bbitest
+package nonmem
 
 import (
 	"bufio"
 	"bytes"
 	"context"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -86,7 +85,7 @@ func TestPostExecutionSucceeds(tt *testing.T) {
 				scenarios = append(scenarios, scenario)
 			}
 
-			err = ioutil.WriteFile(filepath.Join(ROOT_EXECUTION_DIR, "post.sh"), []byte(postExecutionScriptString), 0755)
+			err = os.WriteFile(filepath.Join(ROOT_EXECUTION_DIR, "post.sh"), []byte(postExecutionScriptString), 0755)
 			t.R.NoError(err)
 		})
 	}()

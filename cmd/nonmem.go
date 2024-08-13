@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -301,12 +300,12 @@ func copyFileToDestination(l *NonMemModel, modifyPath bool) error {
 		}
 	} else {
 		var input []byte
-		input, err = ioutil.ReadFile(l.Path)
+		input, err = os.ReadFile(l.Path)
 		if err != nil {
 			return fmt.Errorf("unable to read %s: %w", l.Path, err)
 		}
 
-		err = ioutil.WriteFile(path.Join(l.OutputDir, filename), input, stats.Mode())
+		err = os.WriteFile(path.Join(l.OutputDir, filename), input, stats.Mode())
 		if err != nil {
 			return fmt.Errorf("unable to write contents %s: %w", l.Path, err)
 		}

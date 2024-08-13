@@ -1,15 +1,16 @@
-package bbitest
+package nonmem
 
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 	"testing"
 
+	. "github.com/metrumresearchgroup/bbi/integration"
 	"github.com/metrumresearchgroup/bbi/utils"
 
 	"github.com/metrumresearchgroup/wrapt"
@@ -34,7 +35,7 @@ func TestInitialization(tt *testing.T) {
 			scenario.Prepare(t, context.Background())
 
 			t.Run(fmt.Sprintf("init_%s", scenario.identifier), func(t *wrapt.T) {
-				_, err := executeCommand(context.Background(), "bbi", "init", "--dir", os.Getenv("NONMEMROOT"))
+				_, err := ExecuteCommand(context.Background(), "bbi", "init", "--dir", os.Getenv("NONMEMROOT"))
 				t.R.NoError(err)
 
 				t.A.FileExists(filepath.Join(scenario.Workpath, "bbi.yaml"))
@@ -46,7 +47,7 @@ func TestInitialization(tt *testing.T) {
 				t.R.NoError(err)
 				defer func() { t.R.NoError(configHandle.Close()) }()
 
-				bytes, err := ioutil.ReadAll(configHandle)
+				bytes, err := io.ReadAll(configHandle)
 				t.R.NoError(err)
 
 				t.R.NotContains(bytes, []byte("bbi_binary"))
@@ -95,7 +96,7 @@ func TestInitializationSanitization(tt *testing.T) {
 		t.R.NoError(err)
 		defer fh.Close()
 
-		bytes, err := ioutil.ReadAll(fh)
+		bytes, err := io.ReadAll(fh)
 		t.R.NoError(err)
 		t.R.NoError(yaml.Unmarshal(bytes, &c))
 		t.R.Equal(c.Nonmem["x-y"].Home, filepath.Join(tdir, "x.y"))

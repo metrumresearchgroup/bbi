@@ -1,4 +1,4 @@
-package bbitest
+package nonmem
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	. "github.com/metrumresearchgroup/bbi/integration"
 	"github.com/metrumresearchgroup/bbi/utils"
 
 	"github.com/metrumresearchgroup/wrapt"
@@ -38,7 +39,7 @@ func TestBBIExpandsWithoutPrefix(tt *testing.T) {
 			filepath.Join(scenario.Workpath, "model", targets),
 		}
 
-		output, err := executeCommand(context.Background(), "bbi", commandAndArgs...)
+		output, err := ExecuteCommand(context.Background(), "bbi", commandAndArgs...)
 
 		t.R.NoError(err)
 		t.R.NotEmpty(output)
@@ -107,7 +108,7 @@ func TestBBIExpandsWithPrefix(tt *testing.T) {
 			filepath.Join(scenario.Workpath, "model", targets),
 		}
 
-		output, err := executeCommand(context.Background(), "bbi", commandAndArgs...)
+		output, err := ExecuteCommand(context.Background(), "bbi", commandAndArgs...)
 
 		t.R.NoError(err)
 		t.R.NotEmpty(output)
@@ -177,7 +178,7 @@ func TestBBIExpandsWithPrefixToPartialMatch(tt *testing.T) {
 				filepath.Join(scenario.Workpath, "model", targets),
 			}
 
-			output, err := executeCommand(context.Background(), "bbi", commandAndArgs...)
+			output, err := ExecuteCommand(context.Background(), "bbi", commandAndArgs...)
 
 			t.R.NoError(err)
 			t.R.NotEmpty(output)

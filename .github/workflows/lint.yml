@@ -1,0 +1,33 @@
+name: lint
+on:
+  push:
+    branches:
+      - main
+      - 'scratch/**'
+  pull_request:
+
+# Note: this avoids golangci/golangci-lint-action to work around an
+# error triggered by us pinning to a golangci-lint version built with
+# an older Go.  Revisit when moving from golangci-lint v1.47.2.
+#
+# https://github.com/golangci/golangci-lint-action/issues/442#issuecomment-1203786890
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Install golangci-lint
+        shell: bash
+        run: |
+          bin=$(mktemp -d)
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | \
+            sh -s -- -b "$bin" v1.47.2
+          echo "$bin" >>$GITHUB_PATH
+      - name: Run golangci-lint
+        shell: bash
+        run: |
+          command -v golangci-lint
+          golangci-lint run --out-format=github-actions

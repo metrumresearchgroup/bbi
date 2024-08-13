@@ -1,4 +1,4 @@
-package bbitest
+package integration
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func executeCommand(ctx context.Context, command string, args ...string) (string, error) {
+func ExecuteCommand(ctx context.Context, command string, args ...string) (string, error) {
 	//Find it in path
 	binary, _ := exec.LookPath(command)
 	cmd := exec.CommandContext(ctx, binary, args...)
@@ -40,7 +40,7 @@ func executeCommand(ctx context.Context, command string, args ...string) (string
 }
 
 // nolint:unparam
-func executeCommandNoErrorCheck(ctx context.Context, command string, args ...string) (string, error) {
+func ExecuteCommandNoErrorCheck(ctx context.Context, command string, args ...string) (string, error) {
 	binary, _ := exec.LookPath(command)
 	cmd := exec.CommandContext(ctx, binary, args...)
 	cmd.Env = os.Environ()

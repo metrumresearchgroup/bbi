@@ -1,12 +1,13 @@
-package bbitest
+package postrun
 
 import (
 	"context"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"regexp"
 	"testing"
 
+	. "github.com/metrumresearchgroup/bbi/integration"
 	"github.com/metrumresearchgroup/wrapt"
 )
 
@@ -17,12 +18,12 @@ func TestBBIRecleanBasic(tt *testing.T) {
 	fdata := filepath.Join(dir, "FDATA")
 	fdataCSV := filepath.Join(dir, "FDATA.csv")
 
-	_ = ioutil.WriteFile(fdata, []byte("fake"), 0644)
+	_ = os.WriteFile(fdata, []byte("fake"), 0644)
 	t.A.FileExists(fdata)
-	_ = ioutil.WriteFile(fdataCSV, []byte("fake"), 0644)
+	_ = os.WriteFile(fdataCSV, []byte("fake"), 0644)
 	t.A.FileExists(fdataCSV)
 
-	output, err := executeCommand(context.Background(),
+	output, err := ExecuteCommand(context.Background(),
 		"bbi", "nonmem", "reclean", "--recleanLvl=1", "-v", dir)
 	t.R.NoError(err)
 	t.R.NotEmpty(output)
@@ -33,7 +34,7 @@ func TestBBIRecleanBasic(tt *testing.T) {
 func TestBBIRecleanError(tt *testing.T) {
 	t := wrapt.WrapT(tt)
 
-	output, err := executeCommandNoErrorCheck(context.Background(),
+	output, err := ExecuteCommandNoErrorCheck(context.Background(),
 		"bbi", "nonmem", "reclean")
 
 	t.R.NotNil(err)

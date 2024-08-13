@@ -1,9 +1,9 @@
-package bbitest
+package nonmem
 
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -62,7 +62,7 @@ func TestHasInvalidDataPath(tt *testing.T) {
 		t.Run(utils.AddTestId(m.identifier, testId), func(t *wrapt.T) {
 			// We need to manipulate the file to contain an invalid file reference
 			file, _ := os.Open(filepath.Join(scenario.Workpath, m.filename))
-			b, _ := ioutil.ReadAll(file)
+			b, _ := io.ReadAll(file)
 			file.Close() // Explicitly close so we can write it again
 			lines := strings.Split(string(b), "\n")
 
@@ -75,7 +75,7 @@ func TestHasInvalidDataPath(tt *testing.T) {
 			adjusted := strings.Join(lines, "\n")
 			ab := []byte(adjusted)
 
-			err := ioutil.WriteFile(filepath.Join(scenario.Workpath, m.filename), ab, 0755)
+			err := os.WriteFile(filepath.Join(scenario.Workpath, m.filename), ab, 0755)
 
 			if err != nil {
 				t.Log("Had a problem writing the file")

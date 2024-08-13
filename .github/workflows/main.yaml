@@ -1,0 +1,67 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+      - 'scratch/**'
+    tags:
+      - 'v*'
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ${{ matrix.config.os }}
+    name: ${{ matrix.config.os }} (${{ matrix.config.go }})
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - os: ubuntu-20.04
+            go: 1.21.x
+          - os: ubuntu-latest
+            go: stable
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.config.go }}
+      - name: Unit tests
+        shell: bash
+        run: go list ./... | grep -v integration | xargs go test
+      - name: Build bbi
+        shell: bash
+        run: |
+          version=$(git rev-parse 'HEAD^{tree}')
+          bin=$(mktemp -d)
+          go build -o "$bin/bbi" \
+            -ldflags "-X github.com/metrumresearchgroup/bbi/cmd.VERSION=$version" \
+            cmd/bbi/main.go
+          echo "$bin" >>$GITHUB_PATH
+      - name: Integration tests (postrun)
+        shell: bash
+        run: |
+          bbi version
+          go test ./integration/postrun
+  release:
+    if: github.ref_type == 'tag'
+    name: Make release
+    needs: check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: '~> v2'
+          args: release --clean
+          workdir: cmd/bbi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

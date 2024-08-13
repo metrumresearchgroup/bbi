@@ -1,4 +1,4 @@
-package bbitest
+package postrun
 
 import (
 	"context"
@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"testing"
 
+	. "github.com/metrumresearchgroup/bbi/integration"
 	"github.com/metrumresearchgroup/bbi/utils"
 
 	"github.com/metrumresearchgroup/wrapt"
@@ -32,7 +33,7 @@ func TestCovCorHappyPath(tt *testing.T) {
 				filepath.Join(SUMMARY_TEST_DIR, mod.name, mod.name),
 			}
 
-			output, err := executeCommand(context.Background(), "bbi", commandAndArgs...)
+			output, err := ExecuteCommand(context.Background(), "bbi", commandAndArgs...)
 
 			t.R.NoError(err)
 			t.R.NotEmpty(output)
@@ -74,7 +75,7 @@ func TestCovCorErrors(tt *testing.T) {
 
 			// try without flag and get error
 			var output string
-			output, err := executeCommandNoErrorCheck(context.Background(), "bbi", commandAndArgs...)
+			output, err := ExecuteCommandNoErrorCheck(context.Background(), "bbi", commandAndArgs...)
 			t.R.Error(err)
 
 			errorMatch := rgx.MatchString(output)

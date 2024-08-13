@@ -1,4 +1,4 @@
-package bbitest
+package nonmem
 
 import (
 	"archive/tar"
@@ -8,11 +8,12 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	. "github.com/metrumresearchgroup/bbi/integration"
 
 	"github.com/metrumresearchgroup/wrapt"
 	log "github.com/sirupsen/logrus"
@@ -22,13 +23,6 @@ import (
 
 var ROOT_EXECUTION_DIR string
 var EXECUTION_DIR string
-
-// constants and variables used in summary tests.
-const SUMMARY_TEST_DIR = "testdata/bbi_summary"
-const SUMMARY_GOLD_DIR = "aa_golden_files"
-const noSuchFileError = "no such file or directory"
-const noFilePresentError = "no file present at"
-const wrongExtensionError = "Must provide path to .lst"
 
 type Scenario struct {
 	Details    ScenarioDetails
@@ -67,7 +61,7 @@ func (m Model) Execute(scenario *Scenario, args ...string) (string, error) {
 		filepath.Join(scenario.Workpath, m.filename),
 	}...)
 
-	return executeCommand(scenario.ctx, "bbi", cmdArguments...)
+	return ExecuteCommand(scenario.ctx, "bbi", cmdArguments...)
 }
 
 var ErrNoModelsLocated = errors.New("no model directories were located in the provided scenario")
@@ -437,7 +431,7 @@ func findModelFiles(path string) []string {
 func (scenario *Scenario) Prepare(t *wrapt.T, ctx context.Context) {
 	t.Helper()
 
-	_, err := executeCommand(ctx, "bbi", "init", "--dir", os.Getenv("NONMEMROOT"))
+	_, err := ExecuteCommand(ctx, "bbi", "init", "--dir", os.Getenv("NONMEMROOT"))
 	t.R.NoError(err)
 
 	fs := afero.NewOsFs()
@@ -457,7 +451,7 @@ func (scenario *Scenario) Prepare(t *wrapt.T, ctx context.Context) {
 
 	t.R.NoError(os.Chdir(scenario.Workpath))
 
-	_, err = executeCommand(ctx, "bbi", "init", "--dir", os.Getenv("NONMEMROOT"))
+	_, err = ExecuteCommand(ctx, "bbi", "init", "--dir", os.Getenv("NONMEMROOT"))
 	t.R.NoError(err)
 
 	t.R.NoError(os.Chdir(whereami))
@@ -481,7 +475,7 @@ func FeatureEnabled(key string) bool {
 
 func GetScenarioDetailsFromFile(r io.Reader) (ScenarioDetails, error) {
 	var s ScenarioDetails
-	contents, _ := ioutil.ReadAll(r)
+	contents, _ := io.ReadAll(r)
 	err := json.Unmarshal(contents, &s)
 
 	return s, err
@@ -489,7 +483,7 @@ func GetScenarioDetailsFromFile(r io.Reader) (ScenarioDetails, error) {
 
 func GetBBIConfigJSONHashedValues(r io.Reader) (Hashes, error) {
 	var h Hashes
-	contents, _ := ioutil.ReadAll(r)
+	contents, _ := io.ReadAll(r)
 	err := json.Unmarshal(contents, &h)
 
 	return h, err

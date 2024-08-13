@@ -1,10 +1,9 @@
-package bbitest
+package nonmem
 
 import (
 	"crypto/md5"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -119,7 +118,7 @@ func AssertSpecifiedConfigLoaded(t *wrapt.T, details NonMemTestingDetails, speci
 func AssertContainsNMFEOptions(t *wrapt.T, filepath string, optionValue string) {
 	t.Helper()
 
-	content, _ := ioutil.ReadFile(filepath)
+	content, _ := os.ReadFile(filepath)
 	contentString := string(content)
 	t.R.Contains(contentString, optionValue)
 }
