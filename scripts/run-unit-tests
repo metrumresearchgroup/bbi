@@ -1,0 +1,30 @@
+#!/bin/sh
+
+set -eu
+
+ls_pkgs () {
+    go list ./... |
+        grep -vE '/internal/valtools/[a-z]+$' |
+        grep -vE '/internal/tools/docgen$' |
+        grep -vF '/integration/' |
+        tr '\n' ' '
+}
+
+pkgs=$(ls_pkgs)
+pkgs=${pkgs% *}
+cpkgs=$(printf '%s' "$pkgs" | tr ' ' ',')
+
+run () {
+    go test -p 1 -count 1 "$@"
+}
+
+if test -n "${GOCOVERDIR-}"
+then
+    printf >&2 'testing with -cover\n'
+    # shellcheck disable=SC2086
+    run -cover -coverpkg="$cpkgs" "$@" $pkgs \
+       -args -test.gocoverdir="$GOCOVERDIR"
+else
+    # shellcheck disable=SC2086
+    run "$@" $pkgs
+fi
