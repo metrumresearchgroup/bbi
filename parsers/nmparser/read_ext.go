@@ -40,7 +40,7 @@ func ParseExtLines(lines []string) ExtData {
 	}
 }
 
-//ParseParamsExt returns the ExtData in the structure of final parameter estimates
+// ParseParamsExt returns the ExtData in the structure of final parameter estimates
 // the parameter names correspond to the names per the ext file (THETA1, THETA2, etc)
 // per nonmem 7.4 the following information will be grabbed
 // 1) Theburn-in iterations of the MCMCBayesian analysis are given negative values,starting at –NBURN, the number of burn-in iterations requested by the user. These are followed by positive iterations of the stationary phase.
@@ -149,7 +149,7 @@ func ParseParamsExt(ed ExtData) ([]ParametersData, ParameterNames) {
 	}
 }
 
-//ParseConditionNumberExt returns the condition number for each estimation method from ExtData
+// ParseConditionNumberExt returns the condition number for each estimation method from ExtData
 // per nonmem 7.4 the following information will be grabbed
 // Iteration -1000000003 indicates that this line contains the condition number , lowest, highest, Eigenvalues of the correlation matrix of the variances of the final parameters.
 // NONMEM Users Guide: Introduction to NONMEM 7.4.1.

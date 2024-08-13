@@ -30,7 +30,7 @@ type sgeOperation struct {
 	Models []SGEModel `json:"models"`
 }
 
-//SGEModel is the struct used for SGE operations containing the NonMemModel.
+// SGEModel is the struct used for SGE operations containing the NonMemModel.
 type SGEModel struct {
 	Nonmem               *NonMemModel
 	Cancel               chan bool
@@ -66,12 +66,12 @@ func (s *SGEModel) GetWorkingPath() string {
 	return s.Nonmem.OutputDir
 }
 
-//Begin Scalable method definitions.
+// Begin Scalable method definitions.
 func (l SGEModel) CancellationChannel() chan bool {
 	return l.Cancel
 }
 
-//Prepare is basically the old EstimateModel function. Responsible for creating directories and preparation.
+// Prepare is basically the old EstimateModel function. Responsible for creating directories and preparation.
 func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 	log.Debugf("%s Beginning Prepare phase of SGE Work", l.Nonmem.LogIdentifier())
 
@@ -122,7 +122,7 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 	}
 }
 
-//Work describes the Turnstile execution phase -> IE What heavy lifting should be done.
+// Work describes the Turnstile execution phase -> IE What heavy lifting should be done.
 func (l SGEModel) Work(channels *turnstile.ChannelMap) {
 	cerr := executeNonMemJob(executeSGEJob, l.Nonmem)
 
@@ -139,12 +139,12 @@ func (l SGEModel) Work(channels *turnstile.ChannelMap) {
 	channels.Completed <- 1
 }
 
-//Monitor is the 3rd phase of turnstile (not implemented here).
+// Monitor is the 3rd phase of turnstile (not implemented here).
 func (l SGEModel) Monitor(_ *turnstile.ChannelMap) {
 	//Do nothing for this implementation
 }
 
-//Cleanup is the last phase of execution, in which computation / hard work is done and we're cleaning up leftover files, copying results around et all.
+// Cleanup is the last phase of execution, in which computation / hard work is done and we're cleaning up leftover files, copying results around et all.
 func (l SGEModel) Cleanup(_ *turnstile.ChannelMap) {
 	//err := configlib.WriteViperConfig(l.Nonmem.OutputDir, true)
 	//
@@ -352,7 +352,7 @@ func sgeModelsFromArguments(args []string, config configlib.Config) ([]SGEModel,
 	return output, nil
 }
 
-//Generate the command line script to execute bbi on the grid.
+// Generate the command line script to execute bbi on the grid.
 func generateBbiScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 	t, err := template.New("file").Parse(fileTemplate)
 	buf := new(bytes.Buffer)

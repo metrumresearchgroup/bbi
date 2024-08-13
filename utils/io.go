@@ -11,9 +11,8 @@ import (
 	"github.com/spf13/afero"
 )
 
-//ReadParamsAndOutputFromExt returns the lines associated
+// ReadParamsAndOutputFromExt returns the lines associated
 // with either parameter table outputs or output lines (-100xxx lines).
-//
 func ReadParamsAndOutputFromExt(path string) ([]string, error) {
 	inFile, err := os.Open(path)
 	if err != nil {
@@ -61,7 +60,7 @@ func ReadParamsAndOutputFromExt(path string) ([]string, error) {
 	return lines, nil
 }
 
-//ReadLines reads lines for a file at a given path.
+// ReadLines reads lines for a file at a given path.
 func ReadLines(path string) ([]string, error) {
 	inFile, err := os.Open(path)
 	if err != nil {
@@ -78,7 +77,7 @@ func ReadLines(path string) ([]string, error) {
 	return lines, nil
 }
 
-//ReadLinesFS reads lines for a file at a given path.
+// ReadLinesFS reads lines for a file at a given path.
 func ReadLinesFS(fs afero.Fs, path string) ([]string, error) {
 	inFile, err := fs.Open(path)
 	if err != nil {
@@ -95,7 +94,7 @@ func ReadLinesFS(fs afero.Fs, path string) ([]string, error) {
 	return lines, nil
 }
 
-//WriteLines writes lines to a file at a given path given a filesystem.
+// WriteLines writes lines to a file at a given path given a filesystem.
 func WriteLines(lines []string, path string) error {
 	file, err := os.Create(path)
 	if err != nil {
@@ -111,7 +110,7 @@ func WriteLines(lines []string, path string) error {
 	return w.Flush()
 }
 
-//WriteLinesFS writes lines to a file at a given path given a filesystem.
+// WriteLinesFS writes lines to a file at a given path given a filesystem.
 func WriteLinesFS(fs afero.Fs, lines []string, path string) error {
 	file, err := fs.Create(path)
 	if err != nil {

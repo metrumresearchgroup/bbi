@@ -39,7 +39,7 @@ func ParseGrdLines(lines []string) ExtData {
 	}
 }
 
-//ParseGrdData returns the ExtData in the structure of final parameter estimates.
+// ParseGrdData returns the ExtData in the structure of final parameter estimates.
 func ParseGrdData(ed ExtData) ([]ParametersData, ParameterNames) {
 	var allParametersData []ParametersData
 	var thetas []string

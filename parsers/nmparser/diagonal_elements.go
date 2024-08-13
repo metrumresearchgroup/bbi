@@ -7,18 +7,20 @@ import (
 
 // lowerDiagonalLengthToDimension takes l which is
 // the number of total elements in the lower diagonal
-//  matrix, and calculates the dimension (aka number of
+// matrix, and calculates the dimension (aka number of
 // diagonal elements) for the matrix.
 // Additionally, this function can be used to pass
 // a specific index from the array of lower diagonal
 // elements (as l). In that case, it will return one
 // of the following:
 // * If the index is a diagonal element:
-//   * The number of that diagonal element
-//   * true
+//   - The number of that diagonal element
+//   - true
+//
 // * If the index is not a diagonal element:
-//   * 0
-//   * false
+//   - 0
+//   - false
+//
 // For example, there are 6 elements in the lower
 // diagonal of a 3x3 matrix, the 1st, 3rd, and 6th
 // being diagonals. Calling this function on 1-6
