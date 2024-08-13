@@ -27,7 +27,7 @@ jobs:
           go-version: ${{ matrix.config.go }}
       - name: Unit tests
         shell: bash
-        run: go list ./... | grep -v integration | xargs go test
+        run: ./scripts/run-unit-tests
       - name: Build bbi
         shell: bash
         run: |
