@@ -7,6 +7,8 @@ issues:
         - gocyclo
         - dupl
         - gosec
+  exclude-dirs:
+    - (^|/)mock($|/)
 
 linters-settings:
   errcheck:
@@ -31,8 +33,6 @@ linters-settings:
 
 run:
   skip-dirs-use-default: true
-  skip-dirs:
-    - (^|/)mock($|/)
   timeout: 3m
 
 linters:
