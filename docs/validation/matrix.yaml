@@ -1,0 +1,91 @@
+- entrypoint: bbi
+  skip: true
+
+- entrypoint: bbi init
+  code: cmd/init.go
+  doc: docs/commands/bbi_init.md
+  tests:
+    - cmd/init_test.go
+    - integration/nonmem/init_test.go
+
+- entrypoint: bbi nonmem
+  skip: true
+
+- entrypoint: bbi nonmem clean
+  code: cmd/clean.go
+  doc: docs/commands/bbi_nonmem_clean.md
+  tests: []
+
+- entrypoint: bbi nonmem covcor
+  code: cmd/covcor.go
+  doc: docs/commands/bbi_nonmem_covcor.md
+  tests:
+    - integration/postrun/bbi_covcor_test.go
+    - parsers/nmparser/read_cov_test.go
+
+- entrypoint: bbi nonmem params
+  code: cmd/params.go
+  doc: docs/commands/bbi_nonmem_params.md
+  tests:
+    - cmd/params_test.go
+    - integration/postrun/bbi_params_test.go
+    - parsers/nmparser/read_ext_fast_test.go
+
+- entrypoint: bbi nonmem probs
+  code: cmd/project.go
+  doc: docs/commands/bbi_nonmem_probs.md
+  tests: []
+
+- entrypoint: bbi nonmem reclean
+  code: cmd/reclean.go
+  doc: docs/commands/bbi_nonmem_reclean.md
+  tests:
+    - integration/postrun/bbi_reclean_test.go
+
+- entrypoint: bbi nonmem run
+  skip: true
+
+- entrypoint: bbi nonmem run local
+  code: cmd/local.go
+  doc: docs/commands/bbi_nonmem_run_local.md
+  tests:
+    - cmd/nonmem_test.go
+    - integration/nonmem/bbi_local_test.go
+    - integration/nonmem/config_test.go
+    - integration/nonmem/data_test.go
+    - integration/nonmem/nmqual_test.go
+    - integration/nonmem/postexecution_test.go
+    - parsers/nmparser/add_path_level_test.go
+
+- entrypoint: bbi nonmem run sge
+  code: cmd/sge.go
+  doc: docs/commands/bbi_nonmem_run_sge.md
+  tests:
+    - cmd/nonmem_test.go
+    - cmd/sge_test.go
+    - integration/nonmem/bbi_sge_test.go
+    - parsers/nmparser/add_path_level_test.go
+
+- entrypoint: bbi nonmem scaffold
+  code: cmd/scaffold.go
+  doc: docs/commands/bbi_nonmem_scaffold.md
+  tests: []
+
+- entrypoint: bbi nonmem summary
+  code: cmd/summary.go
+  doc: docs/commands/bbi_nonmem_summary.md
+  tests:
+    - integration/postrun/bbi_summary_test.go
+    - parsers/nmparser/parse_block_result_test.go
+    - parsers/nmparser/parse_final_parameter_estimates_test.go
+    - parsers/nmparser/parse_lst_file_test.go
+    - parsers/nmparser/parse_run_details.go
+    - parsers/nmparser/parse_theta_results_test.go
+    - parsers/nmparser/read_ext_test.go
+    - parsers/nmparser/read_grd_test.go
+    - parsers/nmparser/read_shk_test.go
+
+- entrypoint: bbi version
+  code: cmd/version.go
+  doc: docs/commands/bbi_version.md
+  tests: []

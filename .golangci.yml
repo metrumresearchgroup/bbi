@@ -9,6 +9,7 @@ issues:
         - gosec
   exclude-dirs:
     - (^|/)mock($|/)
+    - internal/valtools
 
 linters-settings:
   errcheck:
