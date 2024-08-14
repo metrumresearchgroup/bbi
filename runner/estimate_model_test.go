@@ -40,7 +40,7 @@ func TestCustomEstimateModel(tt *testing.T) {
 	})
 }
 
-//Should just get back the provided output dir.
+// Should just get back the provided output dir.
 func TestLogiclessTemplateForEstimateModel(tt *testing.T) {
 	testId := "UNIT-RUN-005"
 	tt.Run(utils.AddTestId("", testId), func(tt *testing.T) {

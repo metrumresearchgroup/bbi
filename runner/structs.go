@@ -24,7 +24,7 @@ type ReturnStatus struct {
 	Error  error  `json:"error,omitempty"`
 }
 
-//NextDirSuggestion provides a struct for the recommended next
+// NextDirSuggestion provides a struct for the recommended next
 // directory name, and whether there should be a project reorganization
 // based on directory modifications, and whether this will be the first dir in the sequence.
 type NextDirSuggestion struct {

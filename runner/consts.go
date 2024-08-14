@@ -82,7 +82,7 @@ func EstOutputFileCleanLevels(r string) map[string]int {
 	return EstOutputFiles
 }
 
-//CleanFilesByRun sets clean levels for files by run.
+// CleanFilesByRun sets clean levels for files by run.
 func CleanFilesByRun(r string) map[string]int {
 	var EstOutputFiles = make(map[string]int)
 	// fileExtLvls are based on 1 = lowest priority -> n = highest priority

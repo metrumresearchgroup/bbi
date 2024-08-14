@@ -6,7 +6,7 @@ import (
 	parser "github.com/metrumresearchgroup/bbi/parsers/nmparser"
 )
 
-//PrepareForExecution parses and prepares strings from a file for execution in a different context
+// PrepareForExecution parses and prepares strings from a file for execution in a different context
 // for example, replacing the $DATA path.
 func PrepareForExecution(s []string) []string {
 	for i, line := range s {

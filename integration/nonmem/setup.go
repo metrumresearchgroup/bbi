@@ -13,7 +13,7 @@ import (
 	"strconv"
 	"strings"
 
-	. "github.com/metrumresearchgroup/bbi/integration"
+	bi "github.com/metrumresearchgroup/bbi/integration"
 
 	"github.com/metrumresearchgroup/wrapt"
 	log "github.com/sirupsen/logrus"
@@ -61,7 +61,7 @@ func (m Model) Execute(scenario *Scenario, args ...string) (string, error) {
 		filepath.Join(scenario.Workpath, m.filename),
 	}...)
 
-	return ExecuteCommand(scenario.ctx, "bbi", cmdArguments...)
+	return bi.ExecuteCommand(scenario.ctx, "bbi", cmdArguments...)
 }
 
 var ErrNoModelsLocated = errors.New("no model directories were located in the provided scenario")
@@ -431,7 +431,7 @@ func findModelFiles(path string) []string {
 func (scenario *Scenario) Prepare(t *wrapt.T, ctx context.Context) {
 	t.Helper()
 
-	_, err := ExecuteCommand(ctx, "bbi", "init", "--dir", os.Getenv("NONMEMROOT"))
+	_, err := bi.ExecuteCommand(ctx, "bbi", "init", "--dir", os.Getenv("NONMEMROOT"))
 	t.R.NoError(err)
 
 	fs := afero.NewOsFs()
@@ -451,7 +451,7 @@ func (scenario *Scenario) Prepare(t *wrapt.T, ctx context.Context) {
 
 	t.R.NoError(os.Chdir(scenario.Workpath))
 
-	_, err = ExecuteCommand(ctx, "bbi", "init", "--dir", os.Getenv("NONMEMROOT"))
+	_, err = bi.ExecuteCommand(ctx, "bbi", "init", "--dir", os.Getenv("NONMEMROOT"))
 	t.R.NoError(err)
 
 	t.R.NoError(os.Chdir(whereami))

@@ -8,7 +8,8 @@ import (
 )
 
 // ExpandNameSequence takes a full name pattern with a sequence and returns all values
-//  run[001:004].mod --> run001.mod run002.mod run003.mod run004.mod
+//
+//	run[001:004].mod --> run001.mod run002.mod run003.mod run004.mod
 func ExpandNameSequence(fnp string) ([]string, error) {
 	var output []string
 	r := regexp.MustCompile(`(.*)?\[(.*)](.*)?`)
