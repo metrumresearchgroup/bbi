@@ -16,7 +16,6 @@ package cmd
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -47,8 +46,6 @@ func probs(_ *cobra.Command, args []string) error {
 	case 1:
 		dirPath = args[0]
 	default:
-		fmt.Println("currently only supports scanning one directory")
-
 		return errors.New("project only supports specifying one directory")
 	}
 
