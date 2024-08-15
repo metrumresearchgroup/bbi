@@ -121,6 +121,24 @@ func TestProbs(tt *testing.T) {
 			}
 		}
 	})
+
+	t.Run("directory argument", func(t *wrapt.T) {
+		cmd1 := exec.Command("bbi", "nonmem", "probs")
+		cmd1.Dir = dir
+
+		bs1, err := cmd1.Output()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		cmd2 := exec.Command("bbi", "nonmem", "probs", dir)
+		bs2, err := cmd2.Output()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		t.A.Equal(bs1, bs2)
+	})
 }
 
 func TestProbsErrors(tt *testing.T) {

@@ -58,7 +58,14 @@ func probs(_ *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	modelSummaries := modSummaries(AppFs, modelFiles)
+
+	filesAbs := make([]string, len(modelFiles))
+	for i := range modelFiles {
+		filesAbs[i] = filepath.Join(dirPath, modelFiles[i])
+	}
+
+	modelSummaries := modSummaries(AppFs, filesAbs)
+
 	if Json {
 		err = utils.PrintJSON(modelSummaries)
 		if err != nil {
