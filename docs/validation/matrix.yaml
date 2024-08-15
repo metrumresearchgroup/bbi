@@ -88,4 +88,5 @@
 - entrypoint: bbi version
   code: cmd/version.go
   doc: docs/commands/bbi_version.md
-  tests: []
+  tests:
+    - integration/nmless/bbi_version_test.go
