@@ -69,7 +69,8 @@
 - entrypoint: bbi nonmem scaffold
   code: cmd/scaffold.go
   doc: docs/commands/bbi_nonmem_scaffold.md
-  tests: []
+  tests:
+    - integration/nmless/bbi_scaffold_test.go
 
 - entrypoint: bbi nonmem summary
   code: cmd/summary.go
