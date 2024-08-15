@@ -14,7 +14,8 @@
 - entrypoint: bbi nonmem clean
   code: cmd/clean.go
   doc: docs/commands/bbi_nonmem_clean.md
-  tests: []
+  tests:
+    - integration/nmless/bbi_clean_test.go
 
 - entrypoint: bbi nonmem covcor
   code: cmd/covcor.go
