@@ -35,7 +35,8 @@
 - entrypoint: bbi nonmem probs
   code: cmd/project.go
   doc: docs/commands/bbi_nonmem_probs.md
-  tests: []
+  tests:
+    - integration/nmless/bbi_probs_test.go
 
 - entrypoint: bbi nonmem reclean
   code: cmd/reclean.go
