@@ -14,13 +14,14 @@
 - entrypoint: bbi nonmem clean
   code: cmd/clean.go
   doc: docs/commands/bbi_nonmem_clean.md
-  tests: []
+  tests:
+    - integration/nmless/bbi_clean_test.go
 
 - entrypoint: bbi nonmem covcor
   code: cmd/covcor.go
   doc: docs/commands/bbi_nonmem_covcor.md
   tests:
-    - integration/postrun/bbi_covcor_test.go
+    - integration/nmless/bbi_covcor_test.go
     - parsers/nmparser/read_cov_test.go
 
 - entrypoint: bbi nonmem params
@@ -28,19 +29,20 @@
   doc: docs/commands/bbi_nonmem_params.md
   tests:
     - cmd/params_test.go
-    - integration/postrun/bbi_params_test.go
+    - integration/nmless/bbi_params_test.go
     - parsers/nmparser/read_ext_fast_test.go
 
 - entrypoint: bbi nonmem probs
   code: cmd/project.go
   doc: docs/commands/bbi_nonmem_probs.md
-  tests: []
+  tests:
+    - integration/nmless/bbi_probs_test.go
 
 - entrypoint: bbi nonmem reclean
   code: cmd/reclean.go
   doc: docs/commands/bbi_nonmem_reclean.md
   tests:
-    - integration/postrun/bbi_reclean_test.go
+    - integration/nmless/bbi_reclean_test.go
 
 - entrypoint: bbi nonmem run
   skip: true
@@ -69,13 +71,14 @@
 - entrypoint: bbi nonmem scaffold
   code: cmd/scaffold.go
   doc: docs/commands/bbi_nonmem_scaffold.md
-  tests: []
+  tests:
+    - integration/nmless/bbi_scaffold_test.go
 
 - entrypoint: bbi nonmem summary
   code: cmd/summary.go
   doc: docs/commands/bbi_nonmem_summary.md
   tests:
-    - integration/postrun/bbi_summary_test.go
+    - integration/nmless/bbi_summary_test.go
     - parsers/nmparser/parse_block_result_test.go
     - parsers/nmparser/parse_final_parameter_estimates_test.go
     - parsers/nmparser/parse_lst_file_test.go
@@ -88,4 +91,5 @@
 - entrypoint: bbi version
   code: cmd/version.go
   doc: docs/commands/bbi_version.md
-  tests: []
+  tests:
+    - integration/nmless/bbi_version_test.go

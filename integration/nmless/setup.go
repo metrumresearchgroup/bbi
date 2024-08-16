@@ -1,4 +1,4 @@
-package postrun
+package nmless
 
 // constants and variables used in summary tests.
 const SUMMARY_TEST_DIR = "testdata/bbi_summary"

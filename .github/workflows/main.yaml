@@ -37,11 +37,11 @@ jobs:
             -ldflags "-X github.com/metrumresearchgroup/bbi/cmd.VERSION=$version" \
             cmd/bbi/main.go
           echo "$bin" >>$GITHUB_PATH
-      - name: Integration tests (postrun)
+      - name: Integration tests (without NONMEM)
         shell: bash
         run: |
           bbi version
-          go test ./integration/postrun
+          go test ./integration/nmless
   release:
     if: github.ref_type == 'tag'
     name: Make release
