@@ -110,16 +110,22 @@ func clean(cmd *cobra.Command, args []string) error {
 
 	if !filesOnly {
 		for _, f := range matchedFolders {
+			if !filepath.IsAbs(f) {
+				f = filepath.Join(dir, f)
+			}
 			// explicitly ignoring errors here, as this is not critical
 			// and it's more important to try than to succeed
-			_ = AppFs.RemoveAll(filepath.Join(dir, f))
+			_ = AppFs.RemoveAll(f)
 		}
 	}
 	if !dirsOnly {
 		for _, f := range matchedFiles {
+			if !filepath.IsAbs(f) {
+				f = filepath.Join(dir, f)
+			}
 			// explicitly ignoring errors here, as this is not critical
 			// and it's more important to try than to succeed
-			_ = AppFs.Remove(filepath.Join(dir, f))
+			_ = AppFs.Remove(f)
 		}
 	}
 
