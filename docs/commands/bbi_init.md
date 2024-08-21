@@ -14,7 +14,7 @@ bbi init [flags]
 ### Options
 
 ```
-      --dir strings   A directory in which to look for NonMem Installations
+      --dir strings   A directory in which to look for NONMEM Installations
   -h, --help          help for init
 ```
 

@@ -61,7 +61,7 @@ func NewInitCmd() *cobra.Command {
 	}
 
 	const directory string = "dir"
-	cmd.Flags().StringSlice(directory, []string{}, "A directory in which to look for NonMem Installations")
+	cmd.Flags().StringSlice(directory, []string{}, "A directory in which to look for NONMEM Installations")
 
 	return cmd
 }
