@@ -104,8 +104,6 @@ func EstOutputFilesByRun(r string) map[string]int {
 	fileExtsLvl2 := []string{
 		".clt",
 		".coi",
-		".clt",
-		".coi",
 		".cpu",
 		".shm",
 		".phi",
