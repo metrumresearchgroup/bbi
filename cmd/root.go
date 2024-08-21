@@ -72,7 +72,8 @@ func NewRootCmd() *cobra.Command {
 	}
 
 	// Set random for application
-	rand.Seed(time.Now().UnixNano())
+	// TODO: Remove Seed call once minimum Go is 1.20 (SA1019).
+	rand.Seed(time.Now().UnixNano()) //nolint:staticcheck
 
 	cobra.OnInitialize(initConfig)
 
