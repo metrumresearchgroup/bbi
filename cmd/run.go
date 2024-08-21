@@ -80,12 +80,12 @@ func NewRunCmd() *cobra.Command {
 	viper.SetDefault("output_dir", "{{ .Name }}")
 
 	// Int Variables
-	cmd.PersistentFlags().Int("clean_lvl", 1, "clean level used for file output from a given (set of) runs")
+	cmd.PersistentFlags().Int("clean_lvl", 1, "clean level used for output")
 	errpanic(viper.BindPFlag("clean_lvl", cmd.PersistentFlags().Lookup("clean_lvl")))
 	// TODO: these are likely not meangingful as should be set in configlib, but want to configm
 	viper.SetDefault("clean_lvl", 1)
 
-	cmd.PersistentFlags().Int("copy_lvl", 0, "copy level used for file output from a given (set of) runs")
+	cmd.PersistentFlags().Int("copy_lvl", 0, "copy level used for output")
 	errpanic(viper.BindPFlag("copy_lvl", cmd.PersistentFlags().Lookup("copy_lvl")))
 	viper.SetDefault("copy_lvl", 0)
 
@@ -98,16 +98,16 @@ func NewRunCmd() *cobra.Command {
 	errpanic(viper.BindPFlag("git", cmd.PersistentFlags().Lookup("git")))
 	viper.SetDefault("git", true)
 
-	cmd.PersistentFlags().Bool("overwrite", false, "Whether or not to remove existing output directories if they are present")
+	cmd.PersistentFlags().Bool("overwrite", false, "whether to remove existing output directories")
 	errpanic(viper.BindPFlag("overwrite", cmd.PersistentFlags().Lookup("overwrite")))
 	viper.SetDefault("overwrite", false)
 
 	const configIdentifier string = "config"
-	cmd.PersistentFlags().String(configIdentifier, "", "Path (relative or absolute) to another bbi.yaml to load")
+	cmd.PersistentFlags().String(configIdentifier, "", "path to another bbi.yaml to load")
 	errpanic(viper.BindPFlag(configIdentifier, cmd.PersistentFlags().Lookup(configIdentifier)))
 
 	const saveconfig string = "save_config"
-	cmd.PersistentFlags().Bool(saveconfig, true, "Whether or not to save the existing configuration to a file with the model")
+	cmd.PersistentFlags().Bool(saveconfig, true, "whether to save the existing configuration to the output directory")
 	errpanic(viper.BindPFlag(saveconfig, cmd.PersistentFlags().Lookup(saveconfig)))
 
 	const delayIdentifier string = "delay"
@@ -115,15 +115,15 @@ func NewRunCmd() *cobra.Command {
 	errpanic(viper.BindPFlag(delayIdentifier, cmd.PersistentFlags().Lookup(delayIdentifier)))
 
 	const logFileIdentifier string = "log_file"
-	cmd.PersistentFlags().String(logFileIdentifier, "", "If populated, specifies the file into which to store the output / logging details from bbi")
+	cmd.PersistentFlags().String(logFileIdentifier, "", "file into which to store the output / logging details from bbi")
 	errpanic(viper.BindPFlag(logFileIdentifier, cmd.PersistentFlags().Lookup(logFileIdentifier)))
 
 	const postExecutionHookIdentifier string = "post_work_executable"
-	cmd.PersistentFlags().String(postExecutionHookIdentifier, "", "A script or binary to run when job execution completes or fails")
+	cmd.PersistentFlags().String(postExecutionHookIdentifier, "", "script or binary to run when job execution completes or fails")
 	errpanic(viper.BindPFlag(postExecutionHookIdentifier, cmd.PersistentFlags().Lookup(postExecutionHookIdentifier)))
 
 	const additionalEnvIdentifier string = "additional_post_work_envs"
-	cmd.PersistentFlags().StringSlice(additionalEnvIdentifier, []string{}, "Any additional values (as ENV KEY=VALUE) to provide for the post execution environment")
+	cmd.PersistentFlags().StringSlice(additionalEnvIdentifier, []string{}, "additional values (as ENV KEY=VALUE) to provide for the post execution environment")
 	errpanic(viper.BindPFlag(additionalEnvIdentifier, cmd.PersistentFlags().Lookup(additionalEnvIdentifier)))
 
 	cmd.AddCommand(NewLocalCmd())

@@ -354,8 +354,8 @@ func NewLocalCmd() *cobra.Command {
 	}
 
 	childDirIdentifier := "create_child_dirs"
-	cmd.PersistentFlags().Bool(childDirIdentifier, true, "Indicates whether or not local branch execution"+
-		"should create a new subdirectory with the output_dir variable as its name and execute in that directory")
+	cmd.PersistentFlags().Bool(childDirIdentifier, true,
+		"create a new subdirectory, named based on the output_dir option, for execution")
 	errpanic(viper.BindPFlag("local."+childDirIdentifier, cmd.PersistentFlags().Lookup(childDirIdentifier)))
 
 	return cmd

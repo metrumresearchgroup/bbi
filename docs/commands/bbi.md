@@ -7,7 +7,7 @@ manage and execute models
 ```
   -d, --debug           debug mode
   -h, --help            help for bbi
-      --json            json tree of output, if possible
+      --json            show JSON output, if possible
   -o, --output string   output file
   -p, --preview         preview action, but don't actually run command
       --threads int     number of threads to execute with locally or nodes to execute on in parallel (default 4)
