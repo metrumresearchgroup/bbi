@@ -115,7 +115,10 @@ func clean(cmd *cobra.Command, args []string) error {
 			}
 			// explicitly ignoring errors here, as this is not critical
 			// and it's more important to try than to succeed
-			_ = AppFs.RemoveAll(f)
+			err = AppFs.RemoveAll(f)
+			if err != nil {
+				log.Printf("failed to remove directory %s: %v", f, err)
+			}
 		}
 	}
 	if !dirsOnly {
@@ -125,7 +128,10 @@ func clean(cmd *cobra.Command, args []string) error {
 			}
 			// explicitly ignoring errors here, as this is not critical
 			// and it's more important to try than to succeed
-			_ = AppFs.Remove(f)
+			err = AppFs.Remove(f)
+			if err != nil {
+				log.Printf("failed to remove file %s: %v", f, err)
+			}
 		}
 	}
 
