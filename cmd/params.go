@@ -16,7 +16,8 @@ package cmd
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io/fs"
+	"os"
 	"path/filepath"
 	"runtime"
 	"sort"
@@ -221,13 +222,30 @@ func sortParams(params []string) []string {
 	return sorted
 }
 
+func readDir(dirname string) ([]fs.FileInfo, error) {
+	entries, err := os.ReadDir(dirname)
+	if err != nil {
+		return nil, err
+	}
+	infos := make([]fs.FileInfo, 0, len(entries))
+	for _, entry := range entries {
+		info, err := entry.Info()
+		if err != nil {
+			return infos, err
+		}
+		infos = append(infos, info)
+	}
+
+	return infos, nil
+}
+
 func params(cmd *cobra.Command, args []string) {
 	if debug {
 		viper.Debug()
 	}
 	var modelDirs []string
 	if dir != "" {
-		fi, err := ioutil.ReadDir(dir)
+		fi, err := readDir(dir)
 		if err != nil {
 			log.Fatal(err)
 		}
