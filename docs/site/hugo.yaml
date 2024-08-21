@@ -44,7 +44,7 @@ module:
     - path: github.com/imfing/hextra
 params:
   navbar:
-    displayTitle: false
+    displayTitle: true
     displayLogo: true
     logo:
       path: logo.png

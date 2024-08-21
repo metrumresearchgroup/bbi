@@ -38,11 +38,13 @@ commands:
 content/_index.md: ../../README.md
 	grep -vF 'https://goreportcard.com/badge/' '$<' >'$@'
 
+content/news.md: ./scripts/add-gh-links
 content/news.md: ../../NEWS.md
 	printf -- '---\ntitle: "News"\n---\n\n' >'$@'
 	sed 's/^#/##/' '$<' | \
 	  sed 's/^## bbi/##/' | \
 	  sed 's/^## babylon/##/' | \
+	  ./scripts/add-gh-links https://github.com/metrumresearchgroup/bbi \
 	  >>'$@'
 
 .PHONY: clean
