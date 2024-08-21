@@ -347,10 +347,10 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 
 func NewLocalCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "local",
-		Short: "local specifies to run a (set of) models locally",
-		Long:  runLongDescription,
-		Run:   local,
+		Use:     "local [flags] <model> [<model>...]",
+		Short:   "Run models locally",
+		Example: fmt.Sprintf(runExamples, "local"),
+		Run:     local,
 	}
 
 	childDirIdentifier := "create_child_dirs"

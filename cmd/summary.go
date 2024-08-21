@@ -37,12 +37,12 @@ var (
 	extFile string
 )
 
-const summaryLongDescription string = `summarize model(s), for example:
-bbi nonmem summary run001/run001
-bbi nonmem summary run001/run001.lst
-bbi nonmem summary run001/run001.res
-bbi nonmem summary run001/run001 run002/run002
- `
+const summaryExamples string = `  # Summarize run001
+  bbi nonmem summary run001/run001.lst
+  # The extension may be omitted
+  bbi nonmem summary run001/run001
+  # Output JSON summary for run001 and run002
+  bbi nonmem summary --json run001/run001 run002/run002`
 
 type jsonResults struct {
 	Results []parser.SummaryOutput
@@ -174,10 +174,17 @@ func summary(_ *cobra.Command, args []string) {
 
 func NewSummaryCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "summary",
-		Short: "summarize the output of model(s)",
-		Long:  summaryLongDescription,
-		Run:   summary,
+		Use:   "summary [flags] <lst> [<lst>...]",
+		Short: "Summarize model results",
+		Long: `Summarize the results of the specified *.lst files. By default, this
+prints a table of parameter estimates preceded by a lines with details about
+the run. Pass the --json flag to get a machine-readable output that includes
+more details.
+
+The path may also be specified without the trailing ".lst". *.res files are
+also supported.`,
+		Example: summaryExamples,
+		Run:     summary,
 	}
 
 	// Used for Summary

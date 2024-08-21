@@ -1,14 +1,12 @@
 ## bbi nonmem scaffold
 
-scaffold directory structures
+Scaffold directory structures
 
 ### Synopsis
 
-
-	nmu scaffold --cacheDir=nmcache
-
-	nmu scaffold --cacheDir=../nmcache --preview // show where the cache dir would be created
- 
+This subcommand writes a .gitignore file to the directory specified by
+--cacheDir that tells Git to ignore all files in the directory except for the
+.gitignore file itself.
 
 ```
 bbi nonmem scaffold [flags]
@@ -48,5 +46,5 @@ bbi nonmem scaffold [flags]
 
 ### SEE ALSO
 
-* [bbi nonmem](bbi_nonmem.md)	 - nonmem a (set of) models locally or on the grid
+* [bbi nonmem](bbi_nonmem.md)	 - Entry point for NONMEM-related subcommands
 

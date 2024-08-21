@@ -1,18 +1,30 @@
 ## bbi nonmem summary
 
-summarize the output of model(s)
+Summarize model results
 
 ### Synopsis
 
-summarize model(s), for example:
-bbi nonmem summary run001/run001
-bbi nonmem summary run001/run001.lst
-bbi nonmem summary run001/run001.res
-bbi nonmem summary run001/run001 run002/run002
- 
+Summarize the results of the specified *.lst files. By default, this
+prints a table of parameter estimates preceded by a lines with details about
+the run. Pass the --json flag to get a machine-readable output that includes
+more details.
+
+The path may also be specified without the trailing ".lst". *.res files are
+also supported.
 
 ```
-bbi nonmem summary [flags]
+bbi nonmem summary [flags] <lst> [<lst>...]
+```
+
+### Examples
+
+```
+  # Summarize run001
+  bbi nonmem summary run001/run001.lst
+  # The extension may be omitted
+  bbi nonmem summary run001/run001
+  # Output JSON summary for run001 and run002
+  bbi nonmem summary --json run001/run001 run002/run002
 ```
 
 ### Options
@@ -52,5 +64,5 @@ bbi nonmem summary [flags]
 
 ### SEE ALSO
 
-* [bbi nonmem](bbi_nonmem.md)	 - nonmem a (set of) models locally or on the grid
+* [bbi nonmem](bbi_nonmem.md)	 - Entry point for NONMEM-related subcommands
 

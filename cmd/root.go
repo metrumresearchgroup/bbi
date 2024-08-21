@@ -67,7 +67,7 @@ func Execute(build string) {
 func NewRootCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "bbi",
-		Short: "manage and execute models",
+		Short: "Manage and execute models",
 		Long:  fmt.Sprintf("bbi CLI version %s", VERSION),
 	}
 

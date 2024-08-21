@@ -1,12 +1,6 @@
 ## bbi version
 
-check version
-
-### Synopsis
-
-check the current bbi version
-bbi version
- 
+Print bbi's version and exit
 
 ```
 bbi version [flags]
@@ -31,5 +25,5 @@ bbi version [flags]
 
 ### SEE ALSO
 
-* [bbi](bbi.md)	 - manage and execute models
+* [bbi](bbi.md)	 - Manage and execute models
 

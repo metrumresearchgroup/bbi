@@ -3,6 +3,7 @@ package cmd
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -17,12 +18,12 @@ import (
 	"github.com/spf13/viper"
 )
 
-const runLongDescription string = `run nonmem model(s), for example: 
-bbi nonmem run <local|sge> run001.mod
-bbi nonmem run  --clean_lvl=1 <local|sge> run001.mod run002.mod
-bbi nonmem run <local|sge> run[001:006].mod // expand to run001.mod run002.mod ... run006.mod local
-bbi nonmem run <local|sge> .// run all models in directory
- `
+const runExamples string = `  # Execute model run001
+  bbi nonmem run %[1]s run001.mod
+  #  Run models run001.mod, run002.mod, and run003.mod
+  bbi nonmem run %[1]s 'run[001:003].mod'
+  # Run all models in the current directory
+  bbi nonmem run %[1]s .`
 
 const postProcessingScriptTemplate string = `#!/bin/bash
 
@@ -54,15 +55,17 @@ const postProcessingScriptTemplate string = `#!/bin/bash
 `
 
 func run(_ *cobra.Command, _ []string) {
-	println(runLongDescription)
+	println(fmt.Sprintf(runExamples, "(local|sge)"))
 }
 
 func NewRunCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "run",
-		Short: "run a (set of) models locally or on the grid",
-		Long:  runLongDescription,
-		Run:   run,
+		Short: "Run models locally or on the grid",
+		Long: `This is the entry point to subcommands for running NONMEM models. Each
+subcommand represents a different "mode" of execution (e.g., local).`,
+		Example: fmt.Sprintf(runExamples, "(local|sge)"),
+		Run:     run,
 	}
 
 	// String Variables

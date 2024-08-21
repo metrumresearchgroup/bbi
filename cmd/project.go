@@ -85,11 +85,20 @@ func probs(_ *cobra.Command, args []string) error {
 }
 func NewProbsCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "probs",
-		Short: "summarize information about project",
-		Long: `get information about models in the project:
-nmu project
- `,
+		Use:   "probs [flags] [<directory>]",
+		Short: "Summarize model definitions in a directory",
+		Long: `This subcommand extracts information from the *.mod files in the
+current directory or the specified directory. By default, it displays a
+table with the $PROBLEM text for each model file. If --json is passed, it
+prints JSON output with more details about each model (e.g., which
+estimation methods are present).
+
+Note: Only model files with a *.mod extension are currently supported.`,
+		Example: `# Output a table summarizing the $PROBLEM text for the *.mod files
+# in the current directory
+bbi nonmem probs
+# Instead of the table, show JSON output with more details
+bbi nonmem probs --json`,
 		RunE: probs,
 	}
 }

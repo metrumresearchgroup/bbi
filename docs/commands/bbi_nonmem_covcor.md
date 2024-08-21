@@ -1,16 +1,25 @@
 ## bbi nonmem covcor
 
-load .cov and .cor output from a model run
+Display .cov and .cor output for a model
 
 ### Synopsis
 
-load .cov and .cor output from model(s), for example: 
-bbi nonmem covcor run001/run001
-bbi nonmem covcor run001/run001.cov
- 
+Read the .cov and .cor files from a model's output directory and
+display the values as a JSON object. The argument is typically a shared prefix
+for the run output files, but it can be any path from which the run name can be
+derived.
 
 ```
-bbi nonmem covcor [flags]
+bbi nonmem covcor [flags] <run file>
+```
+
+### Examples
+
+```
+  # Display .cov/cor values from run001/run001.{cov,cor}
+  bbi nonmem covcor run001/run001
+  # Display the same values by specifying a full output file
+  bbi nonmem covcor run001/run001.cov
 ```
 
 ### Options
@@ -46,5 +55,5 @@ bbi nonmem covcor [flags]
 
 ### SEE ALSO
 
-* [bbi nonmem](bbi_nonmem.md)	 - nonmem a (set of) models locally or on the grid
+* [bbi nonmem](bbi_nonmem.md)	 - Entry point for NONMEM-related subcommands
 

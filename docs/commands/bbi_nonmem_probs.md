@@ -1,15 +1,29 @@
 ## bbi nonmem probs
 
-summarize information about project
+Summarize model definitions in a directory
 
 ### Synopsis
 
-get information about models in the project:
-nmu project
- 
+This subcommand extracts information from the *.mod files in the
+current directory or the specified directory. By default, it displays a
+table with the $PROBLEM text for each model file. If --json is passed, it
+prints JSON output with more details about each model (e.g., which
+estimation methods are present).
+
+Note: Only model files with a *.mod extension are currently supported.
 
 ```
-bbi nonmem probs [flags]
+bbi nonmem probs [flags] [<directory>]
+```
+
+### Examples
+
+```
+# Output a table summarizing the $PROBLEM text for the *.mod files
+# in the current directory
+bbi nonmem probs
+# Instead of the table, show JSON output with more details
+bbi nonmem probs --json
 ```
 
 ### Options
@@ -45,5 +59,5 @@ bbi nonmem probs [flags]
 
 ### SEE ALSO
 
-* [bbi nonmem](bbi_nonmem.md)	 - nonmem a (set of) models locally or on the grid
+* [bbi nonmem](bbi_nonmem.md)	 - Entry point for NONMEM-related subcommands
 

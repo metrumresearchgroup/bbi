@@ -43,11 +43,12 @@ func reclean(cmd *cobra.Command, args []string) error {
 
 func NewRecleanCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "reclean [flags] <directory>",
-		Short: "clean files in an estimation directory by clean level",
-		Long: `
-	bbi reclean run001_est_01
- `,
+		Use:   "reclean [flags] <run dir>",
+		Short: "Clean files in run directory by specified level",
+		Example: `  bbi nonmem run local --clean_lvl=0 001.ctl
+  # Reclean the run directory for 001, deleting what would have been cleaned if
+  # the model was executed with a clean level of 1
+  bbi nonmem reclean --recleanLvl=1 001`,
 		RunE: reclean,
 	}
 

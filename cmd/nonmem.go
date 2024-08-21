@@ -164,18 +164,21 @@ type NonMemModel struct {
 	Error error `json:"error"`
 }
 
-var nonmemLongDescription string = fmt.Sprintf("\n%s\n\n%s\n\n%s\n", runLongDescription, summaryLongDescription, covcorLongDescription)
+var nonmemExamples string = fmt.Sprintf("%s\n\n%s\n\n%s\n",
+	fmt.Sprintf(runExamples, "(local|sge)"),
+	summaryExamples,
+	covcorExamples)
 
 func nonmem(_ *cobra.Command, _ []string) {
-	println(nonmemLongDescription)
+	println(nonmemExamples)
 }
 
 func NewNonmemCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "nonmem",
-		Short: "nonmem a (set of) models locally or on the grid",
-		Long:  nonmemLongDescription,
-		Run:   nonmem,
+		Use:     "nonmem",
+		Short:   "Entry point for NONMEM-related subcommands",
+		Example: nonmemExamples,
+		Run:     nonmem,
 	}
 
 	// NM Selector

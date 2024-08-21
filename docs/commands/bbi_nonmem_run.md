@@ -1,18 +1,25 @@
 ## bbi nonmem run
 
-run a (set of) models locally or on the grid
+Run models locally or on the grid
 
 ### Synopsis
 
-run nonmem model(s), for example: 
-bbi nonmem run <local|sge> run001.mod
-bbi nonmem run  --clean_lvl=1 <local|sge> run001.mod run002.mod
-bbi nonmem run <local|sge> run[001:006].mod // expand to run001.mod run002.mod ... run006.mod local
-bbi nonmem run <local|sge> .// run all models in directory
- 
+This is the entry point to subcommands for running NONMEM models. Each
+subcommand represents a different "mode" of execution (e.g., local).
 
 ```
 bbi nonmem run [flags]
+```
+
+### Examples
+
+```
+  # Execute model run001
+  bbi nonmem run (local|sge) run001.mod
+  #  Run models run001.mod, run002.mod, and run003.mod
+  bbi nonmem run (local|sge) 'run[001:003].mod'
+  # Run all models in the current directory
+  bbi nonmem run (local|sge) .
 ```
 
 ### Options
@@ -59,7 +66,7 @@ bbi nonmem run [flags]
 
 ### SEE ALSO
 
-* [bbi nonmem](bbi_nonmem.md)	 - nonmem a (set of) models locally or on the grid
-* [bbi nonmem run local](bbi_nonmem_run_local.md)	 - local specifies to run a (set of) models locally
-* [bbi nonmem run sge](bbi_nonmem_run_sge.md)	 - sge specifies to run a (set of) models on the Sun Grid Engine
+* [bbi nonmem](bbi_nonmem.md)	 - Entry point for NONMEM-related subcommands
+* [bbi nonmem run local](bbi_nonmem_run_local.md)	 - Run models locally
+* [bbi nonmem run sge](bbi_nonmem_run_sge.md)	 - Run models on the Sun Grid Engine
 

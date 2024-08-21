@@ -4,8 +4,13 @@ Create configuration file with defaults
 
 ### Synopsis
 
-Run bbi init to create a bbi.yaml configuration file in the current directory.
- 
+Write a bbi.yaml configuration file in the current directory
+to initialize it for running bbi.
+
+If the --dir=DIR option is specified, DIR should point to a directory that
+contains one or more NONMEM installations directories. Any subdirectory in
+DIR is taken as an installation if it has the expected layout (e.g., a "run"
+directory with an nmfe executable)
 
 ```
 bbi init [flags]
@@ -31,5 +36,5 @@ bbi init [flags]
 
 ### SEE ALSO
 
-* [bbi](bbi.md)	 - manage and execute models
+* [bbi](bbi.md)	 - Manage and execute models
 

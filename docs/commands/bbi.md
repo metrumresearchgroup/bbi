@@ -1,6 +1,6 @@
 ## bbi
 
-manage and execute models
+Manage and execute models
 
 ### Options
 
@@ -17,6 +17,6 @@ manage and execute models
 ### SEE ALSO
 
 * [bbi init](bbi_init.md)	 - Create configuration file with defaults
-* [bbi nonmem](bbi_nonmem.md)	 - nonmem a (set of) models locally or on the grid
-* [bbi version](bbi_version.md)	 - check version
+* [bbi nonmem](bbi_nonmem.md)	 - Entry point for NONMEM-related subcommands
+* [bbi version](bbi_version.md)	 - Print bbi's version and exit
 

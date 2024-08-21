@@ -1,32 +1,33 @@
 ## bbi nonmem
 
-nonmem a (set of) models locally or on the grid
-
-### Synopsis
-
-
-run nonmem model(s), for example: 
-bbi nonmem run <local|sge> run001.mod
-bbi nonmem run  --clean_lvl=1 <local|sge> run001.mod run002.mod
-bbi nonmem run <local|sge> run[001:006].mod // expand to run001.mod run002.mod ... run006.mod local
-bbi nonmem run <local|sge> .// run all models in directory
- 
-
-summarize model(s), for example:
-bbi nonmem summary run001/run001
-bbi nonmem summary run001/run001.lst
-bbi nonmem summary run001/run001.res
-bbi nonmem summary run001/run001 run002/run002
- 
-
-load .cov and .cor output from model(s), for example: 
-bbi nonmem covcor run001/run001
-bbi nonmem covcor run001/run001.cov
- 
-
+Entry point for NONMEM-related subcommands
 
 ```
 bbi nonmem [flags]
+```
+
+### Examples
+
+```
+  # Execute model run001
+  bbi nonmem run (local|sge) run001.mod
+  #  Run models run001.mod, run002.mod, and run003.mod
+  bbi nonmem run (local|sge) 'run[001:003].mod'
+  # Run all models in the current directory
+  bbi nonmem run (local|sge) .
+
+  # Summarize run001
+  bbi nonmem summary run001/run001.lst
+  # The extension may be omitted
+  bbi nonmem summary run001/run001
+  # Output JSON summary for run001 and run002
+  bbi nonmem summary --json run001/run001 run002/run002
+
+  # Display .cov/cor values from run001/run001.{cov,cor}
+  bbi nonmem covcor run001/run001
+  # Display the same values by specifying a full output file
+  bbi nonmem covcor run001/run001.cov
+
 ```
 
 ### Options
@@ -62,13 +63,13 @@ bbi nonmem [flags]
 
 ### SEE ALSO
 
-* [bbi](bbi.md)	 - manage and execute models
-* [bbi nonmem clean](bbi_nonmem_clean.md)	 - clean files and folders
-* [bbi nonmem covcor](bbi_nonmem_covcor.md)	 - load .cov and .cor output from a model run
-* [bbi nonmem params](bbi_nonmem_params.md)	 - get the parameters of model(s)
-* [bbi nonmem probs](bbi_nonmem_probs.md)	 - summarize information about project
-* [bbi nonmem reclean](bbi_nonmem_reclean.md)	 - clean files in an estimation directory by clean level
-* [bbi nonmem run](bbi_nonmem_run.md)	 - run a (set of) models locally or on the grid
-* [bbi nonmem scaffold](bbi_nonmem_scaffold.md)	 - scaffold directory structures
-* [bbi nonmem summary](bbi_nonmem_summary.md)	 - summarize the output of model(s)
+* [bbi](bbi.md)	 - Manage and execute models
+* [bbi nonmem clean](bbi_nonmem_clean.md)	 - Clean files and folders
+* [bbi nonmem covcor](bbi_nonmem_covcor.md)	 - Display .cov and .cor output for a model
+* [bbi nonmem params](bbi_nonmem_params.md)	 - Extract the parameter estimates of models
+* [bbi nonmem probs](bbi_nonmem_probs.md)	 - Summarize model definitions in a directory
+* [bbi nonmem reclean](bbi_nonmem_reclean.md)	 - Clean files in run directory by specified level
+* [bbi nonmem run](bbi_nonmem_run.md)	 - Run models locally or on the grid
+* [bbi nonmem scaffold](bbi_nonmem_scaffold.md)	 - Scaffold directory structures
+* [bbi nonmem summary](bbi_nonmem_summary.md)	 - Summarize model results
 

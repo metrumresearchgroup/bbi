@@ -32,11 +32,12 @@ import (
 	"github.com/spf13/viper"
 )
 
-const paramsLongDescription string = `summarize model(s), for example:
-bbi nonmem params run001
-bbi nonmem params run001
-bbi nonmem params run001
- `
+const paramsExamples string = `  # Display table of parameters for run001
+  bbi nonmem params run001
+  # Display table of parameters for all model runs the current directory
+  bbi nonmem params --dir=.
+  # Print JSON output instead of a table
+  bbi nonmem params --json --dir=.`
 
 var (
 	noParamNames bool
@@ -434,10 +435,14 @@ func params(cmd *cobra.Command, args []string) {
 
 func NewParamsCmd() *cobra.Command {
 	var cmd = &cobra.Command{
-		Use:   "params",
-		Short: "get the parameters of model(s)",
-		Long:  paramsLongDescription,
-		Run:   params,
+		Use:   "params [flags] [<run dir>]",
+		Short: "Extract the parameter estimates of models",
+		Long: `Display the parameter values from completed models. If a directory is
+specified via --dir, get the parameters of all model runs found in that
+directory. Otherwise the positional argument should specify a run directory
+to extract parameters from.`,
+		Example: paramsExamples,
+		Run:     params,
 	}
 
 	//Used for Summary

@@ -1,15 +1,18 @@
 ## bbi nonmem reclean
 
-clean files in an estimation directory by clean level
-
-### Synopsis
-
-
-	bbi reclean run001_est_01
- 
+Clean files in run directory by specified level
 
 ```
-bbi nonmem reclean [flags] <directory>
+bbi nonmem reclean [flags] <run dir>
+```
+
+### Examples
+
+```
+  bbi nonmem run local --clean_lvl=0 001.ctl
+  # Reclean the run directory for 001, deleting what would have been cleaned if
+  # the model was executed with a clean level of 1
+  bbi nonmem reclean --recleanLvl=1 001
 ```
 
 ### Options
@@ -46,5 +49,5 @@ bbi nonmem reclean [flags] <directory>
 
 ### SEE ALSO
 
-* [bbi nonmem](bbi_nonmem.md)	 - nonmem a (set of) models locally or on the grid
+* [bbi nonmem](bbi_nonmem.md)	 - Entry point for NONMEM-related subcommands
 

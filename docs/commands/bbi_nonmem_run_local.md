@@ -1,18 +1,20 @@
 ## bbi nonmem run local
 
-local specifies to run a (set of) models locally
-
-### Synopsis
-
-run nonmem model(s), for example: 
-bbi nonmem run <local|sge> run001.mod
-bbi nonmem run  --clean_lvl=1 <local|sge> run001.mod run002.mod
-bbi nonmem run <local|sge> run[001:006].mod // expand to run001.mod run002.mod ... run006.mod local
-bbi nonmem run <local|sge> .// run all models in directory
- 
+Run models locally
 
 ```
-bbi nonmem run local [flags]
+bbi nonmem run local [flags] <model> [<model>...]
+```
+
+### Examples
+
+```
+  # Execute model run001
+  bbi nonmem run local run001.mod
+  #  Run models run001.mod, run002.mod, and run003.mod
+  bbi nonmem run local 'run[001:003].mod'
+  # Run all models in the current directory
+  bbi nonmem run local .
 ```
 
 ### Options
@@ -60,5 +62,5 @@ bbi nonmem run local [flags]
 
 ### SEE ALSO
 
-* [bbi nonmem run](bbi_nonmem_run.md)	 - run a (set of) models locally or on the grid
+* [bbi nonmem run](bbi_nonmem_run.md)	 - Run models locally or on the grid
 

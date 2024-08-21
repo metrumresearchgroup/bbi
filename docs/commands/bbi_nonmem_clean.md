@@ -1,40 +1,39 @@
 ## bbi nonmem clean
 
-clean files and folders
+Clean files and folders
 
 ### Synopsis
 
+Clean the files and directories that match the specified patterns.
+Whether the pattern is interpreted as a glob or regex is controlled by the
+--regex flag.
 
-glob examples:
-bbi clean *.mod // anything with extension .mod
-bbi clean *.mod --noFolders // anything with extension .mod
-bbi clean run* // anything starting with run
-regular expression examples:
-
-bbi clean ^run --regex // anything beginning with the letters run
-bbi clean ^run -v --regex // print out files and folders that will be deleted
-bbi clean ^run --filesOnly --regex // only remove matching files
-bbi clean _est_ --dirsOnly --regex // only remove matching folders
-bbi clean _est_ --dirsOnly --preview --regex // show what output would be if clean occured but don't actually clean
-bbi clean "run009.[^mod]" --regex // all matching run009.<ext> but not .mod files
-bbi clean "run009.(mod|lst)$" --regex // match run009.lst and run009.mod
-
-can also clean via the opposite of a match with inverse
-
-bbi clean ".modt{0,1}$" --filesOnly --inverse --regex // clean all files not matching .mod or .modt
-
-clean copied files via
-
-bbi clean --copiedRuns="run001"
-bbi clean --copiedRuns="run[001:010]"
-
-can be a comma separated list as well
-
-bbi clean --copiedRuns="run[001:010],run100"
- 
+If files were copied to the parent directory automatically after model
+execution (via the copy_lvl configuration), the original files in the run
+directory can be cleaned up by selecting the run with the --copiedRuns
+option.
 
 ```
-bbi nonmem clean [flags]
+bbi nonmem clean [flags] <pattern> [<pattern>...]
+```
+
+### Examples
+
+```
+  # Remove items in the current directory that end with ".mod"
+  bbi nonmem clean *.mod
+  # The same as above but ensure only files are removed
+  bbi nonmem clean --filesOnly *.mod
+
+  # Remove files in the current directory that start with "run" and end with
+  # ".mod" or ".lst"
+  bbi nonmem clean --filesOnly --regex "run.*\.(mod|lst)$"
+  # Report what the above would remove but don't actually do it
+  bbi nonmem clean --preview --filesOnly --regex "run.*\.(mod|lst)$"
+
+  # Remove copied files (recorded in '{run}_copied.json' by 'bbi run') for
+  # run001, run002, run003, and run100
+  bbi nonmem clean --copiedRuns='run[001:003],run100'
 ```
 
 ### Options
@@ -75,5 +74,5 @@ bbi nonmem clean [flags]
 
 ### SEE ALSO
 
-* [bbi nonmem](bbi_nonmem.md)	 - nonmem a (set of) models locally or on the grid
+* [bbi nonmem](bbi_nonmem.md)	 - Entry point for NONMEM-related subcommands
 

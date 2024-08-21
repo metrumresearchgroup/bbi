@@ -1,17 +1,27 @@
 ## bbi nonmem params
 
-get the parameters of model(s)
+Extract the parameter estimates of models
 
 ### Synopsis
 
-summarize model(s), for example:
-bbi nonmem params run001
-bbi nonmem params run001
-bbi nonmem params run001
- 
+Display the parameter values from completed models. If a directory is
+specified via --dir, get the parameters of all model runs found in that
+directory. Otherwise the positional argument should specify a run directory
+to extract parameters from.
 
 ```
-bbi nonmem params [flags]
+bbi nonmem params [flags] [<run dir>]
+```
+
+### Examples
+
+```
+  # Display table of parameters for run001
+  bbi nonmem params run001
+  # Display table of parameters for all model runs the current directory
+  bbi nonmem params --dir=.
+  # Print JSON output instead of a table
+  bbi nonmem params --json --dir=.
 ```
 
 ### Options
@@ -50,5 +60,5 @@ bbi nonmem params [flags]
 
 ### SEE ALSO
 
-* [bbi nonmem](bbi_nonmem.md)	 - nonmem a (set of) models locally or on the grid
+* [bbi nonmem](bbi_nonmem.md)	 - Entry point for NONMEM-related subcommands
 
