@@ -230,7 +230,7 @@ func TestCleanCopiedRuns(tt *testing.T) {
 	writeCopied(t, filepath.Join(dir, "run10"),
 		[]runner.TargetedFile{
 			{
-				File: "run10.baz",
+				File: filepath.Join(dir, "run10.baz"),
 			},
 		},
 	)

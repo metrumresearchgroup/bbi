@@ -647,8 +647,6 @@ func extrapolateCopyFilesFromExtensions(filename string, level int) []string {
 	extensions[2] = []string{
 		".clt",
 		".coi",
-		".clt",
-		".coi",
 		".cpu",
 		".shm",
 		".phi",
