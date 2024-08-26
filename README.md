@@ -2,6 +2,9 @@
 
 # bbi
 
+Documentation for `bbi` is available at
+<https://metrumresearchgroup.github.io/bbi/docs/>.
+
 bbi is (will be) a complete solution for managing projects involving modeling and simulation with a number 
 of software solutions used in pharmaceutical sciences. 
 
