@@ -72,12 +72,10 @@ func scaffold(cmd *cobra.Command, args []string) error {
 func NewScaffoldCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "scaffold",
-		Short: "scaffold directory structures",
-		Long: `
-	nmu scaffold --cacheDir=nmcache
-
-	nmu scaffold --cacheDir=../nmcache --preview // show where the cache dir would be created
- `,
+		Short: "Scaffold directory structures",
+		Long: `This subcommand writes a .gitignore file to the directory specified by
+--cacheDir that tells Git to ignore all files in the directory except for the
+.gitignore file itself.`,
 		RunE: scaffold,
 	}
 

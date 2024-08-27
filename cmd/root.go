@@ -67,7 +67,7 @@ func Execute(build string) {
 func NewRootCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "bbi",
-		Short: "manage and execute models",
+		Short: "Manage and execute models",
 		Long:  fmt.Sprintf("bbi CLI version %s", VERSION),
 	}
 
@@ -92,7 +92,7 @@ func NewRootCmd() *cobra.Command {
 	cmd.PersistentFlags().IntVar(&threads, "threads", 4, "number of threads to execute with locally or nodes to execute on in parallel")
 	errpanic(viper.BindPFlag("threads", cmd.PersistentFlags().Lookup("threads"))) // Update to make sure viper binds to the flag
 
-	cmd.PersistentFlags().BoolVar(&Json, "json", false, "json tree of output, if possible")
+	cmd.PersistentFlags().BoolVar(&Json, "json", false, "show JSON output, if possible")
 	errpanic(viper.BindPFlag("json", cmd.PersistentFlags().Lookup("json"))) // Bind to viper
 
 	cmd.PersistentFlags().BoolVarP(&preview, "preview", "p", false, "preview action, but don't actually run command")

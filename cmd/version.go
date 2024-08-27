@@ -24,11 +24,8 @@ import (
 func NewVersionCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "version",
-		Short: "check version",
-		Long: `check the current bbi version
-bbi version
- `,
-		Run: version,
+		Short: "Print bbi's version and exit",
+		Run:   version,
 	}
 }
 

@@ -55,13 +55,18 @@ func NewInitCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "init",
 		Short: "Create configuration file with defaults",
-		Long: `Run bbi init to create a bbi.yaml configuration file in the current directory.
- `,
+		Long: `Write a bbi.yaml configuration file in the current directory
+to initialize it for running bbi.
+
+If the --dir=DIR option is specified, DIR should point to a directory that
+contains one or more NONMEM installations directories. Any subdirectory in
+DIR is taken as an installation if it has the expected layout (e.g., a "run"
+directory with an nmfe executable)`,
 		RunE: initializer,
 	}
 
 	const directory string = "dir"
-	cmd.Flags().StringSlice(directory, []string{}, "A directory in which to look for NonMem Installations")
+	cmd.Flags().StringSlice(directory, []string{}, "directory in which to look for NONMEM installations")
 
 	return cmd
 }

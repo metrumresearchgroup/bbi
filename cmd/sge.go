@@ -163,10 +163,10 @@ func errpanic(err error) {
 
 func NewSgeCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "sge",
-		Short: "sge specifies to run a (set of) models on the Sun Grid Engine",
-		Long:  runLongDescription,
-		Run:   sge,
+		Use:     "sge [flags] <model> [<model>...]",
+		Short:   "Run models on the Sun Grid Engine",
+		Example: fmt.Sprintf(runExamples, "sge"),
+		Run:     sge,
 	}
 
 	//String Variables

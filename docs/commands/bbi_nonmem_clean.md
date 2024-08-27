@@ -1,40 +1,39 @@
 ## bbi nonmem clean
 
-clean files and folders
+Clean files and folders
 
 ### Synopsis
 
+Clean the files and directories that match the specified patterns.
+Whether the pattern is interpreted as a glob or regex is controlled by the
+--regex flag.
 
-glob examples:
-bbi clean *.mod // anything with extension .mod
-bbi clean *.mod --noFolders // anything with extension .mod
-bbi clean run* // anything starting with run
-regular expression examples:
-
-bbi clean ^run --regex // anything beginning with the letters run
-bbi clean ^run -v --regex // print out files and folders that will be deleted
-bbi clean ^run --filesOnly --regex // only remove matching files
-bbi clean _est_ --dirsOnly --regex // only remove matching folders
-bbi clean _est_ --dirsOnly --preview --regex // show what output would be if clean occured but don't actually clean
-bbi clean "run009.[^mod]" --regex // all matching run009.<ext> but not .mod files
-bbi clean "run009.(mod|lst)$" --regex // match run009.lst and run009.mod
-
-can also clean via the opposite of a match with inverse
-
-bbi clean ".modt{0,1}$" --filesOnly --inverse --regex // clean all files not matching .mod or .modt
-
-clean copied files via
-
-bbi clean --copiedRuns="run001"
-bbi clean --copiedRuns="run[001:010]"
-
-can be a comma separated list as well
-
-bbi clean --copiedRuns="run[001:010],run100"
- 
+If files were copied to the parent directory automatically after model
+execution (via the copy_lvl configuration), the original files in the run
+directory can be cleaned up by selecting the run with the --copiedRuns
+option.
 
 ```
-bbi nonmem clean [flags]
+bbi nonmem clean [flags] <pattern> [<pattern>...]
+```
+
+### Examples
+
+```
+  # Remove items in the current directory that end with ".mod"
+  bbi nonmem clean *.mod
+  # The same as above but ensure only files are removed
+  bbi nonmem clean --filesOnly *.mod
+
+  # Remove files in the current directory that start with "run" and end with
+  # ".mod" or ".lst"
+  bbi nonmem clean --filesOnly --regex "run.*\.(mod|lst)$"
+  # Report what the above would remove but don't actually do it
+  bbi nonmem clean --preview --filesOnly --regex "run.*\.(mod|lst)$"
+
+  # Remove copied files (recorded in '{run}_copied.json' by 'bbi run') for
+  # run001, run002, run003, and run100
+  bbi nonmem clean --copiedRuns='run[001:003],run100'
 ```
 
 ### Options
@@ -51,29 +50,29 @@ bbi nonmem clean [flags]
 ### Options inherited from parent commands
 
 ```
-      --background             RAW NMFE OPTION - Tells nonmem not to scan StdIn for control characters
+      --background             RAW NMFE OPTION - tell NONMEM not to scan stdin for control characters
   -d, --debug                  debug mode
-      --json                   json tree of output, if possible
-      --licfile string         RAW NMFE OPTION - Specify a license file to use with NMFE (Nonmem)
-      --maxlim int             RAW NMFE OPTION - Set the maximum values for the buffers used by Nonmem (if 0, don't pass -maxlim to nmfe) (default 2)
-      --mpi_exec_path string   The fully qualified path to mpiexec. Used for nonmem parallel operations (default "/usr/local/mpich3/bin/mpiexec")
-      --nm_version string      Version of nonmem from the configuration list to use
-      --nmqual                 Whether or not to execute with nmqual (autolog.pl)
-      --nobuild                RAW NMFE OPTION - Skips recompiling and rebuilding on nonmem executable
+      --json                   show JSON output, if possible
+      --licfile string         RAW NMFE OPTION - NONMEM license file to use
+      --maxlim int             RAW NMFE OPTION - set the maximum values for the buffers used by NONMEM (if 0, don't pass -maxlim to nmfe) (default 2)
+      --mpi_exec_path string   fully qualified path to mpiexec to use for NONMEM parallel operations (default "/usr/local/mpich3/bin/mpiexec")
+      --nm_version string      version of NONMEM from the configuration list to use
+      --nmqual                 whether to execute with nmqual (autolog.pl)
+      --nobuild                RAW NMFE OPTION - do not build a new NONMEM executable
   -o, --output string          output file
-      --parafile string        Location of a user-provided parafile to use for parallel execution
-      --parallel               Whether or not to run nonmem in parallel mode
-      --parallel_timeout int   The amount of time to wait for parallel operations in nonmem before timing out (default 2147483647)
-      --prcompile              RAW NMFE OPTION - Forces PREDPP compilation
-      --prdefault              RAW NMFE OPTION - Do not recompile any routines other than FSUBS
+      --parafile string        location of a user-provided parafile to use for parallel execution
+      --parallel               whether to run NONMEM in parallel mode
+      --parallel_timeout int   amount of time to wait for parallel operations in NONMEM before timing out (default 2147483647)
+      --prcompile              RAW NMFE OPTION - forces PREDPP compilation
+      --prdefault              RAW NMFE OPTION - do not recompile any routines other than FSUBS
   -p, --preview                preview action, but don't actually run command
-      --prsame                 RAW NMFE OPTION - Indicates to nonmem that the PREDPP compilation step should be skipped
+      --prsame                 RAW NMFE OPTION - tell NONMEM to skip the PREDPP compilation step
       --threads int            number of threads to execute with locally or nodes to execute on in parallel (default 4)
-      --tprdefault             RAW NMFE OPTION - Test if is okay to do -prdefault
+      --tprdefault             RAW NMFE OPTION - test if is okay to do -prdefault
   -v, --verbose                verbose output
 ```
 
 ### SEE ALSO
 
-* [bbi nonmem](bbi_nonmem.md)	 - nonmem a (set of) models locally or on the grid
+* [bbi nonmem](bbi_nonmem.md)	 - Entry point for NONMEM-related subcommands
 

@@ -1,0 +1,54 @@
+title: bbi
+baseURL: https://metrumresearchgroup.github.io/bbi/
+languageCode: en-us
+markup:
+  highlight:
+    noClasses: false
+  goldmark:
+    extensions:
+      typographer:
+        # Prevent --option in command pages from being rendered with an en-dash.
+        disable: true
+    parser:
+      attribute:
+        block: true
+menu:
+  main:
+    - name: Docs
+      pageRef: /docs
+      weight: 10
+    - name: News
+      pageRef: /news
+      weight: 20
+    - name: Search
+      weight: 30
+      params:
+        type: search
+    - name: GitHub
+      weight: 40
+      url: https://github.com/metrumresearchgroup/bbi
+      params:
+        icon: github
+  sidebar:
+    - identifier: bbr
+      name: "bbr: R interface to bbi ↗"
+      url: "https://metrumresearchgroup.github.io/bbr"
+      weight: 100
+
+disableKinds:
+  - taxonomy
+  - term
+
+module:
+  imports:
+    - path: github.com/imfing/hextra
+params:
+  navbar:
+    displayTitle: true
+    displayLogo: true
+    logo:
+      path: logo.png
+      width: 25
+  theme:
+    default: system
+    displayToggle: false
