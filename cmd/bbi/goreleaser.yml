@@ -1,24 +1,16 @@
 # goreleaser.yml
 # Build customization
+version: 2
 project_name: bbi
-
-build:
-  binary: bbi
-  goos:
-    - windows
-    - darwin
-    - linux
-  goarch:
-    - amd64
 
 # goreleaser.yml
 brews:
   # Repository to push the tap to.
-  -
-    tap:
-      owner: metrumresearchgroup 
-      name: homebrew-tap 
-
+  - repository:
+      owner: metrumresearchgroup
+      name: homebrew-tap
+      branch: master
+      token: "{{ .Env.GH_GORELEASER_BREWS_TOKEN }}"
 
 builds:
   -
@@ -41,6 +33,7 @@ release:
     name: bbi
     #Turning on auto marking of non standard releases as "pre" releases
   prerelease: auto
+  draft: true
 
 archives:
   -
@@ -50,7 +43,4 @@ archives:
     wrap_in_directory: true
     format: tar.gz
 changelog:
-  filters:
-    exclude:
-      - '^ci:'
-      - '^docs:'
+  disable: true
