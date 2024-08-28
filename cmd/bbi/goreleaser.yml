@@ -42,7 +42,4 @@ archives:
     wrap_in_directory: true
     format: tar.gz
 changelog:
-  filters:
-    exclude:
-      - '^ci:'
-      - '^docs:'
+  disable: true
