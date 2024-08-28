@@ -64,5 +64,6 @@ jobs:
           args: release --clean
           workdir: cmd/bbi
         env:
+          VERSION: ${{ github.ref_name }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_GORELEASER_BREWS_TOKEN: ${{ secrets.GH_GORELEASER_BREWS_TOKEN }}
