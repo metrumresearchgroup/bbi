@@ -33,6 +33,7 @@ release:
     name: bbi
     #Turning on auto marking of non standard releases as "pre" releases
   prerelease: auto
+  draft: true
 
 archives:
   -
