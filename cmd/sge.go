@@ -72,29 +72,29 @@ func (s *SGEModel) GetWorkingPath() string {
 }
 
 // Begin Scalable method definitions.
-func (l SGEModel) CancellationChannel() chan bool {
-	return l.Cancel
+func (s SGEModel) CancellationChannel() chan bool {
+	return s.Cancel
 }
 
 // Prepare is basically the old EstimateModel function. Responsible for creating directories and preparation.
-func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
-	log.Debugf("%s Beginning Prepare phase of SGE Work", l.Nonmem.LogIdentifier())
+func (s SGEModel) Prepare(channels *turnstile.ChannelMap) {
+	log.Debugf("%s Beginning Prepare phase of SGE Work", s.Nonmem.LogIdentifier())
 
 	//Mark the model as started some work
 	channels.Working <- 1
 
 	fs := afero.NewOsFs()
 
-	log.Debugf("%s Overwrite is currrently set to %t", l.Nonmem.LogIdentifier(), l.Nonmem.Configuration.Overwrite)
-	log.Debugf("%s Beginning evaluation of whether or not %s exists", l.Nonmem.LogIdentifier(), l.Nonmem.OutputDir)
+	log.Debugf("%s Overwrite is currrently set to %t", s.Nonmem.LogIdentifier(), s.Nonmem.Configuration.Overwrite)
+	log.Debugf("%s Beginning evaluation of whether or not %s exists", s.Nonmem.LogIdentifier(), s.Nonmem.OutputDir)
 
-	err := createChildDirectories(l.Nonmem, true)
+	err := createChildDirectories(s.Nonmem, true)
 
 	//Save the config into the output directory
 
 	if err != nil {
 		//Handles the cancel operation
-		p := &l
+		p := &s
 		p.BuildExecutionEnvironment(false, err)
 		RecordConcurrentError(p.Nonmem.FileName, err.Error(), err, channels, p.Cancel, p)
 
@@ -102,10 +102,10 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 	}
 
 	//Create Execution Script
-	scriptContents, err := generateBbiScript(sgeTemplate, *l.Nonmem)
+	scriptContents, err := generateBbiScript(sgeTemplate, *s.Nonmem)
 
 	if err != nil {
-		p := &l
+		p := &s
 		p.BuildExecutionEnvironment(false, err)
 		RecordConcurrentError(p.Nonmem.Model, "An error occurred during the creation of the executable script for this model", err, channels, p.Cancel, p)
 
@@ -113,44 +113,44 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 	}
 
 	//rwxr-x---
-	err = afero.WriteFile(fs, path.Join(l.Nonmem.OutputDir, "grid.sh"), scriptContents, 0750)
+	err = afero.WriteFile(fs, path.Join(s.Nonmem.OutputDir, "grid.sh"), scriptContents, 0750)
 
 	if viper.GetBool("debug") {
-		lines, _ := utils.ReadLines(path.Join(l.Nonmem.OutputDir, "grid.sh"))
-		log.Debugf("%s SGE Path's Generated Script content is \n%s", l.Nonmem.LogIdentifier(), strings.Join(lines, "\n"))
+		lines, _ := utils.ReadLines(path.Join(s.Nonmem.OutputDir, "grid.sh"))
+		log.Debugf("%s SGE Path's Generated Script content is \n%s", s.Nonmem.LogIdentifier(), strings.Join(lines, "\n"))
 	}
 
 	if err != nil {
-		p := &l
+		p := &s
 		p.BuildExecutionEnvironment(false, err)
 		RecordConcurrentError(p.Nonmem.Model, "There was an issue writing the executable file", err, channels, p.Cancel, p)
 	}
 }
 
 // Work describes the Turnstile execution phase -> IE What heavy lifting should be done.
-func (l SGEModel) Work(channels *turnstile.ChannelMap) {
-	cerr := executeNonMemJob(executeSGEJob, l.Nonmem)
+func (s SGEModel) Work(channels *turnstile.ChannelMap) {
+	cerr := executeNonMemJob(executeSGEJob, s.Nonmem)
 
 	if cerr.Error != nil {
-		p := &l
+		p := &s
 		p.BuildExecutionEnvironment(false, cerr.Error)
 		RecordConcurrentError(p.Nonmem.Model, cerr.Notes, cerr.Error, channels, p.Cancel, p)
 
 		return
 	}
 
-	log.Debugf("%s Work is completed. Updating turnstile channels", l.Nonmem.LogIdentifier())
-	log.Debugf("%s No monitor or cleanup phases currently exist for SGE Job. Work completed", l.Nonmem.LogIdentifier())
+	log.Debugf("%s Work is completed. Updating turnstile channels", s.Nonmem.LogIdentifier())
+	log.Debugf("%s No monitor or cleanup phases currently exist for SGE Job. Work completed", s.Nonmem.LogIdentifier())
 	channels.Completed <- 1
 }
 
 // Monitor is the 3rd phase of turnstile (not implemented here).
-func (l SGEModel) Monitor(_ *turnstile.ChannelMap) {
+func (s SGEModel) Monitor(_ *turnstile.ChannelMap) {
 	//Do nothing for this implementation
 }
 
 // Cleanup is the last phase of execution, in which computation / hard work is done and we're cleaning up leftover files, copying results around et all.
-func (l SGEModel) Cleanup(_ *turnstile.ChannelMap) {
+func (s SGEModel) Cleanup(_ *turnstile.ChannelMap) {
 	//err := configlib.WriteViperConfig(l.Nonmem.OutputDir, true)
 	//
 	//if err != nil {
