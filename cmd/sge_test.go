@@ -73,7 +73,7 @@ func TestBbiBinaryOverride(tt *testing.T) {
 			},
 		}
 
-		content, err := generateBbiScript(nonMemExecutionTemplate, model)
+		content, err := generateBbiScript(sgeTemplate, model)
 		t.R.NoError(err)
 		t.R.Contains(string(content), "fakebbi nonmem run")
 	})

@@ -25,6 +25,12 @@ import (
 	"github.com/spf13/viper"
 )
 
+const sgeTemplate string = `#!/bin/bash
+#$ -wd {{.WorkingDirectory}}
+
+{{.Command}}
+`
+
 // SGEModel is the struct used for SGE operations containing the NonMemModel.
 type SGEModel struct {
 	Nonmem               *NonMemModel
@@ -92,7 +98,7 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 	}
 
 	//Create Execution Script
-	scriptContents, err := generateBbiScript(nonMemExecutionTemplate, *l.Nonmem)
+	scriptContents, err := generateBbiScript(sgeTemplate, *l.Nonmem)
 
 	if err != nil {
 		p := &l

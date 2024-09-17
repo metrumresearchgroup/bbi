@@ -41,14 +41,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-// scriptTemplate is a go template we'll use for generating the script to do the work.
-const nonMemExecutionTemplate string = `#!/bin/bash
-
-#$ -wd {{ .WorkingDirectory }}
-
-{{ .Command }}
-`
-
 // Parse type 2 refers to evenly load balanced work
 // Transfer Type 1 refers to MPI
 // TIMEOUTI 100 means wait 100 seconds for node to become available
