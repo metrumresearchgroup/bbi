@@ -8,8 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/metrumresearchgroup/bbi/utils"
-
 	"github.com/metrumresearchgroup/gogridengine"
 	"github.com/metrumresearchgroup/wrapt"
 	log "github.com/sirupsen/logrus"
@@ -28,9 +26,8 @@ func TestBbiCompletesSGEExecution(tt *testing.T) {
 		{name: "leading-path-with space"},
 	}
 
-	testId := "INT-SGE-001"
 	for _, test := range tests {
-		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
+		tt.Run("SGE "+test.name, func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			scenario := InitializeScenario(t, test.name)
@@ -86,9 +83,8 @@ func TestBbiCompletesParallelSGEExecution(tt *testing.T) {
 		{name: "leading-path-with space"},
 	}
 
-	testId := "INT-SGE-002"
 	for _, test := range tests {
-		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
+		tt.Run("SGE "+test.name, func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
 			scenario := InitializeScenario(t, test.name)
