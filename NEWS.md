@@ -1,4 +1,24 @@
 
+# bbi 3.3.1
+
+Documentation is now available at
+<https://metrumresearchgroup.github.io/bbi/docs/>.
+
+## Changes
+
+* The documentation of many subcommands has been updated and expanded.
+  (#329)
+
+## Bug fixes
+
+* `bbi nonmem probs` did not correctly handle its optional directory
+  argument.  (#328)
+
+* `bbi nonmem clean` failed to delete files extracted from
+  `*_copied.json` files (enabled when `--copiedRuns` is used) due to
+  incorrect path handling.  (#331)
+
+
 # bbi 3.3.0
 
 ## New features
