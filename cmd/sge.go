@@ -271,6 +271,13 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 
 	//Find Qsub
 	binary, err := exec.LookPath("qsub")
+	if err != nil {
+		return turnstile.ConcurrentError{
+			RunIdentifier: model.Model,
+			Notes:         "could not locate qsub binary in path",
+			Error:         err,
+		}
+	}
 
 	qsubArguments := []string{}
 
@@ -291,14 +298,6 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 	}
 
 	qsubArguments = append(qsubArguments, filepath.Join(model.OutputDir, scriptName))
-
-	if err != nil {
-		return turnstile.ConcurrentError{
-			RunIdentifier: model.Model,
-			Notes:         "could not locate qsub binary in path",
-			Error:         err,
-		}
-	}
 
 	command := exec.Command(binary, qsubArguments...)
 
