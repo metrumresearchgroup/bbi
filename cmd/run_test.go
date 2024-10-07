@@ -53,6 +53,16 @@ func TestRunModelCommandError(tt *testing.T) {
 
 	cerr := runModelCommand(mod, cmd, never)
 	t.A.Error(cerr.Error)
+	t.A.Contains(cerr.Notes, mod.Model+".out")
+
+	outfile := filepath.Join(mod.OutputDir, mod.Model+".out")
+	t.R.FileExists(outfile)
+	bs, err := os.ReadFile(outfile)
+	t.R.NoError(err)
+	output = string(bs)
+
+	t.A.Contains(output, "stdout")
+	t.A.Contains(output, "stderr")
 }
 
 func TestRunModelCommandIgnoreError(tt *testing.T) {
