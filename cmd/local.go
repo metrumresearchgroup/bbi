@@ -466,10 +466,7 @@ func executeLocalJob(model *NonMemModel) turnstile.ConcurrentError {
 		var exitError *exec.ExitError
 		if errors.As(err, &exitError) {
 			code := exitError.ExitCode()
-			details := exitError.String()
-
-			log.Errorf("%s Exit code was %d, details were %s", model.LogIdentifier(), code, details)
-			log.Errorf("%s output details were: %s", model.LogIdentifier(), string(output))
+			log.Errorf("%s exit code: %d, output:\n%s", model.LogIdentifier(), code, string(output))
 		}
 
 		return turnstile.ConcurrentError{
