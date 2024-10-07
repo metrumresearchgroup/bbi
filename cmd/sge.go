@@ -262,7 +262,7 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 	if err != nil {
 		return turnstile.ConcurrentError{
 			RunIdentifier: model.FileName,
-			Notes:         "Failed to template out name for job submission",
+			Notes:         "failed to template out name for job submission",
 			Error:         err,
 		}
 	}
@@ -295,7 +295,7 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 	if err != nil {
 		return turnstile.ConcurrentError{
 			RunIdentifier: model.Model,
-			Notes:         "Could not locate qsub binary in path",
+			Notes:         "could not locate qsub binary in path",
 			Error:         err,
 		}
 	}
@@ -322,7 +322,7 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 			//If the error doesn't appear to be the above error, we'll generate the concurrent error and move along
 			return turnstile.ConcurrentError{
 				RunIdentifier: model.Model,
-				Notes:         "Running the programmatic shell script caused an error",
+				Notes:         "running the programmatic shell script caused an error",
 				Error:         err,
 			}
 		}
@@ -333,7 +333,7 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 	if err != nil {
 		return turnstile.ConcurrentError{
 			RunIdentifier: model.Model,
-			Notes:         "Having issues writing the output file from command execution",
+			Notes:         "having issues writing the output file from command execution",
 			Error:         err,
 		}
 	}

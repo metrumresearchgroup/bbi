@@ -151,7 +151,7 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 		channels.Errors <- turnstile.ConcurrentError{
 			RunIdentifier: l.Nonmem.Model,
 			Error:         err,
-			Notes:         "An error occurred during the creation of the executable script for this model",
+			Notes:         "an error occurred during the creation of the executable script for this model",
 		}
 
 		return
@@ -474,7 +474,7 @@ func executeLocalJob(model *NonMemModel) turnstile.ConcurrentError {
 
 		return turnstile.ConcurrentError{
 			RunIdentifier: model.Model,
-			Notes:         "Running the programmatic shell script caused an error",
+			Notes:         "running the programmatic shell script caused an error",
 			Error:         err,
 		}
 	}
