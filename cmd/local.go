@@ -472,7 +472,11 @@ func executeLocalJob(model *NonMemModel) turnstile.ConcurrentError {
 			log.Errorf("%s output details were: %s", model.LogIdentifier(), string(output))
 		}
 
-		return newConcurrentError(model.Model, "Running the programmatic shell script caused an error", err)
+		return turnstile.ConcurrentError{
+			RunIdentifier: model.Model,
+			Notes:         "Running the programmatic shell script caused an error",
+			Error:         err,
+		}
 	}
 
 	if err = afero.WriteFile(fs, path.Join(model.OutputDir, model.Model+".out"), output, 0640); err != nil {

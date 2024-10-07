@@ -251,14 +251,6 @@ func sge(_ *cobra.Command, args []string) {
 	}
 }
 
-func newConcurrentError(model string, notes string, err error) turnstile.ConcurrentError {
-	return turnstile.ConcurrentError{
-		RunIdentifier: model,
-		Error:         err,
-		Notes:         notes,
-	}
-}
-
 func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 	log.Printf("%s Beginning SGE work phase", model.LogIdentifier())
 	fs := afero.NewOsFs()
@@ -268,7 +260,11 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 	submittedName, err := gridengineJobName(model)
 
 	if err != nil {
-		return newConcurrentError(model.FileName, "Failed to template out name for job submission", err)
+		return turnstile.ConcurrentError{
+			RunIdentifier: model.FileName,
+			Notes:         "Failed to template out name for job submission",
+			Error:         err,
+		}
 	}
 
 	scriptName := "grid.sh"
@@ -297,7 +293,11 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 	qsubArguments = append(qsubArguments, filepath.Join(model.OutputDir, scriptName))
 
 	if err != nil {
-		return newConcurrentError(model.Model, "Could not locate qsub binary in path", err)
+		return turnstile.ConcurrentError{
+			RunIdentifier: model.Model,
+			Notes:         "Could not locate qsub binary in path",
+			Error:         err,
+		}
 	}
 
 	command := exec.Command(binary, qsubArguments...)
@@ -320,14 +320,22 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 		//Let's look to see if it's just because of the typical "No queues present" error
 		if !strings.Contains(string(output), "job is not allowed to run in any queue") {
 			//If the error doesn't appear to be the above error, we'll generate the concurrent error and move along
-			return newConcurrentError(model.Model, "Running the programmatic shell script caused an error", err)
+			return turnstile.ConcurrentError{
+				RunIdentifier: model.Model,
+				Notes:         "Running the programmatic shell script caused an error",
+				Error:         err,
+			}
 		}
 	}
 
 	err = afero.WriteFile(fs, path.Join(model.OutputDir, model.Model+".out"), output, 0640)
 
 	if err != nil {
-		return newConcurrentError(model.Model, "Having issues writing the output file from command execution", err)
+		return turnstile.ConcurrentError{
+			RunIdentifier: model.Model,
+			Notes:         "Having issues writing the output file from command execution",
+			Error:         err,
+		}
 	}
 
 	return turnstile.ConcurrentError{}
