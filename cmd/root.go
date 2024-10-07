@@ -154,7 +154,7 @@ func logSetup(config configlib.Config) {
 		var outfile afero.File
 
 		if ok, _ := afero.Exists(fs, logfile); ok {
-			of, err := fs.OpenFile(logfile, os.O_APPEND|os.O_WRONLY, 0755)
+			of, err := fs.OpenFile(logfile, os.O_APPEND|os.O_WRONLY, 0644)
 
 			if err != nil {
 				log.Fatalf("Unable to open file at %s. Error is %s", logfile, err)
