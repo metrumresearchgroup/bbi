@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"os/exec"
 	"path"
@@ -317,6 +318,11 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 	if err != nil {
 		//Let's look to see if it's just because of the typical "No queues present" error
 		if !strings.Contains(string(output), "job is not allowed to run in any queue") {
+			var exitError *exec.ExitError
+			if errors.As(err, &exitError) {
+				code := exitError.ExitCode()
+				log.Errorf("%s exit code: %d, output:\n%s", model.LogIdentifier(), code, string(output))
+			}
 			//If the error doesn't appear to be the above error, we'll generate the concurrent error and move along
 			return turnstile.ConcurrentError{
 				RunIdentifier: model.Model,
