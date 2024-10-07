@@ -323,7 +323,7 @@ func generateScript(fileTemplate string, l *NonMemModel) ([]byte, error) {
 	t, err := template.New("file").Parse(fileTemplate)
 	buf := new(bytes.Buffer)
 	if err != nil {
-		return []byte{}, errors.New("There was an error processing the provided script template")
+		return []byte{}, fmt.Errorf("parsing script template failed: %w", err)
 	}
 
 	type content struct {
@@ -344,7 +344,7 @@ func generateScript(fileTemplate string, l *NonMemModel) ([]byte, error) {
 	err = t.Execute(buf, cont)
 
 	if err != nil {
-		return []byte{}, errors.New("An error occured during the execution of the provided script template")
+		return []byte{}, fmt.Errorf("generating script template failed: %w", err)
 	}
 
 	if viper.GetBool("debug") {

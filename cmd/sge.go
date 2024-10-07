@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"os/exec"
 	"path"
@@ -364,7 +363,7 @@ func generateBbiScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 	t, err := template.New("file").Parse(fileTemplate)
 	buf := new(bytes.Buffer)
 	if err != nil {
-		return []byte{}, errors.New("There was an error processing the provided script template")
+		return []byte{}, fmt.Errorf("parsing bbi script template failed: %w", err)
 	}
 
 	filename := l.Model
@@ -411,7 +410,7 @@ func generateBbiScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 	})
 
 	if err != nil {
-		return []byte{}, errors.New("An error occured during the execution of the provided script template")
+		return []byte{}, fmt.Errorf("failed to generate bbi script: %w", err)
 	}
 
 	return buf.Bytes(), nil
