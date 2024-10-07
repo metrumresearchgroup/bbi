@@ -151,7 +151,7 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 		channels.Errors <- turnstile.ConcurrentError{
 			RunIdentifier: l.Nonmem.Model,
 			Error:         err,
-			Notes:         "an error occurred during the creation of the executable script for this model",
+			Notes:         "failed to generate executable script",
 		}
 
 		return
@@ -163,7 +163,7 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 	if err = afero.WriteFile(fs, path.Join(l.Nonmem.OutputDir, l.Nonmem.FileName+".sh"), scriptContents, 0750); err != nil {
 		channels.Errors <- turnstile.ConcurrentError{
 			RunIdentifier: l.Nonmem.FileName,
-			Notes:         "writing the .sh file",
+			Notes:         "failed to write .sh file",
 			Error:         err,
 		}
 	}
@@ -172,7 +172,7 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 		if err = writeParaFile(l.Nonmem); err != nil {
 			channels.Errors <- turnstile.ConcurrentError{
 				RunIdentifier: l.Nonmem.FileName,
-				Notes:         "writing to the parafile",
+				Notes:         "failed to write parafile",
 				Error:         err,
 			}
 			//			log.Fatalf("%s Configuration requires parallel operation, but generation or writing of the parafile has failed: %s", l.Nonmem.LogIdentifier(), err)
@@ -275,7 +275,7 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 		if err = afero.WriteFile(fs, path.Join(l.Nonmem.OriginalPath, l.Nonmem.FileName+"_copied.json"), copiedJSON, 0640); err != nil {
 			channels.Errors <- turnstile.ConcurrentError{
 				RunIdentifier: l.Nonmem.FileName,
-				Notes:         "could not write _copied.json file",
+				Notes:         "failed to write _copied.json file",
 				Error:         err,
 			}
 		}
@@ -305,7 +305,7 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 	if err = createNewGitIgnoreFile(l.Nonmem); err != nil {
 		channels.Errors <- turnstile.ConcurrentError{
 			RunIdentifier: l.Nonmem.FileName,
-			Notes:         "failed writing .gitignore file ",
+			Notes:         "failed to write .gitignore file",
 			Error:         err,
 		}
 	}
@@ -474,13 +474,17 @@ func executeLocalJob(model *NonMemModel) turnstile.ConcurrentError {
 
 		return turnstile.ConcurrentError{
 			RunIdentifier: model.Model,
-			Notes:         "running the programmatic shell script caused an error",
+			Notes:         "error running shell script",
 			Error:         err,
 		}
 	}
 
 	if err = afero.WriteFile(fs, path.Join(model.OutputDir, model.Model+".out"), output, 0640); err != nil {
-		return turnstile.ConcurrentError{Error: err, Notes: "unable to write model to output directory", RunIdentifier: model.FileName}
+		return turnstile.ConcurrentError{
+			RunIdentifier: model.FileName,
+			Notes:         "failed to write model output",
+			Error:         err,
+		}
 	}
 
 	return turnstile.ConcurrentError{}

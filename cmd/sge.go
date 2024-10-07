@@ -322,7 +322,7 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 			//If the error doesn't appear to be the above error, we'll generate the concurrent error and move along
 			return turnstile.ConcurrentError{
 				RunIdentifier: model.Model,
-				Notes:         "running the programmatic shell script caused an error",
+				Notes:         "error running submission script",
 				Error:         err,
 			}
 		}
@@ -333,7 +333,7 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 	if err != nil {
 		return turnstile.ConcurrentError{
 			RunIdentifier: model.Model,
-			Notes:         "having issues writing the output file from command execution",
+			Notes:         "failed to write model output",
 			Error:         err,
 		}
 	}
