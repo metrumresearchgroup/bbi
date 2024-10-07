@@ -435,8 +435,6 @@ func WriteGitIgnoreFile(filepath string) error {
 
 func executeLocalJob(model *NonMemModel) turnstile.ConcurrentError {
 	log.Infof("%s Beginning local work phase", model.LogIdentifier())
-	fs := afero.NewOsFs()
-
 	log.Debugf("Output directory is currently set to %s", model.OutputDir)
 
 	scriptLocation := path.Join(model.OutputDir, model.FileName+".sh")
@@ -458,33 +456,7 @@ func executeLocalJob(model *NonMemModel) turnstile.ConcurrentError {
 
 	log.Debugf("%s Generated command was: %s", model.LogIdentifier(), command.String())
 
-	output, err := command.CombinedOutput()
-
-	if err != nil && !strings.Contains(string(output), "not well-formed (invalid token)") {
-		log.Debug(err)
-
-		var exitError *exec.ExitError
-		if errors.As(err, &exitError) {
-			code := exitError.ExitCode()
-			log.Errorf("%s exit code: %d, output:\n%s", model.LogIdentifier(), code, string(output))
-		}
-
-		return turnstile.ConcurrentError{
-			RunIdentifier: model.Model,
-			Notes:         "error running shell script",
-			Error:         err,
-		}
-	}
-
-	if err = afero.WriteFile(fs, path.Join(model.OutputDir, model.Model+".out"), output, 0640); err != nil {
-		return turnstile.ConcurrentError{
-			RunIdentifier: model.FileName,
-			Notes:         "failed to write model output",
-			Error:         err,
-		}
-	}
-
-	return turnstile.ConcurrentError{}
+	return runModelCommand(model, command, localIgnoreError)
 }
 
 func localModelsFromArguments(args []string, config configlib.Config) ([]LocalModel, error) {
@@ -558,4 +530,8 @@ func HashFileOnChannel(ch chan string, file string, identifier string) {
 		ch <- ""
 	}
 	ch <- fmt.Sprintf("%x", h.Sum(nil))
+}
+
+func localIgnoreError(_ error, output string) bool {
+	return strings.Contains(output, "not well-formed (invalid token)")
 }

@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"os/exec"
 	"path"
@@ -253,7 +252,6 @@ func sge(_ *cobra.Command, args []string) {
 
 func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 	log.Printf("%s Beginning SGE work phase", model.LogIdentifier())
-	fs := afero.NewOsFs()
 	//Execute the script we created
 
 	//Compute the grid name for submission
@@ -313,36 +311,7 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 		command.Env = append(command.Env, additionalEnvs...)
 	}
 
-	output, err := command.CombinedOutput()
-
-	if err != nil {
-		//Let's look to see if it's just because of the typical "No queues present" error
-		if !strings.Contains(string(output), "job is not allowed to run in any queue") {
-			var exitError *exec.ExitError
-			if errors.As(err, &exitError) {
-				code := exitError.ExitCode()
-				log.Errorf("%s exit code: %d, output:\n%s", model.LogIdentifier(), code, string(output))
-			}
-			//If the error doesn't appear to be the above error, we'll generate the concurrent error and move along
-			return turnstile.ConcurrentError{
-				RunIdentifier: model.Model,
-				Notes:         "error running submission script",
-				Error:         err,
-			}
-		}
-	}
-
-	err = afero.WriteFile(fs, path.Join(model.OutputDir, model.Model+".out"), output, 0640)
-
-	if err != nil {
-		return turnstile.ConcurrentError{
-			RunIdentifier: model.Model,
-			Notes:         "failed to write model output",
-			Error:         err,
-		}
-	}
-
-	return turnstile.ConcurrentError{}
+	return runModelCommand(model, command, sgeIgnoreError)
 }
 
 func sgeModelsFromArguments(args []string, config configlib.Config) ([]SGEModel, error) {
@@ -447,4 +416,9 @@ func gridengineJobName(model *NonMemModel) (string, error) {
 	}
 
 	return outBytesBuffer.String(), nil
+}
+
+func sgeIgnoreError(_ error, output string) bool {
+	// Ignore the error that occurs when no workers are available yet.
+	return strings.Contains(output, "job is not allowed to run in any queue")
 }

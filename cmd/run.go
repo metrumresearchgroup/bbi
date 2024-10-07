@@ -13,7 +13,9 @@ import (
 
 	"github.com/metrumresearchgroup/bbi/configlib"
 
+	"github.com/metrumresearchgroup/turnstile"
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -333,4 +335,45 @@ func onlyBbiVariables(provided []string) []string {
 	}
 
 	return matched
+}
+
+// runModelCommand runs command, writing the combined standard output and
+// standard error to {model.OutputDir}/{model.Model}.out.  command should be
+// primed to run, but Stdout and Stderr must not be set.
+//
+// ignoreError is a function called if running the command fails.  It takes the
+// error and combined standard output and standard error as arguments.  A return
+// value of true indicates that the error should be swallowed rather propagated
+// as a turnstile.ConcurrentError.
+func runModelCommand(
+	model *NonMemModel, command *exec.Cmd, ignoreError func(error, string) bool,
+) turnstile.ConcurrentError {
+
+	output, err := command.CombinedOutput()
+	if err != nil && !ignoreError(err, string(output)) {
+		log.Debug(err)
+
+		var exitError *exec.ExitError
+		if errors.As(err, &exitError) {
+			code := exitError.ExitCode()
+			log.Errorf("%s exit code: %d, output:\n%s", model.LogIdentifier(), code, string(output))
+		}
+
+		return turnstile.ConcurrentError{
+			RunIdentifier: model.Model,
+			Notes:         fmt.Sprintf("error running %q", command.String()),
+			Error:         err,
+		}
+	}
+
+	fs := afero.NewOsFs()
+	if err = afero.WriteFile(fs, filepath.Join(model.OutputDir, model.Model+".out"), output, 0640); err != nil {
+		return turnstile.ConcurrentError{
+			RunIdentifier: model.Model,
+			Notes:         "failed to write model output",
+			Error:         err,
+		}
+	}
+
+	return turnstile.ConcurrentError{}
 }
