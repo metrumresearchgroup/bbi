@@ -63,6 +63,8 @@ func CheckIfBayesian(results SummaryOutput) bool {
 	return isBayesian
 }
 
+// strToFloat converts s to a float64.  If the result is NaN or any error is
+// encountered, DefaultFloat64 is returned as the value.
 func strToFloat(s string) float64 {
 	f, err := strconv.ParseFloat(s, 64)
 	if err != nil || math.IsNaN(f) {
