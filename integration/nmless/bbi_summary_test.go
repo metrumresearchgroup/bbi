@@ -44,7 +44,7 @@ func TestSummaryHappyPath(tt *testing.T) {
 		"example2_bayes",   // Bayes (5 est methods, from NONMEM examples)
 		"iovmm",            // Mixture model. Also has parameter_near_boundary and final_zero_gradient heuristics.
 		"acop-iov",         // fake model with 62 OMEGAS (fake iov)
-		"acop-nan",         // NaN values for objective function
+		"acop-nan",         // NaN values in several spots
 		"onlysim",          // $SIM with ONLYSIM.
 		"chain",            // CHAIN method that lacks estimation data.
 		"12-empty-problem", // $PROBLEM is an empty string

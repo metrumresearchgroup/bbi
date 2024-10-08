@@ -58,7 +58,7 @@ func ParseRunDetails(lines []string) RunDetails {
 		case strings.Contains(line, "NO. OF FUNCTION EVALUATIONS USED"):
 			runDetails.FunctionEvaluations, _ = strconv.ParseInt(replaceTrim(line, "NO. OF FUNCTION EVALUATIONS USED:"), 10, 64)
 		case strings.Contains(line, "NO. OF SIG. DIGITS IN FINAL EST.:"):
-			runDetails.SignificantDigits, _ = strconv.ParseFloat(replaceTrim(line, "NO. OF SIG. DIGITS IN FINAL EST.:"), 64)
+			runDetails.SignificantDigits = strToFloat(replaceTrim(line, "NO. OF SIG. DIGITS IN FINAL EST.:"))
 		case strings.Contains(line, "Elapsed estimation"):
 			runDetails.EstimationTime = append(runDetails.EstimationTime,
 				parseFinalTime(line))
@@ -68,7 +68,7 @@ func ParseRunDetails(lines []string) RunDetails {
 		case strings.Contains(line, "Elapsed postprocess"):
 			runDetails.PostprocessTime = parseFinalTime(line)
 		case strings.Contains(line, " #CPUT: Total CPU Time in Seconds,"):
-			runDetails.CpuTime, _ = strconv.ParseFloat(replaceTrim(line, " #CPUT: Total CPU Time in Seconds,"), 64)
+			runDetails.CpuTime = strToFloat(replaceTrim(line, " #CPUT: Total CPU Time in Seconds,"))
 		case strings.Contains(line, "Started"):
 			runDetails.RunStart = replaceTrim(line, "Started")
 		case strings.HasPrefix(lineTrimmed, "Finished "):

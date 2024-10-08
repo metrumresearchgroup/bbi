@@ -98,7 +98,7 @@ func ParseParamsExt(ed ExtData) ([]ParametersData, ParameterNames) {
 					// this is the OBJ which we've gotten elsewhere
 					continue
 				}
-				if n, err := strconv.ParseFloat(val, 64); err == nil {
+				if n, err := parseFloatReplaceNaN(val); err == nil {
 					result[i-1] = n
 				} else {
 					log.Println("Did you use a non-default format parameter? bbi does not support non-default format parameters.")
@@ -163,7 +163,7 @@ func ParseConditionNumberExt(ed ExtData) []ConditionNumDetails {
 			fields := strings.Fields(line)
 			step, _ := strconv.Atoi(fields[0])
 			if step == -1000000003 {
-				condNum, _ = strconv.ParseFloat(fields[1], 64)
+				condNum = strToFloat(fields[1])
 
 				break
 			} else {

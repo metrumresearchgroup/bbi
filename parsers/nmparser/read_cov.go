@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"strconv"
 	"strings"
 )
 
@@ -51,7 +50,7 @@ func getThetaMatrix(lines []string) [][]float64 {
 			thetas := make([]float64, len)
 
 			for n := 1; n <= len; n++ {
-				if f, err := strconv.ParseFloat(fields[n], 64); err == nil {
+				if f, err := parseFloatReplaceNaN(fields[n]); err == nil {
 					thetas[n-1] = f
 				} else {
 					panic("error converting value in cov file to number: " + fields[n])

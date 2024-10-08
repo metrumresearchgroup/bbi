@@ -73,3 +73,15 @@ func strToFloat(s string) float64 {
 
 	return f
 }
+
+// parseFloatReplaceNaN converts s to a float64.  If the result is NaN,
+// DefaultFloat64 is returned as the value.  Any errors are relayed as is from
+// strconv.ParseFloat.
+func parseFloatReplaceNaN(s string) (float64, error) {
+	f, err := strconv.ParseFloat(s, 64)
+	if math.IsNaN(f) {
+		f = DefaultFloat64
+	}
+
+	return f, err
+}
