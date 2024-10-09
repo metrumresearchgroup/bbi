@@ -272,7 +272,7 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 		// Write to File in original path indicating what all was copied
 		copiedJSON, _ := json.MarshalIndent(copied, "", "    ")
 
-		if err = afero.WriteFile(fs, path.Join(l.Nonmem.OriginalPath, l.Nonmem.FileName+"_copied.json"), copiedJSON, 0750); err != nil {
+		if err = afero.WriteFile(fs, path.Join(l.Nonmem.OriginalPath, l.Nonmem.FileName+"_copied.json"), copiedJSON, 0640); err != nil {
 			channels.Errors <- turnstile.ConcurrentError{
 				RunIdentifier: l.Nonmem.FileName,
 				Notes:         "could not write _copied.json file",
@@ -475,7 +475,7 @@ func executeLocalJob(model *NonMemModel) turnstile.ConcurrentError {
 		return newConcurrentError(model.Model, "Running the programmatic shell script caused an error", err)
 	}
 
-	if err = afero.WriteFile(fs, path.Join(model.OutputDir, model.Model+".out"), output, 0750); err != nil {
+	if err = afero.WriteFile(fs, path.Join(model.OutputDir, model.Model+".out"), output, 0640); err != nil {
 		return turnstile.ConcurrentError{Error: err, Notes: "unable to write model to output directory", RunIdentifier: model.FileName}
 	}
 
@@ -534,7 +534,7 @@ func writeNonmemConfig(model *NonMemModel) error {
 		return err
 	}
 
-	return afero.WriteFile(afero.NewOsFs(), path.Join(model.OutputDir, "bbi_config.json"), outBytes, 0750)
+	return afero.WriteFile(afero.NewOsFs(), path.Join(model.OutputDir, "bbi_config.json"), outBytes, 0640)
 }
 
 func HashFileOnChannel(ch chan string, file string, identifier string) {

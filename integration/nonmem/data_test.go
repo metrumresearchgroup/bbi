@@ -75,7 +75,7 @@ func TestHasInvalidDataPath(tt *testing.T) {
 			adjusted := strings.Join(lines, "\n")
 			ab := []byte(adjusted)
 
-			err := os.WriteFile(filepath.Join(scenario.Workpath, m.filename), ab, 0755)
+			err := os.WriteFile(filepath.Join(scenario.Workpath, m.filename), ab, 0644)
 
 			if err != nil {
 				t.Log("Had a problem writing the file")
