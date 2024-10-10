@@ -13,6 +13,7 @@ import (
 
 	"github.com/metrumresearchgroup/bbi/configlib"
 
+	"github.com/metrumresearchgroup/turnstile"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -333,4 +334,68 @@ func onlyBbiVariables(provided []string) []string {
 	}
 
 	return matched
+}
+
+// runModelCommand runs command, writing the combined standard output and
+// standard error to {model.OutputDir}/{model.Model}.out.  command should be
+// primed to run; existing values for Stdout and Stderr are ignored.
+//
+// ignoreError is a function called if running the command fails.  It takes the
+// error and combined standard output and standard error as arguments.  A return
+// value of true indicates that the error should be swallowed rather propagated
+// as a turnstile.ConcurrentError.
+func runModelCommand(
+	model *NonMemModel, command *exec.Cmd, ignoreError func(error, string) bool,
+) turnstile.ConcurrentError {
+
+	outfile := filepath.Join(model.OutputDir, model.Model+".out")
+	outfh, err := os.OpenFile(outfile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o640)
+	if err != nil {
+		if errClose := outfh.Close(); errClose != nil {
+			log.Errorf("error closing output file: %v", errClose)
+		}
+
+		return turnstile.ConcurrentError{
+			RunIdentifier: model.Model,
+			Notes:         "unable to create model output file",
+			Error:         err,
+		}
+	}
+
+	command.Stdout = outfh
+	command.Stderr = outfh
+
+	if err = command.Run(); err != nil {
+		if errClose := outfh.Close(); errClose != nil {
+			log.Errorf("error closing output file: %v", errClose)
+		}
+
+		ignore := false
+		output, errRead := os.ReadFile(outfile)
+		if errRead == nil {
+			ignore = ignoreError(err, string(output))
+		} else {
+			log.Errorf("error reading output file: %v", errRead)
+		}
+
+		if !ignore {
+			log.Debug(err)
+
+			var exitError *exec.ExitError
+			if errors.As(err, &exitError) {
+				code := exitError.ExitCode()
+				log.Errorf("%s exit code: %d, output:\n%s",
+					model.LogIdentifier(), code, string(output))
+			}
+
+			return turnstile.ConcurrentError{
+				RunIdentifier: model.Model,
+				Notes: fmt.Sprintf("error running %q; command output written to %q",
+					command.String(), outfile),
+				Error: err,
+			}
+		}
+	}
+
+	return turnstile.ConcurrentError{}
 }
