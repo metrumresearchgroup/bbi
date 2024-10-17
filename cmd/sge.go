@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"os/exec"
 	"path"
@@ -251,30 +250,32 @@ func sge(_ *cobra.Command, args []string) {
 	}
 }
 
-func newConcurrentError(model string, notes string, err error) turnstile.ConcurrentError {
-	return turnstile.ConcurrentError{
-		RunIdentifier: model,
-		Error:         err,
-		Notes:         notes,
-	}
-}
-
 func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 	log.Printf("%s Beginning SGE work phase", model.LogIdentifier())
-	fs := afero.NewOsFs()
 	//Execute the script we created
 
 	//Compute the grid name for submission
 	submittedName, err := gridengineJobName(model)
 
 	if err != nil {
-		return newConcurrentError(model.FileName, "Failed to template out name for job submission", err)
+		return turnstile.ConcurrentError{
+			RunIdentifier: model.FileName,
+			Notes:         "failed to template out name for job submission",
+			Error:         err,
+		}
 	}
 
 	scriptName := "grid.sh"
 
 	//Find Qsub
 	binary, err := exec.LookPath("qsub")
+	if err != nil {
+		return turnstile.ConcurrentError{
+			RunIdentifier: model.Model,
+			Notes:         "could not locate qsub binary in path",
+			Error:         err,
+		}
+	}
 
 	qsubArguments := []string{}
 
@@ -296,10 +297,6 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 
 	qsubArguments = append(qsubArguments, filepath.Join(model.OutputDir, scriptName))
 
-	if err != nil {
-		return newConcurrentError(model.Model, "Could not locate qsub binary in path", err)
-	}
-
 	command := exec.Command(binary, qsubArguments...)
 
 	//Print the whole command if we're in debug mode
@@ -314,23 +311,7 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 		command.Env = append(command.Env, additionalEnvs...)
 	}
 
-	output, err := command.CombinedOutput()
-
-	if err != nil {
-		//Let's look to see if it's just because of the typical "No queues present" error
-		if !strings.Contains(string(output), "job is not allowed to run in any queue") {
-			//If the error doesn't appear to be the above error, we'll generate the concurrent error and move along
-			return newConcurrentError(model.Model, "Running the programmatic shell script caused an error", err)
-		}
-	}
-
-	err = afero.WriteFile(fs, path.Join(model.OutputDir, model.Model+".out"), output, 0640)
-
-	if err != nil {
-		return newConcurrentError(model.Model, "Having issues writing hte output file from command execution", err)
-	}
-
-	return turnstile.ConcurrentError{}
+	return runModelCommand(model, command, sgeIgnoreError)
 }
 
 func sgeModelsFromArguments(args []string, config configlib.Config) ([]SGEModel, error) {
@@ -357,7 +338,7 @@ func generateBbiScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 	t, err := template.New("file").Parse(fileTemplate)
 	buf := new(bytes.Buffer)
 	if err != nil {
-		return []byte{}, errors.New("There was an error processing the provided script template")
+		return []byte{}, fmt.Errorf("parsing bbi script template failed: %w", err)
 	}
 
 	filename := l.Model
@@ -404,7 +385,7 @@ func generateBbiScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 	})
 
 	if err != nil {
-		return []byte{}, errors.New("An error occured during the execution of the provided script template")
+		return []byte{}, fmt.Errorf("failed to generate bbi script: %w", err)
 	}
 
 	return buf.Bytes(), nil
@@ -435,4 +416,9 @@ func gridengineJobName(model *NonMemModel) (string, error) {
 	}
 
 	return outBytesBuffer.String(), nil
+}
+
+func sgeIgnoreError(_ error, output string) bool {
+	// Ignore the error that occurs when no workers are available yet.
+	return strings.Contains(output, "job is not allowed to run in any queue")
 }
