@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	"github.com/metrumresearchgroup/bbi/utils"
@@ -90,7 +89,7 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (Su
 		log.Trace("error reading cpu file: ", err)
 	} else {
 		results.RunDetails.OutputFilesUsed = append(results.RunDetails.OutputFilesUsed, filepath.Base(cpuFilePath))
-		cpuTime, err := strconv.ParseFloat(strings.TrimSpace(cpuLines[0]), 64)
+		cpuTime, err := parseFloatReplaceNaN(strings.TrimSpace(cpuLines[0]))
 		if err != nil {
 			// this is set to trace as don't want it to log normally as could screw up json output that
 			log.Trace("error parsing cpu time: ", err)

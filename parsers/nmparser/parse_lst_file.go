@@ -105,7 +105,7 @@ func getMatrixData(lines []string, start int) MatrixData {
 		// populate matrix
 		for j, row := range rows {
 			for k, cell := range strings.Fields(row) {
-				value, err := strconv.ParseFloat(cell, 64)
+				value, err := parseFloatReplaceNaN(cell)
 				if err == nil {
 					matrix[j][k] = value
 				} else {
@@ -418,7 +418,7 @@ func mustCalculateConditionNumber(lines []string, start int) float64 {
 
 		eigenstarted = true
 		for _, s := range strings.Fields(line) {
-			eigenvalue, err := strconv.ParseFloat(s, 64)
+			eigenvalue, err := parseFloatReplaceNaN(s)
 			if err != nil {
 				panic(fmt.Sprintf("Attempting to calculate condition number but could not parse eigenvalues -- %v", err))
 			}

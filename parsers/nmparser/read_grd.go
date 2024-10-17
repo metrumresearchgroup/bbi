@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"strconv"
 	"strings"
 )
 
@@ -64,7 +63,7 @@ func ParseGrdData(ed ExtData) ([]ParametersData, ParameterNames) {
 					if i == 0 {
 						continue
 					}
-					if n, err := strconv.ParseFloat(val, 64); err == nil {
+					if n, err := parseFloatReplaceNaN(val); err == nil {
 						result[i-1] = n
 					} else {
 						panic("error converting value in grd file to number: " + val)
