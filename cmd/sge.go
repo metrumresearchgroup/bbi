@@ -324,7 +324,7 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 		}
 	}
 
-	err = afero.WriteFile(fs, path.Join(model.OutputDir, model.Model+".out"), output, 0750)
+	err = afero.WriteFile(fs, path.Join(model.OutputDir, model.Model+".out"), output, 0640)
 
 	if err != nil {
 		return newConcurrentError(model.Model, "Having issues writing hte output file from command execution", err)

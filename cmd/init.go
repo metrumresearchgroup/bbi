@@ -44,7 +44,7 @@ func initializer(cmd *cobra.Command, _ []string) error {
 	}
 
 	// Write the byte array to file
-	if err = afero.WriteFile(fs, "./bbi.yaml", yamlString, 0755); err != nil {
+	if err = afero.WriteFile(fs, "./bbi.yaml", yamlString, 0644); err != nil {
 		return fmt.Errorf("write bbi.yaml: %w", err)
 	}
 

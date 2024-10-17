@@ -82,7 +82,7 @@ func (c Config) RenderYamlToFile(path string) error {
 
 	targetFile := filepath.Join(path, "bbi.yaml")
 
-	err = afero.WriteFile(fs, targetFile, yamlBytes, 0755)
+	err = afero.WriteFile(fs, targetFile, yamlBytes, 0644)
 
 	if err != nil {
 		log.Error("An error occurred trying to write the serialized config yaml to file")
