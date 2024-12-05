@@ -352,9 +352,7 @@ func generateBbiScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 	}
 
 	if !l.Configuration.Local.CreateChildDirs {
-		commandComponents = append(commandComponents, []string{
-			"--create_child_dirs=false",
-		}...)
+		commandComponents = append(commandComponents, "--create_child_dirs=false")
 	}
 
 	generatedCommand := strings.TrimSpace(strings.Join(commandComponents, " "))
