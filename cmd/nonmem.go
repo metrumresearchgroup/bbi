@@ -444,9 +444,7 @@ func buildNonMemCommandString(l *NonMemModel) string {
 	filename := utils.ShQuote(l.FileName)
 	cmdArgs = append(cmdArgs, []string{
 		utils.ShQuote(l.Model),
-		"",
 		filename + ".lst",
-		"",
 	}...)
 
 	// Section for Appending the parafile command
