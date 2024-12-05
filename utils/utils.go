@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"text/template"
 
 	"github.com/spf13/afero"
 )
@@ -279,4 +280,10 @@ func ShQuote(s string) string {
 	}
 
 	return "'" + strings.Replace(s, "'", `'"'"'`, -1) + "'"
+}
+
+func NewScriptTemplate(text string) (*template.Template, error) {
+	t := template.New("file")
+	t.Funcs(template.FuncMap{"shquote": ShQuote})
+	return t.Parse(text)
 }

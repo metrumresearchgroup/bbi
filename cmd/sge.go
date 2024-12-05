@@ -26,9 +26,9 @@ import (
 )
 
 const sgeTemplate string = `#!/bin/bash
-#$ -wd {{.WorkingDirectory}}
+#$ -wd {{.WorkingDirectory | shquote}}
 
-{{.Command}}
+{{range .Command}}{{. | shquote}} {{end}}
 `
 
 // SGEModel is the struct used for SGE operations containing the NonMemModel.
@@ -325,7 +325,7 @@ func sgeModelsFromArguments(args []string, config configlib.Config) ([]SGEModel,
 
 // Generate the command line script to execute bbi on the grid.
 func generateBbiScript(fileTemplate string, l NonMemModel) ([]byte, error) {
-	t, err := template.New("file").Parse(fileTemplate)
+	t, err := utils.NewScriptTemplate(fileTemplate)
 	if err != nil {
 		return []byte{}, fmt.Errorf("parsing bbi script template failed: %w", err)
 	}
@@ -339,8 +339,8 @@ func generateBbiScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 	}
 
 	type content struct {
+		Command          []string
 		WorkingDirectory string
-		Command          string
 	}
 
 	binary := l.Configuration.BbiBinary
@@ -351,23 +351,22 @@ func generateBbiScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 		}
 	}
 	commandComponents := []string{
-		utils.ShQuote(binary),
+		binary,
 		"nonmem",
 		"run",
 		"local",
-		utils.ShQuote(filename),
+		filename,
 	}
 
 	if !l.Configuration.Local.CreateChildDirs {
 		commandComponents = append(commandComponents, "--create_child_dirs=false")
 	}
 
-	generatedCommand := strings.TrimSpace(strings.Join(commandComponents, " "))
-	log.Debugf("Generated command is %s", generatedCommand)
+	log.Debugf("command: %v", commandComponents)
 
 	err = t.Execute(buf, content{
-		Command:          generatedCommand,
-		WorkingDirectory: utils.ShQuote(l.OutputDir),
+		Command:          commandComponents,
+		WorkingDirectory: l.OutputDir,
 	})
 
 	if err != nil {
