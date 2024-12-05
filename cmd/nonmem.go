@@ -439,13 +439,11 @@ func buildNonMemCommandString(l *NonMemModel) string {
 	// Are values present for raw options?
 	nmfeOptions := processNMFEOptions(l.Configuration)
 
-	var cmdArgs []string
-
 	filename := utils.ShQuote(l.FileName)
-	cmdArgs = append(cmdArgs, []string{
+	cmdArgs := []string{
 		utils.ShQuote(l.Model),
 		filename + ".lst",
-	}...)
+	}
 
 	// Section for Appending the parafile command
 	if l.Configuration.Parallel {
