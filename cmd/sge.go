@@ -271,15 +271,13 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 		}
 	}
 
-	qsubArguments := []string{}
-
-	qsubArguments = append(qsubArguments, []string{
+	qsubArguments := []string{
 		"-V",
 		"-j",
 		"y",
 		"-N",
 		submittedName,
-	}...)
+	}
 
 	if model.Configuration.Parallel {
 		qsubArguments = append(qsubArguments, []string{
@@ -357,12 +355,9 @@ func generateBbiScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 		utils.ShQuote(binary),
 		"nonmem",
 		"run",
-	}
-
-	commandComponents = append(commandComponents, []string{
 		"local",
 		utils.ShQuote(filename),
-	}...)
+	}
 
 	if !l.Configuration.Local.CreateChildDirs {
 		commandComponents = append(commandComponents, []string{
