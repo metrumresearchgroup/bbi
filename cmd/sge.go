@@ -35,10 +35,6 @@ const sgeTemplate string = `#!/bin/bash
 {{range .Command}}{{. | shquote}} {{end}}
 `
 
-type sgeOperation struct {
-	Models []SGEModel `json:"models"`
-}
-
 // SGEModel is the struct used for SGE operations containing the NonMemModel.
 type SGEModel struct {
 	Nonmem               *NonMemModel
@@ -193,29 +189,25 @@ func sge(_ *cobra.Command, args []string) {
 
 	log.Info("Beginning Local Path")
 
-	lo := sgeOperation{}
-
 	logSetup(config)
 
 	log.Debug("Searching for models based on arguments")
-	lomodels, err := sgeModelsFromArguments(args, config)
+	models, err := sgeModelsFromArguments(args, config)
 	if err != nil {
 		log.Fatalf("An error occurred during model processing: %s", err)
 	}
 
-	lo.Models = lomodels
-
-	if len(lo.Models) == 0 {
+	if len(models) == 0 {
 		log.Fatal("No models were located or loaded. Please verify the arguments provided and try again")
 	}
 
 	//Models Added
-	log.Infof("A total of %d models have been located for work", len(lo.Models))
+	log.Infof("A total of %d models have been located for work", len(models))
 
 	//Create signature safe slice for manager
 	var scalables []turnstile.Scalable
 
-	for _, v := range lo.Models {
+	for _, v := range models {
 		scalables = append(scalables, v)
 	}
 
@@ -244,8 +236,8 @@ func sge(_ *cobra.Command, args []string) {
 	}
 
 	//Double check to make sure nothing has been read in before trying to write to a file
-	if len(lo.Models) > 0 && viper.ConfigFileUsed() != "" {
-		configlib.SaveConfig(lo.Models[0].Nonmem.OriginalPath)
+	if len(models) > 0 && viper.ConfigFileUsed() != "" {
+		configlib.SaveConfig(models[0].Nonmem.OriginalPath)
 	}
 
 	postWorkNotice(m, now)
