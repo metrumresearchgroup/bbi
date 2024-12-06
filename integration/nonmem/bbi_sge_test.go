@@ -98,7 +98,6 @@ func TestBbiCompletesParallelSGEExecution(tt *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
 			defer cancel()
 
-			// log.Infof("Beginning SGE parallel execution test for model set %s",v.identifier)
 			scenario.Prepare(t, ctx)
 
 			for _, m := range scenario.models {
@@ -137,22 +136,6 @@ func TestBbiCompletesParallelSGEExecution(tt *testing.T) {
 		})
 	}
 }
-
-/*
-func fakeBinary(name string) {
-	contents := `#!/bin/bash
-	echo $0 $@
-	exit 0`
-
-	ioutil.WriteFile(name, []byte(contents), 0755)
-}
-*/
-
-/*
-func purgeBinary(name string) {
-	os.Remove(name)
-}
-*/
 
 func WaitForSGEToTerminate(gridNameIdentifier string) {
 	log.Info(fmt.Sprintf("Provided value for location job by name was : %s", gridNameIdentifier))
