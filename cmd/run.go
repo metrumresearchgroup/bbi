@@ -56,7 +56,7 @@ const postProcessingScriptTemplate string = `#!/bin/bash
 `
 
 func run(_ *cobra.Command, _ []string) {
-	println(fmt.Sprintf(runExamples, "(local|sge)"))
+	println(fmt.Sprintf(runExamples, "(local|sge|slurm)"))
 }
 
 func NewRunCmd() *cobra.Command {
@@ -65,7 +65,7 @@ func NewRunCmd() *cobra.Command {
 		Short: "Run models locally or on the grid",
 		Long: `This is the entry point to subcommands for running NONMEM models. Each
 subcommand represents a different "mode" of execution (e.g., local).`,
-		Example: fmt.Sprintf(runExamples, "(local|sge)"),
+		Example: fmt.Sprintf(runExamples, "(local|sge|slurm)"),
 		Run:     run,
 	}
 
@@ -132,6 +132,7 @@ subcommand represents a different "mode" of execution (e.g., local).`,
 
 	cmd.AddCommand(NewLocalCmd())
 	cmd.AddCommand(NewSgeCmd())
+	cmd.AddCommand(NewSlurmCmd())
 
 	return cmd
 }

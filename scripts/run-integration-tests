@@ -38,13 +38,19 @@ export NMVERSION_NMQUAL=nm74gf
 export NONMEMROOT=/opt/NONMEM
 export POST_EXECUTION=true
 export ROOT_EXECUTION_DIR="$tdir"
-export SGE=true
-export SGE_ARCH=lx-amd64
-export SGE_CELL=default
-export SGE_CLUSTER_NAME=p6444
-export SGE_EXECD_PORT=6445
-export SGE_QMASTER_PORT=6444
-export SGE_ROOT=/opt/sge
+
+if command -v sbatch >/dev/null
+then
+    export SLURM=true
+else
+    export SGE=true
+    export SGE_ARCH=lx-amd64
+    export SGE_CELL=default
+    export SGE_CLUSTER_NAME=p6444
+    export SGE_EXECD_PORT=6445
+    export SGE_QMASTER_PORT=6444
+    export SGE_ROOT=/opt/sge
+fi
 
 bin=$tdir/bin
 mkdir "$bin"

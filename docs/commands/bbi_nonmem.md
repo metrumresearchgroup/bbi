@@ -10,11 +10,11 @@ bbi nonmem [flags]
 
 ```
   # Execute model run001
-  bbi nonmem run (local|sge) run001.mod
+  bbi nonmem run (local|sge|slurm) run001.mod
   #  Run models run001.mod, run002.mod, and run003.mod
-  bbi nonmem run (local|sge) 'run[001:003].mod'
+  bbi nonmem run (local|sge|slurm) 'run[001:003].mod'
   # Run all models in the current directory
-  bbi nonmem run (local|sge) .
+  bbi nonmem run (local|sge|slurm) .
 
   # Summarize run001
   bbi nonmem summary run001/run001.lst

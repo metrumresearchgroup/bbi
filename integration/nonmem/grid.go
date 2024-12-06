@@ -11,7 +11,7 @@ import (
 )
 
 func checkGridExecution(
-	tt *testing.T, command string, scenarios []string, waitFn func(string),
+	tt *testing.T, command string, scenarios []string, waitFn func(string) error,
 ) {
 
 	tt.Helper()
@@ -43,7 +43,8 @@ func checkGridExecution(
 					_, err := model.Execute(scenario, nonMemArguments...)
 					t.R.NoError(err)
 
-					waitFn(getGridNameIdentifier(model))
+					err = waitFn(getGridNameIdentifier(model))
+					t.R.NoError(err)
 
 					testingDetails := NonMemTestingDetails{
 						OutputDir: filepath.Join(scenario.Workpath, model.identifier),
@@ -61,7 +62,7 @@ func checkGridExecution(
 }
 
 func checkParallelGridExecution(
-	tt *testing.T, command string, scenarios []string, waitFn func(string),
+	tt *testing.T, command string, scenarios []string, waitFn func(string) error,
 ) {
 
 	tt.Helper()
@@ -98,7 +99,8 @@ func checkParallelGridExecution(
 					_, err := m.Execute(scenario, nonMemArguments...)
 					t.R.NoError(err)
 
-					waitFn(getGridNameIdentifier(m))
+					err = waitFn(getGridNameIdentifier(m))
+					t.R.NoError(err)
 
 					testingDetails := NonMemTestingDetails{
 						OutputDir: filepath.Join(scenario.Workpath, m.identifier),

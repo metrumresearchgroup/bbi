@@ -37,7 +37,7 @@ func TestBbiCompletesParallelSGEExecution(tt *testing.T) {
 	checkParallelGridExecution(tt, "sge", tests, WaitForSGEToTerminate)
 }
 
-func WaitForSGEToTerminate(gridNameIdentifier string) {
+func WaitForSGEToTerminate(gridNameIdentifier string) error {
 	log.Info(fmt.Sprintf("Provided value for location job by name was : %s", gridNameIdentifier))
 	for CountOfPendingJobs(gridNameIdentifier) > 0 {
 		log.Infof("Located %d pending jobs. Waiting for 30 seconds to check again", CountOfPendingJobs(gridNameIdentifier))
@@ -45,6 +45,8 @@ func WaitForSGEToTerminate(gridNameIdentifier string) {
 	}
 
 	log.Info("Looks like all queued and running jobs have terminated")
+
+	return nil
 }
 
 func CountOfPendingJobs(gridNameIdentifier string) int {

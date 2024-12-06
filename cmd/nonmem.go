@@ -157,7 +157,7 @@ type NonMemModel struct {
 }
 
 var nonmemExamples string = fmt.Sprintf("%s\n\n%s\n\n%s\n",
-	fmt.Sprintf(runExamples, "(local|sge)"),
+	fmt.Sprintf(runExamples, "(local|sge|slurm)"),
 	summaryExamples,
 	covcorExamples)
 
