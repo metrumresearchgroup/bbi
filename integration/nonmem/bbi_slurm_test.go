@@ -18,6 +18,7 @@ func TestBbiCompletesSlurmExecution(tt *testing.T) {
 		"acop",
 		"ctl_test",
 		"leading-path-with space",
+		"modquote",
 	}
 
 	checkGridExecution(tt, "slurm", tests, WaitForSlurmToTerminate)
@@ -32,6 +33,7 @@ func TestBbiCompletesParallelSlurmExecution(tt *testing.T) {
 		"acop",
 		"ctl_test",
 		"leading-path-with space",
+		"modquote",
 	}
 
 	checkParallelGridExecution(tt, "slurm", tests, WaitForSlurmToTerminate)
