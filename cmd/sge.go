@@ -25,6 +25,12 @@ import (
 	"github.com/spf13/viper"
 )
 
+const sgeTemplate string = `#!/bin/bash
+#$ -wd {{.WorkingDirectory}}
+
+{{.Command}}
+`
+
 type sgeOperation struct {
 	Models []SGEModel `json:"models"`
 }
@@ -96,7 +102,7 @@ func (l SGEModel) Prepare(channels *turnstile.ChannelMap) {
 	}
 
 	//Create Execution Script
-	scriptContents, err := generateBbiScript(nonMemExecutionTemplate, *l.Nonmem)
+	scriptContents, err := generateBbiScript(sgeTemplate, *l.Nonmem)
 
 	if err != nil {
 		p := &l
