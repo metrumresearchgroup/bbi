@@ -154,12 +154,6 @@ func (l SGEModel) Cleanup(_ *turnstile.ChannelMap) {
 
 //End Scalable method definitions
 
-func errpanic(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
-
 func NewSgeCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "sge [flags] <model> [<model>...]",
