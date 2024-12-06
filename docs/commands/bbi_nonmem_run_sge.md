@@ -21,7 +21,7 @@ bbi nonmem run sge [flags] <model> [<model>...]
 
 ```
       --bbi_binary string         path to bbi executable to be called in goroutines (SGE Execution)
-      --grid_name_prefix string   Any prefix you wish to add to the name of jobs being submitted to the grid
+      --grid_name_prefix string   prefix to add to the name of submitted jobs
   -h, --help                      help for sge
 ```
 
