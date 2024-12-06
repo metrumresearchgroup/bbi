@@ -312,7 +312,7 @@ func copyFileToDestination(l *NonMemModel, modifyPath bool) error {
 // processes any template (including the const one here) to create a byte slice of the entire file.
 func generateScript(fileTemplate string, l *NonMemModel) ([]byte, error) {
 	log.Debugf("%s beginning script command generation. NMQual is set to %t", l.LogIdentifier(), l.Configuration.NMQual)
-	t, err := template.New("file").Parse(fileTemplate)
+	t, err := utils.NewScriptTemplate(fileTemplate)
 	if err != nil {
 		return []byte{}, fmt.Errorf("parsing script template failed: %w", err)
 	}
@@ -321,17 +321,17 @@ func generateScript(fileTemplate string, l *NonMemModel) ([]byte, error) {
 
 	type content struct {
 		WorkingDirectory string
-		Command          string
+		Command          []string
 	}
 
 	cont := content{
-		WorkingDirectory: utils.ShQuote(l.OutputDir),
-		Command:          buildNonMemCommandString(l),
+		WorkingDirectory: l.OutputDir,
+		Command:          buildNonMemCommand(l),
 	}
 
 	// Set the command to autolog contents if we're set to nmqual
 	if l.Configuration.NMQual {
-		cont.Command = buildAutologCommandString(l)
+		cont.Command = buildAutologCommand(l)
 	}
 
 	err = t.Execute(buf, cont)
@@ -399,7 +399,7 @@ func generateParaFile(l *NonMemModel) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func buildNonMemCommandString(l *NonMemModel) string {
+func buildNonMemCommand(l *NonMemModel) []string {
 	var nmHome string
 	var nmBinary string
 
@@ -427,45 +427,44 @@ func buildNonMemCommandString(l *NonMemModel) string {
 	}
 
 	// TODO: Implement cache
-	nmExecutable := utils.ShQuote(path.Join(nmHome, "run", nmBinary))
+	nmExecutable := path.Join(nmHome, "run", nmBinary)
 
 	// Are values present for raw options?
 	nmfeOptions := processNMFEOptions(l.Configuration)
 
-	filename := utils.ShQuote(l.FileName)
 	cmdArgs := []string{
-		utils.ShQuote(l.Model),
-		filename + ".lst",
+		nmExecutable,
+		l.Model,
+		l.FileName + ".lst",
 	}
 
 	// Section for Appending the parafile command
 	if l.Configuration.Parallel {
-		cmdArgs = append(cmdArgs, "-parafile="+filename+".pnm")
+		cmdArgs = append(cmdArgs, "-parafile="+l.FileName+".pnm")
 	}
 
 	if len(nmfeOptions) > 0 {
 		cmdArgs = append(cmdArgs, nmfeOptions...)
 	}
 
-	return nmExecutable + " " + strings.Join(cmdArgs, " ")
+	return cmdArgs
 }
 
-func buildAutologCommandString(l *NonMemModel) string {
+func buildAutologCommand(l *NonMemModel) []string {
 	// `perl  -S /opt/NONMEM/nm74gf/nmqual/autolog.pl /opt/NONMEM/nm74gf/nmqual/log.xml para ce /data/tmp/001 001`
 	nm := l.Configuration.Nonmem[l.Configuration.NMVersion]
-	home := utils.ShQuote(nm.Home)
 	commandComponents := []string{
 		"perl",
 		"-S",
-		filepath.Join(home, "nmqual", "autolog.pl"),
-		filepath.Join(home, "nmqual", "log.xml"),
+		filepath.Join(nm.Home, "nmqual", "autolog.pl"),
+		filepath.Join(nm.Home, "nmqual", "log.xml"),
 		"para",
 		"ce",
-		utils.ShQuote(l.OutputDir),
-		utils.ShQuote(l.FileName),
+		l.OutputDir,
+		l.FileName,
 	}
 
-	return strings.TrimSpace(strings.Join(commandComponents, " "))
+	return commandComponents
 }
 
 // modelName is the full file + ext representation of the model (ie acop.mod)

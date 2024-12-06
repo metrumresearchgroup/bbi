@@ -31,7 +31,7 @@ import (
 
 const localTemplate string = `#!/bin/bash
 
-{{.Command}}
+{{range .Command}}{{. | shquote}} {{end}}
 `
 
 type localOperation struct {
