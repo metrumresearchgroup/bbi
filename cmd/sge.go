@@ -6,7 +6,6 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"text/template"
 	"time"
@@ -26,6 +25,11 @@ import (
 )
 
 const sgeTemplate string = `#!/bin/bash
+#$ -N {{.JobName | shquote}}
+#$ -V
+#$ -j y
+{{- if .Config.Parallel}}
+#$ -pe orte {{.Config.Threads}}{{end}}
 #$ -wd {{.WorkingDirectory | shquote}}
 
 {{range .Command}}{{. | shquote}} {{end}}
@@ -254,17 +258,6 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 	log.Printf("%s Beginning SGE work phase", model.LogIdentifier())
 	//Execute the script we created
 
-	//Compute the grid name for submission
-	submittedName, err := gridengineJobName(model)
-
-	if err != nil {
-		return turnstile.ConcurrentError{
-			RunIdentifier: model.FileName,
-			Notes:         "failed to template out name for job submission",
-			Error:         err,
-		}
-	}
-
 	scriptName := "grid.sh"
 
 	//Find Qsub
@@ -277,25 +270,7 @@ func executeSGEJob(model *NonMemModel) turnstile.ConcurrentError {
 		}
 	}
 
-	qsubArguments := []string{
-		"-V",
-		"-j",
-		"y",
-		"-N",
-		submittedName,
-	}
-
-	if model.Configuration.Parallel {
-		qsubArguments = append(qsubArguments, []string{
-			"-pe",  // Parallel execution
-			"orte", // Parallel environment name for the grid (Namespace for mpi messages)
-			strconv.Itoa(model.Configuration.Threads),
-		}...)
-	}
-
-	qsubArguments = append(qsubArguments, filepath.Join(model.OutputDir, scriptName))
-
-	command := exec.Command(binary, qsubArguments...)
+	command := exec.Command(binary, filepath.Join(model.OutputDir, scriptName))
 
 	//Print the whole command if we're in debug mode
 	log.Debugf("QSUB command is:%s", command.String())
@@ -340,6 +315,11 @@ func generateBbiScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 
 	buf := new(bytes.Buffer)
 
+	jobname, err := gridengineJobName(&l)
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate job name: %w", err)
+	}
+
 	filename := l.Model
 
 	if l.Configuration.NMQual {
@@ -348,6 +328,8 @@ func generateBbiScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 
 	type content struct {
 		Command          []string
+		Config           configlib.Config
+		JobName          string
 		WorkingDirectory string
 	}
 
@@ -374,6 +356,8 @@ func generateBbiScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 
 	err = t.Execute(buf, content{
 		Command:          commandComponents,
+		Config:           l.Configuration,
+		JobName:          jobname,
 		WorkingDirectory: l.OutputDir,
 	})
 
