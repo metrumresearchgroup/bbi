@@ -321,10 +321,11 @@ func copyFileToDestination(l *NonMemModel, modifyPath bool) error {
 func generateScript(fileTemplate string, l *NonMemModel) ([]byte, error) {
 	log.Debugf("%s beginning script command generation. NMQual is set to %t", l.LogIdentifier(), l.Configuration.NMQual)
 	t, err := template.New("file").Parse(fileTemplate)
-	buf := new(bytes.Buffer)
 	if err != nil {
 		return []byte{}, fmt.Errorf("parsing script template failed: %w", err)
 	}
+
+	buf := new(bytes.Buffer)
 
 	type content struct {
 		WorkingDirectory string
@@ -799,11 +800,11 @@ func NewNonMemModel(modelname string, config configlib.Config) (NonMemModel, err
 
 	// Process The template from the viper content for output Dir
 	t, err := template.New("output").Parse(config.OutputDir)
-	buf := new(bytes.Buffer)
-
 	if err != nil {
 		return NonMemModel{}, err
 	}
+
+	buf := new(bytes.Buffer)
 
 	type outputName struct {
 		Name string

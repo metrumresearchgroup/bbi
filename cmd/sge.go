@@ -328,10 +328,11 @@ func sgeModelsFromArguments(args []string, config configlib.Config) ([]SGEModel,
 // Generate the command line script to execute bbi on the grid.
 func generateBbiScript(fileTemplate string, l NonMemModel) ([]byte, error) {
 	t, err := template.New("file").Parse(fileTemplate)
-	buf := new(bytes.Buffer)
 	if err != nil {
 		return []byte{}, fmt.Errorf("parsing bbi script template failed: %w", err)
 	}
+
+	buf := new(bytes.Buffer)
 
 	filename := l.Model
 
