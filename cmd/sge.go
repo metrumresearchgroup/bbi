@@ -174,7 +174,7 @@ func NewSgeCmd() *cobra.Command {
 
 	//String Variables
 	cmd.PersistentFlags().String("bbi_binary", "",
-		"path to bbi executable to be called in goroutines (SGE Execution)")
+		"bbi executable to use in the SGE submission script (default: current process's executable)")
 	errpanic(viper.BindPFlag("bbi_binary", cmd.PersistentFlags().Lookup("bbi_binary")))
 
 	const gridNamePrefixIdentifier string = "grid_name_prefix"
