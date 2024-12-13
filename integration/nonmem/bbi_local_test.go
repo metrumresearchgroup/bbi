@@ -380,6 +380,42 @@ func TestSpecifiedConfigByRelativePathLoaded(tt *testing.T) {
 	})
 }
 
+func TestLicfileOptionIsRelayed(tt *testing.T) {
+	SkipIfNotEnabled(tt, "LOCAL")
+
+	t := wrapt.WrapT(tt)
+
+	dir := t.TempDir()
+	nonMemArguments := []string{
+		"nonmem",
+		"--nm_version",
+		os.Getenv("NMVERSION"),
+		"run",
+		"--licfile", filepath.Join(dir, "dummy-license"),
+		"local",
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+	scenario := InitializeScenario(t, "acop")
+	scenario.Prepare(t, ctx)
+
+	for _, m := range scenario.models {
+		t.Run(m.identifier, func(t *wrapt.T) {
+			_, err := m.Execute(scenario, nonMemArguments...)
+			t.R.NoError(err)
+			nmd := NonMemTestingDetails{
+				OutputDir: filepath.Join(scenario.Workpath, m.identifier),
+				Model:     m,
+				Scenario:  scenario,
+			}
+
+			AssertContainsNMFEOptions(t, filepath.Join(nmd.OutputDir, m.identifier+".sh"),
+				"-licfile")
+		})
+	}
+}
+
 func SkipIfNotEnabled(t *testing.T, feature string) {
 	if !FeatureEnabled(feature) {
 		t.Skip()
