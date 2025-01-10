@@ -211,7 +211,7 @@ func NewNonmemCmd() *cobra.Command {
 	const nmfeGroup string = "nmfe_options"
 	const licFileIdentifier string = "licfile"
 	cmd.PersistentFlags().String(licFileIdentifier, "", "RAW NMFE OPTION - NONMEM license file to use")
-	errpanic(viper.BindPFlag(nmfeGroup+"."+licFileIdentifier, cmd.PersistentFlags().Lookup(licFileIdentifier)))
+	errpanic(viper.BindPFlag(nmfeGroup+".license_file", cmd.PersistentFlags().Lookup(licFileIdentifier)))
 
 	const prSameIdentifier string = "prsame"
 	cmd.PersistentFlags().Bool(prSameIdentifier, false, "RAW NMFE OPTION - tell NONMEM to skip the PREDPP compilation step")
