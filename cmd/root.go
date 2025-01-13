@@ -115,6 +115,12 @@ func initConfig() {
 	}
 }
 
+func errpanic(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
+
 // Assumes random has been set previously and seeded to avoid reproducible data sets
 // Here random is set during root.go setup.
 func randomFloat(min int, max int) float64 {

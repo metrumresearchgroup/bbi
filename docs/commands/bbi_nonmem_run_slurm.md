@@ -1,28 +1,28 @@
-## bbi nonmem run sge
+## bbi nonmem run slurm
 
-Run models on the Sun Grid Engine
+Run models via Slurm
 
 ```
-bbi nonmem run sge [flags] <model> [<model>...]
+bbi nonmem run slurm [flags] <model> [<model>...]
 ```
 
 ### Examples
 
 ```
   # Execute model run001
-  bbi nonmem run sge run001.mod
+  bbi nonmem run slurm run001.mod
   #  Run models run001.mod, run002.mod, and run003.mod
-  bbi nonmem run sge 'run[001:003].mod'
+  bbi nonmem run slurm 'run[001:003].mod'
   # Run all models in the current directory
-  bbi nonmem run sge .
+  bbi nonmem run slurm .
 ```
 
 ### Options
 
 ```
-      --bbi_binary string         bbi executable to use in the SGE submission script (default: current process's executable)
+      --bbi_binary string         bbi executable to use in the Slurm submission script (default: current process's executable)
       --grid_name_prefix string   prefix to add to the name of submitted jobs
-  -h, --help                      help for sge
+  -h, --help                      help for slurm
 ```
 
 ### Options inherited from parent commands

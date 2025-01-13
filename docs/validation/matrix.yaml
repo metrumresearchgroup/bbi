@@ -64,9 +64,17 @@
   doc: docs/commands/bbi_nonmem_run_sge.md
   tests:
     - cmd/nonmem_test.go
-    - cmd/sge_test.go
+    - cmd/grid_test.go
     - integration/nonmem/bbi_sge_test.go
     - parsers/nmparser/add_path_level_test.go
+
+- entrypoint: bbi nonmem run slurm
+  code: cmd/slurm.go
+  doc: docs/commands/bbi_nonmem_run_slurm.md
+  tests:
+    - cmd/nonmem_test.go
+    - cmd/grid_test.go
+    - integration/nonmem/bbi_slurm_test.go
 
 - entrypoint: bbi nonmem scaffold
   code: cmd/scaffold.go

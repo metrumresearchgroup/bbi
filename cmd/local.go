@@ -29,6 +29,11 @@ import (
 	"github.com/spf13/viper"
 )
 
+const localTemplate string = `#!/bin/bash
+
+{{range .Command}}{{. | shquote}} {{end}}
+`
+
 type localOperation struct {
 	Models []LocalModel `json:"models"`
 }
@@ -144,7 +149,7 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 
 	// Create Execution Script
 	log.Debugf("%s Creating local execution script", l.Nonmem.LogIdentifier())
-	scriptContents, err := generateScript(nonMemExecutionTemplate, l.Nonmem)
+	scriptContents, err := generateScript(localTemplate, l.Nonmem)
 
 	if err != nil {
 		l.Cancel <- true

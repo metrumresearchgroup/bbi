@@ -15,11 +15,11 @@ bbi nonmem run [flags]
 
 ```
   # Execute model run001
-  bbi nonmem run (local|sge) run001.mod
+  bbi nonmem run (local|sge|slurm) run001.mod
   #  Run models run001.mod, run002.mod, and run003.mod
-  bbi nonmem run (local|sge) 'run[001:003].mod'
+  bbi nonmem run (local|sge|slurm) 'run[001:003].mod'
   # Run all models in the current directory
-  bbi nonmem run (local|sge) .
+  bbi nonmem run (local|sge|slurm) .
 ```
 
 ### Options
@@ -69,4 +69,5 @@ bbi nonmem run [flags]
 * [bbi nonmem](bbi_nonmem.md)	 - Entry point for NONMEM-related subcommands
 * [bbi nonmem run local](bbi_nonmem_run_local.md)	 - Run models locally
 * [bbi nonmem run sge](bbi_nonmem_run_sge.md)	 - Run models on the Sun Grid Engine
+* [bbi nonmem run slurm](bbi_nonmem_run_slurm.md)	 - Run models via Slurm
 

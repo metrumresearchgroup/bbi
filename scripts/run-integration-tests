@@ -21,20 +21,36 @@ trap 'rm -rf "$tdir"' 0
 BBI_GRID_NAME_PREFIX=$(basename "$tdir")
 export BBI_GRID_NAME_PREFIX
 export LOCAL=true
-export MPIEXEC_PATH=/usr/bin/mpiexec
+
+if test -z "${MPIEXEC_PATH-}"
+then
+    # bbi's default value is /usr/local/mpich3/bin/mpiexec, which is a
+    # symlink on Metworx.  Resolve the path so that tests that check
+    # "--mpi_exec_path argument was in effect?" can distinguish the
+    # passed value from the default.
+    MPIEXEC_PATH=$(realpath -e /usr/local/mpich3/bin/mpiexec)
+    export MPIEXEC_PATH
+fi
+
 export NMQUAL=false
 export NMVERSION=nm75
 export NMVERSION_NMQUAL=nm74gf
 export NONMEMROOT=/opt/NONMEM
 export POST_EXECUTION=true
 export ROOT_EXECUTION_DIR="$tdir"
-export SGE=true
-export SGE_ARCH=lx-amd64
-export SGE_CELL=default
-export SGE_CLUSTER_NAME=p6444
-export SGE_EXECD_PORT=6445
-export SGE_QMASTER_PORT=6444
-export SGE_ROOT=/opt/sge
+
+if command -v sbatch >/dev/null
+then
+    export SLURM=true
+else
+    export SGE=true
+    export SGE_ARCH=lx-amd64
+    export SGE_CELL=default
+    export SGE_CLUSTER_NAME=p6444
+    export SGE_EXECD_PORT=6445
+    export SGE_QMASTER_PORT=6444
+    export SGE_ROOT=/opt/sge
+fi
 
 bin=$tdir/bin
 mkdir "$bin"
