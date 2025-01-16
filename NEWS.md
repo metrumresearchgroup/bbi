@@ -1,4 +1,30 @@
 
+# bbi 3.4.0
+
+## New features and changes
+
+* The new `bbi nonmem run slurm` subcommand provides support for Slurm
+  execution.  (#338)
+
+* `bbi nonmem run` now always writes the underlying command's output
+  to `{model}.out` as opposed to doing so only when the command
+  succeeds.  (#336)
+
+* `bbi nonmem run` now logs more details about failures.  (#336)
+
+* The executable bit is no longer set when writing files that are not
+  intended to be executed, including `bbi.yaml`.  (#335)
+
+## Bug fixes
+
+* `bbi nonmem run` did not relay its `--licfile` command-line argument
+  to the underlying `nmfe` call.  (#339)
+
+* Some spots that parse floats from NONMEM output files did not map
+  `NaN` values to the `-999999999` placeholder, causing `bbi nonmem
+  summary --json` to abort.  (#334)
+
+
 # bbi 3.3.1
 
 Documentation is now available at
