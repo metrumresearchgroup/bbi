@@ -21,10 +21,10 @@ command line interface for executing and managing models and projects. The nomen
 
 For Example:
 
-`bbi nonmem run sge path/to/file.mod`
+`bbi nonmem run local path/to/file.mod`
 
  * `nonmem` : The modeling software we should be targeting for this run
- * `sge` : The mode of execution. For nonmem this can either be local or sge, with sge indicating submission of jobs to the grid
+ * `local` : The mode of execution. For nonmem this can either be `local`, `slurm` (grid submission via Slurm), or `sge` (grid submission via SGE)
  * `path/to/file.mod` : The location of the file to submit for execution. Can be relative or absolute. 
 
  #### Configuration
@@ -45,15 +45,15 @@ For Example:
  * In the executing user's home (`~`) directory
 
 
- #### Configuration and SGE
+ #### Configuration and grid submission
 
- You may notice that if you issue a job with nonmem targeting SGE that a `bbi.yaml` file is created for you automatically. This is because SGE execution wraps the `bbi` CLI into an executable for the grid to execute. This ensures the following:
+ You may notice that if you issue a job with nonmem targeting the grid (via the `sge` or `slurm` subcommand) that a `bbi.yaml` file is created for you automatically. This is because grid execution wraps the `bbi` CLI into an executable for the grid to execute. This ensures the following:
 
- * Execution via SGE is done **the exact same way** that local execution for nonmem occurs. 
+ * Execution on the grid is done **the exact same way** that local execution for nonmem occurs.
  * This includes cleanup, copy-up, and git operations
  * Also ensures a single execution path 
 
- To do this sanely, we make sure that the parameters provided on the initial SGE run are captured and stored with the model. This way, each subsequent `bbi` call made from the grid is made with the *exact same parameters*.
+ To do this sanely, we make sure that the parameters provided on the initial run are captured and stored with the model. This way, each subsequent `bbi` call made from the grid is made with the *exact same parameters*.
 
 ### Summary output
 
