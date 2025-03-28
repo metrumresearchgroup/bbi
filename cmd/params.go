@@ -399,7 +399,8 @@ func params(cmd *cobra.Command, args []string) {
 				absolutePath = dir + "/" + modelDirs[res.Index]
 			}
 
-			if res.Outcome == SUCCESS {
+			switch res.Outcome {
+			case SUCCESS:
 				results := res.Result
 				for i, name := range results.ParameterNames {
 					idx := index(paramSet, strings.ReplaceAll(name, ",", "_"))
@@ -410,7 +411,7 @@ func params(cmd *cobra.Command, args []string) {
 				// first code is the termination status
 				terminationCode := results.TerminationCodes[0][0]
 				fmt.Println(absolutePath + ",," + terminationCode + "," + strings.Join(s, ","))
-			} else if res.Outcome == ERROR {
+			case ERROR:
 				errorMessage := res.Err.Error()
 				fmt.Println(absolutePath + "," + errorMessage + ",," + strings.Join(s, ","))
 			}
@@ -420,9 +421,10 @@ func params(cmd *cobra.Command, args []string) {
 	}
 
 	for _, res := range orderedResults {
-		if res.Outcome == SUCCESS {
+		switch res.Outcome {
+		case SUCCESS:
 			paramResults.Results = append(paramResults.Results, res.Result)
-		} else if res.Outcome == ERROR {
+		case ERROR:
 			paramResults.Errors = append(paramResults.Errors, res.Err)
 		}
 	}
