@@ -13,8 +13,6 @@ issues:
 linters-settings:
   errcheck:
     check-type-assertions: true
-  govet:
-    shadow: true
   unparam:
     check-exported: true
   unused:
