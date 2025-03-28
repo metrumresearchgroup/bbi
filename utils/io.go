@@ -43,7 +43,7 @@ func ReadParamsAndOutputFromExt(path string) ([]string, error) {
 
 	// explicitly handle line that's too long
 	if errors.Is(scanner.Err(), bufio.ErrTooLong) {
-		err = fmt.Errorf("Attempting to parse %s with ReadParamsAndOutputFromExt(): %w", path, scanner.Err())
+		err = fmt.Errorf("attempting to parse %s with ReadParamsAndOutputFromExt(): %w", path, scanner.Err())
 
 		return nil, err
 	}
