@@ -23,7 +23,7 @@ func parseNMVersion(line string) string {
 var problemRe = regexp.MustCompile(`^\s*\$PROB(?:LEM)?\s+`)
 
 func replaceTrim(line string, replacement string) string {
-	return strings.TrimSpace(strings.Replace(line, replacement, "", -1))
+	return strings.TrimSpace(strings.ReplaceAll(line, replacement, ""))
 }
 
 // TODO: remove parseValue if we find no use

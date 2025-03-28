@@ -279,7 +279,7 @@ func ShQuote(s string) string {
 		return s
 	}
 
-	return "'" + strings.Replace(s, "'", `'"'"'`, -1) + "'"
+	return "'" + strings.ReplaceAll(s, "'", `'"'"'`) + "'"
 }
 
 // NewScriptTemplate parses text as the template after exposing the ShQuote
