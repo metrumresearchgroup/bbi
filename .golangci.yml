@@ -15,8 +15,6 @@ linters-settings:
     check-type-assertions: true
   unparam:
     check-exported: true
-  unused:
-    check-exported: true
   whitespace:
     multi-if: true
     multi-func: true
