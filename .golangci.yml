@@ -30,7 +30,6 @@ linters-settings:
 
 
 run:
-  skip-dirs-use-default: true
   timeout: 3m
 
 linters:
