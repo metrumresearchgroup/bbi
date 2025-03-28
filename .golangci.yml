@@ -1,51 +1,65 @@
+version: "2"
+linters:
+  enable:
+    - dupl
+    - errcheck
+    - errorlint
+    - exhaustive
+    - godot
+    - govet
+    - ineffassign
+    - nakedret
+    - nlreturn
+    - rowserrcheck
+    - staticcheck
+    - unconvert
+    - unparam
+    - whitespace
+  settings:
+    errcheck:
+      check-type-assertions: true
+    errorlint:
+      errorf: true
+    gosec:
+      excludes:
+        - G204
+    nakedret:
+      max-func-lines: 0
+    unparam:
+      check-exported: true
+    whitespace:
+      multi-if: true
+      multi-func: true
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - linters:
+          - dupl
+          - gocyclo
+          - gosec
+        path: _test\.go
+    paths:
+      - internal/valtools
+      - third_party$
+      - builtin$
+      - examples$
 issues:
   max-issues-per-linter: 0
   max-same-issues: 0
-  exclude-rules:
-    - path: _test\.go
-      linters:
-        - gocyclo
-        - dupl
-        - gosec
-  exclude-dirs:
-    - internal/valtools
-
-linters-settings:
-  errcheck:
-    check-type-assertions: true
-  unparam:
-    check-exported: true
-  whitespace:
-    multi-if: true
-    multi-func: true
-  errorlint:
-    errorf: true
-  nakedret:
-    max-func-lines: 0
-  gosec:
-    excludes:
-      - G204
-
-
+formatters:
+  enable:
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - internal/valtools
+      - third_party$
+      - builtin$
+      - examples$
 run:
   timeout: 3m
-
-linters:
-  enable:
-    - errcheck
-    - govet
-    - ineffassign
-    - staticcheck
-    - typecheck
-#    - gosec
-    - unparam
-    - unconvert
-    - dupl
-    - errorlint
-    - exhaustive
-    - goimports
-    - nlreturn
-    - whitespace
-    - rowserrcheck
-    - godot
-    - nakedret
