@@ -39,12 +39,10 @@ run:
 linters:
   enable:
     - errcheck
-    - gosimple
     - govet
     - ineffassign
     - staticcheck
     - typecheck
-    - unused
 #    - gosec
     - unparam
     - unconvert
