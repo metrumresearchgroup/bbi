@@ -16,8 +16,8 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - os: ubuntu-20.04
-            go: 1.21.x
+          - os: ubuntu-22.04
+            go: 1.23.x
           - os: ubuntu-latest
             go: stable
     steps:

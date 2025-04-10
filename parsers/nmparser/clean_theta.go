@@ -6,7 +6,7 @@ import "strings"
 func CleanThetaBlock(lines []string) []string {
 	var result = make([]string, 0)
 	for _, line := range lines {
-		cleaned := strings.TrimSpace(strings.Replace(line, "$THETA", "", -1))
+		cleaned := strings.TrimSpace(strings.ReplaceAll(line, "$THETA", ""))
 		// remove any comment only lines at this point
 		if cleaned == "" || string(cleaned[0]) == ";" {
 			continue

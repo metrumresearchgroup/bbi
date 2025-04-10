@@ -98,7 +98,7 @@ func GetModelOutput(lstPath string, ext ModelOutputFile, grd bool, shk bool) (Su
 		results.RunDetails.CpuTime = cpuTime
 	}
 
-	if !(ext.Exclude || results.RunDetails.OnlySim) {
+	if !ext.Exclude && !results.RunDetails.OnlySim {
 		if ext.Name == "" {
 			ext.Name = runNum + ".ext"
 		}

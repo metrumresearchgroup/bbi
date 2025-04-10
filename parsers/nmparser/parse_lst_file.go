@@ -86,7 +86,7 @@ func getMatrixData(lines []string, start int) MatrixData {
 
 			// this line is either the start of values (starts with +) or a continuation of values (starts with ..... or a value)
 			if strings.HasPrefix(clean, "+") {
-				clean = strings.TrimSpace(strings.Replace(strings.Replace(line, "+", "", -1), ",", "", -1))
+				clean = strings.TrimSpace(strings.ReplaceAll(strings.ReplaceAll(line, "+", ""), ",", ""))
 				rows = append(rows, clean)
 			} else {
 				// if there is not a +, append the values to the previous row
@@ -96,7 +96,7 @@ func getMatrixData(lines []string, start int) MatrixData {
 						break
 					}
 					previousrow := len(rows) - 1
-					clean = strings.TrimSpace(strings.Replace(strings.Replace(line, "+", "", -1), ",", "", -1))
+					clean = strings.TrimSpace(strings.ReplaceAll(strings.ReplaceAll(line, "+", ""), ",", ""))
 					rows[previousrow] = rows[previousrow] + " " + clean
 				}
 			}
@@ -187,7 +187,7 @@ func parseGradient(lines []string) bool {
 		return false
 	}
 
-	fields := strings.Fields(strings.TrimSpace(strings.Replace(lines[len(lines)-1], "GRADIENT:", "", -1)))
+	fields := strings.Fields(strings.TrimSpace(strings.ReplaceAll(lines[len(lines)-1], "GRADIENT:", "")))
 	if len(fields) > 0 {
 		result := make([]float64, len(fields))
 		for i, val := range fields {
@@ -241,7 +241,7 @@ func ParseLstEstimationFile(lines []string) SummaryOutput {
 			endSigmaIndex = i
 		case strings.Contains(line, "#METH"):
 			// starting new estimation method, make new details objects
-			method := strings.TrimSpace(strings.Replace(line, "#METH:", "", -1))
+			method := strings.TrimSpace(strings.ReplaceAll(line, "#METH:", ""))
 			allOfvDetails = append(allOfvDetails, NewOfvDetails(method))
 			allCondDetails = append(allCondDetails, NewConditionNumDetails(method, DefaultFloat64))
 		case strings.Contains(line, "#OBJV"):
@@ -339,26 +339,26 @@ func parseOFV(line string, allOfvDetails []OfvDetails) []OfvDetails {
 	ofvDetails := &allOfvDetails[len(allOfvDetails)-1]
 
 	if strings.Contains(line, "#OBJV:") {
-		result := strings.Replace(line, "*", "", -1)
+		result := strings.ReplaceAll(line, "*", "")
 		ofvDetails.OFVNoConstant = strToFloat(
-			strings.TrimSpace(strings.Replace(result, "#OBJV:", "", -1)))
+			strings.TrimSpace(strings.ReplaceAll(result, "#OBJV:", "")))
 	} else if strings.Contains(line, "CONSTANT TO OBJECTIVE FUNCTION") {
-		constantString := strings.TrimSpace(strings.Replace(line, "CONSTANT TO OBJECTIVE FUNCTION:", "", -1))
+		constantString := strings.TrimSpace(strings.ReplaceAll(line, "CONSTANT TO OBJECTIVE FUNCTION:", ""))
 		constantPrefixes := []string{
 			"N*LOG(2PI)",
 			"NIND*NETA*LOG(2PI)",
 			"PRIOR",
 		}
 		for _, cp := range constantPrefixes {
-			constantString = strings.TrimSpace(strings.Replace(constantString, cp, "", -1))
+			constantString = strings.TrimSpace(strings.ReplaceAll(constantString, cp, ""))
 		}
 		ofvDetails.ConstantToOFV = strToFloat(constantString)
 	} else if strings.Contains(line, "OBJECTIVE FUNCTION VALUE WITHOUT CONSTANT") {
 		ofvDetails.OFVNoConstant = strToFloat(
-			strings.TrimSpace(strings.Replace(line, "OBJECTIVE FUNCTION VALUE WITHOUT CONSTANT:", "", -1)))
+			strings.TrimSpace(strings.ReplaceAll(line, "OBJECTIVE FUNCTION VALUE WITHOUT CONSTANT:", "")))
 	} else if strings.Contains(line, "OBJECTIVE FUNCTION VALUE WITH CONSTANT") {
 		ofvDetails.OFVWithConstant = strToFloat(
-			strings.TrimSpace(strings.Replace(line, "OBJECTIVE FUNCTION VALUE WITH CONSTANT:", "", -1)))
+			strings.TrimSpace(strings.ReplaceAll(line, "OBJECTIVE FUNCTION VALUE WITH CONSTANT:", "")))
 	}
 
 	return allOfvDetails

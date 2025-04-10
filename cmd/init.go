@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -225,7 +224,7 @@ func findNonMemBinary(path string) (string, error) {
 		}
 	}
 
-	return "", errors.New("No nonmem binary could be located in the given path. Please check again or try another directory")
+	return "", fmt.Errorf("no nmfe* binary found beneath %s", path)
 }
 
 // findNonMemBinaryWindows is a Windows-specific variant of

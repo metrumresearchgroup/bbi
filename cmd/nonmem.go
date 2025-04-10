@@ -961,7 +961,7 @@ func createChildDirectories(l *NonMemModel, sge bool) error {
 				// Or panic because we're in a scenario where we shouldn't purge, but there's content in the directory from previous runs
 				log.Debugf("%s Configuration for overwrite was %t, but %s had Nonmem outputs. As such, we will hault operations", l.LogIdentifier(), viper.GetBool("debug"), l.OutputDir)
 
-				return fmt.Errorf("The target directory, %s already exist, but we are configured not to overwrite. Invalid configuration / run state", l.OutputDir)
+				return fmt.Errorf("target directory exists but run is not configured to overwrite: %s", l.OutputDir)
 			}
 		}
 	}
@@ -1030,7 +1030,7 @@ func processNMFEOptions(config configlib.Config) []string {
 	// for compatibility because it used to be the default value.
 	if config.NMFEOptions.MaxLim > 0 && config.NMFEOptions.MaxLim < 4 {
 		output = append(output, "-maxlim="+strconv.Itoa(config.NMFEOptions.MaxLim))
-	} else if !(config.NMFEOptions.MaxLim == 0 || config.NMFEOptions.MaxLim == 100) {
+	} else if config.NMFEOptions.MaxLim != 0 && config.NMFEOptions.MaxLim != 100 {
 		log.Warnf("ignoring invalid maxlim value: %v", config.NMFEOptions.MaxLim)
 	}
 
