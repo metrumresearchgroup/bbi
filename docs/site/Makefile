@@ -26,7 +26,14 @@ copied_files += content/news.md
 .PHONY: prep
 prep: commands
 prep: $(copied_files)
-	rm -rf public resources
+	rm -rf public resources static/latest.json
+	$(MAKE) static/latest.json
+
+static/latest.json:
+	v=$$(git for-each-ref --sort='-v:refname' --format='%(refname:short)' 'refs/tags/v*' | \
+	     grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$$' | \
+	     head -n1); \
+	  test -n "$$v" && printf '{"version": "%s"}\n' "$$v" >'$@'
 
 command_dir = content/docs/commands
 

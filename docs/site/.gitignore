@@ -4,4 +4,5 @@
 /local.mk
 /public/
 /resources/
+/static/latest.json
 /static/windows.png
