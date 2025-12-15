@@ -146,7 +146,7 @@ vt-metadata:
 .PHONY: vt-archive
 vt-archive:
 	@mkdir -p '$(VT_OUT_DIR)'
-	@test -z "$(git status --porcelain -unormal --ignore-submodules=none)" || \
+	@test -z "$$(git status --porcelain -unormal --ignore-submodules=none)" || \
 	  { printf >&2 'working tree is dirty; commit changes first\n'; exit 1; }
 	git archive -o '$(prefix).tar.gz' --format=tar.gz HEAD
 
