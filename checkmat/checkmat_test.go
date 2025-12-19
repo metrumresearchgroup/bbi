@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"gopkg.in/yaml.v3"
+	"github.com/goccy/go-yaml"
 )
 
 func assertCode(t *testing.T, output string, code string, ntimes int) {

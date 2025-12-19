@@ -13,7 +13,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"gopkg.in/yaml.v3"
+	"github.com/goccy/go-yaml"
 )
 
 const usageMessage = `usage: checkmat <yaml> <dir>
