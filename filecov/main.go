@@ -30,7 +30,8 @@ Options:
    file.  If you pass a module's go.mod to this option, the module name from
    that file is stripped from the file names in the output (yielding, e.g.,
    "cmd/foo.go").  This is particularly useful in the common case where all the
-   files belong to the same module.  `
+   files belong to the same module.
+`
 
 var (
 	gomod = flag.String("mod", "", "")
