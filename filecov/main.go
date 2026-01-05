@@ -33,9 +33,7 @@ Options:
    files belong to the same module.
 `
 
-var (
-	gomod = flag.String("mod", "", "")
-)
+var gomod = flag.String("mod", "", "")
 
 func usage() {
 	fmt.Fprint(flag.CommandLine.Output(), usageMessage)
@@ -69,7 +67,7 @@ type coverage struct {
 	Files   []*fileCoverage `json:"files"`
 }
 
-func percent(covered int64, total int64) float64 {
+func percent(covered, total int64) float64 {
 	if total == 0 {
 		return 0
 	}
@@ -96,7 +94,7 @@ func percentCovered(profiles []*cover.Profile) coverage {
 	return coverage{Overall: percent(covered, total), Files: fcovs}
 }
 
-func shortenFileNames(cov coverage, modpath string, localpath string) error {
+func shortenFileNames(cov coverage, modpath, localpath string) error {
 	if modpath == "" {
 		return nil
 	}
@@ -136,7 +134,7 @@ func shortenFileNames(cov coverage, modpath string, localpath string) error {
 	return nil
 }
 
-func write(w io.Writer, profiles []*cover.Profile, modpath string, localpath string) error {
+func write(w io.Writer, profiles []*cover.Profile, modpath, localpath string) error {
 	cov := percentCovered(profiles)
 	if modpath != "" {
 		if err := shortenFileNames(cov, modpath, localpath); err != nil {
@@ -153,7 +151,7 @@ func write(w io.Writer, profiles []*cover.Profile, modpath string, localpath str
 	return err
 }
 
-func run(input string, gomod string, w io.Writer) error {
+func run(input, gomod string, w io.Writer) error {
 	profiles, err := cover.ParseProfiles(input)
 	if err != nil {
 		return err

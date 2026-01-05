@@ -43,7 +43,7 @@ func makeEventReader(t *testing.T, tes []testEvent) io.Reader {
 }
 
 func TestProcessEvents(t *testing.T) {
-	var tests = []struct {
+	tests := []struct {
 		name     string
 		events   []testEvent
 		subtests bool
@@ -345,7 +345,7 @@ func TestProcessEventsFailureOutput(t *testing.T) {
 }
 
 func TestProcessEventsErrors(t *testing.T) {
-	var tests = []struct {
+	tests := []struct {
 		name     string
 		events   []testEvent
 		subtests bool

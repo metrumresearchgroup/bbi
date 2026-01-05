@@ -16,7 +16,7 @@ import (
 	"golang.org/x/tools/cover"
 )
 
-func assertNearEqual(t *testing.T, a float64, b float64) {
+func assertNearEqual(t *testing.T, a, b float64) {
 	t.Helper()
 	if math.IsNaN(a) || math.IsNaN(b) {
 		t.Fatal("assertNearEqual: NaN values are not allowed")
@@ -29,7 +29,7 @@ func assertNearEqual(t *testing.T, a float64, b float64) {
 	}
 }
 
-func assertFileCoverage(t *testing.T, got []*fileCoverage, want []*fileCoverage) {
+func assertFileCoverage(t *testing.T, got, want []*fileCoverage) {
 	t.Helper()
 
 	ngot := len(got)
@@ -231,7 +231,7 @@ func chdir(t *testing.T, dir string) {
 func setupRunDir(t *testing.T) string {
 	dir := t.TempDir()
 	realmodPath := filepath.Join(dir, "realmod")
-	err := os.MkdirAll(filepath.Join(realmodPath, "cmd"), 0777)
+	err := os.MkdirAll(filepath.Join(realmodPath, "cmd"), 0o777)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -245,7 +245,7 @@ func setupRunDir(t *testing.T) string {
 	err = os.WriteFile(
 		filepath.Join(modPath, "go.mod"),
 		[]byte("module example.com/tmod\n\ngo 1.22.5"),
-		0666)
+		0o666)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -277,7 +277,7 @@ func TestRun(t *testing.T) {
 		"example.com/tmod/cmd/main.go",
 		modPath+"/"+"cmd/main.go")
 	profPath := filepath.Join(modPath, "coverage.out")
-	err := os.WriteFile(profPath, []byte(pcontent), 0666)
+	err := os.WriteFile(profPath, []byte(pcontent), 0o666)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -316,7 +316,7 @@ func TestRun(t *testing.T) {
 func TestRunNoGoMod(t *testing.T) {
 	modPath := setupRunDir(t)
 	profPath := filepath.Join(modPath, "coverage.out")
-	err := os.WriteFile(profPath, []byte(testProfile), 0666)
+	err := os.WriteFile(profPath, []byte(testProfile), 0o666)
 	if err != nil {
 		t.Fatal(err)
 	}

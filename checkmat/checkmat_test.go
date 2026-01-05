@@ -13,7 +13,7 @@ import (
 	"github.com/goccy/go-yaml"
 )
 
-func assertCode(t *testing.T, output string, code string, ntimes int) {
+func assertCode(t *testing.T, output, code string, ntimes int) {
 	t.Helper()
 	found := strings.Count(output, "["+code+"]")
 	if found != ntimes {
@@ -23,7 +23,7 @@ func assertCode(t *testing.T, output string, code string, ntimes int) {
 }
 
 func TestCheckValidFileNamesBad(t *testing.T) {
-	var tests = []struct {
+	tests := []struct {
 		name    string
 		entries []entry
 		want    int
@@ -107,7 +107,7 @@ func TestCheckValidFileNamesGood(t *testing.T) {
 
 func TestCheckMissingFilesBad(t *testing.T) {
 	dir := t.TempDir()
-	var tests = []struct {
+	tests := []struct {
 		name    string
 		entries []entry
 		want    int
@@ -201,11 +201,11 @@ func TestCheckMissingFilesGood(t *testing.T) {
 		},
 	}
 
-	err := os.MkdirAll(filepath.Join(dir, "cmd"), 0777)
+	err := os.MkdirAll(filepath.Join(dir, "cmd"), 0o777)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = os.MkdirAll(filepath.Join(dir, "docs"), 0777)
+	err = os.MkdirAll(filepath.Join(dir, "docs"), 0o777)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -239,7 +239,7 @@ func TestCheckMissingFilesGood(t *testing.T) {
 }
 
 func TestCheckEntrypointDocMismatchBad(t *testing.T) {
-	var tests = []struct {
+	tests := []struct {
 		name    string
 		entries []entry
 		want    int
@@ -397,7 +397,7 @@ func TestCheckMissingEntriesBad(t *testing.T) {
 		createEmptyFile(t, fname)
 	}
 
-	var tests = []struct {
+	tests := []struct {
 		name    string
 		entries []entry
 		want    int
@@ -504,13 +504,13 @@ func writeEntries(t *testing.T, es []entry, outfile string) {
 func TestCheckAll(t *testing.T) {
 	dir := t.TempDir()
 	docdir := filepath.Join(dir, "docs", "commands")
-	err := os.MkdirAll(docdir, 0777)
+	err := os.MkdirAll(docdir, 0o777)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	codedir := filepath.Join(dir, "cmd")
-	err = os.MkdirAll(codedir, 0777)
+	err = os.MkdirAll(codedir, 0o777)
 	if err != nil {
 		t.Fatal(err)
 	}

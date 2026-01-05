@@ -202,7 +202,7 @@ func checkMissingEntries(es []entry, docdir string, w io.Writer) (int, error) {
 // top-level directory to which files in `yaml` are specified as relative.
 //
 // For each issue found, a message is written to w.
-func check(yaml string, docdir string, topdir string, w io.Writer) (int, error) {
+func check(yaml, docdir, topdir string, w io.Writer) (int, error) {
 	var bad int
 
 	entries, err := readEntries(yaml)

@@ -76,7 +76,7 @@ type key struct {
 //
 // processEvents returns a summary instance that records the test names for each
 // result record encountered.
-func processEvents(r io.Reader, subtests bool, wout io.Writer, werr io.Writer) (summary, error) {
+func processEvents(r io.Reader, subtests bool, wout, werr io.Writer) (summary, error) {
 	var res summary
 
 	failLines := make(map[key][]string)
