@@ -287,7 +287,7 @@ func TestCheckEntrypointDocMismatchBad(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var buf bytes.Buffer
-			bad, err := checkEntrypointDocMismatch(tt.entries, &buf)
+			bad, err := checkEntrypointDocMismatch(tt.entries, "", &buf)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -314,7 +314,7 @@ func TestCheckEntrypointDocMismatchGood(t *testing.T) {
 	}
 
 	var buf bytes.Buffer
-	bad, err := checkEntrypointDocMismatch(entries, &buf)
+	bad, err := checkEntrypointDocMismatch(entries, "", &buf)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -429,7 +429,7 @@ func TestCheckMissingEntriesBad(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var buf bytes.Buffer
-			bad, err := checkMissingEntries(tt.entries, dir, &buf)
+			bad, err := checkMissingEntries(tt.entries, dir, "", &buf)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -464,7 +464,7 @@ func TestCheckMissingEntriesGood(t *testing.T) {
 	}
 
 	var buf bytes.Buffer
-	bad, err := checkMissingEntries(entries, dir, &buf)
+	bad, err := checkMissingEntries(entries, dir, "", &buf)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -550,7 +550,7 @@ func TestCheckAll(t *testing.T) {
 
 	t.Run("all good", func(t *testing.T) {
 		var buf bytes.Buffer
-		bad, err := check(yfile, docdir, dir, &buf)
+		bad, err := check(yfile, docdir, dir, "", &buf)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -589,7 +589,7 @@ func TestCheckAll(t *testing.T) {
 
 	t.Run("some bad", func(t *testing.T) {
 		var buf bytes.Buffer
-		bad, err := check(yfile, docdir, dir, &buf)
+		bad, err := check(yfile, docdir, dir, "", &buf)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -606,4 +606,63 @@ func TestCheckAll(t *testing.T) {
 		assertCode(t, out, "04", 1)
 		assertCode(t, out, "05", 1)
 	})
+}
+
+func TestCheckPrefix(t *testing.T) {
+	dir := t.TempDir()
+	docdir := filepath.Join(dir, "docs", "commands")
+	err := os.MkdirAll(docdir, 0o777)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	codedir := filepath.Join(dir, "cmd")
+	err = os.MkdirAll(codedir, 0o777)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	files := []string{
+		filepath.Join(docdir, "foo.md"),
+		filepath.Join(docdir, "bar.md"),
+		filepath.Join(docdir, "baz.md"),
+		filepath.Join(codedir, "foo.go"),
+		filepath.Join(codedir, "foo_test.go"),
+		filepath.Join(codedir, "bar.go"),
+		filepath.Join(codedir, "bar_test.go"),
+	}
+	for _, f := range files {
+		createEmptyFile(t, f)
+	}
+
+	entries := []entry{
+		{
+			Entrypoint: "foo",
+			Code:       "cmd/foo.go",
+			Doc:        "docs/commands/foo.md",
+			Tests:      []string{"cmd/foo_test.go"},
+		},
+		{
+			Entrypoint: "foo bar",
+			Code:       "cmd/bar.go",
+			Doc:        "docs/commands/bar.md",
+			Tests:      []string{"cmd/bar_test.go"},
+		},
+	}
+
+	yfile := filepath.Join(dir, "docs", "matrix.yaml")
+	writeEntries(t, entries, yfile)
+
+	var buf bytes.Buffer
+	bad, err := check(yfile, docdir, dir, "foo", &buf)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if want := 1; bad != want {
+		t.Errorf("got %d missing entries, want %d", bad, want)
+	}
+
+	out := buf.String()
+	assertCode(t, out, "05", 1)
 }

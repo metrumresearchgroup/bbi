@@ -28,6 +28,14 @@ Options:
    The top-level directory of the repository.  Paths in <yaml> should be
    relative to this directory.
 
+  -cmdprefix=<prefix>
+   Prepend '<prefix> ' when mapping from the documentation file to command name.
+   This makes it possible to name documentation files the subcommand alone
+   (e.g., sub.md instead of top_sub.md for command 'top sub').
+
+   If the base name of the documentation file matches <prefix> exactly, the name
+   is left as is.
+
 Checks:
 
  Verify that
@@ -133,21 +141,25 @@ func checkMissingFiles(es []entry, topdir string, w io.Writer) (int, error) {
 // top-level commands, and it assumes that none of the commands have an
 // underscore in their name.
 
-func docToEntrypoint(f string) string {
+func docToEntrypoint(f, prefix string) string {
 	base := filepath.Base(f)
 	name := strings.TrimSuffix(base, filepath.Ext(base))
+
+	if prefix != "" && name != prefix {
+		name = prefix + " " + name
+	}
 
 	return strings.ReplaceAll(name, "_", " ")
 }
 
-func checkEntrypointDocMismatch(es []entry, w io.Writer) (int, error) {
+func checkEntrypointDocMismatch(es []entry, prefix string, w io.Writer) (int, error) {
 	var bad int
 
 	for _, e := range es {
 		if e.Skip {
 			continue
 		}
-		if docToEntrypoint(e.Doc) != e.Entrypoint {
+		if docToEntrypoint(e.Doc, prefix) != e.Entrypoint {
 			bad++
 			fmt.Fprintf(w, "[03] entry point and doc file mismatch: %q != %q\n", e.Entrypoint, e.Doc)
 		}
@@ -172,7 +184,7 @@ func checkDupEntrypoints(es []entry, w io.Writer) (int, error) {
 	return bad, nil
 }
 
-func checkMissingEntries(es []entry, docdir string, w io.Writer) (int, error) {
+func checkMissingEntries(es []entry, docdir, prefix string, w io.Writer) (int, error) {
 	var bad int
 
 	fh, err := os.Open(docdir)
@@ -196,7 +208,7 @@ func checkMissingEntries(es []entry, docdir string, w io.Writer) (int, error) {
 			continue
 		}
 
-		if _, found := cmds[docToEntrypoint(f)]; !found {
+		if _, found := cmds[docToEntrypoint(f, prefix)]; !found {
 			fmt.Fprintf(w, "[05] No yaml entry for %q\n", filepath.Join(docdir, f))
 			bad++
 		}
@@ -206,12 +218,17 @@ func checkMissingEntries(es []entry, docdir string, w io.Writer) (int, error) {
 }
 
 // check runs all the check functions on the traceability matrix defined in file
-// yaml and returns the total number of issues found.  docdir points to a
-// directory containing the documentation files.  topdir is an absolute path to
-// top-level directory to which files in `yaml` are specified as relative.
+// yaml and returns the total number of issues found.
+//
+// docdir points to a directory containing the documentation files.  The command
+// name is constructed from the base name of the file, prepending prefix and a
+// space if prefix is not empty.
+//
+// topdir is an absolute path to top-level directory to which files in `yaml`
+// are specified as relative.
 //
 // For each issue found, a message is written to w.
-func check(yaml, docdir, topdir string, w io.Writer) (int, error) {
+func check(yaml, docdir, topdir, prefix string, w io.Writer) (int, error) {
 	var bad int
 
 	entries, err := readEntries(yaml)
@@ -225,10 +242,12 @@ func check(yaml, docdir, topdir string, w io.Writer) (int, error) {
 		func(es []entry, w io.Writer) (int, error) {
 			return checkMissingFiles(es, topdir, w)
 		},
-		checkEntrypointDocMismatch,
+		func(es []entry, w io.Writer) (int, error) {
+			return checkEntrypointDocMismatch(es, prefix, w)
+		},
 		checkDupEntrypoints,
 		func(es []entry, w io.Writer) (int, error) {
-			return checkMissingEntries(es, docdir, w)
+			return checkMissingEntries(es, docdir, prefix, w)
 		},
 	}
 
@@ -249,6 +268,7 @@ func main() {
 	}
 
 	repo := flag.String("repo", "", "")
+	cmdprefix := flag.String("cmdprefix", "", "")
 
 	flag.Usage = usage
 	flag.Parse()
@@ -275,7 +295,7 @@ func main() {
 		}
 	}
 
-	bad, err := check(args[0], args[1], topdir, os.Stdout)
+	bad, err := check(args[0], args[1], topdir, *cmdprefix, os.Stdout)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "error:", err)
 		os.Exit(2)
