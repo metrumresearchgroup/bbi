@@ -23,28 +23,30 @@ Run various checks on the traceability matrix defined in <yaml>.  Each file in
 to an entry point in <yaml> once the file extension is removed and underscores
 are substituted for spaces.
 
-Verify that
+Checks:
 
- [01] each file name is valid
+ Verify that
 
-      To be considered "valid", a file name must be relative, must use "/" as
-      the path separator, and must not contain "." or ".." elements.
+   [01] each file name is valid
 
- [02] each named file exists
+        To be considered "valid", a file name must be relative, must use "/" as
+        the path separator, and must not contain "." or ".." elements.
 
-      The current working directory is taken as the top-level project directory,
-      and the files should be relative to this.
+   [02] each named file exists
 
- [03] the base file name for the documentation matches the entry point name
+        The current working directory is taken as the top-level project
+        directory, and the files should be relative to this.
 
- [04] no entry point has more than one entry in <yaml>
+   [03] the base file name for the documentation matches the entry point name
 
- [05] for each file in <dir>, an entry with a matching entry point is found in
-      <yaml>
+   [04] no entry point has more than one entry in <yaml>
 
-      This check is skipped for any entries with a true "skip" value.
+   [05] for each file in <dir>, an entry with a matching entry point is found in
+        <yaml>
 
-Exit with status 1 if any issues are found.
+        This check is skipped for any entries with a true "skip" value.
+
+  Exit with status 1 if any issues are found.
 `
 
 func usage() {
