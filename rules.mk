@@ -12,8 +12,9 @@ version := $(shell git describe --tags --always HEAD)
 version := $(version:v%=%)
 name := $(VT_PKG)_$(version)
 
-VT_OUT_DIR ?= $(vtdir)/output/$(name)
-prefix := $(VT_OUT_DIR)/$(name)
+VT_OUT_DIR ?= $(vtdir)/output
+outdir = $(VT_OUT_DIR)/$(name)
+prefix := $(outdir)/$(name)
 
 VT_BIN_DIR ?= $(vtdir)/bin
 VT_DOC_DIR ?= docs/commands
@@ -29,7 +30,7 @@ endif
 .PHONY: vt-help
 vt-help:
 	$(info Primary targets:)
-	$(info * vt-all: create all validation artifacts under $(VT_OUT_DIR)/)
+	$(info * vt-all: create all validation artifacts under $(outdir)/)
 	$(info * vt-gen-docs: generate command docs under $(VT_DOC_DIR)/)
 	$(info )
 	$(info Other targets:)
@@ -86,7 +87,7 @@ vt-copymat:
 	$(MAKE) vt-checkmat
 	@test -z "$$(git status -unormal --porcelain -- '$(VT_DOC_DIR)')" || \
 	  { printf 'commit changes to $(VT_DOC_DIR) first\n'; exit 1; }
-	@mkdir -p '$(VT_OUT_DIR)'
+	@mkdir -p '$(outdir)'
 	cp '$(VT_MATRIX)' '$(prefix).matrix.yaml'
 
 $(VT_BIN_DIR)/fmttests: $(vtdir)/fmttests/main.go
@@ -101,14 +102,14 @@ $(VT_BIN_DIR)/filecov: $(vtdir)/filecov/main.go
 
 # ATTN: Make coverage directory absolute because we cannot rely on
 # test subprocesses to be executed from the same directory.
-cov_dir := $(abspath $(VT_OUT_DIR)/.coverage)
+cov_dir := $(abspath $(outdir)/.coverage)
 cov_prof := $(cov_dir).profile
 
 .PHONY: vt-cover
 vt-cover: export GOCOVERDIR=$(cov_dir)
 vt-cover: $(VT_BIN_DIR)/filecov
 vt-cover: $(VT_BIN_DIR)/fmttests
-	@mkdir -p '$(VT_OUT_DIR)'
+	@mkdir -p '$(outdir)'
 	rm -rf '$(cov_dir)' && mkdir '$(cov_dir)'
 	'$(vtdir)/scripts/run-tests' '$(VT_BIN_DIR)/fmttests' \
 	  '$(VT_TEST_ALLOW_SKIPS)' $(VT_TEST_RUNNERS) \
@@ -125,13 +126,13 @@ vt-cover-unlisted:
 
 .PHONY: vt-scores
 vt-scores:
-	@mkdir -p '$(VT_OUT_DIR)'
+	@mkdir -p '$(outdir)'
 	'$(vtdir)/scripts/write-scores' '$(prefix).coverage.json' \
 	  >'$(prefix).scores.json'
 
 .PHONY: vt-pkg
 vt-pkg:
-	@mkdir -p '$(VT_OUT_DIR)'
+	@mkdir -p '$(outdir)'
 	jq -n --arg p '$(VT_PKG)' --arg v "$(version)" \
 	'{"mpn_scorecard_format": "1.0",'\
 	' "pkg_name": $$p, "pkg_version": $$v,'\
@@ -140,12 +141,12 @@ vt-pkg:
 
 .PHONY: vt-metadata
 vt-metadata:
-	@mkdir -p '$(VT_OUT_DIR)'
+	@mkdir -p '$(outdir)'
 	'$(vtdir)/scripts/metadata' >'$(prefix).metadata.json'
 
 .PHONY: vt-archive
 vt-archive:
-	@mkdir -p '$(VT_OUT_DIR)'
+	@mkdir -p '$(outdir)'
 	@test -z "$$(git status --porcelain -unormal --ignore-submodules=none)" || \
 	  { printf >&2 'working tree is dirty; commit changes first\n'; exit 1; }
 	git archive -o '$(prefix).tar.gz' --format=tar.gz HEAD

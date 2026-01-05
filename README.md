@@ -210,9 +210,9 @@ source archive and mpn.scorecard inputs.
 
     make vt-all
 
-The generated files are written under the directory specified by the
-variable `VT_OUT_DIR`.  By default, this points to
-`{subtree}/output/{package}_{version}`.
+The generated files are written to a directory named
+`{package}_{version}` under the directory specified by the variable
+`VT_OUT_DIR`.  By default, this points to `{subtree}/output/`.
 
 <a id="vars"></a>
 
@@ -230,8 +230,9 @@ variable `VT_OUT_DIR`.  By default, this points to
  * `VT_MATRIX`: path to matrix file (default:
    `docs/validation/matrix.yaml`)
 
- * `VT_OUT_DIR`: where to generate the results (default:
-   `{subtree}/output/{package}_{version}`)
+ * `VT_OUT_DIR`: directory under which to generate the
+   `{package}_{version}` result directory (default:
+   `{subtree}/output/`)
 
  * `VT_PKG`: name of the package (default: the base name of the
    top-level directory).
