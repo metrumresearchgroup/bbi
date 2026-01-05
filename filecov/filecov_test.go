@@ -36,8 +36,6 @@ func assertFileCoverage(t *testing.T, got, want []*fileCoverage) {
 	nwant := len(want)
 	if ngot != nwant {
 		t.Errorf("coverage files: got %d, want %d", ngot, nwant)
-
-		return
 	}
 
 	mapWant := make(map[string]float64, nwant)
