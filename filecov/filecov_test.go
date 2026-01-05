@@ -210,22 +210,6 @@ func TestWriteShortenNames(t *testing.T) {
 	)
 }
 
-func chdir(t *testing.T, dir string) {
-	old, err := os.Getwd()
-	if err != nil {
-		t.Fatal(err)
-	}
-	err = os.Chdir(dir)
-	if err != nil {
-		_ = os.Chdir(old)
-		t.Fatal(err)
-	}
-
-	t.Cleanup(func() {
-		_ = os.Chdir(old)
-	})
-}
-
 func setupRunDir(t *testing.T) string {
 	dir := t.TempDir()
 	realmodPath := filepath.Join(dir, "realmod")
@@ -264,7 +248,7 @@ func setupRunDir(t *testing.T) string {
 		}
 	}
 
-	chdir(t, modPath)
+	t.Chdir(modPath)
 
 	return modPath
 }
