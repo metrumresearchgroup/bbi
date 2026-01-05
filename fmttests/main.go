@@ -121,8 +121,7 @@ func processEvents(r io.Reader, subtests bool, wout, werr io.Writer) (summary, e
 			// TODO: Consider other approaches for formatting the package name
 			// that avoid collisions (e.g., packageBaseName returns "cmd" for
 			// both ".../foo/cmd" and ".../bar/cmd").
-			fmt.Fprintf(wout, "[%s] %s: %s\n",
-				packageBaseName(e.Package), e.Test, status)
+			fmt.Fprintf(wout, "[%s] %s: %s\n", packageBaseName(e.Package), e.Test, status)
 		}
 	}
 
@@ -156,8 +155,7 @@ func main() {
 	}
 
 	if len(res.Failed) > 0 || (!*allowSkips && len(res.Skipped) > 0) {
-		fmt.Fprintf(os.Stderr, "failed tests: %d, skipped tests: %d\n",
-			len(res.Failed), len(res.Skipped))
+		fmt.Fprintf(os.Stderr, "failed tests: %d, skipped tests: %d\n", len(res.Failed), len(res.Skipped))
 		os.Exit(1)
 	}
 }

@@ -17,8 +17,7 @@ func assertCode(t *testing.T, output, code string, ntimes int) {
 	t.Helper()
 	found := strings.Count(output, "["+code+"]")
 	if found != ntimes {
-		t.Errorf("expected %dx [%s] in output, got %d\noutput: %q",
-			ntimes, code, found, output)
+		t.Errorf("expected %dx [%s] in output, got %d\noutput: %q", ntimes, code, found, output)
 	}
 }
 

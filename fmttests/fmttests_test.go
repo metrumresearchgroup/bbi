@@ -216,8 +216,7 @@ func TestProcessEvents(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			var bufStdout bytes.Buffer
 			var bufStderr bytes.Buffer
-			s, err := processEvents(makeEventReader(t, tt.events),
-				tt.subtests, &bufStdout, &bufStderr)
+			s, err := processEvents(makeEventReader(t, tt.events), tt.subtests, &bufStdout, &bufStderr)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -305,8 +304,7 @@ func TestProcessEventsFailureOutput(t *testing.T) {
 	}
 	var bufStdout bytes.Buffer
 	var bufStderr bytes.Buffer
-	s, err := processEvents(makeEventReader(t, events),
-		false, &bufStdout, &bufStderr)
+	s, err := processEvents(makeEventReader(t, events), false, &bufStdout, &bufStderr)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -390,8 +388,7 @@ func TestProcessEventsErrors(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			var bufStdout bytes.Buffer
 			var bufStderr bytes.Buffer
-			_, err := processEvents(makeEventReader(t, tt.events),
-				false, &bufStdout, &bufStderr)
+			_, err := processEvents(makeEventReader(t, tt.events), false, &bufStdout, &bufStderr)
 			if err == nil {
 				t.Errorf("processEvents unexpectedly passed")
 			}

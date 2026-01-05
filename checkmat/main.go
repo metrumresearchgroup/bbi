@@ -142,8 +142,7 @@ func checkEntrypointDocMismatch(es []entry, w io.Writer) (int, error) {
 		}
 		if docToEntrypoint(e.Doc) != e.Entrypoint {
 			bad++
-			fmt.Fprintf(w, "[03] entry point and doc file mismatch: %q != %q\n",
-				e.Entrypoint, e.Doc)
+			fmt.Fprintf(w, "[03] entry point and doc file mismatch: %q != %q\n", e.Entrypoint, e.Doc)
 		}
 	}
 
@@ -156,8 +155,7 @@ func checkDupEntrypoints(es []entry, w io.Writer) (int, error) {
 	cmds := make(map[string]bool)
 	for _, e := range es {
 		if _, found := cmds[e.Entrypoint]; found {
-			fmt.Fprintf(w, "[04] entry point %q defined more than once\n",
-				e.Entrypoint)
+			fmt.Fprintf(w, "[04] entry point %q defined more than once\n", e.Entrypoint)
 			bad++
 		} else {
 			cmds[e.Entrypoint] = true
