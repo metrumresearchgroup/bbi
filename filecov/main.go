@@ -33,8 +33,6 @@ Options:
    files belong to the same module.
 `
 
-var gomod = flag.String("mod", "", "")
-
 func usage() {
 	fmt.Fprint(flag.CommandLine.Output(), usageMessage)
 }
@@ -184,6 +182,9 @@ func main() {
 	if len(os.Args) > 1 && (os.Args[1] == "-h" || os.Args[1] == "--help") {
 		flag.CommandLine.SetOutput(os.Stdout)
 	}
+
+	gomod := flag.String("mod", "", "")
+
 	flag.Usage = usage
 	flag.Parse()
 	args := flag.Args()

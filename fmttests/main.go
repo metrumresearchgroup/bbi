@@ -27,11 +27,6 @@ If any "fail" record is encountered, exit with status 1.  Any "skip" record will
 also trigger an exit with status 1 unless the -allow-skips flag is specified.
 `
 
-var (
-	subtests   = flag.Bool("subtests", false, "")
-	allowSkips = flag.Bool("allow-skips", false, "")
-)
-
 func usage() {
 	fmt.Fprint(flag.CommandLine.Output(), usageMessage)
 }
@@ -142,6 +137,10 @@ func main() {
 	if len(os.Args) > 1 && (os.Args[1] == "-h" || os.Args[1] == "--help") {
 		flag.CommandLine.SetOutput(os.Stdout)
 	}
+
+	subtests := flag.Bool("subtests", false, "")
+	allowSkips := flag.Bool("allow-skips", false, "")
+
 	flag.Usage = usage
 	flag.Parse()
 
