@@ -185,6 +185,10 @@ func checkMissingEntries(es []entry, docdir string, w io.Writer) (int, error) {
 	}
 
 	for _, f := range fnames {
+		if strings.HasPrefix(f, "README") {
+			continue
+		}
+
 		if _, found := cmds[docToEntrypoint(f)]; !found {
 			fmt.Fprintf(w, "[05] No yaml entry for %q\n", filepath.Join(docdir, f))
 			bad++

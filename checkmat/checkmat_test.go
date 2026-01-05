@@ -515,6 +515,7 @@ func TestCheckAll(t *testing.T) {
 	}
 
 	files := []string{
+		filepath.Join(docdir, "README.md"),
 		filepath.Join(docdir, "foo_bar.md"),
 		filepath.Join(docdir, "baz.md"),
 		filepath.Join(docdir, "skip.md"),
