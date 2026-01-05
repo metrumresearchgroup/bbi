@@ -22,7 +22,7 @@ func assertNearEqual(t *testing.T, a, b float64) {
 		t.Fatal("assertNearEqual: NaN values are not allowed")
 	}
 
-	var tol float64 = 1e-8
+	tol := 1e-8
 	d := math.Abs(a - b)
 	if d >= tol {
 		t.Errorf("absolute difference exceeds tolerance (%e)\na=%f\nb=%f", tol, a, b)
