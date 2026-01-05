@@ -35,7 +35,7 @@ func assertFileCoverage(t *testing.T, got, want []*fileCoverage) {
 	ngot := len(got)
 	nwant := len(want)
 	if ngot != nwant {
-		t.Errorf("expected coverage for %d files, got %d", nwant, ngot)
+		t.Errorf("coverage files: got %d, want %d", ngot, nwant)
 
 		return
 	}
@@ -132,7 +132,7 @@ func TestPercentCoveredNoFiles(t *testing.T) {
 	assertNearEqual(t, cov.Overall, 0.0)
 
 	if len(cov.Files) != 0 {
-		t.Errorf("expected coverage for 0 files, got %d", len(cov.Files))
+		t.Errorf("got coverage for %d files, want 0", len(cov.Files))
 	}
 }
 

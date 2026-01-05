@@ -17,7 +17,7 @@ func assertCode(t *testing.T, output, code string, ntimes int) {
 	t.Helper()
 	found := strings.Count(output, "["+code+"]")
 	if found != ntimes {
-		t.Errorf("expected %dx [%s] in output, got %d\noutput: %q", ntimes, code, found, output)
+		t.Errorf("got %dx [%s] in output, want %dx\noutput: %q", found, code, ntimes, output)
 	}
 }
 
@@ -68,7 +68,7 @@ func TestCheckValidFileNamesBad(t *testing.T) {
 			}
 
 			if bad != tt.want {
-				t.Errorf("invalid file names: want %d, got %d", tt.want, bad)
+				t.Errorf("invalid file names: got %d, want %d", bad, tt.want)
 			}
 			out := buf.String()
 			assertCode(t, out, "01", tt.want)
@@ -96,11 +96,11 @@ func TestCheckValidFileNamesGood(t *testing.T) {
 	}
 
 	if bad != 0 {
-		t.Errorf("expected no invalid file names, got %d", bad)
+		t.Errorf("got %d invalid file names, want none", bad)
 	}
 
 	if out := buf.String(); out != "" {
-		t.Errorf("expected empty output, got %q", out)
+		t.Errorf("got %q for output, want empty", out)
 	}
 }
 
@@ -163,7 +163,7 @@ func TestCheckMissingFilesBad(t *testing.T) {
 			}
 
 			if bad != tt.want {
-				t.Errorf("missing files: want %d, got %d", tt.want, bad)
+				t.Errorf("missing files: got %d, want %d", bad, tt.want)
 			}
 			out := buf.String()
 			assertCode(t, out, "02", tt.want)
@@ -229,11 +229,11 @@ func TestCheckMissingFilesGood(t *testing.T) {
 	}
 
 	if bad != 0 {
-		t.Errorf("expected no missing files, got %d", bad)
+		t.Errorf("got %d missing files, want none", bad)
 	}
 
 	if out := buf.String(); out != "" {
-		t.Errorf("expected empty output, got %q", out)
+		t.Errorf("got %q for output, want empty", out)
 	}
 }
 
@@ -293,7 +293,7 @@ func TestCheckEntrypointDocMismatchBad(t *testing.T) {
 			}
 
 			if bad != tt.want {
-				t.Errorf("command/doc mismatches: want %d, got %d", tt.want, bad)
+				t.Errorf("command/doc mismatches: got %d, want %d", bad, tt.want)
 			}
 			out := buf.String()
 			assertCode(t, out, "03", tt.want)
@@ -320,11 +320,11 @@ func TestCheckEntrypointDocMismatchGood(t *testing.T) {
 	}
 
 	if bad != 0 {
-		t.Errorf("expected no mismatches, got %d", bad)
+		t.Errorf("got %d mismatches, want none", bad)
 	}
 
 	if out := buf.String(); out != "" {
-		t.Errorf("expected empty output, got %q", out)
+		t.Errorf("got %q for output, want empty", out)
 	}
 }
 
@@ -351,7 +351,7 @@ func TestCheckDupEntrypointsBad(t *testing.T) {
 	}
 
 	if wantBad := 1; bad != wantBad {
-		t.Errorf("expected %d duplicated entry, got %d", wantBad, bad)
+		t.Errorf("duplicated entries: got %d, want %d", bad, wantBad)
 	}
 	out := buf.String()
 	assertCode(t, out, "04", 1)
@@ -377,11 +377,11 @@ func TestCheckDupEntrypointsGood(t *testing.T) {
 	}
 
 	if bad != 0 {
-		t.Errorf("expected no duplicated entries, got %d", bad)
+		t.Errorf("got %d duplicated entries, want none", bad)
 	}
 
 	if out := buf.String(); out != "" {
-		t.Errorf("expected empty output, got %q", out)
+		t.Errorf("got %q for output, want empty", out)
 	}
 }
 
@@ -435,7 +435,7 @@ func TestCheckMissingEntriesBad(t *testing.T) {
 			}
 
 			if bad != tt.want {
-				t.Errorf("missing entries: want %d, got %d", tt.want, bad)
+				t.Errorf("missing entries: got %d, want %d", bad, tt.want)
 			}
 			out := buf.String()
 			assertCode(t, out, "05", tt.want)
@@ -470,11 +470,11 @@ func TestCheckMissingEntriesGood(t *testing.T) {
 	}
 
 	if bad != 0 {
-		t.Errorf("expected no missing entries, got %d", bad)
+		t.Errorf("got %d missing entries, want none", bad)
 	}
 
 	if out := buf.String(); out != "" {
-		t.Errorf("expected empty output, got %q", out)
+		t.Errorf("got %q for output, want empty", out)
 	}
 }
 
@@ -555,12 +555,12 @@ func TestCheckAll(t *testing.T) {
 		}
 
 		if bad != 0 {
-			t.Errorf("expected no missing entries, got %d", bad)
+			t.Errorf("got %d missing entries, want none", bad)
 		}
 
 		out := buf.String()
 		if out != "" {
-			t.Errorf("expected empty output, got %q", out)
+			t.Errorf("got %q for output, want empty", out)
 		}
 	})
 
@@ -595,7 +595,7 @@ func TestCheckAll(t *testing.T) {
 
 		wantBad := 7
 		if bad != wantBad {
-			t.Errorf("expected %d missing entries, got %d", wantBad, bad)
+			t.Errorf("got %d missing entries, want %d", bad, wantBad)
 		}
 
 		out := buf.String()
