@@ -211,6 +211,8 @@ func TestWriteShortenNames(t *testing.T) {
 }
 
 func setupRunDir(t *testing.T) string {
+	t.Helper()
+
 	dir := t.TempDir()
 	realmodPath := filepath.Join(dir, "realmod")
 	err := os.MkdirAll(filepath.Join(realmodPath, "cmd"), 0o777)
