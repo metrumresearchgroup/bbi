@@ -72,6 +72,10 @@ You can use [git subtree][gs] to manage the subtree.
 Run `go mod tidy` to update `go.mod` with new dependencies, if any,
 brought in by the subtree.
 
+Alternatively, the valtools module may be set up outside of the main
+repository/module being validating.  In that case, the `VT_REPO`
+variable should point to the repository to validate.
+
 ### 2. Command documentation
 
 Consider a Go module that defines one executable, `foo`, where the
@@ -236,6 +240,8 @@ The generated files are written to a directory named
 
  * `VT_PKG`: name of the package (default: the base name of the
    top-level directory).
+
+ * `VT_REPO`: path to the code repository to validate (default: `.`)
 
  * `VT_TEST_ALLOW_SKIPS`: whether to allow skips when running the
    `VT_TEST_RUNNERS` scripts (default: `no`)

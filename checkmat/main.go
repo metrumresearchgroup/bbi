@@ -16,12 +16,17 @@ import (
 	"github.com/goccy/go-yaml"
 )
 
-const usageMessage = `usage: checkmat <yaml> <dir>
+const usageMessage = `usage: checkmat [<options>] <yaml> <dir>
 
 Run various checks on the traceability matrix defined in <yaml>.  Each file in
 <dir> is taken as the documentation for an entry point, where the base name maps
 to an entry point in <yaml> once the file extension is removed and underscores
 are substituted for spaces.
+
+Options:
+  -repo=<directory>
+   The top-level directory of the repository.  Paths in <yaml> should be
+   relative to this directory.
 
 Checks:
 
@@ -242,6 +247,9 @@ func main() {
 	if len(os.Args) > 1 && (os.Args[1] == "-h" || os.Args[1] == "--help") {
 		flag.CommandLine.SetOutput(os.Stdout)
 	}
+
+	repo := flag.String("repo", "", "")
+
 	flag.Usage = usage
 	flag.Parse()
 	args := flag.Args()
@@ -250,13 +258,24 @@ func main() {
 		os.Exit(2)
 	}
 
-	wd, err := os.Getwd()
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "error:", err)
-		os.Exit(2)
+	var topdir string
+	var err error
+	if *repo == "" {
+		topdir, err = os.Getwd()
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "error:", err)
+			os.Exit(2)
+		}
+
+	} else {
+		topdir, err = filepath.Abs(*repo)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "error:", err)
+			os.Exit(2)
+		}
 	}
 
-	bad, err := check(args[0], args[1], wd, os.Stdout)
+	bad, err := check(args[0], args[1], topdir, os.Stdout)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "error:", err)
 		os.Exit(2)
