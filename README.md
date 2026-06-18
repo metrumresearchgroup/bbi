@@ -228,6 +228,9 @@ The generated files are written to a directory named
  * `VT_CMDPREFIX`: value to pass for the `-cmdprefix` option of
    `checkmat` (default: "")
 
+ * `VT_CHECKMAT_SKIP`: value to pass for the `-skip` option of
+   `checkmat` (default: "")
+
  * `VT_DOC_DIR`: tell `docgen` executable to generate documentation
    files under this directory (default: `docs/commands`)
 

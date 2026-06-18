@@ -6,6 +6,7 @@ endif
 
 VT_REPO ?= .
 VT_CMDPREFIX ?=
+VT_CHECKMAT_SKIP ?=
 
 ifeq ($(VT_PKG),)
 VT_PKG := $(notdir $(CURDIR))
@@ -83,7 +84,7 @@ $(VT_BIN_DIR)/checkmat: $(vtdir)/checkmat/main.go
 .PHONY: vt-checkmat
 vt-checkmat: $(VT_BIN_DIR)/checkmat
 	'$(VT_BIN_DIR)/checkmat' -repo '$(VT_REPO)' -cmdprefix '$(VT_CMDPREFIX)' \
-	  '$(VT_MATRIX)' '$(VT_DOC_DIR)'
+	  -skip '$(VT_CHECKMAT_SKIP)' '$(VT_MATRIX)' '$(VT_DOC_DIR)'
 
 .PHONY: vt-copymat
 vt-copymat:

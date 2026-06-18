@@ -549,8 +549,10 @@ func TestCheckAll(t *testing.T) {
 	writeEntries(t, goodEntries, yfile)
 
 	t.Run("all good", func(t *testing.T) {
+		toskip := make(map[string]bool)
+
 		var buf bytes.Buffer
-		bad, err := check(yfile, docdir, dir, "", &buf)
+		bad, err := check(yfile, docdir, dir, "", toskip, &buf)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -588,8 +590,10 @@ func TestCheckAll(t *testing.T) {
 	createEmptyFile(t, filepath.Join(docdir, "noentry.md"))
 
 	t.Run("some bad", func(t *testing.T) {
+		toskip := make(map[string]bool)
+
 		var buf bytes.Buffer
-		bad, err := check(yfile, docdir, dir, "", &buf)
+		bad, err := check(yfile, docdir, dir, "", toskip, &buf)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -605,6 +609,27 @@ func TestCheckAll(t *testing.T) {
 		assertCode(t, out, "03", 1)
 		assertCode(t, out, "04", 1)
 		assertCode(t, out, "05", 1)
+
+		buf.Reset()
+
+		toskip["03"] = true
+		toskip["05"] = true
+		bad, err = check(yfile, docdir, dir, "", toskip, &buf)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		wantBad = 5
+		if bad != wantBad {
+			t.Errorf("got %d missing entries, want %d", bad, wantBad)
+		}
+
+		out = buf.String()
+		assertCode(t, out, "01", 1)
+		assertCode(t, out, "02", 3)
+		assertCode(t, out, "03", 0)
+		assertCode(t, out, "04", 1)
+		assertCode(t, out, "05", 0)
 	})
 }
 
@@ -653,8 +678,10 @@ func TestCheckPrefix(t *testing.T) {
 	yfile := filepath.Join(dir, "docs", "matrix.yaml")
 	writeEntries(t, entries, yfile)
 
+	toskip := make(map[string]bool)
+
 	var buf bytes.Buffer
-	bad, err := check(yfile, docdir, dir, "foo", &buf)
+	bad, err := check(yfile, docdir, dir, "foo", toskip, &buf)
 	if err != nil {
 		t.Fatal(err)
 	}

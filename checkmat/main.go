@@ -36,6 +36,10 @@ Options:
    If the base name of the documentation file matches <prefix> exactly, the name
    is left as is.
 
+  -skip=<check>[,<check>]
+   Skip the specified checks.  <check> should match they labels in the next
+   section (e.g., "03").
+
 Checks:
 
  Verify that
@@ -228,13 +232,15 @@ func checkMissingEntries(es []entry, docdir, prefix string, w io.Writer) (int, e
 // are specified as relative.
 //
 // For each issue found, a message is written to w.
-func check(yaml, docdir, topdir, prefix string, w io.Writer) (int, error) {
+func check(yaml, docdir, topdir, prefix string, skip map[string]bool, w io.Writer) (int, error) {
 	var bad int
 
 	entries, err := readEntries(yaml)
 	if err != nil {
 		return bad, err
 	}
+
+	labels := []string{"01", "02", "03", "04", "05"}
 
 	type check func([]entry, io.Writer) (int, error)
 	checks := []check{
@@ -251,7 +257,11 @@ func check(yaml, docdir, topdir, prefix string, w io.Writer) (int, error) {
 		},
 	}
 
-	for _, f := range checks {
+	for i, f := range checks {
+		if skip[labels[i]] {
+			continue
+		}
+
 		n, err := f(entries, w)
 		if err != nil {
 			return bad, err
@@ -262,6 +272,24 @@ func check(yaml, docdir, topdir, prefix string, w io.Writer) (int, error) {
 	return bad, nil
 }
 
+func parseSkip(s string) (map[string]bool, error) {
+	m := map[string]bool{"01": false, "02": false, "03": false, "04": false, "05": false}
+	for _, label := range strings.Split(s, ",") {
+		label := strings.TrimSpace(label)
+		if label == "" {
+			continue
+		}
+
+		_, found := m[label]
+		if !found {
+			return nil, fmt.Errorf("skip: unknown check: %s", label)
+		}
+		m[label] = true
+	}
+
+	return m, nil
+}
+
 func main() {
 	if len(os.Args) > 1 && (os.Args[1] == "-h" || os.Args[1] == "--help") {
 		flag.CommandLine.SetOutput(os.Stdout)
@@ -269,6 +297,7 @@ func main() {
 
 	repo := flag.String("repo", "", "")
 	cmdprefix := flag.String("cmdprefix", "", "")
+	skipChecks := flag.String("skip", "", "")
 
 	flag.Usage = usage
 	flag.Parse()
@@ -295,7 +324,13 @@ func main() {
 		}
 	}
 
-	bad, err := check(args[0], args[1], topdir, *cmdprefix, os.Stdout)
+	toSkip, err := parseSkip(*skipChecks)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "error:", err)
+		os.Exit(2)
+	}
+
+	bad, err := check(args[0], args[1], topdir, *cmdprefix, toSkip, os.Stdout)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "error:", err)
 		os.Exit(2)
