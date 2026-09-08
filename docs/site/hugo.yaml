@@ -1,6 +1,6 @@
 title: bbi
 baseURL: https://metrumresearchgroup.github.io/bbi/
-languageCode: en-us
+locale: en-us
 markup:
   highlight:
     noClasses: false
