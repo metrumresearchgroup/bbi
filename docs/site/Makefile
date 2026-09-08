@@ -43,7 +43,7 @@ commands:
 	./scripts/ingest-command-docs '$(command_dir)'
 
 content/_index.md: ../../README.md
-	grep -vF 'https://goreportcard.com/badge/' '$<' >'$@'
+	cp '$<' '$@'
 
 content/news.md: ./scripts/add-gh-links
 content/news.md: ../../NEWS.md
