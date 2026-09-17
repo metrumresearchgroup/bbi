@@ -1,4 +1,3 @@
-[![Go Report Card](https://goreportcard.com/badge/github.com/metrumresearchgroup/bbi)](https://goreportcard.com/report/github.com/metrumresearchgroup/bbi)
 
 # bbi
 
