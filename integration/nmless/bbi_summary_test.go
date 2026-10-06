@@ -359,6 +359,11 @@ func TestSummaryCustomExt(tt *testing.T) {
 			args:   []string{"--no-ext-file", "--json"},
 			golden: gfPrefix + "-no-ext.golden.json",
 		},
+		{
+			name:   "no ext text",
+			args:   []string{"--no-ext-file"},
+			golden: gfPrefix + "-no-ext.golden.txt",
+		},
 	}
 
 	for _, tc := range tests {
