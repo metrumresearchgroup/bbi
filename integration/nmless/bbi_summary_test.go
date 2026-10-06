@@ -333,3 +333,55 @@ func TestSummaryPathMultipleModelsError(tt *testing.T) {
 		}
 	})
 }
+
+func TestSummaryCustomExt(tt *testing.T) {
+	mod := "1001"
+	lst := filepath.Join(SUMMARY_TEST_DIR, mod, mod+".lst")
+	gfPrefix := filepath.Join(SUMMARY_TEST_DIR, SUMMARY_GOLD_DIR, mod)
+
+	tests := []struct {
+		name   string
+		args   []string
+		golden string
+	}{
+		{
+			name:   "custom-ext json",
+			args:   []string{"--ext-file=1001.1.TXT", "--json"},
+			golden: gfPrefix + "-custom-ext.golden.json",
+		},
+		{
+			name:   "custom ext text",
+			args:   []string{"--ext-file=1001.1.TXT"},
+			golden: gfPrefix + "-custom-ext.golden.txt",
+		},
+		{
+			name:   "no-ext json",
+			args:   []string{"--no-ext-file", "--json"},
+			golden: gfPrefix + "-no-ext.golden.json",
+		},
+	}
+
+	for _, tc := range tests {
+		tt.Run(tc.name, func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+
+			cmd := append([]string{"nonmem", "summary"}, tc.args...)
+			cmd = append(cmd, lst)
+			out, err := bi.ExecuteCommand(context.Background(), "bbi", cmd...)
+
+			t.R.NoError(err)
+			t.R.NotEmpty(out)
+
+			gtd := GoldenFileTestingDetails{
+				outputString:   out,
+				goldenFilePath: tc.golden,
+			}
+
+			if os.Getenv("UPDATE_SUMMARY") == "true" {
+				UpdateGoldenFile(t, gtd)
+			}
+
+			RequireOutputMatchesGoldenFile(t, gtd)
+		})
+	}
+}
