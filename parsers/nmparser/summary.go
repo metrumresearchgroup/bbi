@@ -26,14 +26,14 @@ func (results SummaryOutput) Summary() bool {
 		seResult := results.ParametersData[finalEstimationMethodIndex].StdErr.Theta[i]
 		fixed := results.ParametersData[finalEstimationMethodIndex].Fixed.Theta[i]
 		var rse float64
-		if seResult != -999999999 && numResult != 0 && seResult != DefaultFloat64 && numResult != DefaultFloat64 {
+		if numResult != 0 && seResult != DefaultFloat64 && numResult != DefaultFloat64 {
 			rse = math.Abs(seResult / numResult * 100)
 		}
 
 		var s4 string
 		if fixed == 1 {
 			s4 = "FIX"
-		} else if seResult == -999999999 {
+		} else if seResult == DefaultFloat64 {
 			s4 = "-"
 		} else if rse > 30.0 {
 			s4 = aurora.Sprintf(aurora.Red("%s"), fmt.Sprintf("%s (%s%%)", strconv.FormatFloat(seResult, 'f', -1, 64), strconv.FormatFloat(rse, 'f', 1, 64)))
