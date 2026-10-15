@@ -23,17 +23,24 @@ func (results SummaryOutput) Summary() bool {
 	finalEstimationMethodIndex := len(results.ParametersData) - 1
 	for i := range results.ParametersData[finalEstimationMethodIndex].Estimates.Theta {
 		numResult := results.ParametersData[finalEstimationMethodIndex].Estimates.Theta[i]
+		if numResult == DefaultFloat64 {
+			numResult = math.NaN()
+		}
 		seResult := results.ParametersData[finalEstimationMethodIndex].StdErr.Theta[i]
+		if seResult == DefaultFloat64 {
+			seResult = math.NaN()
+		}
+
 		fixed := results.ParametersData[finalEstimationMethodIndex].Fixed.Theta[i]
 		var rse float64
-		if numResult != 0 && seResult != DefaultFloat64 && numResult != DefaultFloat64 {
+		if numResult != 0 && !math.IsNaN(numResult) && !math.IsNaN(seResult){
 			rse = math.Abs(seResult / numResult * 100)
 		}
 
 		var s4 string
 		if fixed == 1 {
 			s4 = "FIX"
-		} else if seResult == DefaultFloat64 {
+		} else if math.IsNaN(seResult) {
 			s4 = "-"
 		} else if rse > 30.0 {
 			s4 = aurora.Sprintf(aurora.Red("%s"), fmt.Sprintf("%s (%s%%)", strconv.FormatFloat(seResult, 'f', -1, 64), strconv.FormatFloat(rse, 'f', 1, 64)))
@@ -80,6 +87,10 @@ func (results SummaryOutput) Summary() bool {
 			var shrinkageValues []string
 			etaName := "-"
 			val := results.ParametersData[finalEstimationMethodIndex].Estimates.Omega[n]
+			if val == DefaultFloat64 {
+				val = math.NaN()
+			}
+
 			if isDiag {
 				etaName = fmt.Sprintf("ETA%v", diagIndex)
 				if shk {
@@ -88,6 +99,10 @@ func (results SummaryOutput) Summary() bool {
 							// get the data for the last method
 							shrinkageDetails := results.ShrinkageDetails[len(results.ShrinkageDetails)-1]
 							shrinkage := shrinkageDetails[sp].EtaSD[diagIndex-1]
+							if shrinkage == DefaultFloat64 {
+								shrinkage = math.NaN()
+							}
+
 							if shrinkage > 30.0 {
 								shrinkageValues = append(shrinkageValues, aurora.Sprintf(aurora.Red("%s"), fmt.Sprintf("%f", shrinkage)))
 							} else {
