@@ -32,8 +32,8 @@ func (results SummaryOutput) Summary() bool {
 		}
 
 		fixed := results.ParametersData[finalEstimationMethodIndex].Fixed.Theta[i]
-		var rse float64
-		if numResult != 0 && !math.IsNaN(numResult) && !math.IsNaN(seResult){
+		rse := math.NaN()
+		if numResult != 0 {
 			rse = math.Abs(seResult / numResult * 100)
 		}
 
