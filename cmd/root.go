@@ -22,7 +22,6 @@ import (
 	"path"
 	"path/filepath"
 	"sync"
-	"time"
 
 	"github.com/metrumresearchgroup/bbi/configlib"
 
@@ -70,10 +69,6 @@ func NewRootCmd() *cobra.Command {
 		Short: "Manage and execute models",
 		Long:  fmt.Sprintf("bbi CLI version %s", VERSION),
 	}
-
-	// Set random for application
-	// TODO: Remove Seed call once minimum Go is 1.20 (SA1019).
-	rand.Seed(time.Now().UnixNano()) //nolint:staticcheck
 
 	cobra.OnInitialize(initConfig)
 
