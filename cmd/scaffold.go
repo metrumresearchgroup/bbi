@@ -27,10 +27,6 @@ import (
 )
 
 func scaffold(cmd *cobra.Command, args []string) error {
-	if debug {
-		viper.Debug()
-	}
-
 	dir, _ := filepath.Abs(".")
 
 	if viper.GetString("cacheDir") != "" {

@@ -29,7 +29,6 @@ import (
 	"github.com/scylladb/go-set/strset"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 const paramsExamples string = `  # Display table of parameters for run001
@@ -241,9 +240,6 @@ func readDir(dirname string) ([]fs.FileInfo, error) {
 }
 
 func params(cmd *cobra.Command, args []string) {
-	if debug {
-		viper.Debug()
-	}
 	var modelDirs []string
 	if dir != "" {
 		fi, err := readDir(dir)
