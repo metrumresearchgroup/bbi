@@ -25,9 +25,6 @@ import (
 )
 
 func reclean(cmd *cobra.Command, args []string) error {
-	if debug {
-		viper.Debug()
-	}
 	if len(args) != 1 {
 		return fmt.Errorf("must specify one positional argument, a directory")
 	}
