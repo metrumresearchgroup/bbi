@@ -938,7 +938,7 @@ func (n NonMemModel) LogIdentifier() string {
 	return fmt.Sprintf("[%s]", n.FileName)
 }
 
-func createChildDirectories(l *NonMemModel, sge bool) error {
+func createChildDirectories(l *NonMemModel, grid bool) error {
 	fs := afero.NewOsFs()
 	log.Debugf("%s Overwrite is currently set to %t", l.LogIdentifier(), viper.GetBool("debug"))
 	// Does output directory exist?
@@ -983,7 +983,7 @@ func createChildDirectories(l *NonMemModel, sge bool) error {
 		}
 	}
 
-	err = configlib.WriteViperConfig(l.OutputDir, sge, l.Configuration)
+	err = configlib.WriteViperConfig(l.OutputDir, grid, l.Configuration)
 	if err != nil {
 		return err
 	}

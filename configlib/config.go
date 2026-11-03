@@ -132,10 +132,10 @@ func SaveConfig(configpath string) {
 	}
 }
 
-func WriteViperConfig(path string, sge bool, config Config) error {
-	if sge {
+func WriteViperConfig(path string, grid bool, config Config) error {
+	if grid {
 		// Set the config to overwrite false and re-write config. This ensures that the local phase will not deal with io contention
-		// around the SGE output streams
+		// around the grid output streams
 		log.Debug("Updating bbi config to overwrite=false. This avoids IO contention with the grid engine for the next execution round")
 		config.Overwrite = false
 		config.SaveConfig = false
