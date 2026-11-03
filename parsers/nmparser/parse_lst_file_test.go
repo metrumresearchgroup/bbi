@@ -43,6 +43,11 @@ func TestParseOBJV(tt *testing.T) {
 			ofvDetails)
 		expected[0].OFVWithConstant = DefaultFloat64
 		t.A.Equal(expected, ofvDetails)
+
+		ofvDetails = parseOFV("OBJECTIVE FUNCTION VALUE WITH CONSTANT: Infinity",
+			ofvDetails)
+		expected[0].OFVWithConstant = DefaultFloat64
+		t.A.Equal(expected, ofvDetails)
 	})
 }
 

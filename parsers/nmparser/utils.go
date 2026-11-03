@@ -67,7 +67,7 @@ func CheckIfBayesian(results SummaryOutput) bool {
 // encountered, DefaultFloat64 is returned as the value.
 func strToFloat(s string) float64 {
 	f, err := strconv.ParseFloat(s, 64)
-	if err != nil || math.IsNaN(f) {
+	if err != nil || math.IsNaN(f) || math.IsInf(f, 0) {
 		f = DefaultFloat64
 	}
 
@@ -79,7 +79,7 @@ func strToFloat(s string) float64 {
 // strconv.ParseFloat.
 func parseFloatReplaceNaN(s string) (float64, error) {
 	f, err := strconv.ParseFloat(s, 64)
-	if math.IsNaN(f) {
+	if math.IsNaN(f) || math.IsInf(f, 0) {
 		f = DefaultFloat64
 	}
 
