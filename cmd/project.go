@@ -30,14 +30,9 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 func probs(_ *cobra.Command, args []string) error {
-	if debug {
-		viper.Debug()
-	}
-
 	AppFs := afero.NewOsFs()
 	var dirPath string
 	switch len(args) {

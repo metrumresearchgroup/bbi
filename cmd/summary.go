@@ -27,7 +27,6 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var (
@@ -61,9 +60,6 @@ func summarizeModel(model string) (sum parser.SummaryOutput, err error) {
 }
 
 func summary(_ *cobra.Command, args []string) {
-	if debug {
-		viper.Debug()
-	}
 	if len(args) == 1 {
 		results, err := summarizeModel(args[0])
 		if err == nil {

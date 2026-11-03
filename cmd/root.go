@@ -69,6 +69,11 @@ func NewRootCmd() *cobra.Command {
 		Use:   "bbi",
 		Short: "Manage and execute models",
 		Long:  fmt.Sprintf("bbi CLI version %s", VERSION),
+		PersistentPreRun: func(_ *cobra.Command, _ []string) {
+			if debug {
+				viper.DebugTo(os.Stderr)
+			}
+		},
 	}
 
 	// Set random for application

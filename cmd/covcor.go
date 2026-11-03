@@ -21,7 +21,6 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 const covcorExamples string = `  # Display .cov/cor values from run001/run001.{cov,cor}
@@ -30,10 +29,6 @@ const covcorExamples string = `  # Display .cov/cor values from run001/run001.{c
   bbi nonmem covcor run001/run001.cov`
 
 func covcor(cmd *cobra.Command, args []string) {
-	if debug {
-		viper.Debug()
-	}
-
 	results, err := parser.GetCovCorOutput(args[0])
 	if err != nil {
 		log.Fatal(err)

@@ -29,7 +29,6 @@ import (
 
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var (
@@ -41,10 +40,6 @@ var (
 )
 
 func clean(cmd *cobra.Command, args []string) error {
-	if debug {
-		viper.Debug()
-	}
-
 	AppFs := afero.NewOsFs()
 
 	dir, _ := filepath.Abs(".")
