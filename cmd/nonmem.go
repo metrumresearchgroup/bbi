@@ -786,36 +786,36 @@ func NewNonMemModel(modelname string, config configlib.Config) (NonMemModel, err
 	}
 
 	lm.Configuration = config
-
-	// Process The template from the viper content for output Dir
-	t, err := template.New("output").Parse(config.OutputDir)
-	if err != nil {
-		return NonMemModel{}, err
-	}
-
-	buf := new(bytes.Buffer)
-
-	type outputName struct {
-		Name string
-	}
-
-	// Make sure to only use the filename for the output dir
-	err = t.Execute(buf, outputName{
-		Name: lm.FileName,
-	})
-
-	if err != nil {
-		return NonMemModel{}, err
-	}
-
-	// Use the template content plus the original path
-	lm.OutputDir = path.Join(lm.OriginalPath, buf.String())
-
+	lm.OutputDir, err = getOutputDir(lm, config.OutputDir)
 	if err != nil {
 		return NonMemModel{}, err
 	}
 
 	return lm, nil
+}
+
+// getOutputDir returns the absolute path to model's output directory, with the
+// final name constructed from the template templ.
+func getOutputDir(model NonMemModel, templ string) (string, error) {
+	t, err := template.New("output").Parse(templ)
+	if err != nil {
+		return "", err
+	}
+
+	buf := new(bytes.Buffer)
+	data := struct{ Name string }{Name: model.FileName}
+	err = t.Execute(buf, data)
+	if err != nil {
+		return "", err
+	}
+
+	name := buf.String()
+
+	if path.Dir(path.Clean(name)) != "." {
+		return "", fmt.Errorf("leading path not allowed in output name: %q", templ)
+	}
+
+	return path.Join(model.OriginalPath, name), nil
 }
 
 func executeNonMemJob(executor func(model *NonMemModel) turnstile.ConcurrentError, model *NonMemModel) turnstile.ConcurrentError {
@@ -938,7 +938,7 @@ func (n NonMemModel) LogIdentifier() string {
 	return fmt.Sprintf("[%s]", n.FileName)
 }
 
-func createChildDirectories(l *NonMemModel, sge bool) error {
+func createChildDirectories(l *NonMemModel, grid bool) error {
 	fs := afero.NewOsFs()
 	log.Debugf("%s Overwrite is currently set to %t", l.LogIdentifier(), viper.GetBool("debug"))
 	// Does output directory exist?
@@ -983,7 +983,7 @@ func createChildDirectories(l *NonMemModel, sge bool) error {
 		}
 	}
 
-	err = configlib.WriteViperConfig(l.OutputDir, sge, l.Configuration)
+	err = configlib.WriteViperConfig(l.OutputDir, grid, l.Configuration)
 	if err != nil {
 		return err
 	}

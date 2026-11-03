@@ -49,10 +49,12 @@ func checkGridExecution(
 					testingDetails := NonMemTestingDetails{
 						OutputDir: filepath.Join(scenario.Workpath, model.identifier),
 						Model:     model,
+						Scenario:  scenario,
 					}
 
 					AssertNonMemCompleted(t, testingDetails)
 					AssertNonMemCreatedOutputFiles(t, testingDetails)
+					AssertModelIsHashedAndCorrect(t, testingDetails)
 					AssertNonMemCleanedUpFiles(t, testingDetails)
 					AssertContainsBBIScript(t, testingDetails)
 				})

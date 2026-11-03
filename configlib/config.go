@@ -57,6 +57,7 @@ type NonMemDetail struct {
 
 type LocalDetail struct {
 	CreateChildDirs bool `mapstructure:"create_child_dirs" yaml:"create_child_dirs" json:"create_child_dirs,omitempty"`
+	ViaGrid         bool `mapstructure:"via_grid" yaml:"via_grid" json:"via_grid,omitempty"`
 }
 
 type NMFEOptions struct {
@@ -132,14 +133,15 @@ func SaveConfig(configpath string) {
 	}
 }
 
-func WriteViperConfig(path string, sge bool, config Config) error {
-	if sge {
+func WriteViperConfig(path string, grid bool, config Config) error {
+	if grid {
 		// Set the config to overwrite false and re-write config. This ensures that the local phase will not deal with io contention
-		// around the SGE output streams
+		// around the grid output streams
 		log.Debug("Updating bbi config to overwrite=false. This avoids IO contention with the grid engine for the next execution round")
 		config.Overwrite = false
 		config.SaveConfig = false
 		config.Local.CreateChildDirs = false
+		config.Local.ViaGrid = true
 	}
 
 	log.Debugf("Requested save of config file %s", path)

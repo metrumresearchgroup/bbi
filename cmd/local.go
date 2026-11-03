@@ -125,6 +125,11 @@ func (l LocalModel) Prepare(channels *turnstile.ChannelMap) {
 		log.Debugf("Create Child Dir directive is %t. Setting Model output dir = %s", l.Nonmem.Configuration.Local.CreateChildDirs, l.Nonmem.OriginalPath)
 		// Set output dir to Original Path for execution sake
 		l.Nonmem.OutputDir = l.Nonmem.OriginalPath
+		if l.Nonmem.Configuration.Local.ViaGrid {
+			// If invoked via `bbi nonmem run (sge|slurm)`, the original model
+			// is actually one level up.
+			l.Nonmem.OriginalPath = filepath.Dir(l.Nonmem.OriginalPath)
+		}
 	}
 
 	if l.Nonmem.Configuration.Local.CreateChildDirs {

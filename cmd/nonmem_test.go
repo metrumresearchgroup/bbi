@@ -4,6 +4,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strconv"
 	"testing"
 
 	"github.com/metrumresearchgroup/bbi/utils"
@@ -295,6 +296,116 @@ func Test_dataFileIsPresent(tt *testing.T) {
 			err := dataFileIsPresent(test.args.datafile, test.args.modelpath)
 
 			t.R.WantError(test.wantErr, err)
+		})
+	}
+}
+
+func TestGetOutputDir(tt *testing.T) {
+	tests := []struct {
+		model NonMemModel
+		templ string
+		want  string
+	}{
+		{
+			model: NonMemModel{
+				FileName:     "1",
+				OriginalPath: "/foo",
+			},
+			templ: "{{ .Name }}",
+			want:  filepath.Join("/foo", "1"),
+		},
+		{
+			model: NonMemModel{
+				FileName:     "1",
+				OriginalPath: "/foo",
+			},
+			templ: "run-{{ .Name }}",
+			want:  filepath.Join("/foo", "run-1"),
+		},
+		{
+			model: NonMemModel{
+				FileName:     "1",
+				OriginalPath: "/foo",
+			},
+			templ: "{{ .Name }}-{{ .Name }}",
+			want:  filepath.Join("/foo", "1-1"),
+		},
+		{
+			model: NonMemModel{
+				FileName:     "1",
+				OriginalPath: "/foo",
+			},
+			templ: "./{{ .Name }}",
+			want:  filepath.Join("/foo", "1"),
+		},
+		{
+			model: NonMemModel{
+				FileName:     "1",
+				OriginalPath: "/foo",
+			},
+			templ: "./{{ .Name }}/",
+			want:  filepath.Join("/foo", "1"),
+		},
+		{
+			model: NonMemModel{
+				FileName:     "1",
+				OriginalPath: "/foo",
+			},
+			templ: "{{ .Name }}/",
+			want:  filepath.Join("/foo", "1"),
+		},
+		{
+			model: NonMemModel{
+				FileName:     "1",
+				OriginalPath: "/foo",
+			},
+			templ: "foo/../{{ .Name }}", // ugly but okay
+			want:  filepath.Join("/foo", "1"),
+		},
+	}
+
+	for i, test := range tests {
+		tt.Run(strconv.Itoa(i), func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+			got, err := getOutputDir(test.model, test.templ)
+			t.R.NoError(err)
+			t.A.Equal(test.want, got)
+		})
+	}
+}
+
+func TestGetOutputDirBad(tt *testing.T) {
+	tests := []struct {
+		model NonMemModel
+		templ string
+	}{
+		{
+			model: NonMemModel{FileName: "1"},
+			templ: "{{ .Unknown }}",
+		},
+		{
+			model: NonMemModel{FileName: "1"},
+			templ: "{{ .Name ",
+		},
+		{
+			model: NonMemModel{FileName: "1"},
+			templ: "/{{ .Name }}",
+		},
+		{
+			model: NonMemModel{FileName: "1"},
+			templ: "../{{ .Name }}",
+		},
+		{
+			model: NonMemModel{FileName: "1"},
+			templ: "foo/bar",
+		},
+	}
+
+	for i, test := range tests {
+		tt.Run(strconv.Itoa(i), func(tt *testing.T) {
+			t := wrapt.WrapT(tt)
+			_, err := getOutputDir(test.model, test.templ)
+			t.R.NotNil(err)
 		})
 	}
 }
