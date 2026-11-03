@@ -811,6 +811,10 @@ func getOutputDir(model NonMemModel, templ string) (string, error) {
 
 	name := buf.String()
 
+	if path.Dir(path.Clean(name)) != "." {
+		return "", fmt.Errorf("leading path not allowed in output name: %q", templ)
+	}
+
 	return path.Join(model.OriginalPath, name), nil
 }
 

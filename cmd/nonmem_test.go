@@ -354,6 +354,14 @@ func TestGetOutputDir(tt *testing.T) {
 			templ: "{{ .Name }}/",
 			want:  filepath.Join("/foo", "1"),
 		},
+		{
+			model: NonMemModel{
+				FileName:     "1",
+				OriginalPath: "/foo",
+			},
+			templ: "foo/../{{ .Name }}", // ugly but okay
+			want:  filepath.Join("/foo", "1"),
+		},
 	}
 
 	for i, test := range tests {
@@ -378,6 +386,18 @@ func TestGetOutputDirBad(tt *testing.T) {
 		{
 			model: NonMemModel{FileName: "1"},
 			templ: "{{ .Name ",
+		},
+		{
+			model: NonMemModel{FileName: "1"},
+			templ: "/{{ .Name }}",
+		},
+		{
+			model: NonMemModel{FileName: "1"},
+			templ: "../{{ .Name }}",
+		},
+		{
+			model: NonMemModel{FileName: "1"},
+			templ: "foo/bar",
 		},
 	}
 
