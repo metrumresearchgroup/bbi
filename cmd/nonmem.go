@@ -811,10 +811,6 @@ func NewNonMemModel(modelname string, config configlib.Config) (NonMemModel, err
 	// Use the template content plus the original path
 	lm.OutputDir = path.Join(lm.OriginalPath, buf.String())
 
-	if err != nil {
-		return NonMemModel{}, err
-	}
-
 	return lm, nil
 }
 
