@@ -786,32 +786,32 @@ func NewNonMemModel(modelname string, config configlib.Config) (NonMemModel, err
 	}
 
 	lm.Configuration = config
-
-	// Process The template from the viper content for output Dir
-	t, err := template.New("output").Parse(config.OutputDir)
+	lm.OutputDir, err = getOutputDir(lm, config.OutputDir)
 	if err != nil {
 		return NonMemModel{}, err
+	}
+
+	return lm, nil
+}
+
+// getOutputDir returns the absolute path to model's output directory, with the
+// final name constructed from the template templ.
+func getOutputDir(model NonMemModel, templ string) (string, error) {
+	t, err := template.New("output").Parse(templ)
+	if err != nil {
+		return "", err
 	}
 
 	buf := new(bytes.Buffer)
-
-	type outputName struct {
-		Name string
-	}
-
-	// Make sure to only use the filename for the output dir
-	err = t.Execute(buf, outputName{
-		Name: lm.FileName,
-	})
-
+	data := struct{ Name string }{Name: model.FileName}
+	err = t.Execute(buf, data)
 	if err != nil {
-		return NonMemModel{}, err
+		return "", err
 	}
 
-	// Use the template content plus the original path
-	lm.OutputDir = path.Join(lm.OriginalPath, buf.String())
+	name := buf.String()
 
-	return lm, nil
+	return path.Join(model.OriginalPath, name), nil
 }
 
 func executeNonMemJob(executor func(model *NonMemModel) turnstile.ConcurrentError, model *NonMemModel) turnstile.ConcurrentError {
