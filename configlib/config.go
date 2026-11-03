@@ -57,6 +57,7 @@ type NonMemDetail struct {
 
 type LocalDetail struct {
 	CreateChildDirs bool `mapstructure:"create_child_dirs" yaml:"create_child_dirs" json:"create_child_dirs,omitempty"`
+	ViaGrid         bool `mapstructure:"via_grid" yaml:"via_grid" json:"via_grid,omitempty"`
 }
 
 type NMFEOptions struct {
@@ -140,6 +141,7 @@ func WriteViperConfig(path string, grid bool, config Config) error {
 		config.Overwrite = false
 		config.SaveConfig = false
 		config.Local.CreateChildDirs = false
+		config.Local.ViaGrid = true
 	}
 
 	log.Debugf("Requested save of config file %s", path)
