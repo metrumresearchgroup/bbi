@@ -111,8 +111,9 @@ subcommand represents a different "mode" of execution (e.g., local).`,
 	errpanic(viper.BindPFlag(configIdentifier, cmd.PersistentFlags().Lookup(configIdentifier)))
 
 	const saveconfig string = "save_config"
-	cmd.PersistentFlags().Bool(saveconfig, true, "whether to save the existing configuration to the output directory")
-	errpanic(viper.BindPFlag(saveconfig, cmd.PersistentFlags().Lookup(saveconfig)))
+	cmd.PersistentFlags().Bool(saveconfig, true, "")
+	errpanic(cmd.PersistentFlags().MarkDeprecated(saveconfig, "has no effect and should not be used"))
+	errpanic(cmd.PersistentFlags().MarkHidden(saveconfig))
 
 	const delayIdentifier string = "delay"
 	cmd.PersistentFlags().Int(delayIdentifier, 0, "Selects a random number of seconds between 1 and this value to stagger / jitter job execution. Assists in dealing with large volumes of work dealing with the same data set. May avoid NMTRAN issues about not being able read / close files")

@@ -237,11 +237,6 @@ func (s *gridSpec) run(args []string) {
 		time.Sleep(5 * time.Millisecond)
 	}
 
-	//Double check to make sure nothing has been read in before trying to write to a file
-	if len(models) > 0 && viper.ConfigFileUsed() != "" {
-		configlib.SaveConfig(models[0].Nonmem.OriginalPath)
-	}
-
 	postWorkNotice(m, now)
 
 	if len(m.ErrorList) > 0 {

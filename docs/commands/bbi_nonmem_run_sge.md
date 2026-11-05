@@ -55,7 +55,6 @@ bbi nonmem run sge [flags] <model> [<model>...]
       --prdefault                           RAW NMFE OPTION - do not recompile any routines other than FSUBS
   -p, --preview                             preview action, but don't actually run command
       --prsame                              RAW NMFE OPTION - tell NONMEM to skip the PREDPP compilation step
-      --save_config                         whether to save the existing configuration to the output directory (default true)
       --threads int                         number of threads to execute with locally or nodes to execute on in parallel (default 4)
       --tprdefault                          RAW NMFE OPTION - test if is okay to do -prdefault
   -v, --verbose                             verbose output
