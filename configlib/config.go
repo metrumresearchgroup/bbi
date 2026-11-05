@@ -3,7 +3,6 @@ package configlib
 import (
 	"errors"
 	"os"
-	"path"
 	"path/filepath"
 	"runtime"
 
@@ -20,7 +19,6 @@ type Config struct {
 	CopyLvl            int                     `mapstructure:"copy_lvl" yaml:"copy_lvl" json:"copy_lvl,omitempty"`
 	Git                bool                    `mapstructure:"git" yaml:"git" json:"git,omitempty"`
 	BbiBinary          string                  `mapstructure:"bbi_binary" yaml:"bbi_binary" json:"bbi_binary,omitempty"`
-	SaveConfig         bool                    `mapstructure:"save_config" yaml:"save_config" json:"save_config,omitempty"`
 	OutputDir          string                  `mapstructure:"output_dir" yaml:"output_dir" json:"output_dir,omitempty"`
 	Threads            int                     `mapstructure:"threads" yaml:"threads" json:"threads,omitempty"`
 	Debug              bool                    `mapstructure:"debug" yaml:"debug" json:"debug,omitempty"`
@@ -122,23 +120,12 @@ func loadDefaultSettings() {
 	viper.SetDefault("threads", runtime.NumCPU())
 }
 
-// SaveConfig takes the viper settings and writes them to a file in the original path.
-func SaveConfig(configpath string) {
-	if viper.GetBool("saveConfig") {
-		err := viper.WriteConfigAs(path.Join(configpath, "bbi.yaml"))
-		if err != nil {
-			log.Fatalf("got error writing config: %s", err)
-		}
-	}
-}
-
 func WriteViperConfig(path string, sge bool, config Config) error {
 	if sge {
 		// Set the config to overwrite false and re-write config. This ensures that the local phase will not deal with io contention
 		// around the SGE output streams
 		log.Debug("Updating bbi config to overwrite=false. This avoids IO contention with the grid engine for the next execution round")
 		config.Overwrite = false
-		config.SaveConfig = false
 		config.Local.CreateChildDirs = false
 	}
 

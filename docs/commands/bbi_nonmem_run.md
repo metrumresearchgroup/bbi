@@ -36,7 +36,6 @@ bbi nonmem run [flags]
       --output_dir string                   Go template for the output directory to use for storing details of each executed model (default "{{ .Name }}")
       --overwrite                           whether to remove existing output directories
       --post_work_executable string         script or binary to run when job execution completes or fails
-      --save_config                         whether to save the existing configuration to the output directory (default true)
 ```
 
 ### Options inherited from parent commands
