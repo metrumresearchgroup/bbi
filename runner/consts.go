@@ -12,6 +12,9 @@ func EstOutputFileCleanLevels() map[string]int {
 	var EstOutputFiles = make(map[string]int)
 	EstOutputFiles["background.set"] = 1
 	EstOutputFiles["compile.lnk"] = 1
+	EstOutputFiles["condor.set"] = 1
+	EstOutputFiles["condorarguments.set"] = 1
+	EstOutputFiles["condoropenmpiscript.set"] = 1
 	EstOutputFiles["FCON"] = 1
 	EstOutputFiles["FDATA"] = 1
 	EstOutputFiles["FDATA.csv"] = 1
@@ -19,6 +22,7 @@ func EstOutputFileCleanLevels() map[string]int {
 	EstOutputFiles["FMSG"] = 1
 	EstOutputFiles["fort.2001"] = 1
 	EstOutputFiles["fort.2002"] = 1
+	EstOutputFiles["FPWARN"] = 1
 	EstOutputFiles["FREPORT"] = 1
 	EstOutputFiles["FSIZES"] = 1
 	EstOutputFiles["FSTREAM"] = 1
@@ -38,8 +42,10 @@ func EstOutputFileCleanLevels() map[string]int {
 	EstOutputFiles["LINKC.LNK"] = 1
 	EstOutputFiles["locfile.set"] = 1
 	EstOutputFiles["maxlim.set"] = 1
+	EstOutputFiles["mpiloc"] = 1
 	EstOutputFiles["newline"] = 1
 	EstOutputFiles["nmexec.set"] = 1
+	EstOutputFiles["nmmpi.sh"] = 1
 	EstOutputFiles["nmpathlist.txt"] = 1
 	EstOutputFiles["nmprd4p.mod"] = 1
 	EstOutputFiles["nobuild.set"] = 1
@@ -54,8 +60,10 @@ func EstOutputFileCleanLevels() map[string]int {
 	EstOutputFiles["rundir.set"] = 1
 	EstOutputFiles["runpdir.set"] = 1
 	EstOutputFiles["simparon.set"] = 1
+	EstOutputFiles["temp.out"] = 1
 	EstOutputFiles["temp_dir"] = 1
 	EstOutputFiles["tprdefault.set"] = 1
+	EstOutputFiles["trashfile.xxx"] = 1
 	EstOutputFiles["trskip.set"] = 1
 	EstOutputFiles["worker.set"] = 1
 	EstOutputFiles["xmloff.set"] = 1
