@@ -298,3 +298,43 @@ func Test_dataFileIsPresent(tt *testing.T) {
 		})
 	}
 }
+
+func TestCreateChildDirectories(tt *testing.T) {
+	t := wrapt.WrapT(tt)
+	dir := t.TempDir()
+
+	mname := "200"
+	mpath := filepath.Join(dir, mname+".ctl")
+	outdir := filepath.Join(dir, mname)
+
+	t.Chdir(dir)
+
+	err := os.WriteFile(mpath, []byte{}, 0o666)
+	t.R.NoError(err)
+
+	mod := &NonMemModel{
+		Path:      mpath,
+		Model:     filepath.Base(mpath),
+		FileName:  mname,
+		OutputDir: outdir,
+		Configuration: configlib.Config{
+			Overwrite: false,
+		},
+	}
+
+	err = createChildDirectories(mod, false)
+	t.R.NoError(err)
+	t.A.DirExists(outdir)
+
+	err = os.WriteFile(filepath.Join(outdir, mname+".lst"), []byte{}, 0o666)
+	t.R.NoError(err)
+
+	err = createChildDirectories(mod, false)
+	t.R.ErrorContains(err, "overwrite")
+
+	mod.Configuration.Overwrite = true
+
+	err = createChildDirectories(mod, false)
+	t.R.NoError(err)
+	t.A.DirExists(outdir)
+}
