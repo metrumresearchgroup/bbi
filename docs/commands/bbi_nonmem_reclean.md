@@ -13,6 +13,14 @@ bbi nonmem reclean [flags] <run dir>
   # cleaned if the model had been executed with a clean level of 1.
   bbi nonmem run local --clean_lvl=0 001.ctl
   bbi nonmem reclean --lvl=1 001
+
+  # When a 'bbi nonmem run' call fails (e.g., due to a non-zero exit
+  # of the underlying nmfe call), the cleanup logic is not executed.
+  # You can follow up with a call to 'bbi nonmem reclean' to trigger
+  # the cleanup logic, using the clean level that was configured for
+  # that run.
+  bbi nonmem run local 001.ctl # nmfe errors
+  bbi nonmem reclean 001
 ```
 
 ### Options

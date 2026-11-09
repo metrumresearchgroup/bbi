@@ -16,10 +16,14 @@ package cmd
 
 import (
 	"fmt"
+	"io/fs"
+	"os"
+	"path/filepath"
 
-	"github.com/metrumresearchgroup/bbi/runner"
+	"github.com/metrumresearchgroup/bbi/configlib"
+	"github.com/metrumresearchgroup/bbi/internal/fmatch"
 
-	"github.com/spf13/afero"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -32,9 +36,76 @@ func reclean(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("must specify one positional argument, a directory")
 	}
 
-	AppFs := afero.NewOsFs()
+	outdir, err := filepath.Abs(args[0])
+	if err != nil {
+		return err
+	}
+	fi, err := os.Stat(outdir)
+	if err != nil {
+		return err
+	}
+	if !fi.IsDir() {
+		return fmt.Errorf("not a directory: %s", args[0])
+	}
 
-	return runner.CleanEstFolder(AppFs, args[0], []string{}, viper.GetInt("clean_lvl"), verbose, debug, preview)
+	cfgfile := filepath.Join(outdir, "bbi.yaml")
+	config, err := configlib.ReadSpecifiedFileIntoConfigStruct(cfgfile)
+	if err != nil {
+		return err
+	}
+
+	level := config.CleanLvl
+	if cmd.Flags().Changed("lvl") {
+		level, err = cmd.Flags().GetInt("lvl")
+		if err != nil {
+			return fmt.Errorf("bug: %w", err)
+		}
+	}
+
+	logSetup(config)
+	log.Infof("re-cleaning at level %d: %s", level, outdir)
+
+	var fn fmatch.Func
+	if preview {
+		fn = recleanPreview
+	} else {
+		fn = func(path string, d fs.DirEntry, level int) error {
+			return recleanRemove(path, d, level, verbose)
+		}
+	}
+
+	cleanMatcher := fmatch.NonmemCleanMatcher(config)
+
+	return cleanMatcher.Do(outdir, level, fn)
+}
+
+func recleanPreview(path string, d fs.DirEntry, _ int) error {
+	fi, err := d.Info()
+	if err != nil {
+		return err
+	}
+
+	kind := "file"
+	if fi.IsDir() {
+		kind = "directory"
+	}
+
+	fmt.Printf("would delete %s %s\n", kind, path)
+
+	return nil
+}
+
+func recleanRemove(path string, _ fs.DirEntry, _ int, verbose bool) error {
+	err := os.RemoveAll(path)
+	if err != nil {
+		return err
+	}
+
+	if verbose {
+		fmt.Printf("deleted %s\n", path)
+	}
+
+	return nil
 }
 
 func NewRecleanCmd() *cobra.Command {
@@ -44,7 +115,15 @@ func NewRecleanCmd() *cobra.Command {
 		Example: `  # Reclean the run directory for 001, deleting what would have been
   # cleaned if the model had been executed with a clean level of 1.
   bbi nonmem run local --clean_lvl=0 001.ctl
-  bbi nonmem reclean --lvl=1 001`,
+  bbi nonmem reclean --lvl=1 001
+
+  # When a 'bbi nonmem run' call fails (e.g., due to a non-zero exit
+  # of the underlying nmfe call), the cleanup logic is not executed.
+  # You can follow up with a call to 'bbi nonmem reclean' to trigger
+  # the cleanup logic, using the clean level that was configured for
+  # that run.
+  bbi nonmem run local 001.ctl # nmfe errors
+  bbi nonmem reclean 001`,
 		RunE:         reclean,
 		SilenceUsage: true,
 	}
