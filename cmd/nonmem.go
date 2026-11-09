@@ -910,29 +910,6 @@ func nonmemModelsFromArguments(args []string, config configlib.Config) ([]NonMem
 	return output, nil
 }
 
-func doesDirectoryContainOutputFiles(path string, modelname string) bool {
-	fs := afero.NewOsFs()
-
-	contents, err := afero.ReadDir(fs, path)
-
-	if err != nil {
-		// If we can't read the output, let's indicate that files did exist to trigger an overwrite.
-		return true
-	}
-
-	contentFiles := getCopiableFileList(modelname, 3, path)
-
-	for _, v := range contents {
-		for _, f := range contentFiles {
-			if v.Name() == f {
-				return true
-			}
-		}
-	}
-
-	return false
-}
-
 func (n NonMemModel) LogIdentifier() string {
 	return fmt.Sprintf("[%s]", n.FileName)
 }
@@ -942,26 +919,14 @@ func createChildDirectories(l *NonMemModel, sge bool) error {
 	log.Debugf("%s Overwrite is currently set to %t", l.LogIdentifier(), viper.GetBool("debug"))
 	// Does output directory exist?
 	if ok, _ := afero.DirExists(fs, l.OutputDir); ok {
-		// If so are we configured to overwrite?
-		if l.Configuration.Overwrite {
-			log.Debugf("%s Removing directory %s", l.LogIdentifier(), l.OutputDir)
-			err := fs.RemoveAll(l.OutputDir)
-			if err != nil {
-				return err
-			}
+		if !l.Configuration.Overwrite {
+			return fmt.Errorf("target directory exists but run is not configured to overwrite: %s", l.OutputDir)
 		}
 
-		if !l.Configuration.Overwrite {
-			// If not, we only want to panic if there are nonmem output files in the directory
-			if !doesDirectoryContainOutputFiles(l.OutputDir, l.Model) {
-				// Continue along if we find no relevant content
-				log.Infof("%s No Nonmem output files detected in %s. Good to continue", l.LogIdentifier(), l.OutputDir)
-			} else {
-				// Or panic because we're in a scenario where we shouldn't purge, but there's content in the directory from previous runs
-				log.Debugf("%s Configuration for overwrite was %t, but %s had Nonmem outputs. As such, we will hault operations", l.LogIdentifier(), viper.GetBool("debug"), l.OutputDir)
-
-				return fmt.Errorf("target directory exists but run is not configured to overwrite: %s", l.OutputDir)
-			}
+		log.Debugf("%s Removing directory %s", l.LogIdentifier(), l.OutputDir)
+		err := fs.RemoveAll(l.OutputDir)
+		if err != nil {
+			return err
 		}
 	}
 

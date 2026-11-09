@@ -5,7 +5,6 @@ go 1.27.0
 require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/goccy/go-yaml v1.19.2
-	github.com/google/uuid v1.1.2
 	github.com/kr/pretty v0.3.1
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/metrumresearchgroup/gogridengine v0.0.1
