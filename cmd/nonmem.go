@@ -475,7 +475,7 @@ func filesToCleanup(model *NonMemModel, exceptions ...string) runner.FileCleanIn
 		Location: model.OutputDir,
 	}
 
-	files := getCleanableFileList(model.FileName, model.Configuration.CleanLvl)
+	files := getCleanableFileList(model.Configuration.CleanLvl)
 
 	for _, v := range files {
 		if !isFilenameInExceptions(exceptions, v) {
@@ -532,27 +532,12 @@ func newTargetFile(filename string, level int) runner.TargetedFile {
 }
 
 // Get only te list of files to clean. Separated because of logic requirements.
-func getCleanableFileList(file string, level int) []string {
+func getCleanableFileList(level int) []string {
 	var output []string
 	files := make(map[int][]string)
 
 	// These files are files that may be desired above the normal. Classified as "Temp" files. Default removed
 	files[1] = nonMemTemporaryFiles
-
-	msfFileSuffixes := []string{
-		"",
-		"_ETAS",
-		"_RMAT",
-		"_SMAT",
-		".msf",
-		"_ETAS.msf",
-		"_RMAT.msf",
-		"_SMAT.msf",
-	}
-
-	for _, f := range msfFileSuffixes {
-		files[1] = append(files[1], strings.Replace(fmt.Sprintf("%s%s", file, f), "run", "msfb", 1))
-	}
 
 	for i := 0; i <= level; i++ {
 		if val, ok := files[i]; ok {

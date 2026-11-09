@@ -52,7 +52,7 @@ func CleanEstFolder(
 
 	runPath := filepath.Base(dirPath)
 	runName := strings.Split(runPath, "_est_")[0]
-	outputFiles := EstOutputFileCleanLevels(runName)
+	outputFiles := EstOutputFileCleanLevels()
 	dirPath, err := filepath.Abs(dirPath)
 	if err != nil {
 		log.Fatalf("could not get absolute path %s", dirPath)

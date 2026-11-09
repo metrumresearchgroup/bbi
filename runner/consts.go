@@ -8,7 +8,7 @@ import (
 // EstOutputFileCleanLevels gives a map of
 // information about the output of NONMEM estimations
 // to be used for cleaning and other manipulations.
-func EstOutputFileCleanLevels(r string) map[string]int {
+func EstOutputFileCleanLevels() map[string]int {
 	var EstOutputFiles = make(map[string]int)
 	EstOutputFiles["background.set"] = 1
 	EstOutputFiles["compile.lnk"] = 1
@@ -59,25 +59,6 @@ func EstOutputFileCleanLevels(r string) map[string]int {
 	EstOutputFiles["fort.2001"] = 1
 	EstOutputFiles["fort.2002"] = 1
 	EstOutputFiles["flushtime.set"] = 1
-
-	msfFileSuffixes := []string{
-		"",
-		"_ETAS",
-		"_RMAT",
-		"_SMAT",
-		".msf",
-		"_ETAS.msf",
-		"_RMAT.msf",
-		"_SMAT.msf",
-	}
-
-	//Examples
-	//For RUN001 as the identifier:
-	//run001_ETAS -> msfb001_etas
-	//run001_RMAT.msf -> msfb001_RMAT.mfs
-	for _, f := range msfFileSuffixes {
-		EstOutputFiles[strings.Replace(fmt.Sprintf("%s%s", r, f), "run", "msfb", 1)] = 1
-	}
 
 	return EstOutputFiles
 }

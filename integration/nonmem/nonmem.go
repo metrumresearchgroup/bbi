@@ -54,7 +54,7 @@ func AssertNonMemCreatedOutputFiles(t *wrapt.T, details NonMemTestingDetails) {
 func AssertNonMemCleanedUpFiles(t *wrapt.T, details NonMemTestingDetails) {
 	t.Helper()
 
-	for f, level := range runner.EstOutputFileCleanLevels(details.Model.identifier) {
+	for f, level := range runner.EstOutputFileCleanLevels() {
 		if level == 1 {
 			t.A.NoFileExists(filepath.Join(details.OutputDir, f))
 		}
