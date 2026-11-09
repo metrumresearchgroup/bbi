@@ -19,14 +19,14 @@ func TestRecleanBasic(tt *testing.T) {
 	fdataCSV := filepath.Join(dir, "FDATA.csv")
 
 	_ = os.WriteFile(fdata, []byte("fake"), 0644)
-	t.A.FileExists(fdata)
+	t.R.FileExists(fdata)
 	_ = os.WriteFile(fdataCSV, []byte("fake"), 0644)
-	t.A.FileExists(fdataCSV)
+	t.R.FileExists(fdataCSV)
 
 	output, err := bi.ExecuteCommand(context.Background(),
 		"bbi", "nonmem", "reclean", "--lvl=1", "-v", dir)
 	t.R.NoError(err)
-	t.R.NotEmpty(output)
+	t.A.NotEmpty(output)
 	t.A.NoFileExists(fdata)
 	t.A.NoFileExists(fdataCSV)
 }
@@ -39,5 +39,5 @@ func TestRecleanError(tt *testing.T) {
 
 	t.R.NotNil(err)
 	errorMatch, _ := regexp.MatchString("one positional", output)
-	t.R.True(errorMatch)
+	t.A.True(errorMatch)
 }
