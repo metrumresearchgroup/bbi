@@ -11,7 +11,7 @@ import (
 	"github.com/metrumresearchgroup/wrapt"
 )
 
-func TestBBIRecleanBasic(tt *testing.T) {
+func TestRecleanBasic(tt *testing.T) {
 	t := wrapt.WrapT(tt)
 
 	dir := t.TempDir()
@@ -31,7 +31,7 @@ func TestBBIRecleanBasic(tt *testing.T) {
 	t.A.NoFileExists(fdataCSV)
 }
 
-func TestBBIRecleanError(tt *testing.T) {
+func TestRecleanError(tt *testing.T) {
 	t := wrapt.WrapT(tt)
 
 	output, err := bi.ExecuteCommandNoErrorCheck(context.Background(),
