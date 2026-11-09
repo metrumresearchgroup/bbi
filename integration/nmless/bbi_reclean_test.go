@@ -40,6 +40,4 @@ func TestBBIRecleanError(tt *testing.T) {
 	t.R.NotNil(err)
 	errorMatch, _ := regexp.MatchString("one positional", output)
 	t.R.True(errorMatch)
-	errorMatch, _ = regexp.MatchString("Usage", output)
-	t.R.True(errorMatch)
 }

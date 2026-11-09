@@ -33,12 +33,8 @@ func reclean(cmd *cobra.Command, args []string) error {
 	}
 
 	AppFs := afero.NewOsFs()
-	err := runner.CleanEstFolder(AppFs, args[0], []string{}, viper.GetInt("clean_lvl"), verbose, debug, preview)
-	if err != nil {
-		fmt.Printf("err: %v", err)
-	}
 
-	return nil
+	return runner.CleanEstFolder(AppFs, args[0], []string{}, viper.GetInt("clean_lvl"), verbose, debug, preview)
 }
 
 func NewRecleanCmd() *cobra.Command {
@@ -49,7 +45,8 @@ func NewRecleanCmd() *cobra.Command {
   # Reclean the run directory for 001, deleting what would have been cleaned if
   # the model was executed with a clean level of 1
   bbi nonmem reclean --lvl=1 001`,
-		RunE: reclean,
+		RunE:         reclean,
+		SilenceUsage: true,
 	}
 
 	cmd.Flags().Int("lvl", 1, "level at which to clean the run directory")
