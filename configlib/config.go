@@ -17,7 +17,6 @@ type Config struct {
 	NMVersion          string                  `mapstructure:"nm_version" yaml:"nm_version" json:"nm_version,omitempty"`
 	Overwrite          bool                    `mapstructure:"overwrite" yaml:"overwrite" json:"overwrite,omitempty"`
 	CleanLvl           int                     `mapstructure:"clean_lvl" yaml:"clean_lvl" json:"clean_lvl,omitempty"`
-	CopyLvl            int                     `mapstructure:"copy_lvl" yaml:"copy_lvl" json:"copy_lvl,omitempty"`
 	Git                bool                    `mapstructure:"git" yaml:"git" json:"git,omitempty"`
 	BbiBinary          string                  `mapstructure:"bbi_binary" yaml:"bbi_binary" json:"bbi_binary,omitempty"`
 	SaveConfig         bool                    `mapstructure:"save_config" yaml:"save_config" json:"save_config,omitempty"`

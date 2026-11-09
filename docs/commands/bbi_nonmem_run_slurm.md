@@ -32,7 +32,6 @@ bbi nonmem run slurm [flags] <model> [<model>...]
       --background                          RAW NMFE OPTION - tell NONMEM not to scan stdin for control characters
       --clean_lvl int                       clean level used for output (default 1)
       --config string                       path to another bbi.yaml to load
-      --copy_lvl int                        copy level used for output
   -d, --debug                               debug mode
       --delay int                           Selects a random number of seconds between 1 and this value to stagger / jitter job execution. Assists in dealing with large volumes of work dealing with the same data set. May avoid NMTRAN issues about not being able read / close files
       --git                                 whether git is used

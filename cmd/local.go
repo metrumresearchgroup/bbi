@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"os/exec"
 	"path"
 	"path/filepath"
@@ -14,12 +15,11 @@ import (
 	"time"
 
 	"github.com/metrumresearchgroup/bbi/configlib"
+	"github.com/metrumresearchgroup/bbi/internal/fmatch"
 
 	log "github.com/sirupsen/logrus"
 
 	"os"
-
-	"github.com/metrumresearchgroup/bbi/runner"
 
 	"github.com/metrumresearchgroup/bbi/utils"
 
@@ -201,11 +201,12 @@ func (l LocalModel) Monitor(_ *turnstile.ChannelMap) {
 	// Do nothing for this implementation
 }
 
-// Cleanup is the last phase of execution, in which computation / hard work is done and we're cleaning up leftover files, copying results around et all.
+// Cleanup is the last phase and is responsible for running tasks after model
+// execution has finished, including removing unwanted files from the output
+// directory and writing bbi_config.json.
 func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 	time.Sleep(10 * time.Millisecond)
 	log.Printf("%s Beginning cleanup phase", l.Nonmem.LogIdentifier())
-	fs := afero.NewOsFs()
 	// while the rest of the cleanup is happening, lets also hash the data in the background
 	// so don't have to wait extra time if its on the larger end
 	// Get the lines of the file
@@ -231,83 +232,26 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 	modelHashChan := make(chan string)
 	go HashFileOnChannel(modelHashChan, path.Join(l.Nonmem.OriginalPath, l.Nonmem.OriginalModel), l.Nonmem.FileName)
 
-	log.Debugf("%s Beginning selection of cleanable / copiable files", l.Nonmem.LogIdentifier())
-	// Magical instructions
-	// TODO: Implement flags for mandatory copy and cleanup exclusions
-	pwi := newPostWorkInstruction(l.Nonmem, []string{}, []string{})
-
-	// Copy Up first so that we don't try to move something we remove :)
-	var copied []runner.TargetedFile
-
-	log.Debugf("%s Beginning selection of copiable files ", l.Nonmem.LogIdentifier())
-	for _, v := range pwi.FilesToCopy.FilesToCopy {
-		var source []string
-		source, err = utils.ReadLines(path.Join(pwi.FilesToCopy.CopyFrom, v.File))
-
-		if err != nil {
-			log.Debugf("%s Unable to read file at %s. Continuing anyway", l.Nonmem.LogIdentifier(), path.Join(pwi.FilesToCopy.CopyFrom, v.File))
-			// Just continue. There are potentially files which will not exist based on the values in the list.
-			continue
-		}
-
-		// Let's avoid stuttering from extension extrapolation
-		file, _ := utils.FileAndExt(v.File)
-
-		if file == l.Nonmem.FileName {
-			file = v.File
-		} else {
-			file = l.Nonmem.FileName + "." + v.File
-		}
-
-		err = utils.WriteLines(source, path.Join(pwi.FilesToCopy.CopyTo, file))
-
-		if err != nil {
-			log.Errorf("%s An error occurred while attempting to copy the files: File is %s", l.Nonmem.LogIdentifier(), v.File)
-
-			continue
-		}
-
-		v.File = filepath.Join(l.Nonmem.OutputDir, v.File)
-
-		copied = append(copied, v)
-	}
-
-	if len(copied) > 0 {
-		log.Debugf("%s Writing out copied json file for", l.Nonmem.LogIdentifier())
-		// Write to File in original path indicating what all was copied
-		copiedJSON, _ := json.MarshalIndent(copied, "", "    ")
-
-		if err = afero.WriteFile(fs, path.Join(l.Nonmem.OriginalPath, l.Nonmem.FileName+"_copied.json"), copiedJSON, 0640); err != nil {
-			channels.Errors <- turnstile.ConcurrentError{
-				RunIdentifier: l.Nonmem.FileName,
-				Notes:         "failed to write _copied.json file",
-				Error:         err,
-			}
-		}
-	}
-
 	// Clean Up
 	log.Debugf("%s Beginning local cleanup operations", l.Nonmem.LogIdentifier())
-	for _, v := range pwi.FilesToClean.FilesToRemove {
-		// Does it even exist?
-		if ok, _ := afero.Exists(fs, path.Join(pwi.FilesToClean.Location, v.File)); ok {
-			// Is it a directory?
-			if ok, _ := afero.IsDir(fs, path.Join(pwi.FilesToClean.Location, v.File)); ok {
-				err = fs.RemoveAll(path.Join(pwi.FilesToClean.Location, v.File))
-				// Nope it's a file!
-			} else {
-				err = fs.Remove(path.Join(pwi.FilesToClean.Location, v.File))
-			}
 
-			if err != nil {
-				// Indicate failure to remove
-				log.Errorf("%s Failure removing file / directory %s. Details : %s", l.Nonmem.LogIdentifier(), v.File, err.Error())
-			}
+	cleanMatcher := fmatch.NonmemCleanMatcher(l.Nonmem.Configuration)
+	err = cleanMatcher.Do(l.Nonmem.OutputDir, l.Nonmem.Configuration.CleanLvl,
+		func(path string, _ fs.DirEntry, _ int) error {
+			return os.RemoveAll(path)
+		},
+	)
+	if err != nil {
+		channels.Errors <- turnstile.ConcurrentError{
+			RunIdentifier: l.Nonmem.FileName,
+			Notes:         "failed to clean outputs",
+			Error:         err,
 		}
 	}
 
 	// Gitignore operations
-	if err = createNewGitIgnoreFile(l.Nonmem); err != nil {
+	err = createNewGitIgnoreFile(l.Nonmem, cleanMatcher.Patterns(1))
+	if err != nil {
 		channels.Errors <- turnstile.ConcurrentError{
 			RunIdentifier: l.Nonmem.FileName,
 			Notes:         "failed to write .gitignore file",
@@ -485,7 +429,7 @@ func localModelsFromArguments(args []string, config configlib.Config) ([]LocalMo
 	return output, nil
 }
 
-func createNewGitIgnoreFile(m *NonMemModel) error {
+func createNewGitIgnoreFile(m *NonMemModel, patterns []string) error {
 	log.Debugf("%s Writing finalized gitignore file", m.LogIdentifier())
 	// First let's remove the gitignore in the output dir.
 	fs := afero.NewOsFs()
@@ -496,12 +440,7 @@ func createNewGitIgnoreFile(m *NonMemModel) error {
 		}
 	}
 
-	// Force level one per initial discussions
-	linesToAddToGitignore := getCleanableFileList(m.FileName, 1)
-	linesToAddToGitignore = append(linesToAddToGitignore, "WK_[0-9]*")
-
-	err := utils.WriteLines(linesToAddToGitignore, path.Join(m.OutputDir, ".gitignore"))
-
+	err := utils.WriteLines(patterns, path.Join(m.OutputDir, ".gitignore"))
 	if err != nil {
 		return err
 	}

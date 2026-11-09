@@ -9,17 +9,25 @@ bbi nonmem reclean [flags] <run dir>
 ### Examples
 
 ```
+  # Reclean the run directory for 001, deleting what would have been
+  # cleaned if the model had been executed with a clean level of 1.
   bbi nonmem run local --clean_lvl=0 001.ctl
-  # Reclean the run directory for 001, deleting what would have been cleaned if
-  # the model was executed with a clean level of 1
-  bbi nonmem reclean --recleanLvl=1 001
+  bbi nonmem reclean --lvl=1 001
+
+  # When a 'bbi nonmem run' call fails (e.g., due to a non-zero exit
+  # of the underlying nmfe call), the cleanup logic is not executed.
+  # You can follow up with a call to 'bbi nonmem reclean' to trigger
+  # the cleanup logic, using the clean level that was configured for
+  # that run.
+  bbi nonmem run local 001.ctl # nmfe errors
+  bbi nonmem reclean 001
 ```
 
 ### Options
 
 ```
-  -h, --help             help for reclean
-      --recleanLvl int   clean level to apply
+  -h, --help      help for reclean
+      --lvl int   level at which to clean the run directory (default 1)
 ```
 
 ### Options inherited from parent commands

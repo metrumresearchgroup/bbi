@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"os"
-	"path"
 	"path/filepath"
 	"testing"
 
@@ -10,68 +9,9 @@ import (
 
 	"github.com/metrumresearchgroup/bbi/configlib"
 
-	"github.com/google/uuid"
 	"github.com/metrumresearchgroup/wrapt"
 	"github.com/spf13/afero"
 )
-
-func Test_doesDirectoryContainOutputFiles(tt *testing.T) {
-	good := uuid.New().String()
-	bad := uuid.New().String()
-
-	t := wrapt.WrapT(tt)
-
-	t.R.NoError(os.Mkdir(good, 0755))
-	t.R.NoError(os.Mkdir(bad, 0755))
-	emptyFile(path.Join(bad, "meow.cov"))
-
-	type args struct {
-		path      string
-		modelname string
-	}
-	tests := []struct {
-		name string
-		args args
-		want bool
-	}{
-		{
-			name: "Empty Directory",
-			args: args{
-				path:      good,
-				modelname: "meow",
-			},
-			want: false,
-		},
-		{
-			name: "Contains covariate file",
-			args: args{
-				path:      bad,
-				modelname: "meow",
-			},
-			want: true,
-		},
-	}
-
-	testId := "UNIT-CMD-001"
-	for _, test := range tests {
-		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
-			t := wrapt.WrapT(tt)
-
-			got := doesDirectoryContainOutputFiles(test.args.path, test.args.modelname)
-
-			t.R.Equal(test.want, got)
-		})
-	}
-
-	// Cleanup the directories
-	os.RemoveAll(good)
-	os.RemoveAll(bad)
-}
-
-func emptyFile(path string) {
-	empty, _ := os.Create(path)
-	empty.Close()
-}
 
 func Test_processNMFEOptions(tt *testing.T) {
 	type args struct {
@@ -89,7 +29,6 @@ func Test_processNMFEOptions(tt *testing.T) {
 					NMVersion:  "",
 					Overwrite:  false,
 					CleanLvl:   0,
-					CopyLvl:    0,
 					Git:        false,
 					BbiBinary:  "",
 					SaveConfig: false,
@@ -126,7 +65,6 @@ func Test_processNMFEOptions(tt *testing.T) {
 					NMVersion:  "",
 					Overwrite:  false,
 					CleanLvl:   0,
-					CopyLvl:    0,
 					Git:        false,
 					BbiBinary:  "",
 					SaveConfig: false,
@@ -297,4 +235,41 @@ func Test_dataFileIsPresent(tt *testing.T) {
 			t.R.WantError(test.wantErr, err)
 		})
 	}
+}
+
+func TestCreateChildDirectories(tt *testing.T) {
+	t := wrapt.WrapT(tt)
+	dir := t.TempDir()
+
+	mname := "200"
+	mpath := filepath.Join(dir, mname+".ctl")
+	outdir := filepath.Join(dir, mname)
+
+	t.Chdir(dir)
+
+	err := os.WriteFile(mpath, []byte{}, 0o666)
+	t.R.NoError(err)
+
+	mod := &NonMemModel{
+		Path:      mpath,
+		Model:     filepath.Base(mpath),
+		FileName:  mname,
+		OutputDir: outdir,
+		Configuration: configlib.Config{
+			Overwrite: false,
+		},
+	}
+
+	err = createChildDirectories(mod, false)
+	t.R.NoError(err)
+	t.A.DirExists(outdir)
+
+	err = createChildDirectories(mod, false)
+	t.R.ErrorContains(err, "overwrite")
+
+	mod.Configuration.Overwrite = true
+
+	err = createChildDirectories(mod, false)
+	t.R.NoError(err)
+	t.A.DirExists(outdir)
 }
