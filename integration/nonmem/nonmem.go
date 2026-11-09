@@ -8,7 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/metrumresearchgroup/bbi/runner"
+	"github.com/metrumresearchgroup/bbi/configlib"
+	"github.com/metrumresearchgroup/bbi/internal/fmatch"
 
 	"github.com/metrumresearchgroup/wrapt"
 	"github.com/spf13/afero"
@@ -54,10 +55,10 @@ func AssertNonMemCreatedOutputFiles(t *wrapt.T, details NonMemTestingDetails) {
 func AssertNonMemCleanedUpFiles(t *wrapt.T, details NonMemTestingDetails) {
 	t.Helper()
 
-	for f, level := range runner.EstOutputFileCleanLevels() {
-		if level == 1 {
-			t.A.NoFileExists(filepath.Join(details.OutputDir, f))
-		}
+	ms := fmatch.NonmemCleanMatcher(configlib.Config{Parallel: true})
+
+	for _, f := range ms.FixedPatterns(1) {
+		t.A.NoFileExists(filepath.Join(details.OutputDir, f))
 	}
 
 	// Parallelization-related files
