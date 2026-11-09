@@ -76,12 +76,6 @@
     - cmd/grid_test.go
     - integration/nonmem/bbi_slurm_test.go
 
-- entrypoint: bbi nonmem scaffold
-  code: cmd/scaffold.go
-  doc: docs/commands/bbi_nonmem_scaffold.md
-  tests:
-    - integration/nmless/bbi_scaffold_test.go
-
 - entrypoint: bbi nonmem summary
   code: cmd/summary.go
   doc: docs/commands/bbi_nonmem_summary.md

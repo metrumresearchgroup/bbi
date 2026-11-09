@@ -70,6 +70,5 @@ bbi nonmem [flags]
 * [bbi nonmem probs](bbi_nonmem_probs.md)	 - Summarize model definitions in a directory
 * [bbi nonmem reclean](bbi_nonmem_reclean.md)	 - Clean files in run directory by specified level
 * [bbi nonmem run](bbi_nonmem_run.md)	 - Run models locally or on the grid
-* [bbi nonmem scaffold](bbi_nonmem_scaffold.md)	 - Scaffold directory structures
 * [bbi nonmem summary](bbi_nonmem_summary.md)	 - Summarize model results
 
