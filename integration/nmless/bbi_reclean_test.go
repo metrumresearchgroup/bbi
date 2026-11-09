@@ -24,7 +24,7 @@ func TestBBIRecleanBasic(tt *testing.T) {
 	t.A.FileExists(fdataCSV)
 
 	output, err := bi.ExecuteCommand(context.Background(),
-		"bbi", "nonmem", "reclean", "--recleanLvl=1", "-v", dir)
+		"bbi", "nonmem", "reclean", "--lvl=1", "-v", dir)
 	t.R.NoError(err)
 	t.R.NotEmpty(output)
 	t.A.NoFileExists(fdata)

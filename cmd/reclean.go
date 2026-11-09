@@ -48,12 +48,11 @@ func NewRecleanCmd() *cobra.Command {
 		Example: `  bbi nonmem run local --clean_lvl=0 001.ctl
   # Reclean the run directory for 001, deleting what would have been cleaned if
   # the model was executed with a clean level of 1
-  bbi nonmem reclean --recleanLvl=1 001`,
+  bbi nonmem reclean --lvl=1 001`,
 		RunE: reclean,
 	}
 
-	cmd.Flags().Int("recleanLvl", 0, "clean level to apply")
-	errpanic(viper.BindPFlag("recleanLvl", cmd.Flags().Lookup("recleanLvl")))
+	cmd.Flags().Int("lvl", 1, "level at which to clean the run directory")
 
 	return cmd
 }
