@@ -89,9 +89,9 @@ subcommand represents a different "mode" of execution (e.g., local).`,
 	// TODO: these are likely not meangingful as should be set in configlib, but want to configm
 	viper.SetDefault("clean_lvl", 1)
 
-	cmd.PersistentFlags().Int("copy_lvl", 0, "copy level used for output")
-	errpanic(viper.BindPFlag("copy_lvl", cmd.PersistentFlags().Lookup("copy_lvl")))
-	viper.SetDefault("copy_lvl", 0)
+	cmd.PersistentFlags().Int("copy_lvl", 0, "")
+	errpanic(cmd.PersistentFlags().MarkDeprecated("copy_lvl", "has no effect and should not be used"))
+	errpanic(cmd.PersistentFlags().MarkHidden("copy_lvl"))
 
 	// cmd.PersistentFlags().Int("gitignoreLvl", 0, "gitignore lvl for a given (set of) runs")
 	// viper.BindPFlag("gitignoreLvl", cmd.PersistentFlags().Lookup("gitignoreLvl"))

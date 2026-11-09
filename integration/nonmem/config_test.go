@@ -144,7 +144,6 @@ func TestConfigValuesAreCorrectInWrittenFile(tt *testing.T) {
 			t.A.Nil(err)
 
 			t.A.Equal(3, Config.CleanLvl)
-			t.A.Equal(1, Config.CopyLvl)
 			t.A.Equal(true, Config.Parallel)
 			t.A.Equal(os.Getenv("NMVERSION"), Config.NMVersion)
 

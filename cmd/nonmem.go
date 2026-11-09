@@ -531,26 +531,6 @@ func newTargetFile(filename string, level int) runner.TargetedFile {
 	}
 }
 
-func filesToCopy(model *NonMemModel, mandatoryFiles ...string) runner.FileCopyInstruction {
-	fci := runner.FileCopyInstruction{
-		CopyTo:   model.OriginalPath,
-		CopyFrom: model.OutputDir,
-	}
-
-	// Process mandatory files first
-	for _, v := range mandatoryFiles {
-		// Crank it up to 11
-		fci.FilesToCopy = append(fci.FilesToCopy, newTargetFile(v, 11))
-	}
-
-	// Create Target File Entries
-	for _, v := range getCopiableFileList(model.Model, model.Configuration.CopyLvl, model.OutputDir) {
-		fci.FilesToCopy = append(fci.FilesToCopy, newTargetFile(v, model.Configuration.CopyLvl))
-	}
-
-	return fci
-}
-
 // Get only te list of files to clean. Separated because of logic requirements.
 func getCleanableFileList(file string, level int) []string {
 	var output []string
@@ -583,92 +563,8 @@ func getCleanableFileList(file string, level int) []string {
 	return output
 }
 
-func getCopiableFileList(file string, level int, filepath string) []string {
-	var output []string
-	files := make(map[int][]string)
-
-	// Get the files from the model
-	filename, _ := utils.FileAndExt(file)
-	if viper.GetBool("debug") {
-		log.Infof("%s Attempting to locate copiable files. Provided path is %s", "["+filename+"]", filepath)
-	}
-
-	// Explicitly load the file provided by the user
-	fileLines, err := utils.ReadLines(path.Join(filepath, file))
-
-	if err != nil {
-		// Let the user know this is basically a no-op
-		log.Errorf("%s We could not locate or read the mod file (%s) indicated to locate output files. As such, no table or output files will be included in copy / delete operations", "["+filename+"]", filename+".mod")
-		log.Errorf("%s Error was specifically : %s", "["+filename+"]", err)
-	}
-
-	// Add defined output files to the list at level 1
-	files[1] = append(files[1], parser.FindOutputFiles(fileLines)...)
-
-	// Still necessary at th is point to make sure we're adding the level based data (such as the raw output files) to the output slice
-	for i := 0; i <= level; i++ {
-		if val, ok := files[i]; ok {
-			output = append(output, val...)
-		}
-	}
-
-	// Extensions now
-	output = append(output, extrapolateCopyFilesFromExtensions(filename, level)...)
-
-	return output
-}
-
-// Extrapolate extensions into string representations of filenames.
-func extrapolateCopyFilesFromExtensions(filename string, level int) []string {
-	var output []string
-	extensions := make(map[int][]string)
-
-	// parser now needs all these files + other tooling uses xml files
-	extensions[1] = []string{
-		".xml",
-		".grd",
-		".shk",
-		".cor",
-		".cov",
-		".ext",
-		".lst",
-	}
-
-	extensions[2] = []string{
-		".clt",
-		".coi",
-		".cpu",
-		".shm",
-		".phi",
-	}
-
-	extensions[3] = []string{
-		"",
-		"_ETAS",
-		"_RMAT",
-		"_SMAT",
-		".msf",
-		"_ETAS.msf",
-		"_RMAT.msf",
-		"_SMAT.msf",
-	}
-
-	// Loop, extrapolate and append to the output slice
-	for i := 0; i <= level; i++ {
-		if val, ok := extensions[i]; ok {
-			for _, ext := range val {
-				// For each filename, let's trim and compose the contents
-				output = append(output, strings.TrimSpace(fmt.Sprintf("%s%s", filename, ext)))
-			}
-		}
-	}
-
-	return output
-}
-
-func newPostWorkInstruction(model *NonMemModel, cleanupExclusions []string, mandatoryCopyFiles []string) runner.PostWorkInstructions {
+func newPostWorkInstruction(model *NonMemModel, cleanupExclusions []string) runner.PostWorkInstructions {
 	return runner.PostWorkInstructions{
-		FilesToCopy:  filesToCopy(model, mandatoryCopyFiles...),
 		FilesToClean: filesToCleanup(model, cleanupExclusions...),
 	}
 }

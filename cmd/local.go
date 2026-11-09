@@ -19,8 +19,6 @@ import (
 
 	"os"
 
-	"github.com/metrumresearchgroup/bbi/runner"
-
 	"github.com/metrumresearchgroup/bbi/utils"
 
 	"github.com/metrumresearchgroup/turnstile"
@@ -201,7 +199,9 @@ func (l LocalModel) Monitor(_ *turnstile.ChannelMap) {
 	// Do nothing for this implementation
 }
 
-// Cleanup is the last phase of execution, in which computation / hard work is done and we're cleaning up leftover files, copying results around et all.
+// Cleanup is the last phase and is responsible for running tasks after model
+// execution has finished, including removing unwanted files from the output
+// directory and writing bbi_config.json.
 func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 	time.Sleep(10 * time.Millisecond)
 	log.Printf("%s Beginning cleanup phase", l.Nonmem.LogIdentifier())
@@ -231,60 +231,7 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 	modelHashChan := make(chan string)
 	go HashFileOnChannel(modelHashChan, path.Join(l.Nonmem.OriginalPath, l.Nonmem.OriginalModel), l.Nonmem.FileName)
 
-	log.Debugf("%s Beginning selection of cleanable / copiable files", l.Nonmem.LogIdentifier())
-	// Magical instructions
-	// TODO: Implement flags for mandatory copy and cleanup exclusions
-	pwi := newPostWorkInstruction(l.Nonmem, []string{}, []string{})
-
-	// Copy Up first so that we don't try to move something we remove :)
-	var copied []runner.TargetedFile
-
-	log.Debugf("%s Beginning selection of copiable files ", l.Nonmem.LogIdentifier())
-	for _, v := range pwi.FilesToCopy.FilesToCopy {
-		var source []string
-		source, err = utils.ReadLines(path.Join(pwi.FilesToCopy.CopyFrom, v.File))
-
-		if err != nil {
-			log.Debugf("%s Unable to read file at %s. Continuing anyway", l.Nonmem.LogIdentifier(), path.Join(pwi.FilesToCopy.CopyFrom, v.File))
-			// Just continue. There are potentially files which will not exist based on the values in the list.
-			continue
-		}
-
-		// Let's avoid stuttering from extension extrapolation
-		file, _ := utils.FileAndExt(v.File)
-
-		if file == l.Nonmem.FileName {
-			file = v.File
-		} else {
-			file = l.Nonmem.FileName + "." + v.File
-		}
-
-		err = utils.WriteLines(source, path.Join(pwi.FilesToCopy.CopyTo, file))
-
-		if err != nil {
-			log.Errorf("%s An error occurred while attempting to copy the files: File is %s", l.Nonmem.LogIdentifier(), v.File)
-
-			continue
-		}
-
-		v.File = filepath.Join(l.Nonmem.OutputDir, v.File)
-
-		copied = append(copied, v)
-	}
-
-	if len(copied) > 0 {
-		log.Debugf("%s Writing out copied json file for", l.Nonmem.LogIdentifier())
-		// Write to File in original path indicating what all was copied
-		copiedJSON, _ := json.MarshalIndent(copied, "", "    ")
-
-		if err = afero.WriteFile(fs, path.Join(l.Nonmem.OriginalPath, l.Nonmem.FileName+"_copied.json"), copiedJSON, 0640); err != nil {
-			channels.Errors <- turnstile.ConcurrentError{
-				RunIdentifier: l.Nonmem.FileName,
-				Notes:         "failed to write _copied.json file",
-				Error:         err,
-			}
-		}
-	}
+	pwi := newPostWorkInstruction(l.Nonmem, []string{})
 
 	// Clean Up
 	log.Debugf("%s Beginning local cleanup operations", l.Nonmem.LogIdentifier())
