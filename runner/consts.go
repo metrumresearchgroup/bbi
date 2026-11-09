@@ -15,23 +15,26 @@ func EstOutputFileCleanLevels() map[string]int {
 	EstOutputFiles["FCON"] = 1
 	EstOutputFiles["FDATA"] = 1
 	EstOutputFiles["FDATA.csv"] = 1
+	EstOutputFiles["flushtime.set"] = 1
 	EstOutputFiles["FMSG"] = 1
+	EstOutputFiles["fort.2001"] = 1
+	EstOutputFiles["fort.2002"] = 1
 	EstOutputFiles["FREPORT"] = 1
 	EstOutputFiles["FSIZES"] = 1
 	EstOutputFiles["FSTREAM"] = 1
 	EstOutputFiles["FSUBS"] = 1
 	EstOutputFiles["FSUBS.0"] = 1
-	EstOutputFiles["FSUBS.o"] = 1
-	EstOutputFiles["FSUBS_MU.F90"] = 1
 	EstOutputFiles["FSUBS.f90"] = 1
 	EstOutputFiles["fsubs.f90"] = 1
+	EstOutputFiles["FSUBS.o"] = 1
 	EstOutputFiles["FSUBS2"] = 1
-	EstOutputFiles["gfortran.txt"] = 1
+	EstOutputFiles["FSUBS_MU.F90"] = 1
 	EstOutputFiles["GFCOMPILE.BAT"] = 1
+	EstOutputFiles["gfortran.txt"] = 1
 	EstOutputFiles["INTER"] = 1
 	EstOutputFiles["licfile.set"] = 1
-	EstOutputFiles["linkc.lnk"] = 1
 	EstOutputFiles["LINK.LNK"] = 1
+	EstOutputFiles["linkc.lnk"] = 1
 	EstOutputFiles["LINKC.LNK"] = 1
 	EstOutputFiles["locfile.set"] = 1
 	EstOutputFiles["maxlim.set"] = 1
@@ -56,9 +59,6 @@ func EstOutputFileCleanLevels() map[string]int {
 	EstOutputFiles["trskip.set"] = 1
 	EstOutputFiles["worker.set"] = 1
 	EstOutputFiles["xmloff.set"] = 1
-	EstOutputFiles["fort.2001"] = 1
-	EstOutputFiles["fort.2002"] = 1
-	EstOutputFiles["flushtime.set"] = 1
 
 	return EstOutputFiles
 }
