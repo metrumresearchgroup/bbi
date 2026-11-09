@@ -67,7 +67,6 @@ bbi nonmem [flags]
 * [bbi nonmem clean](bbi_nonmem_clean.md)	 - Clean files and folders
 * [bbi nonmem covcor](bbi_nonmem_covcor.md)	 - Display .cov and .cor output for a model
 * [bbi nonmem params](bbi_nonmem_params.md)	 - Extract the parameter estimates of models
-* [bbi nonmem probs](bbi_nonmem_probs.md)	 - Summarize model definitions in a directory
 * [bbi nonmem reclean](bbi_nonmem_reclean.md)	 - Clean files in run directory by specified level
 * [bbi nonmem run](bbi_nonmem_run.md)	 - Run models locally or on the grid
 * [bbi nonmem summary](bbi_nonmem_summary.md)	 - Summarize model results
