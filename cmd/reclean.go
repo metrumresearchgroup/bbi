@@ -41,9 +41,9 @@ func NewRecleanCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "reclean [flags] <run dir>",
 		Short: "Clean files in run directory by specified level",
-		Example: `  bbi nonmem run local --clean_lvl=0 001.ctl
-  # Reclean the run directory for 001, deleting what would have been cleaned if
-  # the model was executed with a clean level of 1
+		Example: `  # Reclean the run directory for 001, deleting what would have been
+  # cleaned if the model had been executed with a clean level of 1.
+  bbi nonmem run local --clean_lvl=0 001.ctl
   bbi nonmem reclean --lvl=1 001`,
 		RunE:         reclean,
 		SilenceUsage: true,

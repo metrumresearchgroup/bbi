@@ -9,9 +9,9 @@ bbi nonmem reclean [flags] <run dir>
 ### Examples
 
 ```
+  # Reclean the run directory for 001, deleting what would have been
+  # cleaned if the model had been executed with a clean level of 1.
   bbi nonmem run local --clean_lvl=0 001.ctl
-  # Reclean the run directory for 001, deleting what would have been cleaned if
-  # the model was executed with a clean level of 1
   bbi nonmem reclean --lvl=1 001
 ```
 
