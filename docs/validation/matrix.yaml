@@ -32,12 +32,6 @@
     - integration/nmless/bbi_params_test.go
     - parsers/nmparser/read_ext_fast_test.go
 
-- entrypoint: bbi nonmem probs
-  code: cmd/project.go
-  doc: docs/commands/bbi_nonmem_probs.md
-  tests:
-    - integration/nmless/bbi_probs_test.go
-
 - entrypoint: bbi nonmem reclean
   code: cmd/reclean.go
   doc: docs/commands/bbi_nonmem_reclean.md
@@ -75,12 +69,6 @@
     - cmd/nonmem_test.go
     - cmd/grid_test.go
     - integration/nonmem/bbi_slurm_test.go
-
-- entrypoint: bbi nonmem scaffold
-  code: cmd/scaffold.go
-  doc: docs/commands/bbi_nonmem_scaffold.md
-  tests:
-    - integration/nmless/bbi_scaffold_test.go
 
 - entrypoint: bbi nonmem summary
   code: cmd/summary.go

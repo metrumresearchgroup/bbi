@@ -237,10 +237,8 @@ func NewNonmemCmd() *cobra.Command {
 	cmd.AddCommand(NewCleanCmd())
 	cmd.AddCommand(NewCovcorCmd())
 	cmd.AddCommand(NewParamsCmd())
-	cmd.AddCommand(NewProbsCmd())
 	cmd.AddCommand(NewRecleanCmd())
 	cmd.AddCommand(NewRunCmd())
-	cmd.AddCommand(NewScaffoldCmd())
 	cmd.AddCommand(NewSummaryCmd())
 
 	return cmd
