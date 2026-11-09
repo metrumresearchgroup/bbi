@@ -5,30 +5,50 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"testing"
 
 	bi "github.com/metrumresearchgroup/bbi/integration"
 	"github.com/metrumresearchgroup/wrapt"
 )
 
+func dirnames(t *testing.T, dir string) []string {
+	t.Helper()
+
+	fh, err := os.Open(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer fh.Close()
+
+	files, err := fh.Readdirnames(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	slices.Sort(files)
+
+	return files
+}
+
 func TestRecleanBasic(tt *testing.T) {
 	t := wrapt.WrapT(tt)
 
 	dir := t.TempDir()
-	fdata := filepath.Join(dir, "FDATA")
-	fdataCSV := filepath.Join(dir, "FDATA.csv")
 
-	_ = os.WriteFile(fdata, []byte("fake"), 0644)
-	t.R.FileExists(fdata)
-	_ = os.WriteFile(fdataCSV, []byte("fake"), 0644)
-	t.R.FileExists(fdataCSV)
+	err := os.WriteFile(filepath.Join(dir, "FDATA"), []byte{}, 0o666)
+	t.R.NoError(err)
+	err = os.WriteFile(filepath.Join(dir, "FDATA.csv"), []byte{}, 0o666)
+	t.R.NoError(err)
+
+	t.A.Equal([]string{"FDATA", "FDATA.csv"}, dirnames(tt, dir))
 
 	output, err := bi.ExecuteCommand(context.Background(),
 		"bbi", "nonmem", "reclean", "--lvl=1", "-v", dir)
 	t.R.NoError(err)
 	t.A.NotEmpty(output)
-	t.A.NoFileExists(fdata)
-	t.A.NoFileExists(fdataCSV)
+
+	t.A.Equal([]string{}, dirnames(tt, dir))
 }
 
 func TestRecleanError(tt *testing.T) {
