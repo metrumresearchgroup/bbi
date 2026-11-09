@@ -60,7 +60,7 @@ func AssertNonMemCleanedUpFiles(t *wrapt.T, details NonMemTestingDetails) {
 		}
 	}
 
-	// Parallelization-related files handled by nonmem.filesToCleanup().
+	// Parallelization-related files
 	files, err := os.ReadDir(details.OutputDir)
 	t.R.NoError(err)
 	for _, fi := range files {

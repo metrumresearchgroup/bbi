@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"os/exec"
 	"path"
 	"path/filepath"
@@ -14,6 +15,7 @@ import (
 	"time"
 
 	"github.com/metrumresearchgroup/bbi/configlib"
+	"github.com/metrumresearchgroup/bbi/internal/fmatch"
 
 	log "github.com/sirupsen/logrus"
 
@@ -205,7 +207,6 @@ func (l LocalModel) Monitor(_ *turnstile.ChannelMap) {
 func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 	time.Sleep(10 * time.Millisecond)
 	log.Printf("%s Beginning cleanup phase", l.Nonmem.LogIdentifier())
-	fs := afero.NewOsFs()
 	// while the rest of the cleanup is happening, lets also hash the data in the background
 	// so don't have to wait extra time if its on the larger end
 	// Get the lines of the file
@@ -231,30 +232,26 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 	modelHashChan := make(chan string)
 	go HashFileOnChannel(modelHashChan, path.Join(l.Nonmem.OriginalPath, l.Nonmem.OriginalModel), l.Nonmem.FileName)
 
-	pwi := newPostWorkInstruction(l.Nonmem, []string{})
-
 	// Clean Up
 	log.Debugf("%s Beginning local cleanup operations", l.Nonmem.LogIdentifier())
-	for _, v := range pwi.FilesToClean.FilesToRemove {
-		// Does it even exist?
-		if ok, _ := afero.Exists(fs, path.Join(pwi.FilesToClean.Location, v.File)); ok {
-			// Is it a directory?
-			if ok, _ := afero.IsDir(fs, path.Join(pwi.FilesToClean.Location, v.File)); ok {
-				err = fs.RemoveAll(path.Join(pwi.FilesToClean.Location, v.File))
-				// Nope it's a file!
-			} else {
-				err = fs.Remove(path.Join(pwi.FilesToClean.Location, v.File))
-			}
 
-			if err != nil {
-				// Indicate failure to remove
-				log.Errorf("%s Failure removing file / directory %s. Details : %s", l.Nonmem.LogIdentifier(), v.File, err.Error())
-			}
+	cleanMatcher := fmatch.NonmemCleanMatcher(l.Nonmem.Configuration)
+	err = cleanMatcher.Do(l.Nonmem.OutputDir, l.Nonmem.Configuration.CleanLvl,
+		func(path string, _ fs.DirEntry, _ int) error {
+			return os.RemoveAll(path)
+		},
+	)
+	if err != nil {
+		channels.Errors <- turnstile.ConcurrentError{
+			RunIdentifier: l.Nonmem.FileName,
+			Notes:         "failed to clean outputs",
+			Error:         err,
 		}
 	}
 
 	// Gitignore operations
-	if err = createNewGitIgnoreFile(l.Nonmem); err != nil {
+	err = createNewGitIgnoreFile(l.Nonmem, cleanMatcher.Patterns(1))
+	if err != nil {
 		channels.Errors <- turnstile.ConcurrentError{
 			RunIdentifier: l.Nonmem.FileName,
 			Notes:         "failed to write .gitignore file",
@@ -432,7 +429,7 @@ func localModelsFromArguments(args []string, config configlib.Config) ([]LocalMo
 	return output, nil
 }
 
-func createNewGitIgnoreFile(m *NonMemModel) error {
+func createNewGitIgnoreFile(m *NonMemModel, patterns []string) error {
 	log.Debugf("%s Writing finalized gitignore file", m.LogIdentifier())
 	// First let's remove the gitignore in the output dir.
 	fs := afero.NewOsFs()
@@ -443,12 +440,7 @@ func createNewGitIgnoreFile(m *NonMemModel) error {
 		}
 	}
 
-	// Force level one per initial discussions
-	linesToAddToGitignore := getCleanableFileList(1)
-	linesToAddToGitignore = append(linesToAddToGitignore, "WK_[0-9]*")
-
-	err := utils.WriteLines(linesToAddToGitignore, path.Join(m.OutputDir, ".gitignore"))
-
+	err := utils.WriteLines(patterns, path.Join(m.OutputDir, ".gitignore"))
 	if err != nil {
 		return err
 	}

@@ -30,7 +30,6 @@ import (
 
 	"github.com/metrumresearchgroup/bbi/configlib"
 	parser "github.com/metrumresearchgroup/bbi/parsers/nmparser"
-	"github.com/metrumresearchgroup/bbi/runner"
 
 	"github.com/metrumresearchgroup/bbi/utils"
 
@@ -60,70 +59,6 @@ type nonmemParallelDirective struct {
 	MpiExecPath       string
 	HeadNodes         int
 	WorkerNodes       int
-}
-
-var nonMemTemporaryFiles []string = []string{
-	"background.set",
-	"compile.lnk",
-	"FCON",
-	"FDATA",
-	"FDATA.csv",
-	"FMSG",
-	"FREPORT",
-	"FSIZES",
-	"FSTREAM",
-	"FSUBS",
-	"FSUBS.0",
-	"FSUBS.o",
-	"FSUBS_MU.F90",
-	"FSUBS.f90",
-	"fsubs.f90",
-	"FSUBS2",
-	"gfortran.txt",
-	"GFCOMPILE.BAT",
-	"INTER",
-	"licfile.set",
-	"linkc.lnk",
-	"LINK.LNK",
-	"LINKC.LNK",
-	"locfile.set",
-	"maxlim.set",
-	"newline",
-	"nmexec.set",
-	"nmpathlist.txt",
-	"nmprd4p.mod",
-	"nobuild.set",
-	"parafile.set",
-	"parafprint.set",
-	"prcompile.set",
-	"prdefault.set",
-	"prsame.set",
-	"PRSIZES.f90",
-	"rundir.set",
-	"runpdir.set",
-	"simparon.set",
-	"temp_dir",
-	"tprdefault.set",
-	"trskip.set",
-	"worker.set",
-	"xmloff.set",
-	"fort.2001",
-	"fort.2002",
-	"flushtime.set",
-	"nonmem",
-	"FPWARN",
-	"condorarguments.set",
-	"condoropenmpiscript.set",
-	"condor.set",
-	"mpiloc",
-	"nmmpi.sh",
-	"temp.out",
-	"trashfile.xxx",
-}
-
-var parallelRegexesToRemove []string = []string{
-	"worker[0-9]{1,}",
-	"fort.[0-9]{1,}",
 }
 
 // NonMemModel is the definition of a model for NonMem including its target directories and settings required for execution.
@@ -464,94 +399,6 @@ func buildAutologCommand(l *NonMemModel) []string {
 	}
 
 	return commandComponents
-}
-
-// modelName is the full file + ext representation of the model (ie acop.mod)
-// directory is the directory in which we will be performing cleanup
-// exceptions is a variadic input for allowing exceptions / overrides.
-// We're taking a local model because grid engine execution doesn't wait for completion. Nothing to do :).
-func filesToCleanup(model *NonMemModel, exceptions ...string) runner.FileCleanInstruction {
-	fci := runner.FileCleanInstruction{
-		Location: model.OutputDir,
-	}
-
-	files := getCleanableFileList(model.Configuration.CleanLvl)
-
-	for _, v := range files {
-		if !isFilenameInExceptions(exceptions, v) {
-			// Let's add it to the cleanup list if it's not in the exclusions
-			fci.FilesToRemove = append(fci.FilesToRemove, newTargetFile(v, model.Configuration.CleanLvl))
-		}
-	}
-
-	if model.Configuration.Parallel {
-		fs := afero.NewOsFs()
-		files, err := afero.ReadDir(fs, model.OutputDir)
-
-		if err != nil {
-			log.Printf("Error trying to read directory %s for parallel files to cleanup", model.OutputDir)
-		}
-
-		for _, variant := range parallelRegexesToRemove {
-			r := regexp.MustCompile(variant)
-
-			for _, f := range files {
-				if r.MatchString(f.Name()) {
-					fci.FilesToRemove = append(fci.FilesToRemove, newTargetFile(f.Name(), model.Configuration.CleanLvl))
-				}
-			}
-		}
-
-		re_wk := regexp.MustCompile("^WK_[0-9]+")
-		for _, f := range files {
-			if f.Size() == 0 && !f.IsDir() && re_wk.MatchString(f.Name()) {
-				fci.FilesToRemove = append(fci.FilesToRemove, newTargetFile(f.Name(), model.Configuration.CleanLvl))
-			}
-		}
-	}
-
-	return fci
-}
-
-func isFilenameInExceptions(haystack []string, needle string) bool {
-	for _, v := range haystack {
-		if v == needle {
-			return true
-		}
-	}
-
-	// No matches
-	return false
-}
-
-func newTargetFile(filename string, level int) runner.TargetedFile {
-	return runner.TargetedFile{
-		File:  filename,
-		Level: level,
-	}
-}
-
-// Get only te list of files to clean. Separated because of logic requirements.
-func getCleanableFileList(level int) []string {
-	var output []string
-	files := make(map[int][]string)
-
-	// These files are files that may be desired above the normal. Classified as "Temp" files. Default removed
-	files[1] = nonMemTemporaryFiles
-
-	for i := 0; i <= level; i++ {
-		if val, ok := files[i]; ok {
-			output = append(output, val...)
-		}
-	}
-
-	return output
-}
-
-func newPostWorkInstruction(model *NonMemModel, cleanupExclusions []string) runner.PostWorkInstructions {
-	return runner.PostWorkInstructions{
-		FilesToClean: filesToCleanup(model, cleanupExclusions...),
-	}
 }
 
 func postWorkNotice(m *turnstile.Manager, t time.Time) {

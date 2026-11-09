@@ -11,25 +11,6 @@ import (
 	"github.com/spf13/afero"
 )
 
-// TargetedFile represents metadata about files copied or cleaned after run.
-type TargetedFile struct {
-	File  string `json:"file,omitempty"`
-	Level int    `json:"level,omitempty"`
-}
-
-// PostWorkInstructions contains all hte details for whether any cleanup or copy actions should occur during the post work phase of the operation.
-type PostWorkInstructions struct {
-	FilesToClean FileCleanInstruction
-}
-
-// FileCleanInstruction includes everything necessary to remove files for a designated model run.
-type FileCleanInstruction struct {
-	// Directory in which the files we will remove exist. Should correlate to template output for outputDir
-	Location string
-	// Slice of strings representing filenames to be purged. Should correlate to clean level contents
-	FilesToRemove []TargetedFile
-}
-
 // CleanEstFolder cleans the estimation folder based on the set clean level
 // Ex:
 // AppFs := afero.NewOsFs()
