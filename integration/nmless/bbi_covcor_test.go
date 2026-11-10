@@ -4,7 +4,7 @@ import (
 	"context"
 	"os"
 	"path/filepath"
-	"regexp"
+	"strconv"
 	"testing"
 
 	bi "github.com/metrumresearchgroup/bbi/integration"
@@ -53,33 +53,29 @@ func TestCovCorHappyPath(tt *testing.T) {
 }
 
 func TestCovCorErrors(tt *testing.T) {
-	var models = []struct {
-		name string
+	tests := []struct {
+		args []string
+		want string
 	}{
-		{name: "12"},
-		{name: "iovmm"},
+		{
+			args: []string{filepath.Join(SUMMARY_TEST_DIR, "12", "12")},
+			want: noFilePresentError,
+		},
+		{
+			args: []string{filepath.Join(SUMMARY_TEST_DIR, "iovmm", "iovmm")},
+			want: noFilePresentError,
+		},
 	}
 
-	rgx := regexp.MustCompile(noFilePresentError)
-
-	testId := "INT-COVCOR-002"
-	for _, mod := range models {
-		tt.Run(utils.AddTestId(mod.name, testId), func(tt *testing.T) {
+	for i, tc := range tests {
+		tt.Run(strconv.Itoa(i), func(tt *testing.T) {
 			t := wrapt.WrapT(tt)
 
-			commandAndArgs := []string{
-				"nonmem",
-				"covcor",
-				filepath.Join(SUMMARY_TEST_DIR, mod.name, mod.name),
-			}
+			args := append([]string{"nonmem", "covcor"}, tc.args...)
+			output, err := bi.ExecuteCommandNoErrorCheck(context.Background(), "bbi", args...)
 
-			// try without flag and get error
-			var output string
-			output, err := bi.ExecuteCommandNoErrorCheck(context.Background(), "bbi", commandAndArgs...)
-			t.R.Error(err)
-
-			errorMatch := rgx.MatchString(output)
-			t.R.True(errorMatch)
+			t.R.NotNil(err)
+			t.A.Contains(output, tc.want)
 		})
 	}
 }
