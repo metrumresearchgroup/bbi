@@ -34,6 +34,10 @@ func covcor(cmd *cobra.Command, args []string) {
 		viper.Debug()
 	}
 
+	if len(args) != 1 {
+		log.Fatal("covcor takes only one positional argument")
+	}
+
 	results, err := parser.GetCovCorOutput(args[0])
 	if err != nil {
 		log.Fatal(err)
