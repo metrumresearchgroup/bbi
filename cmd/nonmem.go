@@ -688,7 +688,7 @@ func postWorkNotice(m *turnstile.Manager, t time.Time) {
 		}
 	}
 
-	log.Infof("\r%d models completed in %s", m.Completed, time.Since(t))
+	log.Infof("%d models completed in %s", m.Completed, time.Since(t))
 }
 
 // NewNonMemModel creates the core nonmem dataset from the passed arguments.
