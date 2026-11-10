@@ -132,8 +132,6 @@ func TestHasValidComplexPathCTLAndMod(tt *testing.T) {
 
 			output, err := m.Execute(intermediary, args...)
 
-			println(output)
-
 			ntd := NonMemTestingDetails{
 				OutputDir: filepath.Join(intermediary.Workpath, m.identifier),
 				Model:     m,

@@ -56,7 +56,8 @@ const postProcessingScriptTemplate string = `#!/bin/bash
 `
 
 func run(_ *cobra.Command, _ []string) {
-	println(fmt.Sprintf(runExamples, "(local|sge|slurm)"))
+	fmt.Fprintf(os.Stderr, runExamples, "(local|sge|slurm)")
+	fmt.Fprintln(os.Stderr, "")
 }
 
 func NewRunCmd() *cobra.Command {
