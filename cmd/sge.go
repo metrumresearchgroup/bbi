@@ -10,6 +10,7 @@ import (
 
 const sgeTemplate string = `#!/bin/bash
 #$ -N {{.JobName | shquote}}
+#$ -o grid.out
 #$ -V
 #$ -j y
 {{- if .Config.Parallel}}
