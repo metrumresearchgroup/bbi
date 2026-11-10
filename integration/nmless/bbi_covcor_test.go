@@ -65,6 +65,14 @@ func TestCovCorErrors(tt *testing.T) {
 			args: []string{filepath.Join(SUMMARY_TEST_DIR, "iovmm", "iovmm")},
 			want: noFilePresentError,
 		},
+		{
+			args: []string{},
+			want: "one positional argument",
+		},
+		{
+			args: []string{"one", "two"},
+			want: "one positional argument",
+		},
 	}
 
 	for i, tc := range tests {
