@@ -24,14 +24,15 @@ func (results SummaryOutput) Summary() bool {
 	for i := range results.ParametersData[finalEstimationMethodIndex].Estimates.Theta {
 		numResult := results.ParametersData[finalEstimationMethodIndex].Estimates.Theta[i]
 		seResult := results.ParametersData[finalEstimationMethodIndex].StdErr.Theta[i]
-		fixed := results.ParametersData[finalEstimationMethodIndex].Fixed.Theta[i]
 		var rse float64
 		if seResult != -999999999 && numResult != 0 && seResult != DefaultFloat64 && numResult != DefaultFloat64 {
 			rse = math.Abs(seResult / numResult * 100)
 		}
 
+		fixedTheta := results.ParametersData[finalEstimationMethodIndex].Fixed.Theta
+
 		var s4 string
-		if fixed == 1 {
+		if len(fixedTheta) > i && fixedTheta[i] == 1 {
 			s4 = "FIX"
 		} else if seResult == -999999999 {
 			s4 = "-"

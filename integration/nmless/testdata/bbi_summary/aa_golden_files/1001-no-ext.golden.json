@@ -1,0 +1,182 @@
+{
+	"run_details": {
+		"version": "7.4.4",
+		"run_start": "-999999999",
+		"run_end": "Fri Aug 21 16:30:36 EDT 2020",
+		"estimation_time": [
+			2898.17
+		],
+		"covariance_time": [
+			0
+		],
+		"postprocess_time": 0.46,
+		"cpu_time": 16217.448,
+		"function_evaluations": -999999999,
+		"significant_digits": -999999999,
+		"problem_text": "Run# 1001.1",
+		"mod_file": "-999999999",
+		"estimation_method": [
+			"MCMC Bayesian Analysis"
+		],
+		"data_set": "../tranNM_final.csv",
+		"number_of_subjects": 240,
+		"number_of_obs": 599,
+		"number_of_data_records": 921,
+		"output_files_used": [
+			"1001.lst",
+			"1001.cpu"
+		]
+	},
+	"run_heuristics": {
+		"covariance_step_aborted": false,
+		"large_condition_number": true,
+		"eigenvalue_issues": false,
+		"correlations_not_ok": false,
+		"parameter_near_boundary": false,
+		"hessian_reset": false,
+		"has_final_zero_gradient": false,
+		"minimization_terminated": false,
+		"eta_pval_significant": false,
+		"prderr": true
+	},
+	"parameters_data": [
+		{
+			"method": "METHOD NOT DETECTED",
+			"estimates": {
+				"theta": [
+					-0.782,
+					5.7,
+					0.927,
+					0.313,
+					-11.8,
+					5.47
+				],
+				"omega": [
+					0.0105,
+					0,
+					0.151,
+					0,
+					0.0829,
+					0.0669,
+					0,
+					-0.66,
+					-0.317,
+					7.47
+				],
+				"sigma": [
+					1150,
+					0,
+					2000
+				]
+			},
+			"std_err": {
+				"theta": [
+					0.14,
+					0.127,
+					0.00453,
+					0.224,
+					0.328,
+					1.14
+				],
+				"omega": [
+					0.00375,
+					0,
+					0.0781,
+					0,
+					0.0552,
+					0.0397,
+					0,
+					0.339,
+					0.263,
+					1.39
+				],
+				"sigma": [
+					362,
+					0,
+					182
+				]
+			},
+			"random_effect_sd": {
+				"omega": [
+					-999999999,
+					-999999999,
+					-999999999,
+					-999999999,
+					-999999999,
+					-999999999,
+					-999999999,
+					-999999999,
+					-999999999,
+					-999999999
+				],
+				"sigma": [
+					-999999999,
+					-999999999,
+					-999999999
+				]
+			},
+			"random_effect_sdse": {
+				"omega": [
+					-999999999,
+					-999999999,
+					-999999999,
+					-999999999,
+					-999999999,
+					-999999999,
+					-999999999,
+					-999999999,
+					-999999999,
+					-999999999
+				],
+				"sigma": [
+					-999999999,
+					-999999999,
+					-999999999
+				]
+			},
+			"fixed": {}
+		}
+	],
+	"parameter_names": {
+		"theta": [
+			"THETA1",
+			"THETA2",
+			"THETA3",
+			"THETA4",
+			"THETA5",
+			"THETA6"
+		],
+		"omega": [
+			"OMEGA(1,1)",
+			"OMEGA(2,1)",
+			"OMEGA(2,2)",
+			"OMEGA(3,1)",
+			"OMEGA(3,2)",
+			"OMEGA(3,3)",
+			"OMEGA(4,1)",
+			"OMEGA(4,2)",
+			"OMEGA(4,3)",
+			"OMEGA(4,4)"
+		],
+		"sigma": [
+			"SIGMA(1,1)",
+			"SIGMA(2,1)",
+			"SIGMA(2,2)"
+		]
+	},
+	"ofv": [
+		{
+			"method": "MCMC Bayesian Analysis",
+			"ofv_no_constant": 3842.571,
+			"constant_to_ofv": 44.868349604386125,
+			"ofv_with_constant": 3887.4392217087275
+		}
+	],
+	"condition_number": [
+		{
+			"method": "MCMC Bayesian Analysis",
+			"condition_number": 4352.941176470587
+		}
+	],
+	"success": true
+}
