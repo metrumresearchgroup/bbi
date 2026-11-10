@@ -9,7 +9,7 @@ import (
 
 const slurmTemplate string = `#!/bin/bash
 #SBATCH --job-name={{.JobName | shquote}}
-#SBATCH --output=slurm.out
+#SBATCH --output=grid.out
 #SBATCH --export=ALL
 {{- if .Config.Parallel}}
 #SBATCH --ntasks={{.Config.Threads}}{{end}}
