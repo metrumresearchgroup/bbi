@@ -162,7 +162,7 @@ var nonmemExamples string = fmt.Sprintf("%s\n\n%s\n\n%s\n",
 	covcorExamples)
 
 func nonmem(_ *cobra.Command, _ []string) {
-	println(nonmemExamples)
+	fmt.Fprintln(os.Stderr, nonmemExamples)
 }
 
 func NewNonmemCmd() *cobra.Command {
@@ -689,7 +689,6 @@ func postWorkNotice(m *turnstile.Manager, t time.Time) {
 	}
 
 	log.Infof("\r%d models completed in %s", m.Completed, time.Since(t))
-	println("")
 }
 
 // NewNonMemModel creates the core nonmem dataset from the passed arguments.
