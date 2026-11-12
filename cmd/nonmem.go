@@ -248,10 +248,7 @@ func NewNonmemCmd() *cobra.Command {
 
 // "Copies" a file by reading its content (optionally updating the path).
 func copyFileToDestination(l *NonMemModel, modifyPath bool) error {
-	fs := afero.NewOsFs()
-
 	filename := l.Model
-
 	// Set it to a ctl file if we're in NMQual mode
 	if l.Configuration.NMQual {
 		filename = l.FileName + ".ctl"
@@ -262,7 +259,7 @@ func copyFileToDestination(l *NonMemModel, modifyPath bool) error {
 		return err
 	}
 
-	st, err := fs.Stat(l.Path)
+	st, err := os.Stat(l.Path)
 	if err != nil {
 		return err
 	}
@@ -288,7 +285,8 @@ func copyFileToDestination(l *NonMemModel, modifyPath bool) error {
 
 		// Write the file contents
 		fileContents := strings.Join(sourceLines, "\n")
-		if err = afero.WriteFile(fs, path.Join(l.OutputDir, filename), []byte(fileContents), st.Mode()); err != nil {
+		err = os.WriteFile(path.Join(l.OutputDir, filename), []byte(fileContents), st.Mode())
+		if err != nil {
 			return err
 		}
 	} else {
