@@ -53,6 +53,7 @@ func TestBbiCompletesLocalExecution(tt *testing.T) {
 						"nonmem",
 						"run",
 						"local",
+						"--overwrite",
 						"--nm_version",
 						os.Getenv("NMVERSION"),
 					}
