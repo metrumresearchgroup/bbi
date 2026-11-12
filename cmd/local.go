@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/metrumresearchgroup/bbi/configlib"
+	parser "github.com/metrumresearchgroup/bbi/parsers/nmparser"
 
 	log "github.com/sirupsen/logrus"
 
@@ -507,7 +508,7 @@ func writeNonmemConfig(model *NonMemModel) error {
 
 func hashDataPath(ch chan<- string, model *NonMemModel) {
 	mpath := filepath.Join(model.OutputDir, model.Model)
-	lines, err := utils.ReadLines(mpath)
+	bs, err := os.ReadFile(mpath)
 	if err != nil {
 		log.Errorf("%s unable read %q to extract data path: %v\n", model.LogIdentifier(), mpath, err)
 		ch <- ""
@@ -515,14 +516,9 @@ func hashDataPath(ch chan<- string, model *NonMemModel) {
 		return
 	}
 
-	for _, line := range lines {
-		if strings.HasPrefix(strings.TrimSpace(line), "$DATA") {
-			model.DataPath = filepath.Clean(strings.Fields(line)[1])
-		}
-	}
-
-	if model.DataPath == "" {
-		log.Errorf("%s unable to extract data path from %q\n", model.LogIdentifier(), mpath)
+	model.DataPath, err = parser.DataFile(bs)
+	if err != nil {
+		log.Errorf("%s unable to extract data path from %q: %v\n", model.LogIdentifier(), mpath, err)
 		ch <- ""
 
 		return
