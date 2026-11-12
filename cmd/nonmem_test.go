@@ -201,54 +201,6 @@ func Test_processNMFEOptions(tt *testing.T) {
 	}
 }
 
-func Test_modelDataFile(tt *testing.T) {
-	type args struct {
-		modelLines []string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    string
-		wantErr bool
-	}{
-		{
-			name: "Data File in 2nd line",
-			args: args{
-				modelLines: []string{
-					"random first line",
-					"$DATA /tmp/data.csv",
-					"random third line",
-				},
-			},
-			want:    "/tmp/data.csv",
-			wantErr: false,
-		},
-		{
-			name: "Data file present without target",
-			args: args{
-				modelLines: []string{
-					"random first line",
-					"$DATA",
-					"random third line",
-				},
-			},
-			want:    "",
-			wantErr: true,
-		},
-	}
-	testId := "UNIT-CMD-003"
-	for _, test := range tests {
-		tt.Run(utils.AddTestId(test.name, testId), func(tt *testing.T) {
-			t := wrapt.WrapT(tt)
-
-			got, err := modelDataFile(test.args.modelLines)
-
-			t.R.WantError(test.wantErr, err)
-			t.R.Equal(test.want, got)
-		})
-	}
-}
-
 func Test_dataFileIsPresent(tt *testing.T) {
 	const testingDir string = "/tmp/testing/bbi"
 	const testingFile string = "test.txt"

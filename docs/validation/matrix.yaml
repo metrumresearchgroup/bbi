@@ -57,7 +57,7 @@
     - integration/nonmem/data_test.go
     - integration/nonmem/nmqual_test.go
     - integration/nonmem/postexecution_test.go
-    - parsers/nmparser/add_path_level_test.go
+    - parsers/nmparser/datafile_test.go
 
 - entrypoint: bbi nonmem run sge
   code: cmd/sge.go
@@ -66,7 +66,7 @@
     - cmd/nonmem_test.go
     - cmd/grid_test.go
     - integration/nonmem/bbi_sge_test.go
-    - parsers/nmparser/add_path_level_test.go
+    - parsers/nmparser/datafile_test.go
 
 - entrypoint: bbi nonmem run slurm
   code: cmd/slurm.go

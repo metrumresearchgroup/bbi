@@ -1,6 +1,7 @@
 package nonmem
 
 import (
+	"bytes"
 	"context"
 	"io"
 	"os"
@@ -52,6 +53,7 @@ func TestBbiCompletesLocalExecution(tt *testing.T) {
 						"nonmem",
 						"run",
 						"local",
+						"--overwrite",
 						"--nm_version",
 						os.Getenv("NMVERSION"),
 					}
@@ -414,6 +416,56 @@ func TestLicfileOptionIsRelayed(tt *testing.T) {
 				"-licfile")
 		})
 	}
+}
+
+func TestLocalAbsDataPath(tt *testing.T) {
+	SkipIfNotEnabled(tt, "LOCAL")
+
+	t := wrapt.WrapT(tt)
+
+	scenario := InitializeScenario(t, "acop")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+	scenario.Prepare(t, ctx)
+
+	t.R.Len(scenario.models, 1)
+	m := scenario.models[0]
+
+	// Adjust model to use absolute data path.
+
+	mfile := m.path + "." + m.extension
+	bs, err := os.ReadFile(mfile)
+	t.R.NoError(err)
+
+	toreplace := []byte("$DATA acop.csv")
+	if n := bytes.Count(bs, toreplace); n != 1 {
+		t.Fatalf("acop model: got %d occurrences of %q, want 1", n, toreplace)
+	}
+
+	dpath := filepath.Join(scenario.Workpath, "acop.csv")
+	bs = bytes.Replace(bs, toreplace, []byte("$DATA "+dpath), 1)
+	err = os.WriteFile(mfile, bs, 0o666)
+	t.R.NoError(err)
+
+	args := []string{
+		"nonmem",
+		"run",
+		"local",
+		"--nm_version",
+		os.Getenv("NMVERSION"),
+	}
+	_, err = m.Execute(scenario, args...)
+	t.R.NoError(err)
+
+	ntd := NonMemTestingDetails{
+		OutputDir: filepath.Join(scenario.Workpath, m.identifier),
+		Model:     m,
+		Scenario:  scenario,
+	}
+
+	AssertNonMemCompleted(t, ntd)
+	AssertDataSourceIsHashedAndCorrect(t, ntd)
 }
 
 func SkipIfNotEnabled(t *testing.T, feature string) {

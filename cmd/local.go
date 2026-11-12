@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/metrumresearchgroup/bbi/configlib"
+	parser "github.com/metrumresearchgroup/bbi/parsers/nmparser"
 
 	log "github.com/sirupsen/logrus"
 
@@ -208,25 +209,9 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 	fs := afero.NewOsFs()
 	// while the rest of the cleanup is happening, lets also hash the data in the background
 	// so don't have to wait extra time if its on the larger end
-	// Get the lines of the file
-	modelPath := filepath.Join(l.Nonmem.OutputDir, l.Nonmem.Model)
-	sourceLines, err := utils.ReadLines(modelPath)
-
-	if err != nil {
-		log.Errorf("%s error reading model at path: %s, to extract data path: %s\n", l.Nonmem.LogIdentifier(), modelPath, err)
-	}
-
-	log.Debugf("%s Beginning hash calculation operations for data file", l.Nonmem.LogIdentifier())
-
-	for _, line := range sourceLines {
-		if strings.HasPrefix(strings.TrimSpace(line), "$DATA") {
-			// extract out data path
-			l.Nonmem.DataPath = filepath.Clean(strings.Fields(line)[1])
-		}
-	}
 
 	dataHashChan := make(chan string)
-	go HashFileOnChannel(dataHashChan, path.Join(l.Nonmem.OutputDir, l.Nonmem.DataPath), l.Nonmem.FileName)
+	go hashDataPath(dataHashChan, l.Nonmem)
 
 	modelHashChan := make(chan string)
 	go HashFileOnChannel(modelHashChan, path.Join(l.Nonmem.OriginalPath, l.Nonmem.OriginalModel), l.Nonmem.FileName)
@@ -240,6 +225,8 @@ func (l LocalModel) Cleanup(channels *turnstile.ChannelMap) {
 	var copied []runner.TargetedFile
 
 	log.Debugf("%s Beginning selection of copiable files ", l.Nonmem.LogIdentifier())
+
+	var err error
 	for _, v := range pwi.FilesToCopy.FilesToCopy {
 		var source []string
 		source, err = utils.ReadLines(path.Join(pwi.FilesToCopy.CopyFrom, v.File))
@@ -519,7 +506,34 @@ func writeNonmemConfig(model *NonMemModel) error {
 	return afero.WriteFile(afero.NewOsFs(), path.Join(model.OutputDir, "bbi_config.json"), outBytes, 0640)
 }
 
-func HashFileOnChannel(ch chan string, file string, identifier string) {
+func hashDataPath(ch chan<- string, model *NonMemModel) {
+	mpath := filepath.Join(model.OutputDir, model.Model)
+	bs, err := os.ReadFile(mpath)
+	if err != nil {
+		log.Errorf("%s unable read %q to extract data path: %v\n", model.LogIdentifier(), mpath, err)
+		ch <- ""
+
+		return
+	}
+
+	model.DataPath, err = parser.DataFile(bs)
+	if err != nil {
+		log.Errorf("%s unable to extract data path from %q: %v\n", model.LogIdentifier(), mpath, err)
+		ch <- ""
+
+		return
+	}
+
+	dataPath := model.DataPath
+	if !filepath.IsAbs(dataPath) {
+		dataPath = path.Join(model.OutputDir, dataPath)
+	}
+
+	log.Debugf("%s Beginning hash calculation operations for data file", model.LogIdentifier())
+	HashFileOnChannel(ch, dataPath, model.FileName)
+}
+
+func HashFileOnChannel(ch chan<- string, file string, identifier string) {
 	f, err := os.Open(file)
 	if err != nil {
 		log.Debugf("File requested was %s, Identifier is %s", file, identifier)

@@ -16,7 +16,6 @@ package cmd
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -248,65 +247,35 @@ func NewNonmemCmd() *cobra.Command {
 
 // "Copies" a file by reading its content (optionally updating the path).
 func copyFileToDestination(l *NonMemModel, modifyPath bool) error {
-	fs := afero.NewOsFs()
-
 	filename := l.Model
-
 	// Set it to a ctl file if we're in NMQual mode
 	if l.Configuration.NMQual {
 		filename = l.FileName + ".ctl"
 	}
 
-	if exists, _ := afero.DirExists(fs, l.OutputDir); !exists {
-		// Create the directory
-		if err := fs.MkdirAll(l.OutputDir, 0750); err != nil {
-			return err
-		}
-	}
-
-	stats, err := fs.Stat(l.Path)
+	err := os.MkdirAll(l.OutputDir, 0o750)
 	if err != nil {
 		return err
 	}
 
+	st, err := os.Stat(l.Path)
+	if err != nil {
+		return err
+	}
+
+	bs, err := os.ReadFile(l.Path)
+	if err != nil {
+		return fmt.Errorf("unable to read %q: %w", l.Path, err)
+	}
+
 	if modifyPath {
-		// this is going to break the hashing so it doesn't matter anyway, but this implementation will strip
-		// trailing newlines, so for a file that doesn't modify the path, it will unnecessarily invalidate a hash check
-		// hence we'll use an alternate implementation of ioutils to make sure hashes match if no modification is needed
-		var sourceLines []string
-		sourceLines, err = utils.ReadLines(l.Path)
-
+		bs, err = parser.AdjustDataFile(bs)
 		if err != nil {
-			return errors.New("Unable to read the contents of " + l.Path)
-		}
-
-		// We'll use stats for setting the mode of the target file to make sure perms are the same
-
-		for k, line := range sourceLines {
-			if strings.Contains(line, "$DATA") {
-				sourceLines[k] = parser.AddPathLevelToData(line)
-			}
-		}
-
-		// Write the file contents
-		fileContents := strings.Join(sourceLines, "\n")
-		if err = afero.WriteFile(fs, path.Join(l.OutputDir, filename), []byte(fileContents), stats.Mode()); err != nil {
-			return err
-		}
-	} else {
-		var input []byte
-		input, err = os.ReadFile(l.Path)
-		if err != nil {
-			return fmt.Errorf("unable to read %s: %w", l.Path, err)
-		}
-
-		err = os.WriteFile(path.Join(l.OutputDir, filename), input, stats.Mode())
-		if err != nil {
-			return fmt.Errorf("unable to write contents %s: %w", l.Path, err)
+			return fmt.Errorf("%s: %w", l.Path, err)
 		}
 	}
 
-	return nil
+	return os.WriteFile(path.Join(l.OutputDir, filename), bs, st.Mode())
 }
 
 // processes any template (including the const one here) to create a byte slice of the entire file.
@@ -694,14 +663,14 @@ func postWorkNotice(m *turnstile.Manager, t time.Time) {
 
 // NewNonMemModel creates the core nonmem dataset from the passed arguments.
 func NewNonMemModel(modelname string, config configlib.Config) (NonMemModel, error) {
-	modelLines, err := utils.ReadLines(modelname)
+	modelContent, err := os.ReadFile(modelname)
 
 	if err != nil {
 		return NonMemModel{}, err
 	}
 
 	// Verify contains data reference and extract
-	datafile, err := modelDataFile(modelLines)
+	datafile, err := parser.DataFile(modelContent)
 	if err != nil {
 		return NonMemModel{}, err
 	}
@@ -1035,22 +1004,6 @@ func processNMFEOptions(config configlib.Config) []string {
 	}
 
 	return output
-}
-
-func modelDataFile(modelLines []string) (string, error) {
-	for _, v := range modelLines {
-		if strings.Contains(v, "$DATA") {
-			fields := strings.Fields(v)
-			if len(fields) < 2 {
-				return "", fmt.Errorf("the model file contains a $DATA directive, but doesn't appear to specify "+
-					"a target. %s is the content of the line", v)
-			}
-
-			return fields[1], nil
-		}
-	}
-	// Everything looks good at this point
-	return "", fmt.Errorf("no $DATA line as found in the model file")
 }
 
 func dataFileIsPresent(datafile string, modelpath string) error {
