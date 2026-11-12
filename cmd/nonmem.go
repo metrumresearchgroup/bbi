@@ -264,7 +264,7 @@ func copyFileToDestination(l *NonMemModel, modifyPath bool) error {
 		}
 	}
 
-	stats, err := fs.Stat(l.Path)
+	st, err := fs.Stat(l.Path)
 	if err != nil {
 		return err
 	}
@@ -290,7 +290,7 @@ func copyFileToDestination(l *NonMemModel, modifyPath bool) error {
 
 		// Write the file contents
 		fileContents := strings.Join(sourceLines, "\n")
-		if err = afero.WriteFile(fs, path.Join(l.OutputDir, filename), []byte(fileContents), stats.Mode()); err != nil {
+		if err = afero.WriteFile(fs, path.Join(l.OutputDir, filename), []byte(fileContents), st.Mode()); err != nil {
 			return err
 		}
 	} else {
@@ -300,7 +300,7 @@ func copyFileToDestination(l *NonMemModel, modifyPath bool) error {
 			return fmt.Errorf("unable to read %s: %w", l.Path, err)
 		}
 
-		err = os.WriteFile(path.Join(l.OutputDir, filename), input, stats.Mode())
+		err = os.WriteFile(path.Join(l.OutputDir, filename), input, st.Mode())
 		if err != nil {
 			return fmt.Errorf("unable to write contents %s: %w", l.Path, err)
 		}
