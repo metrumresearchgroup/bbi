@@ -16,7 +16,6 @@ package cmd
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -270,9 +269,8 @@ func copyFileToDestination(l *NonMemModel, modifyPath bool) error {
 		// hence we'll use an alternate implementation of ioutils to make sure hashes match if no modification is needed
 		var sourceLines []string
 		sourceLines, err = utils.ReadLines(l.Path)
-
 		if err != nil {
-			return errors.New("Unable to read the contents of " + l.Path)
+			return fmt.Errorf("unable to read %q: %w", l.Path, err)
 		}
 
 		// We'll use stats for setting the mode of the target file to make sure perms are the same
