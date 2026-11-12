@@ -524,7 +524,7 @@ func writeNonmemConfig(model *NonMemModel) error {
 	return afero.WriteFile(afero.NewOsFs(), path.Join(model.OutputDir, "bbi_config.json"), outBytes, 0640)
 }
 
-func HashFileOnChannel(ch chan string, file string, identifier string) {
+func HashFileOnChannel(ch chan<- string, file string, identifier string) {
 	f, err := os.Open(file)
 	if err != nil {
 		log.Debugf("File requested was %s, Identifier is %s", file, identifier)
