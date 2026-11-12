@@ -257,11 +257,9 @@ func copyFileToDestination(l *NonMemModel, modifyPath bool) error {
 		filename = l.FileName + ".ctl"
 	}
 
-	if exists, _ := afero.DirExists(fs, l.OutputDir); !exists {
-		// Create the directory
-		if err := fs.MkdirAll(l.OutputDir, 0750); err != nil {
-			return err
-		}
+	err := os.MkdirAll(l.OutputDir, 0o750)
+	if err != nil {
+		return err
 	}
 
 	st, err := fs.Stat(l.Path)
